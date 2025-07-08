@@ -1,0 +1,13 @@
+
+[INFO ] 25/07/08-08:47:54:054 - LogPlugin.setLoggerProperties(LogPlugin.java:134) 
+[main]: << Workspace / astlog.home>> : D:\Job\Freelux\Working\TBS_Monitoring\FrL_BLEnetwork_owner\ws
+===========================================================
+
+[INFO ] 25/07/08-08:48:03:003 - Log4A.logInfo(Log4A.java:34) 
+[Worker-0]: ##Detail Info : Check Job (mode is Activation File,File is C:\Users\Admin\.andesight\ast3.2.3_rds\configuration\com.andestech.ide.license.ui\license.lic)
+
+[INFO ] 25/07/08-08:48:03:003 - Log4A.logInfo(Log4A.java:34) 
+[Worker-0]: call TRUE_LICENSE license
+
+[INFO ] 25/07/08-08:48:13:013 - Log4A.logInfo(Log4A.java:34) 
+[main]: call TRUE_LICENSE license

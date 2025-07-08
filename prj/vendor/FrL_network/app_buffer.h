@@ -24,10 +24,6 @@
 #ifndef VENDOR_B91_BLE_SAMPLE_APP_BUFFER_H_
 #define VENDOR_B91_BLE_SAMPLE_APP_BUFFER_H_
 
-
-
-
-
 /**
  * @brief	connMaxRxOctets
  * refer to BLE SPEC "4.5.10 Data PDU length management" & "2.4.2.21 LL_LENGTH_REQ and LL_LENGTH_RSP"
@@ -36,7 +32,6 @@
  */
 #define ACL_CONN_MAX_RX_OCTETS			27
 
-
 /**
  * @brief	connMaxTxOctets
  * refer to BLE SPEC "4.5.10 Data PDU length management" & "2.4.2.21 LL_LENGTH_REQ and LL_LENGTH_RSP"
@@ -44,9 +39,6 @@
  * 1. connMaxTxOctets should be in range of 27 ~ 251
  */
 #define ACL_CONN_MAX_TX_OCTETS			27
-
-
-
 
 /********************* ACL connection LinkLayer TX & RX data FIFO allocation, Begin ************************************************/
 /**
@@ -61,7 +53,6 @@
  */
 #define ACL_RX_FIFO_SIZE				48  // ACL_CONN_MAX_RX_OCTETS + 21, then 16 Byte align
 #define ACL_RX_FIFO_NUM					8	// must be: 2^n
-
 
 /**
  * @brief	ACL TX buffer size & number
@@ -79,20 +70,14 @@
 #define ACL_TX_FIFO_SIZE				48	// ACL_CONN_MAX_TX_OCTETS + 10, then 16 Byte align
 #define ACL_TX_FIFO_NUM					17	// must be: (2^n) + 1
 
-
-
-
-extern	u8	app_acl_rxfifo[];
-extern	u8	app_acl_txfifo[];
+extern u8 app_acl_rxfifo[];
+extern u8 app_acl_txfifo[];
 /******************** ACL connection LinkLayer TX & RX data FIFO allocation, End ***************************************************/
 
 /********************* RX MTU buffer, Begin ********************************/
 
-	#define MTU_SIZE_SETTING   			 80
-
+#define MTU_SIZE_SETTING   			 80
 
 /******************** RX MTU buffer,, End ***********************************/
-
-
 
 #endif /* VENDOR_B91_BLE_SAMPLE_APP_BUFFER_H_ */

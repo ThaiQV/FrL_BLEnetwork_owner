@@ -117,7 +117,7 @@ void array_printf(unsigned char*data, unsigned int len) {
 	printf("}\n");
 }
 #else
-//keep safe, if user call printf func, smp will be wrong, if no printf is used, below can be removed.
+keep safe, if user call printf func, smp will be wrong, if no printf is used, below can be removed.
 __attribute__((used)) int _write(int fd, const unsigned char *buf, int size)
 {
 	return 0;

@@ -24,7 +24,6 @@
 #ifndef SPP_H_
 #define SPP_H_
 
-
 #define SPP_CMD_SET_ADV_INTV								0xFF01
 #define SPP_CMD_SET_ADV_DATA								0xFF02
 
@@ -45,20 +44,17 @@
 #define SPP_CMD_SET_ADV_DIRECT_ADDR							0xFF19
 #define SPP_CMD_SEND_NOTIFY_DATA                            0xFF1C
 
-
-
 typedef struct {
 	u16 cmdId;
 	u16 paramLen;
-	u8  param[0];
+	u8 param[0];
 } spp_cmd_t;
 
-
 typedef struct {
-	u8	token;
-	u8  paramLen;
+	u8 token;
+	u8 paramLen;
 	u16 eventId;
-	u8  param[0];
+	u8 param[0];
 } spp_event_t;
 
 /**
@@ -67,14 +63,14 @@ typedef struct {
  * @param[in]   n - data length
  * @return      0 is ok
  */
-int bls_uart_handler (u8 *p, int n);
+int bls_uart_handler(u8 *p, int n);
 /**
  * @brief		this function is used to process tx uart data to remote device.
  * @param[in]   header - hci event type
  * @param[in]   pEvent - event data
  * @return      0 is ok
  */
-int spp_send_data (u32 header, spp_event_t * pEvt);
+int spp_send_data(u32 header, spp_event_t * pEvt);
 /**
  * @brief		this function is used to restart module.
  * @param[in]	none
@@ -82,5 +78,5 @@ int spp_send_data (u32 header, spp_event_t * pEvt);
  */
 void spp_restart_proc(void);
 
-
+void _uart_send_putchar(unsigned char *buf, int size);
 #endif /* SPP_H_ */

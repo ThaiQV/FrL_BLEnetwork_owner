@@ -37,51 +37,46 @@
 #define 		DUMP_STR_EN                                   		0
 #endif
 
-
 #define			SL_STACK_EN											1
 
-
 #if (DUMP_STR_EN)
-	#define my_usb_init(id, p_print)		myudb_usb_init(id, p_print)
-	#define	usb_send_str(s)					usb_send_str_data(s, 0, 0)
-	#define	usb_send_data(p,n) 				usb_send_str_data(0,p,n)
-	#define my_dump_str_data(en,s,p,n)		if(en){usb_send_str_data(s,(u8*)(p),n);}
-	#define my_dump_str_u32s(en,s,d0,d1,d2,d3)		if(en){usb_send_str_u32s(s,(u32)(d0),(u32)(d1),(u32)(d2),(u32)(d3));}
-	#define my_uart_send_str_data			usb_send_str_data
-	#define	my_uart_send_str_int			usb_send_str_int
-	#define	myudb_usb_handle_irq()			udb_usb_handle_irq()
+#define my_usb_init(id, p_print)		myudb_usb_init(id, p_print)
+#define	usb_send_str(s)					usb_send_str_data(s, 0, 0)
+#define	usb_send_data(p,n) 				usb_send_str_data(0,p,n)
+#define my_dump_str_data(en,s,p,n)		if(en){usb_send_str_data(s,(u8*)(p),n);}
+#define my_dump_str_u32s(en,s,d0,d1,d2,d3)		if(en){usb_send_str_u32s(s,(u32)(d0),(u32)(d1),(u32)(d2),(u32)(d3));}
+#define my_uart_send_str_data			usb_send_str_data
+#define	my_uart_send_str_int			usb_send_str_int
+#define	myudb_usb_handle_irq()			udb_usb_handle_irq()
 #else
-	#define my_usb_init(id, p_print)
-	#define	usb_send_str(s)
-	#define	usb_send_data(p,n)
-	#define my_dump_str_data(en,s,p,n)
-	#define my_dump_str_u32s(en,s,d0,d1,d2,d3)
-	#define my_uart_send_str_data
-	#define	my_uart_send_str_int
-	#define	myudb_usb_handle_irq()
+#define my_usb_init(id, p_print)
+#define	usb_send_str(s)
+#define	usb_send_data(p,n)
+#define my_dump_str_data(en,s,p,n)
+#define my_dump_str_u32s(en,s,d0,d1,d2,d3)
+#define my_uart_send_str_data
+#define	my_uart_send_str_int
+#define	myudb_usb_handle_irq()
 #endif
 
+typedef int (*func_myudb_hci_cmd_cb_t)(unsigned char *, int);
 
+void myudb_register_hci_cb(void *p);
+void myudb_register_hci_debug_cb(void *p);
 
-typedef int (*func_myudb_hci_cmd_cb_t) (unsigned char *, int);
+void myudb_usb_init(u16 id, void * p_print);
 
-void 	myudb_register_hci_cb (void *p);
-void    myudb_register_hci_debug_cb (void *p);
+void myudb_usb_bulkout_ready();
 
-void    myudb_usb_init(u16 id, void * p_print);
+void udb_usb_handle_irq(void);
 
-void 	myudb_usb_bulkout_ready ();
+void usb_send_status_pkt(u8 status, u8 buffer_num, u8 *pkt, u16 len);
 
-void 	udb_usb_handle_irq(void);
+void myudb_capture_enable(int en);
 
-void 	usb_send_status_pkt(u8 status, u8 buffer_num, u8 *pkt, u16 len);
+void usb_send_str_data(char *str, u8 *ph, int n);
 
-void 	myudb_capture_enable (int en);
-
-void 	usb_send_str_data (char *str, u8 *ph, int n);
-
-void 	usb_send_str_u32s (char *str, u32 d0, u32 d1, u32 d2, u32 d3);
-
+void usb_send_str_u32s(char *str, u32 d0, u32 d1, u32 d2, u32 d3);
 
 #define			my_irq_disable()		u32 rie = core_interrupt_disable ()
 #define			my_irq_restore()		core_restore_interrupt(rie)
@@ -98,7 +93,6 @@ void 	usb_send_str_u32s (char *str, u32 d0, u32 d1, u32 d2, u32 d3);
 #define         DEBUG_PORT				GPIO_PB2
 #define			log_ref_gpio_h()		gpio_set_high_level(DEBUG_PORT)
 #define			log_ref_gpio_l()		gpio_set_low_level(DEBUG_PORT)
-
 
 #define	log_hw_ref()			 if(VCD_EN){my_irq_disable();log_ref_gpio_h();log_uart(0x20);int t=get_systemtick();log_uart(t);log_uart(t>>8);log_uart(t>>16);log_ref_gpio_l();my_irq_restore();}
 
@@ -119,15 +113,10 @@ void 	usb_send_str_u32s (char *str, u32 d0, u32 d1, u32 d2, u32 d3);
 //3-byte (11-id-6bits) 16-bit data
 #define	log_b16(en,id,d)		 if(VCD_EN && en) {my_irq_disable();log_uart(0xc0|(id&63));log_uart(d);log_uart((d)>>8);my_irq_restore();}
 
-
-
-
 #define	log_tick_irq(en,id)		 if(VCD_EN && en) {log_uart(0x20|(id));int t=get_systemtick();log_uart(t);log_uart(t>>8);log_uart(t>>16);}
 #define	log_tick_irq_2(en,id,t)	 if(VCD_EN && en) {log_uart(0x20|(id));log_uart(t);log_uart(t>>8);log_uart(t>>16);}
 
-
 #define	log_event_irq(en,id) 	 if(VCD_EN && en) {log_uart(0x00|(id));}
-
 
 #define	log_task_irq(en,id,b)	 if(VCD_EN && en) {log_uart(((b)?0x60:0x40)|(id));int t=get_systemtick();log_uart(t);log_uart(t>>8);log_uart(t>>16);}
 
@@ -137,13 +126,8 @@ void 	usb_send_str_u32s (char *str, u32 d0, u32 d1, u32 d2, u32 d3);
 #define	log_task_begin_irq_2(en,id,t) if(VCD_EN && en) {log_uart(0x60|(id));log_uart(t);log_uart(t>>8);log_uart(t>>16);}
 #define	log_task_end_irq_2(en,id,t) 	 if(VCD_EN && en) {log_uart(0x40|(id));log_uart(t);log_uart(t>>8);log_uart(t>>16);}
 
-
-
 #define	log_b8_irq(en,id,d)		 if(VCD_EN && en) {log_uart(0x80|(id));log_uart(d);}
 
 #define	log_b16_irq(en,id,d)	 if(VCD_EN && en) {log_uart(0xc0|(id));log_uart(d);log_uart((d)>>8);}
-
-
-
 
 #endif

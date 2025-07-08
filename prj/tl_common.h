@@ -48,4 +48,6 @@
 
 #include "gpio_default.h"
 
+#include "Freelux_libs/plog.h"
+
 #endif /* TL_COMMON_H_ */

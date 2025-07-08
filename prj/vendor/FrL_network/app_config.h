@@ -24,14 +24,14 @@
 #pragma once
 
 /////////////////// MODULE /////////////////////////////////
-#define BLE_MODULE_PM_ENABLE				1
-#define PM_DEEPSLEEP_RETENTION_ENABLE		1
+#define BLE_MODULE_PM_ENABLE				0
+#define PM_DEEPSLEEP_RETENTION_ENABLE		0
 #define TELIK_SPP_SERVICE_ENABLE			1
 #define BLE_MODULE_INDICATE_DATA_TO_MCU		1
 #define BATT_CHECK_ENABLE       			0   //enable or disable battery voltage detection
 #define BLT_APP_LED_ENABLE					1
 
-#define UART_DMA_USE						1
+#define UART_DMA_USE						0
 
 /**
  *  @brief  flash firmware check
@@ -57,22 +57,6 @@
 #define USED_DEEP_ANA_REG                   DEEP_ANA_REG1 //u8,can save 8 bit info when deep
 #define	LOW_BATT_FLG					    BIT(0)
 
-#if (BATT_CHECK_ENABLE)
-#define VBAT_CHANNEL_EN						0
-
-#if VBAT_CHANNEL_EN
-/**		The battery voltage sample range is 1.8~3.5V    **/
-#else
-/** 	if the battery voltage > 3.6V, should take some external voltage divider	**/
-#define GPIO_BAT_DETECT					GPIO_PB0
-#define PB0_FUNC						AS_GPIO
-#define PB0_INPUT_ENABLE				0
-#define PB0_OUTPUT_ENABLE				0
-#define PB0_DATA_OUT					0
-#define ADC_INPUT_PIN_CHN				ADC_GPIO_PB0
-#endif
-#endif
-
 //////////////////// LED CONFIG (EVK board) ///////////////////////////
 #if BLT_APP_LED_ENABLE
 #define LED_ON_LEVAL 					1 			//gpio output high voltage to turn on led
@@ -91,25 +75,6 @@
 #define PB5_OUTPUT_ENABLE				1
 #define	PB4_OUTPUT_ENABLE				1
 #endif
-
-//////////////////////////// MODULE PM GPIO	(EVK board) /////////////////////////////////
-#define GPIO_WAKEUP_MODULE					GPIO_PA2   //mcu wakeup module
-#define	PA2_FUNC							AS_GPIO
-#define PA2_INPUT_ENABLE					1
-#define	PA2_OUTPUT_ENABLE					0
-#define	PA2_DATA_OUT						0
-#define GPIO_WAKEUP_MODULE_HIGH				gpio_setup_up_down_resistor(GPIO_WAKEUP_MODULE, PM_PIN_PULLUP_10K);
-#define GPIO_WAKEUP_MODULE_LOW				gpio_setup_up_down_resistor(GPIO_WAKEUP_MODULE, PM_PIN_PULLDOWN_100K);
-
-#define GPIO_WAKEUP_MCU						GPIO_PA1   //module wakeup mcu
-#define	PA1_FUNC							AS_GPIO
-#define PA1_INPUT_ENABLE					1
-#define	PA1_OUTPUT_ENABLE					1
-#define	PA1_DATA_OUT						0
-#define GPIO_WAKEUP_MCU_HIGH				do{gpio_set_output_en(GPIO_WAKEUP_MCU, 1); gpio_write(GPIO_WAKEUP_MCU, 1);}while(0)
-#define GPIO_WAKEUP_MCU_LOW					do{gpio_set_output_en(GPIO_WAKEUP_MCU, 1); gpio_write(GPIO_WAKEUP_MCU, 0);}while(0)
-#define GPIO_WAKEUP_MCU_FLOAT				do{gpio_set_output_en(GPIO_WAKEUP_MCU, 0); gpio_write(GPIO_WAKEUP_MCU, 0);}while(0)
-
 /////////////////////HCI UART variables///////////////////////////////////////
 /*----------------------------------------------*
  *	SPP TX FIFO  = 2 Bytes LEN + n Bytes Data.	*
