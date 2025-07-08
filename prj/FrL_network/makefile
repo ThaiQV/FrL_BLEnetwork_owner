@@ -67,18 +67,6 @@ $(SECONDARY_OUTPUT_PATH)/pwr \
 GCOV_OUT += \
 $(foreach subdir,$(SUBDIRS),$(wildcard $(subdir)/*.gcda) $(wildcard $(subdir)/*.gcno)) \
 
-SYMBOL_OUTPUTS += \
-$(SECONDARY_OUTPUT_PATH)/symbol.txt \
-
-READELF_OUTPUTS += \
-$(SECONDARY_OUTPUT_PATH)/readelf.txt \
-
-OBJDUMP_OUTPUTS += \
-$(SECONDARY_OUTPUT_PATH)/objdump.txt \
-
-SIZE_OUTPUTS += \
-$(SECONDARY_OUTPUT_PATH)/.PHONY.size \
-
 
 # All Target
 all: FrL_network.elf secondary-outputs
@@ -96,46 +84,22 @@ $(foreach subdir,$(SUBDIRS),$(wildcard $(subdir)/*.gcda) $(wildcard $(subdir)/*.
 ../gmon.sum ../gmon.out: FrL_network.elf $(OBJS) $(USER_OBJS)
 $(SECONDARY_OUTPUT_PATH)/pwr: FrL_network.elf $(OBJS) $(USER_OBJS)
 
-$(SECONDARY_OUTPUT_PATH)/symbol.txt: $(LINKER_OUTPUTS)
-	@echo 'Invoking: NM (symbol listing)'
-	$(CROSS_COMPILE)nm -n -l -C "FrL_network.elf" > $(SECONDARY_OUTPUT_PATH)/symbol.txt
-	@echo 'Finished building: $@'
-	@echo ' '
-
-$(SECONDARY_OUTPUT_PATH)/readelf.txt: $(LINKER_OUTPUTS)
-	@echo 'Invoking: Readelf (ELF info listing)'
-	$(CROSS_COMPILE)readelf -a "FrL_network.elf" > $(SECONDARY_OUTPUT_PATH)/readelf.txt
-	@echo 'Finished building: $@'
-	@echo ' '
-
-$(SECONDARY_OUTPUT_PATH)/objdump.txt: $(LINKER_OUTPUTS)
-	@echo 'Invoking: Objdump (disassembly)'
-	$(CROSS_COMPILE)objdump -x -d -C "FrL_network.elf" > $(SECONDARY_OUTPUT_PATH)/objdump.txt
-	@echo 'Finished building: $@'
-	@echo ' '
-
 : $(LINKER_OUTPUTS)
-	@echo 'Invoking: Objcopy (object content copy)'
-	$(CROSS_COMPILE)objcopy -S -O binary "FrL_network.elf"
-	@echo 'Finished building: $@'
-	@echo ' '
-
-$(SECONDARY_OUTPUT_PATH)/.PHONY.size: $(LINKER_OUTPUTS)
-	@echo 'Invoking: Size (section size listing)'
-	$(CROSS_COMPILE)size  "FrL_network.elf" | tee $(SECONDARY_OUTPUT_PATH)/.PHONY.size
+	@echo 'Invoking: NM (symbol listing)'
+	$(CROSS_COMPILE)nm -n -l -C "FrL_network.elf" >
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(GPROF_OUT)$(PWR_OUT)$(SIZE_OUTPUTS)$(READELF_OUTPUTS)$(EXECUTABLES)$(OBJDUMP_OUTPUTS)$(OBJS)$(SYMBOL_OUTPUTS)$(S_UPPER_DEPS)$(GCOV_OUT)$(C_DEPS) FrL_network.elf
+	-$(RM) $(GPROF_OUT)$(PWR_OUT)$(EXECUTABLES)$(OBJS)$(S_UPPER_DEPS)$(GCOV_OUT)$(C_DEPS) FrL_network.elf
 	-@echo ' '
 
 post-build:
 	-"D:\Job\Freelux\Working\TBS_Monitoring\FrL_BLEnetwork_owner\prj/tl_check_fw.bat"   FrL_network
 	-@echo ' '
 
-secondary-outputs: $(SYMBOL_OUTPUTS) $(READELF_OUTPUTS) $(OBJDUMP_OUTPUTS) $(SIZE_OUTPUTS)
+secondary-outputs:
 
 .PHONY: all clean dependents
 .SECONDARY: post-build

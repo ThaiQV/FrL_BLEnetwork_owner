@@ -31,7 +31,7 @@
 #define BATT_CHECK_ENABLE       			0   //enable or disable battery voltage detection
 #define BLT_APP_LED_ENABLE					1
 
-#define UART_DMA_USE						0
+#define UART_DMA_USE						1
 
 /**
  *  @brief  flash firmware check
@@ -45,6 +45,21 @@
 
 //////////////// SMP SETTING  //////////////////////////////
 #define BLE_SECURITY_ENABLE 			   	1
+
+/**
+ *  @brief  DEBUG  Configuration
+ */
+#define UART_PRINT_DEBUG_ENABLE  			1
+/////////////////////////////////////// PRINT DEBUG INFO ///////////////////////////////////////
+#if (UART_PRINT_DEBUG_ENABLE)
+//the baud rate should not bigger than 115200 when MCU clock is 16M)
+//the baud rate should not bigger than 1000000 when MCU clock is 24M)
+#define PRINT_BAUD_RATE             		115200
+#define DEBUG_INFO_TX_PIN           		GPIO_PD3
+#define PULL_WAKEUP_SRC_PD3         		PM_PIN_PULLUP_10K
+#define PD3_OUTPUT_ENABLE         			1
+#define PD3_DATA_OUT                     	1 //must
+#endif
 
 ////////////////////////UART INIT///////////////////////////
 #define PB2_OUTPUT_ENABLE					1

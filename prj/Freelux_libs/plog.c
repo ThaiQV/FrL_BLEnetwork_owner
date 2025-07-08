@@ -33,7 +33,7 @@ void _ATCmdTest(type_debug_t _type, void * arg);
 /***                           Private definitions                           **/
 /******************************************************************************/
 /******************************************************************************/
-typedef int (*plog_putchar_func) (unsigned char *p, int s);
+typedef void (*plog_putchar_func)(unsigned char *p, int s);
 
 typedef struct {
 	type_debug_t type;
@@ -58,13 +58,12 @@ const plog_cmd_t plog_cmd[] = { { DRV, (const char *) "p drv", _set_plog }, { IN
 //---------------------------------------
 		{ PLEND, (const char *) "None", NULL }, };
 
-
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
 /******************************************************************************/
 /******************************************************************************/
-plog_putchar_func plog_putchar;
+plog_putchar_func plog_putchar = NULL;
 /******************************************************************************/
 /******************************************************************************/
 /***                            Private functions                            **/
@@ -203,18 +202,3 @@ void PLOG_DEVICE_PROFILE(fl_version_t _bootloader, fl_version_t _fw, fl_version_
 void PLOG_HELP(void) {
 	_help(HELP, 0);
 }
-/****************************************************************************************************
- * @brief 		init putchar functions
- *
- * @param[in] 	none
- *
- * @return	  	none
- *
- */
-//void PLOG_Init(void* pfunc){
-//	plog_putchar = (plog_putchar_func*)pfunc;
-//}
-//
-//__attribute__((used)) int _write(int fd, const unsigned char *buf, int size) {
-//	plog_putchar(buf,size);
-//}

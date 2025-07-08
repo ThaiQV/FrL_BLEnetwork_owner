@@ -422,15 +422,24 @@
 								<option defaultValue="-g" id="nds.both.asm.option.flags.91506538" name="Assembler flags" superClass="nds.both.asm.option.flags" valueType="string"/>
 								<inputType id="tool.nds.assembler.input.461082924" superClass="tool.nds.assembler.input"/>
 							</tool>
-							<tool id="tool.nds32le-elf-mculib-v5f.nm.base.1799632875" name="NM (symbol listing)" superClass="tool.nds32le-elf-mculib-v5f.nm.base"/>
-							<tool id="tool.nds32le-elf-mculib-v5f.readelf.base.1975541611" name="Readelf (ELF info listing)" superClass="tool.nds32le-elf-mculib-v5f.readelf.base"/>
+							<tool id="tool.nds32le-elf-mculib-v5f.nm.base.1799632875" name="NM (symbol listing)" superClass="tool.nds32le-elf-mculib-v5f.nm.base">
+								<option id="nds.nm.option.disable.901181601" superClass="nds.nm.option.disable" value="true" valueType="boolean"/>
+							</tool>
+							<tool id="tool.nds32le-elf-mculib-v5f.readelf.base.1975541611" name="Readelf (ELF info listing)" superClass="tool.nds32le-elf-mculib-v5f.readelf.base">
+								<option id="nds.readelf.option.disable.608378880" superClass="nds.readelf.option.disable" value="true" valueType="boolean"/>
+							</tool>
 							<tool id="tool.nds32le-elf-mculib-v5f.objdump.base.970433946" name="Objdump (disassembly)" superClass="tool.nds32le-elf-mculib-v5f.objdump.base">
-								<option id="nds.objdump.option.disable.1439697828" name="Disable. (Do not auto-generate output file.)" superClass="nds.objdump.option.disable" value="false" valueType="boolean"/>
+								<option id="nds.objdump.option.disable.1439697828" name="Disable. (Do not auto-generate output file.)" superClass="nds.objdump.option.disable" value="true" valueType="boolean"/>
 							</tool>
 							<tool id="tool.nds32le-elf-mculib-v5f.objcopy.base.534089381" name="Objcopy (object content copy)" superClass="tool.nds32le-elf-mculib-v5f.objcopy.base">
 								<option id="nds.objcopy.option.disable.1405239765" name="Disable. (Do not auto-generate output file.)" superClass="nds.objcopy.option.disable" value="true" valueType="boolean"/>
+								<option id="nds.objcopy.option.outputformat.539914" name="Create an output file in format" superClass="nds.objcopy.option.outputformat" value="nds.objcopy.option.outputformat.ihex" valueType="enumerated"/>
+								<option id="nds.objcopy.option.discardlocals.1617454588" name="Remove any compiler-generated symbols. (-X)" superClass="nds.objcopy.option.discardlocals" value="false" valueType="boolean"/>
+								<option id="nds.objcopy.option.stripall.1868974133" name="Remove all symbol and relocation information. (-S)" superClass="nds.objcopy.option.stripall" value="false" valueType="boolean"/>
 							</tool>
-							<tool id="tool.nds32le-elf-mculib-v5f.size.base.743675506" name="Size (section size listing)" superClass="tool.nds32le-elf-mculib-v5f.size.base"/>
+							<tool id="tool.nds32le-elf-mculib-v5f.size.base.743675506" name="Size (section size listing)" superClass="tool.nds32le-elf-mculib-v5f.size.base">
+								<option id="nds.size.option.disable.918008962" name="Disable. (Do not auto-generate output file.)" superClass="nds.size.option.disable" value="true" valueType="boolean"/>
+							</tool>
 							<tool id="tool.nds32le-elf-mculib-v5f.ldsag.base.1516938642" name="LdSaG Tool" superClass="tool.nds32le-elf-mculib-v5f.ldsag.base"/>
 						</toolChain>
 					</folderInfo>

@@ -55,7 +55,7 @@
 /**
  *  @brief  DEBUG  Configuration
  */
-#define UART_PRINT_DEBUG_ENABLE  			0
+#define UART_PRINT_DEBUG_ENABLE  			1
 #define DEBUG_GPIO_ENABLE					0
 #define JTAG_DEBUG_ENABLE					0
 

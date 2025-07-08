@@ -1,17 +1,294 @@
-14:17:30 **** Incremental Build of configuration FrL_network for project FrL_BLE_network ****
+16:41:22 **** Incremental Build of configuration FrL_network for project FrL_BLE_network ****
 make -j4 all 
+Building file: ../3rd-party/freertos-V5/croutine.c
+Building file: ../3rd-party/freertos-V5/event_groups.c
+Building file: ../3rd-party/freertos-V5/list.c
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"3rd-party/freertos-V5/croutine.d" -MT"3rd-party/freertos-V5/croutine.d 3rd-party/freertos-V5/croutine.o" -o "3rd-party/freertos-V5/croutine.o" "../3rd-party/freertos-V5/croutine.c"
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"3rd-party/freertos-V5/event_groups.d" -MT"3rd-party/freertos-V5/event_groups.d 3rd-party/freertos-V5/event_groups.o" -o "3rd-party/freertos-V5/event_groups.o" "../3rd-party/freertos-V5/event_groups.c"
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"3rd-party/freertos-V5/list.d" -MT"3rd-party/freertos-V5/list.d 3rd-party/freertos-V5/list.o" -o "3rd-party/freertos-V5/list.o" "../3rd-party/freertos-V5/list.c"
+Building file: ../3rd-party/freertos-V5/queue.c
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"3rd-party/freertos-V5/queue.d" -MT"3rd-party/freertos-V5/queue.d 3rd-party/freertos-V5/queue.o" -o "3rd-party/freertos-V5/queue.o" "../3rd-party/freertos-V5/queue.c"
+Finished building: ../3rd-party/freertos-V5/croutine.c
+Finished building: ../3rd-party/freertos-V5/event_groups.c
+Finished building: ../3rd-party/freertos-V5/list.c
+ 
+ 
+ 
+Building file: ../3rd-party/freertos-V5/stream_buffer.c
+Building file: ../3rd-party/freertos-V5/tasks.c
+Building file: ../3rd-party/freertos-V5/timers.c
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"3rd-party/freertos-V5/stream_buffer.d" -MT"3rd-party/freertos-V5/stream_buffer.d 3rd-party/freertos-V5/stream_buffer.o" -o "3rd-party/freertos-V5/stream_buffer.o" "../3rd-party/freertos-V5/stream_buffer.c"
+Finished building: ../3rd-party/freertos-V5/queue.c
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"3rd-party/freertos-V5/timers.d" -MT"3rd-party/freertos-V5/timers.d 3rd-party/freertos-V5/timers.o" -o "3rd-party/freertos-V5/timers.o" "../3rd-party/freertos-V5/timers.c"
+ 
+Invoking: Andes C Compiler
+Building file: ../3rd-party/freertos-V5/portable/GCC/RISC-V/port.c
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"3rd-party/freertos-V5/tasks.d" -MT"3rd-party/freertos-V5/tasks.d 3rd-party/freertos-V5/tasks.o" -o "3rd-party/freertos-V5/tasks.o" "../3rd-party/freertos-V5/tasks.c"
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"3rd-party/freertos-V5/portable/GCC/RISC-V/port.d" -MT"3rd-party/freertos-V5/portable/GCC/RISC-V/port.d 3rd-party/freertos-V5/portable/GCC/RISC-V/port.o" -o "3rd-party/freertos-V5/portable/GCC/RISC-V/port.o" "../3rd-party/freertos-V5/portable/GCC/RISC-V/port.c"
+Finished building: ../3rd-party/freertos-V5/stream_buffer.c
+Finished building: ../3rd-party/freertos-V5/timers.c
+ 
+ 
+Building file: ../3rd-party/freertos-V5/portable/MemMang/heap_4.c
+Finished building: ../3rd-party/freertos-V5/tasks.c
+Building file: ../3rd-party/freertos-V5/portable/MemMang/memory_impl.c
+Invoking: Andes C Compiler
+ 
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"3rd-party/freertos-V5/portable/MemMang/heap_4.d" -MT"3rd-party/freertos-V5/portable/MemMang/heap_4.d 3rd-party/freertos-V5/portable/MemMang/heap_4.o" -o "3rd-party/freertos-V5/portable/MemMang/heap_4.o" "../3rd-party/freertos-V5/portable/MemMang/heap_4.c"
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"3rd-party/freertos-V5/portable/MemMang/memory_impl.d" -MT"3rd-party/freertos-V5/portable/MemMang/memory_impl.d 3rd-party/freertos-V5/portable/MemMang/memory_impl.o" -o "3rd-party/freertos-V5/portable/MemMang/memory_impl.o" "../3rd-party/freertos-V5/portable/MemMang/memory_impl.c"
+Finished building: ../3rd-party/freertos-V5/portable/GCC/RISC-V/port.c
+ 
 Building file: ../Freelux_libs/plog.c
+Building file: ../application/app/usbaud.c
 Invoking: Andes C Compiler
 riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"Freelux_libs/plog.d" -MT"Freelux_libs/plog.d Freelux_libs/plog.o" -o "Freelux_libs/plog.o" "../Freelux_libs/plog.c"
-../Freelux_libs/plog.c: In function 'PLG_PrintHexBuffer':
-../Freelux_libs/plog.c:164:11: warning: unused variable 'buffer' [-Wunused-variable]
-  uint8_t *buffer = (uint8_t*) &buffer_p;
-           ^~~~~~
-../Freelux_libs/plog.c: In function 'PLOG_DEVICE_PROFILE':
-../Freelux_libs/plog.c:187:13: warning: unused variable 'device_info' [-Wunused-variable]
-  const char device_info[] = "\n*****************************************\n"
-             ^~~~~~~~~~~
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"application/app/usbaud.d" -MT"application/app/usbaud.d application/app/usbaud.o" -o "application/app/usbaud.o" "../application/app/usbaud.c"
+Finished building: ../3rd-party/freertos-V5/portable/MemMang/memory_impl.c
+Finished building: ../3rd-party/freertos-V5/portable/MemMang/heap_4.c
+ 
+ 
+Building file: ../application/app/usbkb.c
+Building file: ../application/app/usbmouse.c
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"application/app/usbkb.d" -MT"application/app/usbkb.d application/app/usbkb.o" -o "application/app/usbkb.o" "../application/app/usbkb.c"
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"application/app/usbmouse.d" -MT"application/app/usbmouse.d application/app/usbmouse.o" -o "application/app/usbmouse.o" "../application/app/usbmouse.c"
 Finished building: ../Freelux_libs/plog.c
+ 
+Building file: ../application/audio/adpcm.c
+Finished building: ../application/app/usbaud.c
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"application/audio/adpcm.d" -MT"application/audio/adpcm.d application/audio/adpcm.o" -o "application/audio/adpcm.o" "../application/audio/adpcm.c"
+ 
+Building file: ../application/audio/tl_audio.c
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"application/audio/tl_audio.d" -MT"application/audio/tl_audio.d application/audio/tl_audio.o" -o "application/audio/tl_audio.o" "../application/audio/tl_audio.c"
+Finished building: ../application/app/usbmouse.c
+ 
+Building file: ../application/keyboard/keyboard.c
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"application/keyboard/keyboard.d" -MT"application/keyboard/keyboard.d application/keyboard/keyboard.o" -o "application/keyboard/keyboard.o" "../application/keyboard/keyboard.c"
+Finished building: ../application/app/usbkb.c
+Finished building: ../application/audio/adpcm.c
+ 
+ 
+Building file: ../application/print/printf.c
+Building file: ../application/usbstd/usb.c
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"application/print/printf.d" -MT"application/print/printf.d application/print/printf.o" -o "application/print/printf.o" "../application/print/printf.c"
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"application/usbstd/usb.d" -MT"application/usbstd/usb.d application/usbstd/usb.o" -o "application/usbstd/usb.o" "../application/usbstd/usb.c"
+Finished building: ../application/audio/tl_audio.c
+ 
+Building file: ../application/usbstd/usbdesc.c
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"application/usbstd/usbdesc.d" -MT"application/usbstd/usbdesc.d application/usbstd/usbdesc.o" -o "application/usbstd/usbdesc.o" "../application/usbstd/usbdesc.c"
+Finished building: ../application/keyboard/keyboard.c
+ 
+Building file: ../common/plic_isr.c
+Finished building: ../application/usbstd/usb.c
+Invoking: Andes C Compiler
+ 
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"common/plic_isr.d" -MT"common/plic_isr.d common/plic_isr.o" -o "common/plic_isr.o" "../common/plic_isr.c"
+Finished building: ../application/print/printf.c
+Building file: ../common/utility.c
+ 
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"common/utility.d" -MT"common/utility.d common/utility.o" -o "common/utility.o" "../common/utility.c"
+Building file: ../common/usb_dbg/myudb_usb.c
+Invoking: Andes C Compiler
+Finished building: ../application/usbstd/usbdesc.c
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"common/usb_dbg/myudb_usb.d" -MT"common/usb_dbg/myudb_usb.d common/usb_dbg/myudb_usb.o" -o "common/usb_dbg/myudb_usb.o" "../common/usb_dbg/myudb_usb.c"
+ 
+Building file: ../common/usb_dbg/myudb_usbdesc.c
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"common/usb_dbg/myudb_usbdesc.d" -MT"common/usb_dbg/myudb_usbdesc.d common/usb_dbg/myudb_usbdesc.o" -o "common/usb_dbg/myudb_usbdesc.o" "../common/usb_dbg/myudb_usbdesc.c"
+Finished building: ../common/usb_dbg/myudb_usb.c
+ 
+Finished building: ../common/utility.c
+Building file: ../drivers/B91/adc.c
+ 
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"drivers/B91/adc.d" -MT"drivers/B91/adc.d drivers/B91/adc.o" -o "drivers/B91/adc.o" "../drivers/B91/adc.c"
+Finished building: ../common/usb_dbg/myudb_usbdesc.c
+Building file: ../drivers/B91/aes.c
+Finished building: ../common/plic_isr.c
+Invoking: Andes C Compiler
+ 
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"drivers/B91/aes.d" -MT"drivers/B91/aes.d drivers/B91/aes.o" -o "drivers/B91/aes.o" "../drivers/B91/aes.c"
+ 
+Building file: ../drivers/B91/analog.c
+Building file: ../drivers/B91/audio.c
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"drivers/B91/analog.d" -MT"drivers/B91/analog.d drivers/B91/analog.o" -o "drivers/B91/analog.o" "../drivers/B91/analog.c"
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"drivers/B91/audio.d" -MT"drivers/B91/audio.d drivers/B91/audio.o" -o "drivers/B91/audio.o" "../drivers/B91/audio.c"
+Finished building: ../drivers/B91/aes.c
+ 
+Building file: ../drivers/B91/clock.c
+Finished building: ../drivers/B91/adc.c
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"drivers/B91/clock.d" -MT"drivers/B91/clock.d drivers/B91/clock.o" -o "drivers/B91/clock.o" "../drivers/B91/clock.c"
+ 
+Building file: ../drivers/B91/flash.c
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"drivers/B91/flash.d" -MT"drivers/B91/flash.d drivers/B91/flash.o" -o "drivers/B91/flash.o" "../drivers/B91/flash.c"
+Finished building: ../drivers/B91/analog.c
+ 
+Building file: ../drivers/B91/gpio.c
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"drivers/B91/gpio.d" -MT"drivers/B91/gpio.d drivers/B91/gpio.o" -o "drivers/B91/gpio.o" "../drivers/B91/gpio.c"
+Finished building: ../drivers/B91/clock.c
+ 
+Building file: ../drivers/B91/i2c.c
+Finished building: ../drivers/B91/audio.c
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"drivers/B91/i2c.d" -MT"drivers/B91/i2c.d drivers/B91/i2c.o" -o "drivers/B91/i2c.o" "../drivers/B91/i2c.c"
+ 
+Building file: ../drivers/B91/lpc.c
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"drivers/B91/lpc.d" -MT"drivers/B91/lpc.d drivers/B91/lpc.o" -o "drivers/B91/lpc.o" "../drivers/B91/lpc.c"
+Finished building: ../drivers/B91/flash.c
+Finished building: ../drivers/B91/gpio.c
+ 
+ 
+Building file: ../drivers/B91/mdec.c
+Building file: ../drivers/B91/pwm.c
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"drivers/B91/mdec.d" -MT"drivers/B91/mdec.d drivers/B91/mdec.o" -o "drivers/B91/mdec.o" "../drivers/B91/mdec.c"
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"drivers/B91/pwm.d" -MT"drivers/B91/pwm.d drivers/B91/pwm.o" -o "drivers/B91/pwm.o" "../drivers/B91/pwm.c"
+Finished building: ../drivers/B91/lpc.c
+ 
+Finished building: ../drivers/B91/i2c.c
+Building file: ../drivers/B91/s7816.c
+ 
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"drivers/B91/s7816.d" -MT"drivers/B91/s7816.d drivers/B91/s7816.o" -o "drivers/B91/s7816.o" "../drivers/B91/s7816.c"
+Building file: ../drivers/B91/spi.c
+Finished building: ../drivers/B91/mdec.c
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"drivers/B91/spi.d" -MT"drivers/B91/spi.d drivers/B91/spi.o" -o "drivers/B91/spi.o" "../drivers/B91/spi.c"
+ 
+Building file: ../drivers/B91/stimer.c
+Finished building: ../drivers/B91/pwm.c
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"drivers/B91/stimer.d" -MT"drivers/B91/stimer.d drivers/B91/stimer.o" -o "drivers/B91/stimer.o" "../drivers/B91/stimer.c"
+ 
+Building file: ../drivers/B91/timer.c
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"drivers/B91/timer.d" -MT"drivers/B91/timer.d drivers/B91/timer.o" -o "drivers/B91/timer.o" "../drivers/B91/timer.c"
+Finished building: ../drivers/B91/s7816.c
+Finished building: ../drivers/B91/stimer.c
+ 
+ 
+Building file: ../drivers/B91/uart.c
+Building file: ../drivers/B91/usbhw.c
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"drivers/B91/uart.d" -MT"drivers/B91/uart.d drivers/B91/uart.o" -o "drivers/B91/uart.o" "../drivers/B91/uart.c"
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"drivers/B91/usbhw.d" -MT"drivers/B91/usbhw.d drivers/B91/usbhw.o" -o "drivers/B91/usbhw.o" "../drivers/B91/usbhw.c"
+Finished building: ../drivers/B91/timer.c
+ 
+Building file: ../drivers/B91/ext_driver/software_pa.c
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"drivers/B91/ext_driver/software_pa.d" -MT"drivers/B91/ext_driver/software_pa.d drivers/B91/ext_driver/software_pa.o" -o "drivers/B91/ext_driver/software_pa.o" "../drivers/B91/ext_driver/software_pa.c"
+Finished building: ../drivers/B91/usbhw.c
+ 
+Building file: ../drivers/B91/flash/flash_mid146085.c
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"drivers/B91/flash/flash_mid146085.d" -MT"drivers/B91/flash/flash_mid146085.d drivers/B91/flash/flash_mid146085.o" -o "drivers/B91/flash/flash_mid146085.o" "../drivers/B91/flash/flash_mid146085.c"
+Finished building: ../drivers/B91/spi.c
+Finished building: ../drivers/B91/ext_driver/software_pa.c
+ 
+ 
+Finished building: ../drivers/B91/uart.c
+Building file: ../drivers/B91/flash/flash_mid156085.c
+Building file: ../drivers/B91/flash/flash_mid166085.c
+ 
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"drivers/B91/flash/flash_mid156085.d" -MT"drivers/B91/flash/flash_mid156085.d drivers/B91/flash/flash_mid156085.o" -o "drivers/B91/flash/flash_mid156085.o" "../drivers/B91/flash/flash_mid156085.c"
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"drivers/B91/flash/flash_mid166085.d" -MT"drivers/B91/flash/flash_mid166085.d drivers/B91/flash/flash_mid166085.o" -o "drivers/B91/flash/flash_mid166085.o" "../drivers/B91/flash/flash_mid166085.c"
+Finished building: ../drivers/B91/flash/flash_mid146085.c
+ 
+Building file: ../vendor/FrL_network/app.c
+Building file: ../vendor/FrL_network/app_att.c
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"vendor/FrL_network/app.d" -MT"vendor/FrL_network/app.d vendor/FrL_network/app.o" -o "vendor/FrL_network/app.o" "../vendor/FrL_network/app.c"
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"vendor/FrL_network/app_att.d" -MT"vendor/FrL_network/app_att.d vendor/FrL_network/app_att.o" -o "vendor/FrL_network/app_att.o" "../vendor/FrL_network/app_att.c"
+Finished building: ../drivers/B91/flash/flash_mid156085.c
+Finished building: ../drivers/B91/flash/flash_mid166085.c
+ 
+ 
+Building file: ../vendor/FrL_network/app_buffer.c
+Building file: ../vendor/FrL_network/main.c
+Invoking: Andes C Compiler
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"vendor/FrL_network/app_buffer.d" -MT"vendor/FrL_network/app_buffer.d vendor/FrL_network/app_buffer.o" -o "vendor/FrL_network/app_buffer.o" "../vendor/FrL_network/app_buffer.c"
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"vendor/FrL_network/main.d" -MT"vendor/FrL_network/main.d vendor/FrL_network/main.o" -o "vendor/FrL_network/main.o" "../vendor/FrL_network/main.c"
+Finished building: ../vendor/FrL_network/app_att.c
+Finished building: ../vendor/FrL_network/app.c
+ 
+ 
+Building file: ../vendor/FrL_network/spp.c
+Building file: ../vendor/common/battery_check.c
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"vendor/FrL_network/spp.d" -MT"vendor/FrL_network/spp.d vendor/FrL_network/spp.o" -o "vendor/FrL_network/spp.o" "../vendor/FrL_network/spp.c"
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"vendor/common/battery_check.d" -MT"vendor/common/battery_check.d vendor/common/battery_check.o" -o "vendor/common/battery_check.o" "../vendor/common/battery_check.c"
+Finished building: ../vendor/FrL_network/app_buffer.c
+ 
+Building file: ../vendor/common/blt_common.c
+Finished building: ../vendor/FrL_network/main.c
+Invoking: Andes C Compiler
+ 
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"vendor/common/blt_common.d" -MT"vendor/common/blt_common.d vendor/common/blt_common.o" -o "vendor/common/blt_common.o" "../vendor/common/blt_common.c"
+Building file: ../vendor/common/blt_fw_sign.c
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"vendor/common/blt_fw_sign.d" -MT"vendor/common/blt_fw_sign.d vendor/common/blt_fw_sign.o" -o "vendor/common/blt_fw_sign.o" "../vendor/common/blt_fw_sign.c"
+Finished building: ../vendor/common/battery_check.c
+ 
+Building file: ../vendor/common/blt_led.c
+Finished building: ../vendor/FrL_network/spp.c
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"vendor/common/blt_led.d" -MT"vendor/common/blt_led.d vendor/common/blt_led.o" -o "vendor/common/blt_led.o" "../vendor/common/blt_led.c"
+ 
+Building file: ../vendor/common/blt_soft_timer.c
+Finished building: ../vendor/common/blt_common.c
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"vendor/common/blt_soft_timer.d" -MT"vendor/common/blt_soft_timer.d vendor/common/blt_soft_timer.o" -o "vendor/common/blt_soft_timer.o" "../vendor/common/blt_soft_timer.c"
+ 
+Finished building: ../vendor/common/blt_fw_sign.c
+Building file: ../vendor/common/common_dbg.c
+ 
+Invoking: Andes C Compiler
+Building file: ../vendor/common/custom_pair.c
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"vendor/common/common_dbg.d" -MT"vendor/common/common_dbg.d vendor/common/common_dbg.o" -o "vendor/common/common_dbg.o" "../vendor/common/common_dbg.c"
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"vendor/common/custom_pair.d" -MT"vendor/common/custom_pair.d vendor/common/custom_pair.o" -o "vendor/common/custom_pair.o" "../vendor/common/custom_pair.c"
+Finished building: ../vendor/common/blt_led.c
+ 
+Finished building: ../vendor/common/blt_soft_timer.c
+Building file: ../vendor/common/flash_fw_check.c
+Finished building: ../vendor/common/common_dbg.c
+ 
+Invoking: Andes C Compiler
+riscv32-elf-gcc -DCHIP_TYPE=CHIP_TYPE_9518 -D__PROJECT_FRL_NETWORK__=1 -I"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj" -I../drivers/B91 -I../vendor/Common -I../common -O2 -mcmodel=medium -flto -g3 -Wall -mcpu=d25f -ffunction-sections -fdata-sections -c -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -MMD -MP -MF"vendor/common/flash_fw_check.d" -MT"vendor/common/flash_fw_check.d vendor/common/flash_fw_check.o" -o "vendor/common/flash_fw_check.o" "../vendor/common/flash_fw_check.c"
+ 
+Finished building: ../vendor/common/custom_pair.c
+ 
+Finished building: ../vendor/common/flash_fw_check.c
  
 Building target: FrL_network.elf
 Invoking: Andes C Linker
@@ -35,24 +312,6 @@ output done!
 D:\Job\Freelux\Working\TBS_Monitoring\FrL_BLEnetwork_owner\prj\FrL_network>echo "**************** end of post build ******************" 
 "**************** end of post build ******************"
  
-Invoking: NM (symbol listing)
-riscv32-elf-nm -n -l -C "FrL_network.elf" > output/symbol.txt
-Invoking: Readelf (ELF info listing)
-riscv32-elf-readelf -a "FrL_network.elf" > output/readelf.txt
-Invoking: Objdump (disassembly)
-riscv32-elf-objdump -x -d -C "FrL_network.elf" > output/objdump.txt
-Invoking: Size (section size listing)
-riscv32-elf-size  "FrL_network.elf" | tee output/.PHONY.size
-Finished building: output/symbol.txt
-Finished building: output/readelf.txt
- 
- 
-   text	   code	 rodata	   data	    bss	    dec	    hex	filename
-  47956	  46228	   1728	   4842	    134	  52932	   cec4	FrL_network.elf
-Finished building: output/.PHONY.size
-Finished building: output/objdump.txt
- 
- 
 
-14:17:34 Build Finished (took 4s.625ms)
+16:41:36 Build Finished (took 13s.672ms)
 

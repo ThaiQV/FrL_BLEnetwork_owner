@@ -24,7 +24,7 @@
 #pragma once
 #include "drivers.h"
 #include <stdio.h>
-#define DEBUG_MODE	0
+#define DEBUG_MODE	1
 
 #if(DEBUG_MODE==1)
 

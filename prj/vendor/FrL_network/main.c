@@ -64,8 +64,7 @@ void uart0_irq_handler(void) {
 	extern void uart0_recieve_irq(void);
 	uart0_recieve_irq();
 #else
-	if(uart_get_irq_status(UART0, UART_RXBUF_IRQ_STATUS))
-	{
+	if (uart_get_irq_status(UART0, UART_RXBUF_IRQ_STATUS)) {
 		extern void uart0_recieve_irq(void);
 
 		uart0_recieve_irq();
@@ -120,6 +119,7 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 	}
 	irq_enable();
 
+	PLOG_DEVICE_PROFILE(BOOTLOADER_VERSION, FW_VERSION, HW_VERSION);
 	while (1) {
 		main_loop();
 	}

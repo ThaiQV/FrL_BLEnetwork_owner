@@ -287,24 +287,19 @@ _attribute_no_inline_ void user_init_normal(void) {
 	unsigned char bwpc;
 	uart_cal_div_and_bwpc(115200, sys_clk.pclk*1000*1000, &div, &bwpc);
 	uart_init(UART0, div, bwpc, UART_PARITY_NONE, UART_STOP_BIT_ONE);
-
 	//uart irq set
 	plic_interrupt_enable(IRQ19_UART0);
 	plic_set_priority(IRQ19_UART0,1);
-
 	uart_tx_irq_trig_level(UART0, 0);
 	uart_rx_irq_trig_level(UART0, 1);
-
 	uart_set_irq_mask(UART0, UART_RX_IRQ_MASK);
 #endif
 	extern int rx_from_uart_cb(void);
 	extern int tx_to_uart_cb(void);
 	blc_register_hci_handler(rx_from_uart_cb, tx_to_uart_cb);				//customized uart handler
-
 	extern int controller_event_handler(u32 h, u8 *para, int n);
 	blc_hci_registerControllerEventHandler(controller_event_handler);		//register event callback
 	bls_hci_mod_setEventMask_cmd(0xfffff);			//enable all 18 events,event list see ll.h
-
 	//PM
 	bls_pm_setSuspendMask(SUSPEND_DISABLE);
 }

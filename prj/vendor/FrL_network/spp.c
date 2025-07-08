@@ -366,32 +366,7 @@ int tx_to_uart_cb(void) {
 	}
 	return 0;
 }
-/*********************************************************************
- * @fn      : _uart_send_putchar
- *
- * @brief   : use to printf
- *
- * @param   :pointer data
- * 			len data
- *
- * @return  : size
- */
-void _uart_send_putchar(unsigned char *buf, int size) {
-#if UART_DMA_USE
-	if (buf && !uart_dma_send_flag)
-#else
-	if (buf && !uart_tx_is_busy(UART0))
-#endif
-			{
-#if UART_DMA_USE
-		if (uart_send_dma(UART0, (u8 *) (&buf), size)) {
-			uart_dma_send_flag = 1;
-		}
-#else
-		uart_send(UART0, buf, size);
-#endif
-	}
-}
+
 /**
  * @brief		this function is used to restart module.
  * @param[in]	none

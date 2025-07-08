@@ -12,7 +12,7 @@
 #include "stdio.h"
 #include "stdint.h"
 
-#define PLOG_ENA         0                    /* printf for debug */ // defined into the setting project
+#define PLOG_ENA         1                    /* printf for debug */ // defined into the setting project
 
 #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 
@@ -385,7 +385,7 @@ if (!(val))                                                             \
 #define TERMINAL_UN_HIGH_LIGHT()    PRINTF("\033[27m")
 
 /* terminal display-------------------------------------------------------END */
-void PLOG_Init(void* pfunc);
+//void PLOG_Init(void* pfunc);
 void PLOG_Stop(type_debug_t _type);
 void PLOG_Start(type_debug_t _type);
 void PLOG_HELP(void);
