@@ -385,9 +385,10 @@ if (!(val))                                                             \
 #define TERMINAL_UN_HIGH_LIGHT()    PRINTF("\033[27m")
 
 /* terminal display-------------------------------------------------------END */
-//void PLOG_Init(void* pfunc);
+//void PLG_PrintHexBuffer(type_debug_t _type,uint8_t *buffer, uint16_t size);
 void PLOG_Stop(type_debug_t _type);
 void PLOG_Start(type_debug_t _type);
 void PLOG_HELP(void);
 void PLOG_DEVICE_PROFILE(fl_version_t _bootloader, fl_version_t _fw,
 		fl_version_t _hw);
+//void PLG_PrintHexBuffer(type_debug_t _typedbg, uint8_t *buffer, uint16_t size);

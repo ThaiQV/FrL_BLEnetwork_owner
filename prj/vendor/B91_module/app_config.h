@@ -23,6 +23,8 @@
 
 #pragma once
 
+
+
 /////////////////// MODULE /////////////////////////////////
 #define BLE_MODULE_PM_ENABLE				1
 #define PM_DEEPSLEEP_RETENTION_ENABLE		1
@@ -33,15 +35,19 @@
 
 #define UART_DMA_USE						1
 
+
 /**
  *  @brief  flash firmware check
  */
 #define FLASH_FIRMWARE_CHECK_ENABLE			0
 
+
 /**
  *  @brief  firmware signature check
  */
 #define FIRMWARES_SIGNATURE_ENABLE			0
+
+
 
 //////////////// SMP SETTING  //////////////////////////////
 #define BLE_SECURITY_ENABLE 			   	1
@@ -61,36 +67,39 @@
 #define VBAT_CHANNEL_EN						0
 
 #if VBAT_CHANNEL_EN
-/**		The battery voltage sample range is 1.8~3.5V    **/
+	/**		The battery voltage sample range is 1.8~3.5V    **/
 #else
-/** 	if the battery voltage > 3.6V, should take some external voltage divider	**/
-#define GPIO_BAT_DETECT					GPIO_PB0
-#define PB0_FUNC						AS_GPIO
-#define PB0_INPUT_ENABLE				0
-#define PB0_OUTPUT_ENABLE				0
-#define PB0_DATA_OUT					0
-#define ADC_INPUT_PIN_CHN				ADC_GPIO_PB0
+	/** 	if the battery voltage > 3.6V, should take some external voltage divider	**/
+	#define GPIO_BAT_DETECT					GPIO_PB0
+	#define PB0_FUNC						AS_GPIO
+	#define PB0_INPUT_ENABLE				0
+	#define PB0_OUTPUT_ENABLE				0
+	#define PB0_DATA_OUT					0
+	#define ADC_INPUT_PIN_CHN				ADC_GPIO_PB0
 #endif
 #endif
 
 //////////////////// LED CONFIG (EVK board) ///////////////////////////
 #if BLT_APP_LED_ENABLE
-#define LED_ON_LEVAL 					1 			//gpio output high voltage to turn on led
-#define	GPIO_LED_WHITE					GPIO_PB6
-#define	GPIO_LED_GREEN					GPIO_PB5
-#define	GPIO_LED_BLUE					GPIO_PB4
-#define GPIO_LED_RED					GPIO_PB7
+	#define LED_ON_LEVAL 					1 			//gpio output high voltage to turn on led
+	#define	GPIO_LED_WHITE					GPIO_PB6
+	#define	GPIO_LED_GREEN					GPIO_PB5
+	#define	GPIO_LED_BLUE					GPIO_PB4
+	#define GPIO_LED_RED					GPIO_PB7
 
-#define PB7_FUNC						AS_GPIO
-#define PB6_FUNC						AS_GPIO
-#define PB5_FUNC						AS_GPIO
-#define PB4_FUNC						AS_GPIO
+	#define PB7_FUNC						AS_GPIO
+	#define PB6_FUNC						AS_GPIO
+	#define PB5_FUNC						AS_GPIO
+	#define PB4_FUNC						AS_GPIO
 
-#define	PB7_OUTPUT_ENABLE				1
-#define	PB6_OUTPUT_ENABLE				1
-#define PB5_OUTPUT_ENABLE				1
-#define	PB4_OUTPUT_ENABLE				1
+	#define	PB7_OUTPUT_ENABLE				1
+	#define	PB6_OUTPUT_ENABLE				1
+	#define PB5_OUTPUT_ENABLE				1
+	#define	PB4_OUTPUT_ENABLE				1
 #endif
+
+
+
 
 //////////////////////////// MODULE PM GPIO	(EVK board) /////////////////////////////////
 #define GPIO_WAKEUP_MODULE					GPIO_PA2   //mcu wakeup module
@@ -110,18 +119,27 @@
 #define GPIO_WAKEUP_MCU_LOW					do{gpio_set_output_en(GPIO_WAKEUP_MCU, 1); gpio_write(GPIO_WAKEUP_MCU, 0);}while(0)
 #define GPIO_WAKEUP_MCU_FLOAT				do{gpio_set_output_en(GPIO_WAKEUP_MCU, 0); gpio_write(GPIO_WAKEUP_MCU, 0);}while(0)
 
+
+
+
+
+
+
+
+
+
 /////////////////////HCI UART variables///////////////////////////////////////
 /*----------------------------------------------*
- *	SPP TX FIFO  = 2 Bytes LEN + n Bytes Data.	*
- *												*
- *	T_txdata_buf = 4 Bytes LEN + n Bytes Data.	*
- *												*
- *	SPP_TXFIFO_SIZE = 2 + n.					*
- *												*
- *	UART_DATA_LEN = n.							*
- *												*
- *	UART_DATA_LEN = SPP_TXFIFO_SIZE - 2.		*
- *-----------------------------------------------*/
+*	SPP TX FIFO  = 2 Bytes LEN + n Bytes Data.	*
+*												*
+*	T_txdata_buf = 4 Bytes LEN + n Bytes Data.	*
+*												*
+*	SPP_TXFIFO_SIZE = 2 + n.					*
+*												*
+*	UART_DATA_LEN = n.							*
+*												*
+*	UART_DATA_LEN = SPP_TXFIFO_SIZE - 2.		*
+*-----------------------------------------------*/
 #define SPP_RXFIFO_SIZE		72
 #define SPP_RXFIFO_NUM		2
 
@@ -129,14 +147,22 @@
 #define SPP_TXFIFO_NUM		8
 
 #define UART_DATA_LEN    	(SPP_TXFIFO_SIZE - 2)   // data max 252
-typedef struct {
-	unsigned int len; // data max 252
-	unsigned char data[UART_DATA_LEN];
-} uart_data_t;
+typedef struct{
+    unsigned int len; // data max 252
+    unsigned char data[UART_DATA_LEN];
+}uart_data_t;
+
+
+
+
+
+
 
 ///////////////////////////////////// ATT  HANDLER define ///////////////////////////////////////
-typedef enum {
+typedef enum
+{
 	ATT_H_START = 0,
+
 
 	//// Gap ////
 	/**********************************************************************************************/
@@ -148,12 +174,14 @@ typedef enum {
 	CONN_PARAM_CD_H,						//UUID: 2803, 	VALUE:  			Prop: Read
 	CONN_PARAM_DP_H,						//UUID: 2A04,   VALUE: connParameter
 
+
 	//// gatt ////
 	/**********************************************************************************************/
 	GenericAttribute_PS_H,					//UUID: 2800, 	VALUE: uuid 1801
 	GenericAttribute_ServiceChanged_CD_H,	//UUID: 2803, 	VALUE:  			Prop: Indicate
 	GenericAttribute_ServiceChanged_DP_H,   //UUID:	2A05,	VALUE: service change
 	GenericAttribute_ServiceChanged_CCB_H,	//UUID: 2902,	VALUE: serviceChangeCCC
+
 
 	//// device information ////
 	/**********************************************************************************************/
@@ -186,114 +214,121 @@ typedef enum {
 
 	ATT_END_H,
 
-} ATT_HANDLE;
+}ATT_HANDLE;
+
+
+
 
 #define DEBUG_GPIO_ENABLE						0
 
 #if(DEBUG_GPIO_ENABLE)
 
-#define GPIO_CHN0							GPIO_PE1
-#define GPIO_CHN1							GPIO_PE2
+
+	#define GPIO_CHN0							GPIO_PE1
+	#define GPIO_CHN1							GPIO_PE2
 //	#define GPIO_CHN2							GPIO_PA0
-#define GPIO_CHN3							GPIO_PA4
-#define GPIO_CHN4							GPIO_PA3
-#define GPIO_CHN5							GPIO_PB0
+    #define GPIO_CHN3							GPIO_PA4
+	#define GPIO_CHN4							GPIO_PA3
+	#define GPIO_CHN5							GPIO_PB0
 //	#define GPIO_CHN6							GPIO_PB2
-#define GPIO_CHN7							GPIO_PE0
+	#define GPIO_CHN7							GPIO_PE0
 
 //	#define GPIO_CHN8							GPIO_PA2
-#define GPIO_CHN9							GPIO_PA1
-#define GPIO_CHN10							GPIO_PB1
+	#define GPIO_CHN9							GPIO_PA1
+	#define GPIO_CHN10							GPIO_PB1
 //	#define GPIO_CHN11							GPIO_PB3
 
-#define PE1_OUTPUT_ENABLE					1
-#define PE2_OUTPUT_ENABLE					1
+
+	#define PE1_OUTPUT_ENABLE					1
+	#define PE2_OUTPUT_ENABLE					1
 //	#define PA0_OUTPUT_ENABLE					1
-#define PA4_OUTPUT_ENABLE					1
-#define PA3_OUTPUT_ENABLE					1
-#define PB0_OUTPUT_ENABLE					1
+	#define PA4_OUTPUT_ENABLE					1
+	#define PA3_OUTPUT_ENABLE					1
+	#define PB0_OUTPUT_ENABLE					1
 //	#define PB2_OUTPUT_ENABLE					1
-#define PE0_OUTPUT_ENABLE					1
+	#define PE0_OUTPUT_ENABLE					1
 
 //	#define PA2_OUTPUT_ENABLE					1
-#define PA1_OUTPUT_ENABLE					1
-#define PB1_OUTPUT_ENABLE					1
+	#define PA1_OUTPUT_ENABLE					1
+	#define PB1_OUTPUT_ENABLE					1
 //	#define PB3_OUTPUT_ENABLE					1
 
-#define DBG_CHN0_LOW		gpio_write(GPIO_CHN0, 0)
-#define DBG_CHN0_HIGH		gpio_write(GPIO_CHN0, 1)
-#define DBG_CHN0_TOGGLE		gpio_toggle(GPIO_CHN0)
-#define DBG_CHN1_LOW		gpio_write(GPIO_CHN1, 0)
-#define DBG_CHN1_HIGH		gpio_write(GPIO_CHN1, 1)
-#define DBG_CHN1_TOGGLE		gpio_toggle(GPIO_CHN1)
-#define DBG_CHN2_LOW		//gpio_write(GPIO_CHN2, 0)
-#define DBG_CHN2_HIGH		//gpio_write(GPIO_CHN2, 1)
-#define DBG_CHN2_TOGGLE		//gpio_toggle(GPIO_CHN2)
-#define DBG_CHN3_LOW		gpio_write(GPIO_CHN3, 0)
-#define DBG_CHN3_HIGH		gpio_write(GPIO_CHN3, 1)
-#define DBG_CHN3_TOGGLE		gpio_toggle(GPIO_CHN3)
-#define DBG_CHN4_LOW		gpio_write(GPIO_CHN4, 0)
-#define DBG_CHN4_HIGH		gpio_write(GPIO_CHN4, 1)
-#define DBG_CHN4_TOGGLE		gpio_toggle(GPIO_CHN4)
-#define DBG_CHN5_LOW		gpio_write(GPIO_CHN5, 0)
-#define DBG_CHN5_HIGH		gpio_write(GPIO_CHN5, 1)
-#define DBG_CHN5_TOGGLE		gpio_toggle(GPIO_CHN5)
-#define DBG_CHN6_LOW		//gpio_write(GPIO_CHN6, 0)
-#define DBG_CHN6_HIGH		//gpio_write(GPIO_CHN6, 1)
-#define DBG_CHN6_TOGGLE		//gpio_toggle(GPIO_CHN6)
-#define DBG_CHN7_LOW		gpio_write(GPIO_CHN7, 0)
-#define DBG_CHN7_HIGH		gpio_write(GPIO_CHN7, 1)
-#define DBG_CHN7_TOGGLE		gpio_toggle(GPIO_CHN7)
-#define DBG_CHN8_LOW		//gpio_write(GPIO_CHN8, 0)
-#define DBG_CHN8_HIGH		//gpio_write(GPIO_CHN8, 1)
-#define DBG_CHN8_TOGGLE		//gpio_toggle(GPIO_CHN8)
-#define DBG_CHN9_LOW		gpio_write(GPIO_CHN9, 0)
-#define DBG_CHN9_HIGH		gpio_write(GPIO_CHN9, 1)
-#define DBG_CHN9_TOGGLE		gpio_toggle(GPIO_CHN9)
-#define DBG_CHN10_LOW		gpio_write(GPIO_CHN10, 0)
-#define DBG_CHN10_HIGH		gpio_write(GPIO_CHN10, 1)
-#define DBG_CHN10_TOGGLE	gpio_toggle(GPIO_CHN10)
-#define DBG_CHN11_LOW		//gpio_write(GPIO_CHN11, 0)
-#define DBG_CHN11_HIGH		//gpio_write(GPIO_CHN11, 1)
-#define DBG_CHN11_TOGGLE	//gpio_toggle(GPIO_CHN11)
+
+	#define DBG_CHN0_LOW		gpio_write(GPIO_CHN0, 0)
+	#define DBG_CHN0_HIGH		gpio_write(GPIO_CHN0, 1)
+	#define DBG_CHN0_TOGGLE		gpio_toggle(GPIO_CHN0)
+	#define DBG_CHN1_LOW		gpio_write(GPIO_CHN1, 0)
+	#define DBG_CHN1_HIGH		gpio_write(GPIO_CHN1, 1)
+	#define DBG_CHN1_TOGGLE		gpio_toggle(GPIO_CHN1)
+	#define DBG_CHN2_LOW		//gpio_write(GPIO_CHN2, 0)
+	#define DBG_CHN2_HIGH		//gpio_write(GPIO_CHN2, 1)
+	#define DBG_CHN2_TOGGLE		//gpio_toggle(GPIO_CHN2)
+	#define DBG_CHN3_LOW		gpio_write(GPIO_CHN3, 0)
+	#define DBG_CHN3_HIGH		gpio_write(GPIO_CHN3, 1)
+	#define DBG_CHN3_TOGGLE		gpio_toggle(GPIO_CHN3)
+	#define DBG_CHN4_LOW		gpio_write(GPIO_CHN4, 0)
+	#define DBG_CHN4_HIGH		gpio_write(GPIO_CHN4, 1)
+	#define DBG_CHN4_TOGGLE		gpio_toggle(GPIO_CHN4)
+	#define DBG_CHN5_LOW		gpio_write(GPIO_CHN5, 0)
+	#define DBG_CHN5_HIGH		gpio_write(GPIO_CHN5, 1)
+	#define DBG_CHN5_TOGGLE		gpio_toggle(GPIO_CHN5)
+	#define DBG_CHN6_LOW		//gpio_write(GPIO_CHN6, 0)
+	#define DBG_CHN6_HIGH		//gpio_write(GPIO_CHN6, 1)
+	#define DBG_CHN6_TOGGLE		//gpio_toggle(GPIO_CHN6)
+	#define DBG_CHN7_LOW		gpio_write(GPIO_CHN7, 0)
+	#define DBG_CHN7_HIGH		gpio_write(GPIO_CHN7, 1)
+	#define DBG_CHN7_TOGGLE		gpio_toggle(GPIO_CHN7)
+	#define DBG_CHN8_LOW		//gpio_write(GPIO_CHN8, 0)
+	#define DBG_CHN8_HIGH		//gpio_write(GPIO_CHN8, 1)
+	#define DBG_CHN8_TOGGLE		//gpio_toggle(GPIO_CHN8)
+	#define DBG_CHN9_LOW		gpio_write(GPIO_CHN9, 0)
+	#define DBG_CHN9_HIGH		gpio_write(GPIO_CHN9, 1)
+	#define DBG_CHN9_TOGGLE		gpio_toggle(GPIO_CHN9)
+	#define DBG_CHN10_LOW		gpio_write(GPIO_CHN10, 0)
+	#define DBG_CHN10_HIGH		gpio_write(GPIO_CHN10, 1)
+	#define DBG_CHN10_TOGGLE	gpio_toggle(GPIO_CHN10)
+	#define DBG_CHN11_LOW		//gpio_write(GPIO_CHN11, 0)
+	#define DBG_CHN11_HIGH		//gpio_write(GPIO_CHN11, 1)
+	#define DBG_CHN11_TOGGLE	//gpio_toggle(GPIO_CHN11)
 #else
-#define DBG_CHN0_LOW
-#define DBG_CHN0_HIGH
-#define DBG_CHN0_TOGGLE
-#define DBG_CHN1_LOW
-#define DBG_CHN1_HIGH
-#define DBG_CHN1_TOGGLE
-#define DBG_CHN2_LOW
-#define DBG_CHN2_HIGH
-#define DBG_CHN2_TOGGLE
-#define DBG_CHN3_LOW
-#define DBG_CHN3_HIGH
-#define DBG_CHN3_TOGGLE
-#define DBG_CHN4_LOW
-#define DBG_CHN4_HIGH
-#define DBG_CHN4_TOGGLE
-#define DBG_CHN5_LOW
-#define DBG_CHN5_HIGH
-#define DBG_CHN5_TOGGLE
-#define DBG_CHN6_LOW
-#define DBG_CHN6_HIGH
-#define DBG_CHN6_TOGGLE
-#define DBG_CHN7_LOW
-#define DBG_CHN7_HIGH
-#define DBG_CHN7_TOGGLE
-#define DBG_CHN8_LOW
-#define DBG_CHN8_HIGH
-#define DBG_CHN8_TOGGLE
-#define DBG_CHN9_LOW
-#define DBG_CHN9_HIGH
-#define DBG_CHN9_TOGGLE
-#define DBG_CHN10_LOW
-#define DBG_CHN10_HIGH
-#define DBG_CHN10_TOGGLE
-#define DBG_CHN11_LOW
-#define DBG_CHN11_HIGH
-#define DBG_CHN11_TOGGLE
+	#define DBG_CHN0_LOW
+	#define DBG_CHN0_HIGH
+	#define DBG_CHN0_TOGGLE
+	#define DBG_CHN1_LOW
+	#define DBG_CHN1_HIGH
+	#define DBG_CHN1_TOGGLE
+	#define DBG_CHN2_LOW
+	#define DBG_CHN2_HIGH
+	#define DBG_CHN2_TOGGLE
+	#define DBG_CHN3_LOW
+	#define DBG_CHN3_HIGH
+	#define DBG_CHN3_TOGGLE
+	#define DBG_CHN4_LOW
+	#define DBG_CHN4_HIGH
+	#define DBG_CHN4_TOGGLE
+	#define DBG_CHN5_LOW
+	#define DBG_CHN5_HIGH
+	#define DBG_CHN5_TOGGLE
+	#define DBG_CHN6_LOW
+	#define DBG_CHN6_HIGH
+	#define DBG_CHN6_TOGGLE
+	#define DBG_CHN7_LOW
+	#define DBG_CHN7_HIGH
+	#define DBG_CHN7_TOGGLE
+	#define DBG_CHN8_LOW
+	#define DBG_CHN8_HIGH
+	#define DBG_CHN8_TOGGLE
+	#define DBG_CHN9_LOW
+	#define DBG_CHN9_HIGH
+	#define DBG_CHN9_TOGGLE
+	#define DBG_CHN10_LOW
+	#define DBG_CHN10_HIGH
+	#define DBG_CHN10_TOGGLE
+	#define DBG_CHN11_LOW
+	#define DBG_CHN11_HIGH
+	#define DBG_CHN11_TOGGLE
 #endif  //end of DEBUG_GPIO_ENABLE
+
 
 /////////////////// set default   ////////////////
 

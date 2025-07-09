@@ -26,19 +26,26 @@
 #include "stack/ble/ble.h"
 #include "app.h"
 
+#if(FREERTOS_ENABLE)
+#include <FreeRTOS.h>
+#include <task.h>
+#endif
 /**
  * @brief		BLE SDK RF interrupt handler.
  * @param[in]	none
  * @return      none
  */
 _attribute_ram_code_
-void rf_irq_handler(void) {
-	DBG_CHN10_HIGH;
+void rf_irq_handler(void)
+{
+	DBG_CHN14_HIGH;
 
-	irq_blt_sdk_handler();
+	irq_blt_sdk_handler ();
 
-	DBG_CHN10_LOW;
+	DBG_CHN14_LOW;
 }
+
+
 
 /**
  * @brief		BLE SDK System timer interrupt handler.
@@ -46,46 +53,46 @@ void rf_irq_handler(void) {
  * @return      none
  */
 _attribute_ram_code_
-void stimer_irq_handler(void) {
-	DBG_CHN9_HIGH;
+void stimer_irq_handler(void)
+{
+	DBG_CHN15_HIGH;
 
-	irq_blt_sdk_handler();
+	irq_blt_sdk_handler ();
 
-	DBG_CHN9_LOW;
+	DBG_CHN15_LOW;
 }
 
-/**
- * @brief		BLE SDK UART0 interrupt handler.
- * @param[in]	none
- * @return      none
- */
-void uart0_irq_handler(void) {
-#if UART_DMA_USE
-	extern void uart0_recieve_irq(void);
-	uart0_recieve_irq();
-#else
-	if (uart_get_irq_status(UART0, UART_RXBUF_IRQ_STATUS)) {
-		extern void uart0_recieve_irq(void);
 
-		uart0_recieve_irq();
-	}
+
+
+#if (FREERTOS_ENABLE)
+	#if(!TEST_CONN_CURRENT_ENABLE)
+		static void led_task(void *pvParameters){
+			reg_gpio_pb_oen &= ~ GPIO_PB7;
+			while(1){
+				reg_gpio_pb_out |= GPIO_PB7;
+				printf("LED ON;\r\n");
+				vTaskDelay(1000);
+				printf("LED OFF;\r\n");
+				reg_gpio_pb_out &= ~GPIO_PB7;
+				vTaskDelay(1000);
+			}
+		}
+	#endif
+void proto_task( void *pvParameters );
 #endif
-}
 
 /**
  * @brief		This is main function
  * @param[in]	none
  * @return      none
  */
-fl_version_t BOOTLOADER_VERSION = { 0, 0, 0 };
-fl_version_t FW_VERSION = { 1, 0, 0 };
-fl_version_t HW_VERSION = { 1, 0, 0 };
-_attribute_ram_code_ int main(void)   //must on ramcode
+_attribute_ram_code_ int main (void)   //must on ramcode
 {
 	DBG_CHN0_LOW;
 	blc_pm_select_internal_32k_crystal();
 
-	sys_init(DCDC_1P4_DCDC_1P8, VBAT_MAX_VALUE_GREATER_THAN_3V6);
+	sys_init(DCDC_1P4_DCDC_1P8,VBAT_MAX_VALUE_GREATER_THAN_3V6);
 
 	/* detect if MCU is wake_up from deep retention mode */
 	int deepRetWakeUp = pm_is_MCU_deepRetentionWakeup();  //MCU deep retention wakeUp
@@ -96,33 +103,65 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 
 	gpio_init(!deepRetWakeUp);
 
-	PLOG_DEVICE_PROFILE(BOOTLOADER_VERSION, FW_VERSION, HW_VERSION);
 
-	if (!deepRetWakeUp) {  //read flash size
+
+	if(!deepRetWakeUp){//read flash size
+		#if (BATT_CHECK_ENABLE)
+			user_battery_power_check();
+		#endif
+
 		blc_readFlashSize_autoConfigCustomFlashSector();
 
-#if (FLASH_FIRMWARE_CHECK_ENABLE)
-		blt_firmware_completeness_check
-#endif
+		#if (FLASH_FIRMWARE_CHECK_ENABLE)
+			blt_firmware_completeness_check();
+		#endif
 
-#if FIRMWARES_SIGNATURE_ENABLE
-		blt_firmware_signature_check();
-#endif
+		#if FIRMWARES_SIGNATURE_ENABLE
+			blt_firmware_signature_check();
+		#endif
 	}
 
-	blc_app_loadCustomizedParameters();  //load customized freq_offset cap value
+	/* load customized freq_offset cap value. */
+	blc_app_loadCustomizedParameters();
 
-	if (deepRetWakeUp) { //MCU wake_up from deepSleep retention mode
-#if (PM_DEEPSLEEP_RETENTION_ENABLE)
-	user_init_deepRetn ();
-#endif
-	} else { //MCU power_on or wake_up from deepSleep mode
+	if( deepRetWakeUp ){ //MCU wake_up from deepSleep retention mode
+		user_init_deepRetn ();
+	}
+	else{ //MCU power_on or wake_up from deepSleep mode
 		user_init_normal();
-	}
-	irq_enable();
-	while (1) {
-		main_loop();
+#if (FREERTOS_ENABLE)
+		extern void blc_ll_set_freertos_en(u8 en);
+		blc_ll_set_freertos_en(1);
+#endif
 	}
 
+#if (FREERTOS_ENABLE)
+
+	extern void vPortRestoreTask();
+	if( deepRetWakeUp ){
+		printf("enter restor work.\r\n");
+		vPortRestoreTask();
+
+	}else{
+		#if(!TEST_CONN_CURRENT_ENABLE)
+			xTaskCreate( led_task, "tLed", configMINIMAL_STACK_SIZE, (void*)0, (tskIDLE_PRIORITY+1), 0 );
+		#endif
+		xTaskCreate( proto_task, "tProto", 2*configMINIMAL_STACK_SIZE, (void*)0, (tskIDLE_PRIORITY+1), 0 );
+	//	xTaskCreate( ui_task, "tUI", configMINIMAL_STACK_SIZE, (void*)0, tskIDLE_PRIORITY + 1, 0 );
+		vTaskStartScheduler();
+	}
+#else
+	irq_enable();
+
+	while (1) {
+		main_loop ();
+	}
 	return 0;
+#endif
 }
+
+#if (FREERTOS_ENABLE)
+//  !!! should notify those tasks that ulTaskNotifyTake long time and should be wakeup every time PM wakeup
+void vPortWakeupNotify(){
+}
+#endif

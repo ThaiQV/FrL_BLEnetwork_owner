@@ -4,5 +4,5 @@
 
 USER_OBJS :=
 
-LIBS := -lm -lfirmware_encrypt -lB91_ble_lib -ldsp
+LIBS := -lB91_ble_lib -lfirmware_encrypt -lm -ldsp
 

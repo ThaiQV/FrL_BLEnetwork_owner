@@ -24,18 +24,18 @@
 #pragma once
 
 #if (__PROJECT_B91_BLE_SAMPLE__)
-#include "../B91_ble_sample/app_config.h"
+	#include "../B91_ble_sample/app_config.h"
+#elif (__PROJECT_B91_FREELUX_NWK__)
+#include "../FrL_Network/app_config.h"
 #elif (__PROJECT_B91_MODULE__ )
-#include "../B91_module/app_config.h"
+	#include "../B91_module/app_config.h"
 #elif (__PROJECT_B91_FEATURE_TEST__)
-#include "../B91_feature/app_config.h"
+	#include "../B91_feature/app_config.h"
 #elif(__PROJECT_B91_INTERNAL_TEST__)
-#include "../B91_internal_test/app_config.h"
+	#include "../B91_internal_test/app_config.h"
 #elif(__PROJECT_B91_DEBUG_DEMO__)
-#include "../B91_debug_demo/app_config.h"
-#elif (__PROJECT_FRL_NETWORK__ )
-#include "../FrL_network/app_config.h"
+	#include "../B91_debug_demo/app_config.h"
 #else
-#include "../common/default_config.h"
+	#include "../common/default_config.h"
 #endif
 

@@ -26,13 +26,18 @@
 
 #include "stack/ble/ble_format.h"
 
+
+
+
+
 /**
  * @brief      for user to initialize legacy advertising module
  * 			   notice that only one module can be selected between legacy advertising module and extended advertising module
  * @param	   none
  * @return     none
  */
-void blc_ll_initLegacyAdvertising_module(void);
+void 		blc_ll_initLegacyAdvertising_module(void);
+
 
 /**
  * @brief	   set the data used in advertising packets that have a data field.
@@ -40,7 +45,8 @@ void blc_ll_initLegacyAdvertising_module(void);
  * @param[in]  len - The number of significant octets in the Advertising_Data.
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t bls_ll_setAdvData(u8 *data, u8 len);
+ble_sts_t	bls_ll_setAdvData(u8 *data, u8 len);
+
 
 /**
  * @brief	   This function is used to provide data used in Scanning Packets that have a data field.
@@ -48,7 +54,9 @@ ble_sts_t bls_ll_setAdvData(u8 *data, u8 len);
  * @param[in]  len - The number of significant octets in the Scan_Response_Data.
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t bls_ll_setScanRspData(u8 *data, u8 len);
+ble_sts_t 	bls_ll_setScanRspData(u8 *data, u8 len);
+
+
 
 /**
  * @brief      This function is used to set the advertising parameters.
@@ -62,15 +70,23 @@ ble_sts_t bls_ll_setScanRspData(u8 *data, u8 len);
  * @param[in]  advFilterPolicy - Advertising_Filter_Policy
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t bls_ll_setAdvParam(u16 intervalMin, u16 intervalMax, adv_type_t advType, own_addr_type_t ownAddrType, u8 peerAddrType, u8 *peerAddr,
-		adv_chn_map_t adv_channelMap, adv_fp_type_t advFilterPolicy);
+ble_sts_t   bls_ll_setAdvParam( u16 intervalMin,  u16 intervalMax,  adv_type_t advType,  		 	  own_addr_type_t ownAddrType,  \
+							     u8 peerAddrType, u8  *peerAddr,    adv_chn_map_t 	adv_channelMap,   adv_fp_type_t   advFilterPolicy);
+
+
+
 
 /**
  * @brief      This function is used to request the Controller to start or stop advertising.
  * @param[in]  adv_enable - Advertising_Enable
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t bls_ll_setAdvEnable(int adv_enable);
+ble_sts_t   bls_ll_setAdvEnable(int adv_enable);
+
+
+
+
+
 
 /**
  * @brief      This function is used to set advertise duration time.
@@ -78,7 +94,11 @@ ble_sts_t bls_ll_setAdvEnable(int adv_enable);
  * @param[in]  duration_en - Duration_Enable
  * @return     Status - 0x00: BLE success; 0x01-0xFF: fail
  */
-ble_sts_t bls_ll_setAdvDuration(u32 duration_us, u8 duration_en);
+ble_sts_t   bls_ll_setAdvDuration (u32 duration_us, u8 duration_en);
+
+
+
+
 
 /**
  * @brief      This function is used to set some other channel to replace advertising chn37/38/39.
@@ -87,7 +107,7 @@ ble_sts_t bls_ll_setAdvDuration(u32 duration_us, u8 duration_en);
  * @param[in]  chn2 - channel to replace channel 39
  * @return     none
  */
-void blc_ll_setAdvCustomedChannel(u8 chn0, u8 chn1, u8 chn2);
+void 		blc_ll_setAdvCustomedChannel (u8 chn0, u8 chn1, u8 chn2);
 
 /**
  * @brief      this function is used to set whether to continue sending broadcast packets when receiving scan request in the current adv interval.
@@ -103,7 +123,8 @@ void bls_ll_continue_adv_after_scan_req(u8 enable);
  * @return     Status - 0x00:  success;
  * 						other: fail
  */
-u8 blt_set_adv_direct_init_addrtype(u8* cmdPara);
+u8 			blt_set_adv_direct_init_addrtype(u8* cmdPara);
+
 
 /**
  * @brief      This function is used to set advertising type in slave role.
@@ -111,7 +132,8 @@ u8 blt_set_adv_direct_init_addrtype(u8* cmdPara);
  * @return     Status - 0x00:  success;
  * 						other: fail
  */
-ble_sts_t bls_ll_setAdvType(u8 advType);
+ble_sts_t   bls_ll_setAdvType(u8 advType);
+
 
 /**
  * @brief      This function is used to set advertising type.
@@ -119,19 +141,22 @@ ble_sts_t bls_ll_setAdvType(u8 advType);
  * @return     Status - 0x00:  success;
  * 						other: fail
  */
-ble_sts_t blt_set_adv_addrtype(u8* cmdPara);
+ble_sts_t 	blt_set_adv_addrtype(u8* cmdPara);
 #endif
 
-extern u32 blc_rcvd_connReq_tick;
+extern u32  blc_rcvd_connReq_tick;
+
 
 /**
  * @brief      This function is used to get connection time.
  * @param	   none
  * @return     connection time
  */
-static inline u32 bls_ll_getConnectionCreateTime(void) {
+static inline u32 	bls_ll_getConnectionCreateTime(void)
+{
 	return blc_rcvd_connReq_tick;
 }
+
 
 /**
  * @brief      This function is used to add adv in connection slave role.
@@ -139,7 +164,8 @@ static inline u32 bls_ll_getConnectionCreateTime(void) {
  * @return     Status - 0x00:  success;
  * 						other: fail
  */
-ble_sts_t blc_ll_addAdvertisingInConnSlaveRole(void);
+ble_sts_t   blc_ll_addAdvertisingInConnSlaveRole(void);
+
 
 /**
  * @brief      This function is used to remove adv in connection slave role.
@@ -147,7 +173,9 @@ ble_sts_t blc_ll_addAdvertisingInConnSlaveRole(void);
  * @return     Status - 0x00:  success;
  * 						other: fail
  */
-ble_sts_t blc_ll_removeAdvertisingFromConnSLaveRole(void);
+ble_sts_t   blc_ll_removeAdvertisingFromConnSLaveRole(void);
+
+
 
 /**
  * @brief	   This function is used to set whether to check the adv_interval
@@ -156,14 +184,17 @@ ble_sts_t blc_ll_removeAdvertisingFromConnSLaveRole(void);
  */
 void blc_ll_setAdvIntervalCheckEnable(u8 enable);
 
+
+
 /**
  * @brief      This function is used to set ADV parameter in slave role.
  * @param[in]  cmdPara - command parameter
  * @return     Status - 0x00:  success;
  * 						other: fail
  */
-ble_sts_t blc_ll_setAdvParamInConnSlaveRole(u8 *adv_data, u8 advData_len, u8 *scanRsp_data, u8 scanRspData_len, adv_type_t advType, own_addr_type_t ownAddrType,
-		adv_chn_map_t adv_channelMap, adv_fp_type_t advFilterPolicy);
+ble_sts_t 	blc_ll_setAdvParamInConnSlaveRole( u8 		  *adv_data,  u8              advData_len, u8 *scanRsp_data,  			 u8 scanRspData_len,
+											   adv_type_t  advType,   own_addr_type_t ownAddrType, adv_chn_map_t adv_channelMap, adv_fp_type_t advFilterPolicy);
+
 
 /**
  * @brief      This function is used to set ADV interval in slave role.
@@ -172,7 +203,8 @@ ble_sts_t blc_ll_setAdvParamInConnSlaveRole(u8 *adv_data, u8 advData_len, u8 *sc
  * @return     Status - 0x00:  success;
  * 						other: fail
  */
-ble_sts_t bls_ll_setAdvInterval(u16 intervalMin, u16 intervalMax);
+ble_sts_t 	bls_ll_setAdvInterval(u16 intervalMin, u16 intervalMax);
+
 
 /**
  * @brief      This function is used to set ADV aaachannel used in slave role.
@@ -180,7 +212,8 @@ ble_sts_t bls_ll_setAdvInterval(u16 intervalMin, u16 intervalMax);
  * @return     Status - 0x00:  success;
  * 						other: fail
  */
-ble_sts_t bls_ll_setAdvChannelMap(adv_chn_map_t adv_channelMap);
+ble_sts_t 	bls_ll_setAdvChannelMap(adv_chn_map_t adv_channelMap);
+
 
 /**
  * @brief      This function is used to set ADV aaachannel used in slave role.
@@ -188,17 +221,26 @@ ble_sts_t bls_ll_setAdvChannelMap(adv_chn_map_t adv_channelMap);
  * @return     Status - 0x00:  success;
  * 						other: fail
  */
-ble_sts_t bls_ll_setAdvFilterPolicy(adv_fp_type_t advFilterPolicy);
+ble_sts_t 	bls_ll_setAdvFilterPolicy(adv_fp_type_t advFilterPolicy);
 
-typedef int (*advertise_prepare_handler_t)(rf_packet_adv_t * p);
+
+typedef int (*advertise_prepare_handler_t) (rf_packet_adv_t * p);
+
 
 /**
  * @brief      This function is used to set advertising prepare_handler.
  * @param[in]  p - data pointer
  * @return     none
  */
-void bls_set_advertise_prepare(void *p);
+void bls_set_advertise_prepare (void *p);
+
+
+
+
 
 #define blc_ll_initAdvertising_module   blc_ll_initLegacyAdvertising_module
+
+
+
 
 #endif /* LL_ADV_H_ */

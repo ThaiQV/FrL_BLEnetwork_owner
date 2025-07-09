@@ -14,8 +14,12 @@ SAG_FILE += \
 
 GPROF_OUT := 
 PWR_OUT := 
+SIZE_OUTPUTS := 
+READELF_OUTPUTS := 
 EXECUTABLES := 
+OBJDUMP_OUTPUTS := 
 OBJS := 
+SYMBOL_OUTPUTS := 
 S_UPPER_DEPS := 
 GCOV_OUT := 
 C_DEPS := 
@@ -37,6 +41,6 @@ common/usb_dbg \
 drivers/B91 \
 drivers/B91/ext_driver \
 drivers/B91/flash \
-vendor/FrL_network \
+vendor/FrL_Network \
 vendor/common \
 

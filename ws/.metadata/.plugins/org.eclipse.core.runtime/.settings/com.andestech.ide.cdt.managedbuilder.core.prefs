@@ -1,4 +1,0 @@
-eclipse.preferences.version=1
-toolChain/nds32le-elf-mculib-v5f/ldscript/_stack=3000000
-toolChain/nds32le-elf-mculib-v5f/ldscript/fileName=C\:\\Andestech\\AndeSight_RDS_v323\\toolchains\\nds32le-elf-mculib-v5f\\riscv32-elf\\lib\\ldscripts\\elf32lriscv.x
-toolChain/nds32le-elf-mculib-v5f/ldscript/lastModified=1599007867000

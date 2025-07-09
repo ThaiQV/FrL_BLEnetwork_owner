@@ -33,7 +33,6 @@ void _ATCmdTest(type_debug_t _type, void * arg);
 /***                           Private definitions                           **/
 /******************************************************************************/
 /******************************************************************************/
-typedef void (*plog_putchar_func)(unsigned char *p, int s);
 
 typedef struct {
 	type_debug_t type;
@@ -43,13 +42,22 @@ typedef struct {
 } plog_cmd_t;
 volatile uint16_t FmDebug = PL_ALL;
 
-const plog_cmd_t plog_cmd[] = { { DRV, (const char *) "p drv", _set_plog }, { INF, (const char *) "p inf", _set_plog }, { INF_FILE, (const char *) "p file",
-		_set_plog }, { ZIG, (const char *) "p zig", _set_plog }, { ZIG_GP, (const char *) "p zgp", _set_plog }, { APP, (const char *) "p app", _set_plog }, {
-		BOOTLOADER, (const char *) "p bootloader", _set_plog }, { FLA, (const char *) "p fla", _set_plog }, { USER, (const char *) "p users", _set_plog }, {
-		PERI, (const char *) "p peri", _set_plog }, { BLE, (const char *) "p ble", _set_plog }, { ALL, (const char *) "p all", _set_plog }, { DEFAULT,
-		(const char *) "p default", _set_plog },
-/**@Cmd for testing. Not save*/
-{ HELP, (const char *) "p help", _help },
+const plog_cmd_t plog_cmd[] = {
+		{ DRV, (const char *) "p drv", _set_plog },
+		{ INF, (const char *) "p inf", _set_plog },
+		{ INF_FILE,(const char *) "p file", _set_plog },
+		{ ZIG, (const char *) "p zig",_set_plog },
+		{ ZIG_GP, (const char *) "p zgp",_set_plog },
+		{ APP, (const char *) "p app", _set_plog },
+		{ BOOTLOADER,(const char *) "p bootloader", _set_plog },
+		{ FLA,(const char *) "p fla", _set_plog },
+		{ USER, (const char *) "p users",_set_plog },
+		{ PERI, (const char *) "p peri", _set_plog },
+		{ BLE,(const char *) "p ble", _set_plog },
+		{ ALL, (const char *) "p all",_set_plog },
+		{ DEFAULT, (const char *) "p default", _set_plog },
+		/**@Cmd for testing. Not save*/
+		{ HELP, (const char *) "p help", _help },
 //	{SETCMD,(const char *)"p set",_Simulate},
 //	{GETCMD,(const char *)"p get",_Simulate},
 //	{TESTCMD,(const char *)"p test",_Simulate},
@@ -58,12 +66,13 @@ const plog_cmd_t plog_cmd[] = { { DRV, (const char *) "p drv", _set_plog }, { IN
 //---------------------------------------
 		{ PLEND, (const char *) "None", NULL }, };
 
+
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
 /******************************************************************************/
 /******************************************************************************/
-plog_putchar_func plog_putchar = NULL;
+
 /******************************************************************************/
 /******************************************************************************/
 /***                            Private functions                            **/
@@ -71,7 +80,8 @@ plog_putchar_func plog_putchar = NULL;
 /******************************************************************************/
 
 bool bool_dbg_fnc(char *_input) {
-	if (strncmp(_input, "on", 2) == 0) return true;
+	if (strncmp(_input, "on", 2) == 0)
+		return true;
 //	else if(strncmp(_input,"off",3) == 0)
 	return false;
 }
@@ -80,8 +90,9 @@ bool bool_dbg_fnc(char *_input) {
 /***                            Private ProtoThreads                         **/
 /******************************************************************************/
 /******************************************************************************/
-const char help[] = { "\r\n*************** FreeLux Log (v1.0) ********************\r\n"
-		"** p reset : Reset HW\r\n" };
+const char help[] = {
+		"\r\n*************** FreeLux Log (v1.0) ********************\r\n"
+				"** p reset : Reset HW\r\n" };
 void _help(type_debug_t _type, void* arg) {
 	printf("\r\n%s", help);
 	printf("** Plog commands line: <cmd> on/off \r\n");
@@ -101,7 +112,8 @@ void _set_plog(type_debug_t _type, void * arg) {
 	uint32_t buf = 0x00000000U;
 	char *_arr = (char*) arg;
 	bool _mode = bool_dbg_fnc(_arr);
-	if (_mode == true) buf = 0xFFFFFFFFU;
+	if (_mode == true)
+		buf = 0xFFFFFFFFU;
 	switch ((uint8_t) _type) {
 	case ALL: {
 		FmDebug = (buf & PL_ALL);
@@ -113,7 +125,8 @@ void _set_plog(type_debug_t _type, void * arg) {
 	}
 
 	default: {
-		if (_mode == false) FmDebug = FmDebug & (~BIT(_type));
+		if (_mode == false)
+			FmDebug = FmDebug & (~BIT(_type));
 		else
 			FmDebug = FmDebug | BIT(_type);
 		break;
@@ -129,9 +142,11 @@ void _plog_parser(char *_arr, uint8_t _arr_sz) {
 	uint8_t i = 0;
 	printf("%s", _arr);
 	while (PLEND != plog_cmd[i].type) {
-		if (strncmp(plog_cmd[i].cmd_txt, _arr, strlen(plog_cmd[i].cmd_txt)) == 0) {
+		if (strncmp(plog_cmd[i].cmd_txt, _arr, strlen(plog_cmd[i].cmd_txt))
+				== 0) {
 //			plog_cmd[i].Cbk_fnc(bool_dbg_fnc(&_arr[strlen(plog_cmd[i].cmd_txt)+1]),plog_cmd[i].type);
-			plog_cmd[i].Cbk_fnc(plog_cmd[i].type, &_arr[strlen(plog_cmd[i].cmd_txt) + 1]);
+			plog_cmd[i].Cbk_fnc(plog_cmd[i].type,
+					&_arr[strlen(plog_cmd[i].cmd_txt) + 1]);
 		}
 		i++;
 	};
@@ -152,28 +167,31 @@ void _plog_parser(char *_arr, uint8_t _arr_sz) {
 /***                      Processing functions 					             **/
 /******************************************************************************/
 /******************************************************************************/
+
 void PLOG_Stop(type_debug_t _type) {
 	_set_plog(_type, "off");
 }
 void PLOG_Start(type_debug_t _type) {
 	_set_plog(_type, "on");
 }
-void PLG_PrintHexBuffer(type_debug_t _typedbg, void *buffer_p, uint16_t size, const char* _file_name, const char* _fnc_name, u16 _line) {
-	uint16_t newline = 0;
-	uint8_t *buffer = (uint8_t*) &buffer_p;
-	P_PRINTFA(_typedbg, "[LOG]"FORMAT_CONTENT, _file_name, _fnc_name, _line);
-	for (uint16_t i = 0; i < size; i++) {
-		if (newline != 0) {
-			//P_PRINTF(_typedbg, "\r\n");
-			newline = 0;
-		}
-		P_PRINTFA(_typedbg, "%02X ", buffer[i]);
-		if (((i + 1) % 16) == 0) newline = 1;
-	}
-	P_PRINTF(_typedbg, "\r\n");
-	///Tesst
-	//P_PRINTFHEX_A(_typedbg,buffer,size,"%s","TESTTT:");
-}
+
+//void PLG_PrintHexBuffer(type_debug_t _typedbg, void *buffer_p, uint16_t size,const char* _file_name,const char* _fnc_name,u16 _line) {
+//	uint16_t newline = 0;
+//	uint8_t *buffer = (uint8_t*)&buffer_p;
+//	P_PRINTFA(_typedbg,"[LOG]"FORMAT_CONTENT,_file_name , _fnc_name, _line);
+//	for (uint16_t i = 0; i < size; i++) {
+//		if (newline != 0) {
+//			//P_PRINTF(_typedbg, "\r\n");
+//			newline = 0;
+//		}
+//		P_PRINTFA(_typedbg, "%02X ", buffer[i]);
+//		if (((i + 1) % 16) == 0)
+//			newline = 1;
+//	}
+//	P_PRINTF(_typedbg, "\r\n");
+//	///Tesst
+//	//P_PRINTFHEX_A(_typedbg,buffer,size,"%s","TESTTT:");
+//}
 
 /****************************************************************************************************
  * @brief 		Display the device's profile function
@@ -182,14 +200,15 @@ void PLG_PrintHexBuffer(type_debug_t _typedbg, void *buffer_p, uint16_t size, co
  *
  * @return	  	none.
  */
-void PLOG_DEVICE_PROFILE(fl_version_t _bootloader, fl_version_t _fw, fl_version_t _hw) {
+void PLOG_DEVICE_PROFILE(fl_version_t _bootloader, fl_version_t _fw,fl_version_t _hw) {
 	const char device_info[] = "\n*****************************************\n"
 			"*** FreeLux @2025 - RnD Team		*\n"
 			"*** BOOTLOADER : %d.%d.%d			*\n"
 			"*** FIRMWARE   : %d.%d.%d			*\n"
 			"*** HARDWARE   : %d.%d.%d			*\n"
 			"*****************************************\n";
-	P_INFO(device_info, _bootloader.major, _bootloader.minor, _bootloader.patch, _fw.major, _fw.minor, _fw.patch, _hw.major, _hw.minor, _hw.patch);
+	P_INFO(device_info, _bootloader.major, _bootloader.minor, _bootloader.patch,
+			_fw.major, _fw.minor, _fw.patch, _hw.major, _hw.minor, _hw.patch);
 }
 /****************************************************************************************************
  * @brief 		platform initialization function

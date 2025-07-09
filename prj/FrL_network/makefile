@@ -38,7 +38,7 @@ RM := rm -rf
 -include drivers/B91/subdir.mk
 -include drivers/B91/ext_driver/subdir.mk
 -include drivers/B91/flash/subdir.mk
--include vendor/FrL_network/subdir.mk
+-include vendor/FrL_Network/subdir.mk
 -include vendor/common/subdir.mk
 -include objects.mk
 
@@ -54,9 +54,9 @@ endif
 -include ../makefile.defs
 
 # Add inputs and outputs from these tool invocations to the build variables 
-BUILD_ARTIFACT_FILE_BASE_NAME = FrL_network
+BUILD_ARTIFACT_FILE_BASE_NAME = FrL_Network
 
-LINKER_OUTPUTS = FrL_network.elf
+LINKER_OUTPUTS = FrL_Network.elf
 
 GPROF_OUT += \
 ../gmon.sum ../gmon.out \
@@ -67,39 +67,75 @@ $(SECONDARY_OUTPUT_PATH)/pwr \
 GCOV_OUT += \
 $(foreach subdir,$(SUBDIRS),$(wildcard $(subdir)/*.gcda) $(wildcard $(subdir)/*.gcno)) \
 
+SYMBOL_OUTPUTS += \
+$(SECONDARY_OUTPUT_PATH)/symbol.txt \
+
+READELF_OUTPUTS += \
+$(SECONDARY_OUTPUT_PATH)/readelf.txt \
+
+OBJDUMP_OUTPUTS += \
+$(SECONDARY_OUTPUT_PATH)/objdump.txt \
+
+SIZE_OUTPUTS += \
+$(SECONDARY_OUTPUT_PATH)/.PHONY.size \
+
 
 # All Target
-all: FrL_network.elf secondary-outputs
+all: FrL_Network.elf secondary-outputs
 
 # Tool invocations
-FrL_network.elf: $(OBJS) $(USER_OBJS)
+FrL_Network.elf: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: Andes C Linker'
-	$(CROSS_COMPILE)gcc -O2 -nostartfiles -static -L"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/proj_lib" -mcmodel=medium -flto -g3 -mcpu=d25f -ffunction-sections -fdata-sections -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -T"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/boot.link" -Wl,--gc-sections -o "FrL_network.elf" $(OBJS) $(USER_OBJS) $(LIBS)
+	$(CROSS_COMPILE)gcc -O2 -nostartfiles -static -L"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/proj_lib" -mcmodel=medium -flto -g3 -mcpu=d25f -ffunction-sections -fdata-sections -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -T"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/boot.link" -Wl,--gc-sections -o "FrL_Network.elf" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 	$(MAKE) --no-print-directory post-build
 
-$(foreach subdir,$(SUBDIRS),$(wildcard $(subdir)/*.gcda) $(wildcard $(subdir)/*.gcno)): FrL_network.elf $(OBJS) $(USER_OBJS)
-../gmon.sum ../gmon.out: FrL_network.elf $(OBJS) $(USER_OBJS)
-$(SECONDARY_OUTPUT_PATH)/pwr: FrL_network.elf $(OBJS) $(USER_OBJS)
+$(foreach subdir,$(SUBDIRS),$(wildcard $(subdir)/*.gcda) $(wildcard $(subdir)/*.gcno)): FrL_Network.elf $(OBJS) $(USER_OBJS)
+../gmon.sum ../gmon.out: FrL_Network.elf $(OBJS) $(USER_OBJS)
+$(SECONDARY_OUTPUT_PATH)/pwr: FrL_Network.elf $(OBJS) $(USER_OBJS)
+
+$(SECONDARY_OUTPUT_PATH)/symbol.txt: $(LINKER_OUTPUTS)
+	@echo 'Invoking: NM (symbol listing)'
+	$(CROSS_COMPILE)nm -n -l -C "FrL_Network.elf" > $(SECONDARY_OUTPUT_PATH)/symbol.txt
+	@echo 'Finished building: $@'
+	@echo ' '
+
+$(SECONDARY_OUTPUT_PATH)/readelf.txt: $(LINKER_OUTPUTS)
+	@echo 'Invoking: Readelf (ELF info listing)'
+	$(CROSS_COMPILE)readelf -a "FrL_Network.elf" > $(SECONDARY_OUTPUT_PATH)/readelf.txt
+	@echo 'Finished building: $@'
+	@echo ' '
+
+$(SECONDARY_OUTPUT_PATH)/objdump.txt: $(LINKER_OUTPUTS)
+	@echo 'Invoking: Objdump (disassembly)'
+	$(CROSS_COMPILE)objdump -x -d -C "FrL_Network.elf" > $(SECONDARY_OUTPUT_PATH)/objdump.txt
+	@echo 'Finished building: $@'
+	@echo ' '
 
 : $(LINKER_OUTPUTS)
-	@echo 'Invoking: NM (symbol listing)'
-	$(CROSS_COMPILE)nm -n -l -C "FrL_network.elf" >
+	@echo 'Invoking: Objcopy (object content copy)'
+	$(CROSS_COMPILE)objcopy -S -O binary "FrL_Network.elf"
+	@echo 'Finished building: $@'
+	@echo ' '
+
+$(SECONDARY_OUTPUT_PATH)/.PHONY.size: $(LINKER_OUTPUTS)
+	@echo 'Invoking: Size (section size listing)'
+	$(CROSS_COMPILE)size  "FrL_Network.elf" | tee $(SECONDARY_OUTPUT_PATH)/.PHONY.size
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(GPROF_OUT)$(PWR_OUT)$(EXECUTABLES)$(OBJS)$(S_UPPER_DEPS)$(GCOV_OUT)$(C_DEPS) FrL_network.elf
+	-$(RM) $(GPROF_OUT)$(PWR_OUT)$(SIZE_OUTPUTS)$(READELF_OUTPUTS)$(EXECUTABLES)$(OBJDUMP_OUTPUTS)$(OBJS)$(SYMBOL_OUTPUTS)$(S_UPPER_DEPS)$(GCOV_OUT)$(C_DEPS) FrL_Network.elf
 	-@echo ' '
 
 post-build:
-	-"D:\Job\Freelux\Working\TBS_Monitoring\FrL_BLEnetwork_owner\prj/tl_check_fw.bat"   FrL_network
+	-"D:\Job\Freelux\Working\TBS_Monitoring\FrL_BLEnetwork_owner\prj/tl_check_fw.bat"   FrL_Network
 	-@echo ' '
 
-secondary-outputs:
+secondary-outputs: $(SYMBOL_OUTPUTS) $(READELF_OUTPUTS) $(OBJDUMP_OUTPUTS) $(SIZE_OUTPUTS)
 
 .PHONY: all clean dependents
 .SECONDARY: post-build

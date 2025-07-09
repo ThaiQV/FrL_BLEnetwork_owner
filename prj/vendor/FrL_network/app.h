@@ -47,11 +47,12 @@ void user_init_deepRetn();
  */
 void main_loop (void);
 
+
 /**
- * @brief		user initialization when battery power check
+ * @brief		this function is used to process battery power.
  * @param[in]	none
  * @return      none
  */
-void user_init_battery_power_check(void);
+void user_battery_power_check(void);
 
 #endif /* VENDOR_APP_H_ */
