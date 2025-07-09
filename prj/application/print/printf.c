@@ -100,8 +100,6 @@ _attribute_ram_code_sec_noinline_  void dr_putchar(unsigned char byte){
 
 __attribute__((used)) int _write(int fd, const unsigned char *buf, int size)
 {
-
-
     int    i;
     for (i = 0; i < size; i++){
     	dr_putchar(buf[i]);

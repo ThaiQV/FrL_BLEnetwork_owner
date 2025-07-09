@@ -36,16 +36,13 @@
  * @return      none
  */
 _attribute_ram_code_
-void rf_irq_handler(void)
-{
+void rf_irq_handler(void) {
 	DBG_CHN14_HIGH;
 
-	irq_blt_sdk_handler ();
+	irq_blt_sdk_handler();
 
 	DBG_CHN14_LOW;
 }
-
-
 
 /**
  * @brief		BLE SDK System timer interrupt handler.
@@ -53,32 +50,28 @@ void rf_irq_handler(void)
  * @return      none
  */
 _attribute_ram_code_
-void stimer_irq_handler(void)
-{
+void stimer_irq_handler(void) {
 	DBG_CHN15_HIGH;
 
-	irq_blt_sdk_handler ();
+	irq_blt_sdk_handler();
 
 	DBG_CHN15_LOW;
 }
 
-
-
-
 #if (FREERTOS_ENABLE)
-	#if(!TEST_CONN_CURRENT_ENABLE)
-		static void led_task(void *pvParameters){
-			reg_gpio_pb_oen &= ~ GPIO_PB7;
-			while(1){
-				reg_gpio_pb_out |= GPIO_PB7;
-				printf("LED ON;\r\n");
-				vTaskDelay(1000);
-				printf("LED OFF;\r\n");
-				reg_gpio_pb_out &= ~GPIO_PB7;
-				vTaskDelay(1000);
-			}
-		}
-	#endif
+#if(!TEST_CONN_CURRENT_ENABLE)
+static void led_task(void *pvParameters) {
+	reg_gpio_pb_oen &= ~ GPIO_PB7;
+	while(1) {
+		reg_gpio_pb_out |= GPIO_PB7;
+		printf("LED ON;\r\n");
+		vTaskDelay(1000);
+		printf("LED OFF;\r\n");
+		reg_gpio_pb_out &= ~GPIO_PB7;
+		vTaskDelay(1000);
+	}
+}
+#endif
 void proto_task( void *pvParameters );
 #endif
 
@@ -87,7 +80,11 @@ void proto_task( void *pvParameters );
  * @param[in]	none
  * @return      none
  */
-_attribute_ram_code_ int main (void)   //must on ramcode
+fl_version_t _bootloader = { 0, 0, 0 };
+fl_version_t _fw = { 1, 0, 0 };
+fl_version_t _hw = { 0, 0, 0 };
+
+_attribute_ram_code_ int main(void)   //must on ramcode
 {
 	DBG_CHN0_LOW;
 	blc_pm_select_internal_32k_crystal();
@@ -102,32 +99,33 @@ _attribute_ram_code_ int main (void)   //must on ramcode
 	rf_drv_ble_init();
 
 	gpio_init(!deepRetWakeUp);
+#if (UART_PRINT_DEBUG_ENABLE)
+	DEBUG_TX_PIN_INIT();
+#endif
+	PLOG_DEVICE_PROFILE(_bootloader,_fw,_hw);
 
-
-
-	if(!deepRetWakeUp){//read flash size
-		#if (BATT_CHECK_ENABLE)
-			user_battery_power_check();
-		#endif
+	if (!deepRetWakeUp) {  //read flash size
+#if (BATT_CHECK_ENABLE)
+	user_battery_power_check();
+#endif
 
 		blc_readFlashSize_autoConfigCustomFlashSector();
 
-		#if (FLASH_FIRMWARE_CHECK_ENABLE)
-			blt_firmware_completeness_check();
-		#endif
+#if (FLASH_FIRMWARE_CHECK_ENABLE)
+		blt_firmware_completeness_check();
+#endif
 
-		#if FIRMWARES_SIGNATURE_ENABLE
-			blt_firmware_signature_check();
-		#endif
+#if FIRMWARES_SIGNATURE_ENABLE
+		blt_firmware_signature_check();
+#endif
 	}
 
 	/* load customized freq_offset cap value. */
 	blc_app_loadCustomizedParameters();
 
-	if( deepRetWakeUp ){ //MCU wake_up from deepSleep retention mode
-		user_init_deepRetn ();
-	}
-	else{ //MCU power_on or wake_up from deepSleep mode
+	if (deepRetWakeUp) { //MCU wake_up from deepSleep retention mode
+		user_init_deepRetn();
+	} else { //MCU power_on or wake_up from deepSleep mode
 		user_init_normal();
 #if (FREERTOS_ENABLE)
 		extern void blc_ll_set_freertos_en(u8 en);
@@ -138,23 +136,23 @@ _attribute_ram_code_ int main (void)   //must on ramcode
 #if (FREERTOS_ENABLE)
 
 	extern void vPortRestoreTask();
-	if( deepRetWakeUp ){
+	if( deepRetWakeUp ) {
 		printf("enter restor work.\r\n");
 		vPortRestoreTask();
 
-	}else{
-		#if(!TEST_CONN_CURRENT_ENABLE)
-			xTaskCreate( led_task, "tLed", configMINIMAL_STACK_SIZE, (void*)0, (tskIDLE_PRIORITY+1), 0 );
-		#endif
+	} else {
+#if(!TEST_CONN_CURRENT_ENABLE)
+		xTaskCreate( led_task, "tLed", configMINIMAL_STACK_SIZE, (void*)0, (tskIDLE_PRIORITY+1), 0 );
+#endif
 		xTaskCreate( proto_task, "tProto", 2*configMINIMAL_STACK_SIZE, (void*)0, (tskIDLE_PRIORITY+1), 0 );
-	//	xTaskCreate( ui_task, "tUI", configMINIMAL_STACK_SIZE, (void*)0, tskIDLE_PRIORITY + 1, 0 );
+		//	xTaskCreate( ui_task, "tUI", configMINIMAL_STACK_SIZE, (void*)0, tskIDLE_PRIORITY + 1, 0 );
 		vTaskStartScheduler();
 	}
 #else
 	irq_enable();
 
 	while (1) {
-		main_loop ();
+		main_loop();
 	}
 	return 0;
 #endif
@@ -162,6 +160,6 @@ _attribute_ram_code_ int main (void)   //must on ramcode
 
 #if (FREERTOS_ENABLE)
 //  !!! should notify those tasks that ulTaskNotifyTake long time and should be wakeup every time PM wakeup
-void vPortWakeupNotify(){
+void vPortWakeupNotify() {
 }
 #endif

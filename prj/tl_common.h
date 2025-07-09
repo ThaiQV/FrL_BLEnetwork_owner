@@ -24,7 +24,6 @@
 #ifndef TL_COMMON_H_
 #define TL_COMMON_H_
 
-
 #include "common/types.h"
 #include "common/bit.h"
 #include "common/utility.h"
@@ -37,13 +36,8 @@
 
 #include <string.h>
 
-
-
-
 #include "common/usb_dbg/myudb.h"
 #include "common/usb_dbg/log_def_stack.h"
-
-
 
 #include "vendor/common/blt_common.h"
 #include "vendor/common/blt_fw_sign.h"
