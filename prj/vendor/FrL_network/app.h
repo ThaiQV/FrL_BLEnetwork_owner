@@ -24,6 +24,10 @@
 #ifndef VENDOR_APP_H_
 #define VENDOR_APP_H_
 
+#define		MY_RF_POWER_INDEX					RF_POWER_INDEX_P2p79dBm
+
+#define		BLE_DEVICE_ADDRESS_TYPE 			BLE_DEVICE_ADDRESS_PUBLIC
+
 /**
  * @brief		user initialization when MCU power on or wake_up from deepSleep mode
  * @param[in]	none

@@ -34,7 +34,7 @@
 #define APP_DIRECT_ADV_ENABLE				0
 #define BLE_OTA_SERVER_ENABLE				1
 #define BATT_CHECK_ENABLE					0
-
+#define	BLT_SOFTWARE_TIMER_ENABLE			1
 /**
  *  @brief  flash firmware check
  */

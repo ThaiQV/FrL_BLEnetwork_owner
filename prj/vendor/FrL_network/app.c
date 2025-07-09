@@ -33,21 +33,19 @@
 #include "application/keyboard/keyboard.h"
 #include "battery_check.h"
 
+#include "fl_adv_proc.h"
+
 #define 	ADV_IDLE_ENTER_DEEP_TIME			60  //60 s
 #define 	CONN_IDLE_ENTER_DEEP_TIME			60  //60 s
 
 #define 	MY_DIRECT_ADV_TMIE					2000000
-
-#define		MY_RF_POWER_INDEX					RF_POWER_INDEX_P2p79dBm
-
-#define		BLE_DEVICE_ADDRESS_TYPE 			BLE_DEVICE_ADDRESS_PUBLIC
 
 _attribute_data_retention_ own_addr_type_t app_own_address_type = OWN_ADDRESS_PUBLIC;
 
 /**
  * @brief	Adv Packet data
  */
-const u8 tbl_advData[] = { 0x05, 0x09, 'e', 'H', 'I', 'D', 0x02, 0x01, 0x05, 				// BLE limited discoverable mode and BR/EDR not supported
+u8 tbl_advData[] = { 0x05, 0x09, 'e', 'H', 'I', 'D', 0x02, 0x01, 0x05, 				// BLE limited discoverable mode and BR/EDR not supported
 0x03, 0x19, 0x80, 0x01, 					// 384, Generic Remote Control, Generic category
 		0x05, 0x02, 0x12, 0x18, 0x0F, 0x18,		// incomplete list of service class UUIDs (0x1812, 0x180F)
 		};
@@ -336,52 +334,8 @@ _attribute_no_inline_ void user_init_normal(void) {
 
 //////////////////////////// BLE stack Initialization  End //////////////////////////////////
 
-	////////////////// config adv packet /////////////////////
-#if (APP_SECURITY_ENABLE && APP_DIRECT_ADV_ENABLE)
-	u8 bond_number = blc_smp_param_getCurrentBondingDeviceNumber();  //get bonded device number
-	smp_param_save_t bondInfo;
-	if(bond_number)//at least 1 bonding device exist
-	{
-		bls_smp_param_loadByIndex( bond_number - 1, &bondInfo);  //get the latest bonding device (index: bond_number-1 )
-
-	}
-
-	if(bond_number)   //set direct adv
-	{
-		//set direct adv
-		u8 status = bls_ll_setAdvParam( ADV_INTERVAL_30MS, ADV_INTERVAL_35MS,
-				ADV_TYPE_CONNECTABLE_DIRECTED_LOW_DUTY, app_own_address_type,
-				bondInfo.peer_addr_type, bondInfo.peer_addr,
-				BLT_ENABLE_ADV_ALL,
-				ADV_FP_NONE);
-		if(status != BLE_SUCCESS) {while(1);}  //debug: adv setting err
-
-		//it is recommended that direct adv only last for several seconds, then switch to indirect adv
-		bls_ll_setAdvDuration(MY_DIRECT_ADV_TMIE, 1);
-		bls_app_registerEventCallback (BLT_EV_FLAG_ADV_DURATION_TIMEOUT, &app_switch_to_indirect_adv);
-
-	}
-	else   //set indirect adv
-#endif
-	{
-		u8 status = bls_ll_setAdvParam(ADV_INTERVAL_30MS,ADV_INTERVAL_35MS,ADV_TYPE_CONNECTABLE_UNDIRECTED,app_own_address_type,0,NULL,
-				BLT_ENABLE_ADV_ALL,ADV_FP_NONE);
-		if (status != BLE_SUCCESS) {
-			while (1)
-				;
-		}  //debug: adv setting err
-	}
-
-	bls_ll_setAdvData((u8 *) tbl_advData,sizeof(tbl_advData));
-	bls_ll_setScanRspData((u8 *) tbl_scanRsp,sizeof(tbl_scanRsp));
-	bls_ll_setAdvEnable(BLC_ADV_ENABLE);  //adv enable
-	//set rf power index, user must set it after every suspend wakeup, cause relative setting will be reset in suspend
-	rf_set_power_level_index(MY_RF_POWER_INDEX);
-
-	bls_app_registerEventCallback(BLT_EV_FLAG_CONNECT,&task_connect);
-	bls_app_registerEventCallback(BLT_EV_FLAG_TERMINATE,&task_terminate);
-	bls_app_registerEventCallback(BLT_EV_FLAG_SUSPEND_EXIT,&task_suspend_exit);
-
+	////////////////// config adv scan /////////////////////
+	fl_adv_scanner_init();
 	///////////////////// Power Management initialization///////////////////
 #if(BLE_APP_PM_ENABLE)
 	blc_ll_initPowerManagement_module();
@@ -432,7 +386,10 @@ _attribute_no_inline_ void user_init_normal(void) {
 #endif
 
 	advertise_begin_tick = clock_time();
-
+	///////////////////// stimer Management initialization///////////////////
+	blt_soft_timer_init();
+	///////////////////// freelux adv periodic initialization///////////////////
+	fl_adv_period_init();
 }
 
 /**
@@ -474,6 +431,10 @@ _attribute_ram_code_ void user_init_deepRetn(void) {
  * @return      none
  */
 _attribute_no_inline_ void main_loop(void) {
+	////////////////////////////////////// ADV-Period /////////////////////////////////
+	fl_adv_period_run();
+	////////////////////////////////////// Soft-timer /////////////////////////////////
+	blt_soft_timer_process(MAINLOOP_ENTRY);
 	////////////////////////////////////// BLE entry /////////////////////////////////
 	blt_sdk_main_loop();
 
