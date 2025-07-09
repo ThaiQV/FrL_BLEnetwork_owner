@@ -48,6 +48,8 @@
 
 #include "gpio_default.h"
 
-#include "Freelux_libs/plog.h"
+#include "Freelux_libs/fl_common.h"
+//#include "Freelux_libs/plog.h"
+//#include "Freelux_libs/queue_fifo.h"
 
 #endif /* TL_COMMON_H_ */

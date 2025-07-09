@@ -8,9 +8,10 @@
  *License: Revised BSD License, see LICENSE.TXT file include in the project
  **************************************************************************/
 
-#include "data_types.h"
+#include "types.h"
 #include "stdio.h"
 #include "stdint.h"
+#include "math.h"
 
 #define PLOG_ENA         1                    /* printf for debug */ // defined into the setting project
 
@@ -250,7 +251,6 @@ enum {
 																			}\
 																			P_PRINTF(dbg, "\r\n");}
 
-
 #define P_INFO(fmt,...)			_COLOR(USER);                      \
 														PRINTF(fmt,##__VA_ARGS__);\
 														TERMINAL_FONT_BLACK();                      
@@ -329,7 +329,6 @@ if (!(val))                                                             \
 #define TERMINAL_FONT_L_PURPLE()    PRINTF("\033[1;35m")    /* light purple */
 #define TERMINAL_FONT_L_CYAN()      PRINTF("\033[1;36m")    /* light cyan */
 
-
 /* background color */
 #define TERMINAL_BACK_BLACK()       PRINTF("\033[0;40m")
 #define TERMINAL_BACK_RED()         PRINTF("\033[1;41m")    /* red */
@@ -348,7 +347,6 @@ if (!(val))                                                             \
 #define TERMINAL_BACK_L_BLUE()      PRINTF("\033[0;44m")    /* light blue */
 #define TERMINAL_BACK_L_PURPLE()    PRINTF("\033[0;45m")    /* light purple */
 #define TERMINAL_BACK_L_CYAN()      PRINTF("\033[0;46m")    /* light cyan */
-
 
 /* terminal clear end */
 #define TERMINAL_CLEAR_END()        PRINTF("\033[K")
@@ -385,10 +383,14 @@ if (!(val))                                                             \
 #define TERMINAL_UN_HIGH_LIGHT()    PRINTF("\033[27m")
 
 /* terminal display-------------------------------------------------------END */
+typedef struct {
+	u8 major;
+	u8 minor;
+	u8 patch;
+} fl_version_t;
 //void PLG_PrintHexBuffer(type_debug_t _type,uint8_t *buffer, uint16_t size);
 void PLOG_Stop(type_debug_t _type);
 void PLOG_Start(type_debug_t _type);
 void PLOG_HELP(void);
-void PLOG_DEVICE_PROFILE(fl_version_t _bootloader, fl_version_t _fw,
-		fl_version_t _hw);
+void PLOG_DEVICE_PROFILE(fl_version_t _bootloader, fl_version_t _fw, fl_version_t _hw);
 //void PLG_PrintHexBuffer(type_debug_t _typedbg, uint8_t *buffer, uint16_t size);

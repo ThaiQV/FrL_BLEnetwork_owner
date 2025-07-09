@@ -331,11 +331,6 @@ _attribute_no_inline_ void user_init_normal(void) {
 	blc_smp_setSecurityLevel(No_Security);
 #endif
 	//////////// Host Initialization  End /////////////////////////
-
-//////////////////////////// BLE stack Initialization  End //////////////////////////////////
-
-	////////////////// config adv scan /////////////////////
-	fl_adv_scanner_init();
 	///////////////////// Power Management initialization///////////////////
 #if(BLE_APP_PM_ENABLE)
 	blc_ll_initPowerManagement_module();
@@ -385,11 +380,14 @@ _attribute_no_inline_ void user_init_normal(void) {
 
 #endif
 
-	advertise_begin_tick = clock_time();
+	//////////////////////////// BLE stack Initialization  End //////////////////////////////////
+	///////////////////// freelux adv initialization///////////////////
+	fl_adv_init();
+	////////////////// config adv scan /////////////////////
+	fl_adv_scanner_init();
 	///////////////////// stimer Management initialization///////////////////
 	blt_soft_timer_init();
-	///////////////////// freelux adv periodic initialization///////////////////
-	fl_adv_period_init();
+
 }
 
 /**
@@ -432,7 +430,7 @@ _attribute_ram_code_ void user_init_deepRetn(void) {
  */
 _attribute_no_inline_ void main_loop(void) {
 	////////////////////////////////////// ADV-Period /////////////////////////////////
-	fl_adv_period_run();
+	fl_adv_run();
 	////////////////////////////////////// Soft-timer /////////////////////////////////
 	blt_soft_timer_process(MAINLOOP_ENTRY);
 	////////////////////////////////////// BLE entry /////////////////////////////////
