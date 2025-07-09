@@ -27,6 +27,7 @@
 
 #include "spp.h"
 
+
 extern int module_uart_data_flg;
 extern u32 module_wakeup_module_tick;
 extern my_fifo_t spp_rx_fifo;
@@ -64,6 +65,7 @@ int controller_event_handler(u32 h, u8 *para, int n) {
 
 		switch (event) {
 		case BLT_EV_FLAG_SCAN_RSP:
+			LOGA(BLE,"ADV Req (%d)!!!!\r\n",n);
 			break;
 
 		case BLT_EV_FLAG_CONNECT: {

@@ -40,6 +40,7 @@ _attribute_data_retention_ my_fifo_t spp_tx_fifo = {
 SPP_TXFIFO_SIZE,
 SPP_TXFIFO_NUM, 0, 0, spp_tx_fifo_b, };
 
+#define 	APP_ADV_DURAITON_TIME				300*1000	//ms
 #define     MY_APP_ADV_CHANNEL					BLT_ENABLE_ADV_ALL
 #define 	MY_ADV_INTERVAL_MIN					ADV_INTERVAL_30MS
 #define 	MY_ADV_INTERVAL_MAX					ADV_INTERVAL_40MS
@@ -74,7 +75,8 @@ volatile unsigned int uart0_rx_buff_byte[16] __attribute__((aligned(4))) = { 0x0
 /**
  * @brief	Adv Packet data
  */
-const u8 tbl_advData[] = { 0x05, 0x09, 'F', 'R', 'N', 'W', 0x02, 0x01, 0x05, 						// BLE limited discoverable mode and BR/EDR not supported
+const u8 tbl_advData[] = { 0x19, 0xff, 0x4c, 0x46, 0x55, 0xaa, 0x69, 0x1b, 0x0, 0x59, 0x7f, 0x10, 0x9f, 0x81, 0x4d, 0x68, 0x69, 0x43, 0xe7, 0x75, 0xe4, 0xad,
+		0x4a, 0xf, 0x44, 0x8b 						// BLE limited discoverable mode and BR/EDR not supported
 		};
 
 _attribute_data_retention_ u8 conn_update_cnt;
@@ -95,6 +97,8 @@ _attribute_data_retention_ u32 module_wakeup_module_tick;
 #define UART_TX_BUSY			((spp_tx_fifo.rptr != spp_tx_fifo.wptr) || uart_tx_is_busy(UART0) )
 #endif
 #define UART_RX_BUSY			(spp_rx_fifo.rptr != spp_rx_fifo.wptr)
+
+void app_durationADV_timeout_proccess(u8 e, u8 *p, int n);
 
 /**
  * @brief      callback function of LinkLayer Event "BLT_EV_FLAG_ADV_DURATION_TIMEOUT"
@@ -173,7 +177,31 @@ void uart0_recieve_process(void) {
 		}
 	}
 }
-
+/**
+ * @brief      This function servers gpio test
+ * @param[in]  none
+ * @return     0
+ */
+int resendADV(void) {
+	bls_ll_setAdvData((u8 *) tbl_advData, sizeof(tbl_advData));
+	//	bls_ll_setScanRspData((u8 *) tbl_scanRsp, sizeof(tbl_scanRsp));
+	bls_ll_setAdvDuration(APP_ADV_DURAITON_TIME, 1); // ms
+	bls_app_registerEventCallback(BLT_EV_FLAG_ADV_DURATION_TIMEOUT, &app_durationADV_timeout_proccess);
+	bls_ll_setAdvEnable(BLC_ADV_ENABLE);  //adv enable
+	blt_soft_timer_delete(&resendADV);
+	return 0;
+}
+/**
+ * @brief      callback function of LinkLayer Event "BLT_EV_FLAG_ADV_DURATION_TIMEOUT"
+ * @param[in]  e - LinkLayer Event type
+ * @param[in]  p - data pointer of event
+ * @param[in]  n - data length of event
+ * @return     none
+ */
+void app_durationADV_timeout_proccess(u8 e, u8 *p, int n) {
+	LOGA(APP, "ADV the end!!\r\n");
+	blt_soft_timer_add(&resendADV, 500);  //ms
+}
 /**
  * @brief		user initialization when MCU power on or wake_up from deepSleep mode
  * @param[in]	none
@@ -239,69 +267,79 @@ _attribute_no_inline_ void user_init_normal(void) {
 	// Hid device on android7.0/7.1 or later version
 	// New paring: send security_request immediately after connection complete
 	// reConnect:  send security_request 1000mS after connection complete. If master start paring or encryption before 1000mS timeout, slave do not send security_request.
-	blc_smp_configSecurityRequestSending(SecReq_IMM_SEND, SecReq_PEND_SEND, 1000); //if not set, default is:  send "security request" immediately after link layer connection established(regardless of new connection or reconnection)
+	blc_smp_configSecurityRequestSending(SecReq_IMM_SEND, SecReq_PEND_SEND, 1000);//if not set, default is:  send "security request" immediately after link layer connection established(regardless of new connection or reconnection)
 #else
-			blc_smp_setSecurityLevel(No_Security);
+	blc_smp_setSecurityLevel(No_Security);
 #endif
 	////////////////// config adv packet /////////////////////
 
-	u8 status = bls_ll_setAdvParam(ADV_INTERVAL_30MS, ADV_INTERVAL_35MS, ADV_TYPE_CONNECTABLE_UNDIRECTED, app_own_address_type, 0, NULL, BLT_ENABLE_ADV_ALL,
+	u8 status = bls_ll_setAdvParam(ADV_INTERVAL_30MS, ADV_INTERVAL_35MS, ADV_TYPE_NONCONNECTABLE_UNDIRECTED, app_own_address_type, 0, NULL, BLT_ENABLE_ADV_ALL,
 			ADV_FP_NONE);
 	if (status != BLE_SUCCESS) {
 	}  //debug: adv setting err
-	   ///////////////////// USER application initialization ///////////////////
+	   //scan setting
+	   //blc_ll_initScanning_module(); //new sdk version
+//	blc_ll_setScanParameter(SCAN_TYPE_PASSIVE, SCAN_INTERVAL_50MS, SCAN_WINDOW_30MS, OWN_ADDRESS_PUBLIC, SCAN_FP_ALLOW_ADV_ANY);
+//	blc_ll_addScanningInAdvState();  //add scan in adv state
+	//adv broadcast
 	bls_ll_setAdvData((u8 *) tbl_advData, sizeof(tbl_advData));
 //	bls_ll_setScanRspData((u8 *) tbl_scanRsp, sizeof(tbl_scanRsp));
+	bls_ll_setAdvDuration(APP_ADV_DURAITON_TIME, 1); // ms
+	bls_app_registerEventCallback(BLT_EV_FLAG_ADV_DURATION_TIMEOUT, &app_durationADV_timeout_proccess);
 	bls_ll_setAdvEnable(BLC_ADV_ENABLE);  //adv enable
 	rf_set_power_level_index(MY_RF_POWER_INDEX);
+//
+//#if UART_DMA_USE
+//	unsigned short div;
+//	unsigned char bwpc;
+//	uart_reset(UART0);
+//	uart_set_pin(UART0_TX_PB2, UART0_RX_PB3);  // uart tx/rx pin set
+//	uart_cal_div_and_bwpc(115200, sys_clk.pclk * 1000 * 1000, &div, &bwpc);
+//	uart_set_rx_timeout(UART0, bwpc, 12, UART_BW_MUL1);
+//	uart_init(UART0, div, bwpc, UART_PARITY_NONE, UART_STOP_BIT_ONE);
+//
+//	uart_clr_irq_mask(UART0, UART_RX_IRQ_MASK | UART_TX_IRQ_MASK | UART_TXDONE_MASK | UART_RXDONE_MASK);
+//	core_interrupt_enable();
+//
+//	uart_set_tx_dma_config(UART0, UART_DMA_CHANNEL_TX);
+//	uart_set_rx_dma_config(UART0, UART_DMA_CHANNEL_RX);
+//
+//	uart_clr_tx_done(UART0);
+//	uart_set_irq_mask(UART0, UART_RXDONE_MASK);
+//
+//	uart_set_irq_mask(UART0, UART_TXDONE_MASK);
+//	plic_interrupt_enable(IRQ19_UART0);
+//
+//	u8 *uart_rx_addr = (spp_rx_fifo_b + (spp_rx_fifo.wptr & (spp_rx_fifo.num - 1)) * spp_rx_fifo.size);
+//	uart_receive_dma(UART0, (unsigned char *) uart_rx_addr, (unsigned int) spp_rx_fifo.size);
+//
+//#else
+//	//uart config
+//	uart_reset(UART0);
+//	uart_set_pin(UART0_TX_PB2, UART0_RX_PB3 );// uart tx/rx pin set
+//	unsigned short div;
+//	unsigned char bwpc;
+//	uart_cal_div_and_bwpc(115200, sys_clk.pclk*1000*1000, &div, &bwpc);
+//	uart_init(UART0, div, bwpc, UART_PARITY_NONE, UART_STOP_BIT_ONE);
+//	//uart irq set
+//	plic_interrupt_enable(IRQ19_UART0);
+//	plic_set_priority(IRQ19_UART0,1);
+//	uart_tx_irq_trig_level(UART0, 0);
+//	uart_rx_irq_trig_level(UART0, 1);
+//	uart_set_irq_mask(UART0, UART_RX_IRQ_MASK);
+//#endif
+//	extern int rx_from_uart_cb(void);
+//	extern int tx_to_uart_cb(void);
+//	blc_register_hci_handler(rx_from_uart_cb, tx_to_uart_cb);				//customized uart handler
 
-#if UART_DMA_USE
-	unsigned short div;
-	unsigned char bwpc;
-	uart_reset(UART0);
-	uart_set_pin(UART0_TX_PB2, UART0_RX_PB3);  // uart tx/rx pin set
-	uart_cal_div_and_bwpc(115200, sys_clk.pclk * 1000 * 1000, &div, &bwpc);
-	uart_set_rx_timeout(UART0, bwpc, 12, UART_BW_MUL1);
-	uart_init(UART0, div, bwpc, UART_PARITY_NONE, UART_STOP_BIT_ONE);
-
-	uart_clr_irq_mask(UART0, UART_RX_IRQ_MASK | UART_TX_IRQ_MASK | UART_TXDONE_MASK | UART_RXDONE_MASK);
-	core_interrupt_enable();
-
-	uart_set_tx_dma_config(UART0, UART_DMA_CHANNEL_TX);
-	uart_set_rx_dma_config(UART0, UART_DMA_CHANNEL_RX);
-
-	uart_clr_tx_done(UART0);
-	uart_set_irq_mask(UART0, UART_RXDONE_MASK);
-
-	uart_set_irq_mask(UART0, UART_TXDONE_MASK);
-	plic_interrupt_enable(IRQ19_UART0);
-
-	u8 *uart_rx_addr = (spp_rx_fifo_b + (spp_rx_fifo.wptr & (spp_rx_fifo.num - 1)) * spp_rx_fifo.size);
-	uart_receive_dma(UART0, (unsigned char *) uart_rx_addr, (unsigned int) spp_rx_fifo.size);
-
-#else
-	//uart config
-	uart_reset(UART0);
-	uart_set_pin(UART0_TX_PB2, UART0_RX_PB3 );// uart tx/rx pin set
-	unsigned short div;
-	unsigned char bwpc;
-	uart_cal_div_and_bwpc(115200, sys_clk.pclk*1000*1000, &div, &bwpc);
-	uart_init(UART0, div, bwpc, UART_PARITY_NONE, UART_STOP_BIT_ONE);
-	//uart irq set
-	plic_interrupt_enable(IRQ19_UART0);
-	plic_set_priority(IRQ19_UART0,1);
-	uart_tx_irq_trig_level(UART0, 0);
-	uart_rx_irq_trig_level(UART0, 1);
-	uart_set_irq_mask(UART0, UART_RX_IRQ_MASK);
-#endif
-	extern int rx_from_uart_cb(void);
-	extern int tx_to_uart_cb(void);
-	blc_register_hci_handler(rx_from_uart_cb, tx_to_uart_cb);				//customized uart handler
 	extern int controller_event_handler(u32 h, u8 *para, int n);
 	blc_hci_registerControllerEventHandler(controller_event_handler);		//register event callback
 	bls_hci_mod_setEventMask_cmd(0xfffff);			//enable all 18 events,event list see ll.h
-	//PM
-	bls_pm_setSuspendMask(SUSPEND_DISABLE);
+//	//PM
+////	bls_pm_setSuspendMask(SUSPEND_DISABLE);
+
+	//soft timer
+	blt_soft_timer_init();
 }
 
 /**
@@ -310,12 +348,13 @@ _attribute_no_inline_ void user_init_normal(void) {
  * @return      none
  */
 _attribute_no_inline_ void main_loop(void) {
+	blt_soft_timer_process(MAINLOOP_ENTRY);
 	////////////////////////////////////// BLE entry /////////////////////////////////
 	blt_sdk_main_loop();
 	//  add spp UI task
 #if !UART_DMA_USE
 	uart0_recieve_process();
 #endif
-	spp_restart_proc();
+	//spp_restart_proc();
 }
 

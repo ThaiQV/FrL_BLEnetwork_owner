@@ -11,3 +11,6 @@
 
 [INFO ] 25/07/08-08:48:13:013 - Log4A.logInfo(Log4A.java:34) 
 [main]: call TRUE_LICENSE license
+
+[INFO ] 25/07/09-08:28:28:028 - Log4A.logInfo(Log4A.java:34) 
+[Framework stop]: call TRUE_LICENSE license

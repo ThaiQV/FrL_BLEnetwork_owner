@@ -24,6 +24,7 @@
 #pragma once
 
 /////////////////// MODULE /////////////////////////////////
+//#define SCAN_IN_ADV_STATE					1
 #define BLE_MODULE_PM_ENABLE				0
 #define PM_DEEPSLEEP_RETENTION_ENABLE		0
 #define TELIK_SPP_SERVICE_ENABLE			1
@@ -44,7 +45,7 @@
 #define FIRMWARES_SIGNATURE_ENABLE			0
 
 //////////////// SMP SETTING  //////////////////////////////
-#define BLE_SECURITY_ENABLE 			   	1
+#define BLE_SECURITY_ENABLE 			   	0
 
 /**
  *  @brief  DEBUG  Configuration

@@ -77,8 +77,8 @@ void uart0_irq_handler(void) {
  * @param[in]	none
  * @return      none
  */
-fl_version_t BOOTLOADER_VERSION = { 1, 0, 0 };
-fl_version_t FW_VERSION = { 1, 1, 0 };
+fl_version_t BOOTLOADER_VERSION = { 0, 0, 0 };
+fl_version_t FW_VERSION = { 1, 0, 0 };
 fl_version_t HW_VERSION = { 1, 0, 0 };
 _attribute_ram_code_ int main(void)   //must on ramcode
 {
@@ -95,6 +95,8 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 	rf_drv_ble_init();
 
 	gpio_init(!deepRetWakeUp);
+
+	PLOG_DEVICE_PROFILE(BOOTLOADER_VERSION, FW_VERSION, HW_VERSION);
 
 	if (!deepRetWakeUp) {  //read flash size
 		blc_readFlashSize_autoConfigCustomFlashSector();
@@ -118,8 +120,6 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 		user_init_normal();
 	}
 	irq_enable();
-
-	PLOG_DEVICE_PROFILE(BOOTLOADER_VERSION, FW_VERSION, HW_VERSION);
 	while (1) {
 		main_loop();
 	}
