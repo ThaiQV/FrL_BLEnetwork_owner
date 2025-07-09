@@ -33,7 +33,6 @@
 
 #define  DEBUG_BUS  	DEBUG_IO
 
-
 #if (DEBUG_BUS==DEBUG_USB)
 	#define   EDPS_DAT   (0x100818 |0x80000000)
 	#define   USBFIFO    (0x10083d |0x80000000)
