@@ -100,15 +100,17 @@ _attribute_no_inline_ void user_init_normal(void) {
 	blc_smp_setSecurityLevel(No_Security);
 #endif
 	//////////// Host Initialization  End /////////////////////////
+	///////////////////// stimer Management initialization///////////////////
+	//blc_ll_initPowerManagement_module();
+	blt_soft_timer_init();
 	///////////////////// Power Management initialization///////////////////
-	bls_pm_setSuspendMask(SUSPEND_DISABLE);
+	//bls_pm_setSuspendMask(SUSPEND_DISABLE);
 	//////////////////////////// BLE stack Initialization  End //////////////////////////////////
 	///////////////////// freelux adv initialization///////////////////
-	fl_adv_init();
 	////////////////// config adv scan /////////////////////
 	fl_adv_scanner_init();
-	///////////////////// stimer Management initialization///////////////////
-	blt_soft_timer_init();
+	fl_adv_init();
+
 }
 
 /**
@@ -129,11 +131,12 @@ _attribute_ram_code_ void user_init_deepRetn(void) {
  * @return      none
  */
 _attribute_no_inline_ void main_loop(void) {
+	////////////////////////////////////// BLE entry /////////////////////////////////
+	blt_sdk_main_loop();
 	////////////////////////////////////// ADV-Period /////////////////////////////////
 	fl_adv_run();
 	////////////////////////////////////// Soft-timer /////////////////////////////////
 	blt_soft_timer_process(MAINLOOP_ENTRY);
-	////////////////////////////////////// BLE entry /////////////////////////////////
-	blt_sdk_main_loop();
+
 }
 

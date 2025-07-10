@@ -50,6 +50,7 @@ void FL_QUEUE_CLEAR(fl_data_container_t *pCont, u8 _size) {
  */
 u8 FL_QUEUE_ISEMPTY(fl_data_container_t *pcontainer) {
 	return (pcontainer->head_index == pcontainer->tail_index);
+	//return (pcontainer->count == 0)
 }
 /**
  * Returns whether a queue container is full.
@@ -57,15 +58,18 @@ u8 FL_QUEUE_ISEMPTY(fl_data_container_t *pcontainer) {
  * @return 1 if full; 0 otherwise.
  */
 u8 FL_QUEUE_ISFULL(fl_data_container_t *pcontainer) {
-	return ((pcontainer->head_index - pcontainer->tail_index) & pcontainer->mask) == pcontainer->mask;
+	//return ((pcontainer->head_index - pcontainer->tail_index) & pcontainer->mask) == pcontainer->mask;
+	return (pcontainer->count == pcontainer->mask);
 }
+
 /**
  * Adds a parameter to a queue container.
  * @param pCont The pack in which the data should be placed.
  * @param data The pack to place.
  */
 s8 FL_QUEUE_ADD(fl_data_container_t *pCont, fl_pack_t *pdata) {
-	if (!FL_QUEUE_ISFULL(pCont)) {
+	if (!FL_QUEUE_ISFULL(pCont))
+	{
 		pCont->data[pCont->tail_index] = *pdata;
 		//memcpy(pCont->data[pCont->tail_index],pdata,sizeof(fl_pack_t)/sizeof(u8));
 		pCont->tail_index = (pCont->tail_index + 1) & (pCont->mask);
@@ -105,7 +109,6 @@ u8 FL_QUEUE_GETnCLEAR(fl_data_container_t *pCont, fl_pack_t *pdata) {
 	*pdata = pCont->data[pCont->head_index];
 	memset(pCont->data[pCont->head_index].data_arr,0,sizeof(fl_pack_t));
 	pCont->data[pCont->head_index].length =0;
-
 	pCont->head_index = ((pCont->head_index + 1) & pCont->mask);
 	pCont->count--;
 	return 1;
@@ -117,12 +120,12 @@ u8 FL_QUEUE_GETnCLEAR(fl_data_container_t *pCont, fl_pack_t *pdata) {
  * @return index of quêu if have; -1 otherwise.
  */
 s8 FL_QUEUE_FIND(fl_data_container_t *pCont, fl_pack_t *pdata ,u8 _len){
-	if (FL_QUEUE_ISEMPTY(pCont)) {
-		/* No items */
-		return -1;
-	}
+//	if (FL_QUEUE_ISEMPTY(pCont)) {
+//		/* No items */
+//		return -1;
+//	}
 	for(int indx = 0; indx < pCont->mask + 1; indx++) {
-		if(memcmp(pCont[indx].data->data_arr,pdata->data_arr,_len) == 0){
+		if(memcmp(pCont->data[indx].data_arr,pdata->data_arr,_len) == 0){
 			return indx;
 		}
 	}
