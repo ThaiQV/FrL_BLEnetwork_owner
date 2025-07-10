@@ -55,6 +55,13 @@ s8 FL_QUEUE_ADD(fl_data_container_t *pCont, fl_pack_t *pdata);
  */
 u8 FL_QUEUE_GET(fl_data_container_t *pCont, fl_pack_t *pdata);
 /**
+ * Returns the pack in a queue container AND CLEAR IT.(FIFO)
+ * @param buffer The buffer from which the data should be returned.
+ * @param data A pointer to the location at which the data should be placed.
+ * @return 1 if data was returned; 0 otherwise.
+ */
+u8 FL_QUEUE_GETnCLEAR(fl_data_container_t *pCont, fl_pack_t *pdata);
+/**
  * Returns the pack in a queue container.(FIFO)
  * @param pack in queue that find.
  * @param
