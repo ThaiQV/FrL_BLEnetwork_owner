@@ -7,18 +7,21 @@ C_SRCS += \
 ../vendor/FrL_Network/app.c \
 ../vendor/FrL_Network/app_buffer.c \
 ../vendor/FrL_Network/fl_adv_proc.c \
+../vendor/FrL_Network/fl_adv_repeat.c \
 ../vendor/FrL_Network/main.c 
 
 OBJS += \
 ./vendor/FrL_Network/app.o \
 ./vendor/FrL_Network/app_buffer.o \
 ./vendor/FrL_Network/fl_adv_proc.o \
+./vendor/FrL_Network/fl_adv_repeat.o \
 ./vendor/FrL_Network/main.o 
 
 C_DEPS += \
 ./vendor/FrL_Network/app.d \
 ./vendor/FrL_Network/app_buffer.d \
 ./vendor/FrL_Network/fl_adv_proc.d \
+./vendor/FrL_Network/fl_adv_repeat.d \
 ./vendor/FrL_Network/main.d 
 
 
