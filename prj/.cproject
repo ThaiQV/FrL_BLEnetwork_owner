@@ -401,7 +401,6 @@
 									<listOptionValue builtIn="false" value="CHIP_TYPE=CHIP_TYPE_9518"/>
 									<listOptionValue builtIn="false" value="__PROJECT_B91_BLE_SAMPLE__=0"/>
 									<listOptionValue builtIn="false" value="__PROJECT_B91_FREELUX_NWK__=1"/>
-									<listOptionValue builtIn="false" value="REPEATER_CORE=1"/>
 								</option>
 								<option id="nds.c.compiler.option.include.paths.1264387355" name="Include paths (-I)" superClass="nds.c.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}}&quot;"/>
@@ -530,6 +529,7 @@
 									<listOptionValue builtIn="false" value="CHIP_TYPE=CHIP_TYPE_9518"/>
 									<listOptionValue builtIn="false" value="__PROJECT_B91_BLE_SAMPLE__=0"/>
 									<listOptionValue builtIn="false" value="__PROJECT_B91_FREELUX_NWK__=1"/>
+									<listOptionValue builtIn="false" value="MASTER_CORE=1"/>
 								</option>
 								<option id="nds.c.compiler.option.include.paths.1385723824" name="Include paths (-I)" superClass="nds.c.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}}&quot;"/>
