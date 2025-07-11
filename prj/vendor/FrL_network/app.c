@@ -53,6 +53,7 @@ _attribute_no_inline_ void user_init_normal(void) {
 	u8 mac_random_static[6];
 	blc_initMacAddress(flash_sector_mac_address,mac_public,mac_random_static);
 
+	P_PRINTFHEX_A(APP,mac_public,6,"%s","MAC:");
 #if(BLE_DEVICE_ADDRESS_TYPE == BLE_DEVICE_ADDRESS_PUBLIC)
 	app_own_address_type = OWN_ADDRESS_PUBLIC;
 #elif(BLE_DEVICE_ADDRESS_TYPE == BLE_DEVICE_ADDRESS_RANDOM_STATIC)
@@ -100,17 +101,16 @@ _attribute_no_inline_ void user_init_normal(void) {
 	blc_smp_setSecurityLevel(No_Security);
 #endif
 	//////////// Host Initialization  End /////////////////////////
-	///////////////////// stimer Management initialization///////////////////
-	//blc_ll_initPowerManagement_module();
-	blt_soft_timer_init();
+
 	///////////////////// Power Management initialization///////////////////
 	//bls_pm_setSuspendMask(SUSPEND_DISABLE);
 	//////////////////////////// BLE stack Initialization  End //////////////////////////////////
 	///////////////////// freelux adv initialization///////////////////
 	////////////////// config adv scan /////////////////////
-	fl_adv_scanner_init();
 	fl_adv_init();
-
+	///////////////////// stimer Management initialization///////////////////
+	//blc_ll_initPowerManagement_module();
+	blt_soft_timer_init();
 }
 
 /**
