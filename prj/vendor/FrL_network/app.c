@@ -137,6 +137,5 @@ _attribute_no_inline_ void main_loop(void) {
 	fl_adv_run();
 	////////////////////////////////////// Soft-timer /////////////////////////////////
 	blt_soft_timer_process(MAINLOOP_ENTRY);
-
 }
 

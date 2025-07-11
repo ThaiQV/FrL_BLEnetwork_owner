@@ -100,7 +100,8 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 
 	gpio_init(!deepRetWakeUp);
 #if (UART_PRINT_DEBUG_ENABLE)
-	DEBUG_TX_PIN_INIT();
+	DEBUG_TX_PIN_INIT()
+	;
 #endif
 	PLOG_DEVICE_PROFILE(_bootloader,_fw,_hw);
 
@@ -150,9 +151,13 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 	}
 #else
 	irq_enable();
+	/// wdt init
+	wd_set_interval_ms(5000);     // 5s
+	wd_start();                   //
 
 	while (1) {
 		main_loop();
+		wd_clear();
 	}
 	return 0;
 #endif

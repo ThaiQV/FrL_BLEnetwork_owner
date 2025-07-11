@@ -71,7 +71,7 @@ s8 FL_QUEUE_ADD(fl_data_container_t *pCont, fl_pack_t *pdata) {
 	if (!FL_QUEUE_ISFULL(pCont))
 	{
 		pCont->data[pCont->tail_index] = *pdata;
-		//memcpy(pCont->data[pCont->tail_index],pdata,sizeof(fl_pack_t)/sizeof(u8));
+//		memcpy(pCont->data[pCont->tail_index].data_arr,pdata,sizeof(fl_pack_t)/sizeof(u8));
 		pCont->tail_index = (pCont->tail_index + 1) & (pCont->mask);
 		pCont->count++;
 		return pCont->tail_index;
@@ -90,7 +90,7 @@ u8 FL_QUEUE_GET(fl_data_container_t *pCont, fl_pack_t *pdata) {
 		return 0;
 	}
 	*pdata = pCont->data[pCont->head_index];
-	//memcpy(pdata,pCont->data[pCont->head_index].data_arr,sizeof(fl_pack_t)/sizeof(u8));
+//	memcpy(pdata,pCont->data[pCont->head_index].data_arr,sizeof(fl_pack_t)/sizeof(u8));
 	pCont->head_index = ((pCont->head_index + 1) & pCont->mask);
 	pCont->count--;
 	return 1;
