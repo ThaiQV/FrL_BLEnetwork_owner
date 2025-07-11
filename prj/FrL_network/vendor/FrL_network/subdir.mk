@@ -8,6 +8,8 @@ C_SRCS += \
 ../vendor/FrL_Network/app_buffer.c \
 ../vendor/FrL_Network/fl_adv_proc.c \
 ../vendor/FrL_Network/fl_adv_repeat.c \
+../vendor/FrL_Network/fl_nwk_master_handler.c \
+../vendor/FrL_Network/fl_nwk_slave_handler.c \
 ../vendor/FrL_Network/main.c 
 
 OBJS += \
@@ -15,6 +17,8 @@ OBJS += \
 ./vendor/FrL_Network/app_buffer.o \
 ./vendor/FrL_Network/fl_adv_proc.o \
 ./vendor/FrL_Network/fl_adv_repeat.o \
+./vendor/FrL_Network/fl_nwk_master_handler.o \
+./vendor/FrL_Network/fl_nwk_slave_handler.o \
 ./vendor/FrL_Network/main.o 
 
 C_DEPS += \
@@ -22,6 +26,8 @@ C_DEPS += \
 ./vendor/FrL_Network/app_buffer.d \
 ./vendor/FrL_Network/fl_adv_proc.d \
 ./vendor/FrL_Network/fl_adv_repeat.d \
+./vendor/FrL_Network/fl_nwk_master_handler.d \
+./vendor/FrL_Network/fl_nwk_slave_handler.d \
 ./vendor/FrL_Network/main.d 
 
 
