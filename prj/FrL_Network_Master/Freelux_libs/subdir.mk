@@ -4,14 +4,17 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../Freelux_libs/fl_sys_datetime.c \
 ../Freelux_libs/plog.c \
 ../Freelux_libs/queue_fifo.c 
 
 OBJS += \
+./Freelux_libs/fl_sys_datetime.o \
 ./Freelux_libs/plog.o \
 ./Freelux_libs/queue_fifo.o 
 
 C_DEPS += \
+./Freelux_libs/fl_sys_datetime.d \
 ./Freelux_libs/plog.d \
 ./Freelux_libs/queue_fifo.d 
 

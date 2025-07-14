@@ -90,10 +90,9 @@ uint32_t fl_rtc_get(void) {
 void fl_rtc_sync(u32 timetamp_sync){
 	RTC_OFFSET_TIME = fl_rtc_get();
 	if (abs(timetamp_sync-RTC_OFFSET_TIME)> RTC_SYNC_SPREAD) {
-		ERR(FLA,"Synchronize system time !!!");
+		ERR(FLA,"Synchronize system time !!!\r\n");
 		RTC_OFFSET_TIME = timetamp_sync;
-		u8 u32_arr[4] = { U32_BYTE0(RTC_OFFSET_TIME), U32_BYTE1(RTC_OFFSET_TIME), U32_BYTE2(RTC_OFFSET_TIME), U32_BYTE3(RTC_OFFSET_TIME) };
-		flash_write_page(RTC_STORAGE_ADDR,4,u32_arr);
+		fl_rtc_set(RTC_OFFSET_TIME);
 	}
 }
 

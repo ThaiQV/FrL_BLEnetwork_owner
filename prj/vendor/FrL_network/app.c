@@ -53,7 +53,7 @@ int app_system_time_sync(void) {
 	u32 cur_timetamp = fl_rtc_get();
 	LOGA(APP,"SYSTIME:%d\r\n",cur_timetamp);
 	fl_rtc_timestamp_to_datetime(cur_timetamp,&cur_dt);
-	LOGA(APP,"SYSTIME:%02d/%02d/%02d/ - %02d:%02d:%02d\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second);
+	LOGA(APP,"SYSTIME:%02d/%02d/%02d - %02d:%02d:%02d\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second);
 	return 0;
 }
 
@@ -86,8 +86,8 @@ _attribute_no_inline_ void user_init_normal(void) {
 	blc_ll_initBasicMCU();                      //mandatory
 	blc_ll_initStandby_module(mac_public);		//mandatory
 	blc_ll_initLegacyAdvertising_module(); 		//legacy advertising module: mandatory for BLE slave
-	blc_ll_initConnection_module();				//connection module  mandatory for BLE slave/master
-	blc_ll_initSlaveRole_module();				//slave module: 	 mandatory for BLE slave,
+//	blc_ll_initConnection_module();				//connection module  mandatory for BLE slave/master
+//	blc_ll_initSlaveRole_module();				//slave module: 	 mandatory for BLE slave,
 
 	blc_ll_setAclConnMaxOctetsNumber(ACL_CONN_MAX_RX_OCTETS,ACL_CONN_MAX_TX_OCTETS);
 
