@@ -49,7 +49,7 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
  12 .debug_abbrev 00000d14  00000000  00000000  0001e840  2**0
                   CONTENTS, READONLY, DEBUGGING
- 13 .debug_loc    00008da4  00000000  00000000  0001f554  2**0
+ 13 .debug_loc    00008da0  00000000  00000000  0001f554  2**0
                   CONTENTS, READONLY, DEBUGGING
  14 .debug_aranges 000005a8  00000000  00000000  000282f8  2**3
                   CONTENTS, READONLY, DEBUGGING
@@ -7896,7 +7896,7 @@ Disassembly of section .text:
 20006a14:	00150593          	addi	a1,a0,1
 20006a18:	20009637          	lui	a2,0x20009
 20006a1c:	20009537          	lui	a0,0x20009
-20006a20:	08300693          	li	a3,131
+20006a20:	08500693          	li	a3,133
 20006a24:	08c60613          	addi	a2,a2,140 # 2000908c <__FUNCTION__.13043>
 20006a28:	4bc50513          	addi	a0,a0,1212 # 200094bc <days_in_month+0x31c>
 20006a2c:	1ed010ef          	jal	ra,20008418 <printf>
@@ -7933,7 +7933,7 @@ Disassembly of section .text:
 20006aa8:	00150593          	addi	a1,a0,1
 20006aac:	200094b7          	lui	s1,0x20009
 20006ab0:	20009537          	lui	a0,0x20009
-20006ab4:	08100693          	li	a3,129
+20006ab4:	08300693          	li	a3,131
 20006ab8:	08c48613          	addi	a2,s1,140 # 2000908c <__FUNCTION__.13043>
 20006abc:	5a450513          	addi	a0,a0,1444 # 200095a4 <days_in_month+0x404>
 20006ac0:	159010ef          	jal	ra,20008418 <printf>
@@ -7952,7 +7952,7 @@ Disassembly of section .text:
 20006af4:	143010ef          	jal	ra,20008436 <strrchr>
 20006af8:	00150593          	addi	a1,a0,1
 20006afc:	20009537          	lui	a0,0x20009
-20006b00:	08700693          	li	a3,135
+20006b00:	08900693          	li	a3,137
 20006b04:	08c48613          	addi	a2,s1,140
 20006b08:	5f450513          	addi	a0,a0,1524 # 200095f4 <days_in_month+0x454>
 20006b0c:	10d010ef          	jal	ra,20008418 <printf>
@@ -8001,7 +8001,7 @@ Disassembly of section .text:
 20006b98:	00150593          	addi	a1,a0,1
 20006b9c:	20009637          	lui	a2,0x20009
 20006ba0:	20009537          	lui	a0,0x20009
-20006ba4:	06800693          	li	a3,104
+20006ba4:	06a00693          	li	a3,106
 20006ba8:	06c60613          	addi	a2,a2,108 # 2000906c <__FUNCTION__.13039>
 20006bac:	43c50513          	addi	a0,a0,1084 # 2000943c <days_in_month+0x29c>
 20006bb0:	069010ef          	jal	ra,20008418 <printf>
@@ -8069,7 +8069,7 @@ Disassembly of section .text:
 20006c78:	00150593          	addi	a1,a0,1
 20006c7c:	20009a37          	lui	s4,0x20009
 20006c80:	20009537          	lui	a0,0x20009
-20006c84:	17d00693          	li	a3,381
+20006c84:	17f00693          	li	a3,383
 20006c88:	110a0613          	addi	a2,s4,272 # 20009110 <__FUNCTION__.13353>
 20006c8c:	33850513          	addi	a0,a0,824 # 20009338 <days_in_month+0x198>
 20006c90:	788010ef          	jal	ra,20008418 <printf>
@@ -8230,8 +8230,8 @@ Disassembly of section .text:
 20006ed8:	dfffa097          	auipc	ra,0xdfffa
 20006edc:	410080e7          	jalr	1040(ra) # 12e8 <smemcpy>
 20006ee0:	009402a3          	sb	s1,5(s0)
-20006ee4:	67d1                	c.lui	a5,0x14
-20006ee6:	88078793          	addi	a5,a5,-1920 # 13880 <BIN_SIZE+0x9f5e>
+20006ee4:	67b1                	c.lui	a5,0xc
+20006ee6:	35078793          	addi	a5,a5,848 # c350 <BIN_SIZE+0x2a2e>
 20006eea:	2ef42023          	sw	a5,736(s0)
 20006eee:	4785                	c.li	a5,1
 20006ef0:	2cf408a3          	sb	a5,721(s0)
@@ -8274,7 +8274,7 @@ Disassembly of section .text:
 20006f80:	20009637          	lui	a2,0x20009
 20006f84:	00774703          	lbu	a4,7(a4)
 20006f88:	20009537          	lui	a0,0x20009
-20006f8c:	16e00693          	li	a3,366
+20006f8c:	17000693          	li	a3,368
 20006f90:	11060613          	addi	a2,a2,272 # 20009110 <__FUNCTION__.13353>
 20006f94:	1b450513          	addi	a0,a0,436 # 200091b4 <days_in_month+0x14>
 20006f98:	480010ef          	jal	ra,20008418 <printf>
@@ -8297,7 +8297,7 @@ Disassembly of section .text:
 20006fdc:	00150593          	addi	a1,a0,1
 20006fe0:	20009637          	lui	a2,0x20009
 20006fe4:	20009537          	lui	a0,0x20009
-20006fe8:	0c200693          	li	a3,194
+20006fe8:	0c400693          	li	a3,196
 20006fec:	0dc60613          	addi	a2,a2,220 # 200090dc <__FUNCTION__.13148>
 20006ff0:	3b450513          	addi	a0,a0,948 # 200093b4 <days_in_month+0x214>
 20006ff4:	424010ef          	jal	ra,20008418 <printf>
@@ -8324,7 +8324,7 @@ Disassembly of section .text:
 20007048:	20009637          	lui	a2,0x20009
 2000704c:	00774703          	lbu	a4,7(a4)
 20007050:	20009537          	lui	a0,0x20009
-20007054:	09600693          	li	a3,150
+20007054:	09800693          	li	a3,152
 20007058:	0c860613          	addi	a2,a2,200 # 200090c8 <__FUNCTION__.13124>
 2000705c:	36850513          	addi	a0,a0,872 # 20009368 <days_in_month+0x1c8>
 20007060:	3b8010ef          	jal	ra,20008418 <printf>
@@ -8481,7 +8481,7 @@ Disassembly of section .text:
 20007294:	02e10703          	lb	a4,46(sp)
 20007298:	20009637          	lui	a2,0x20009
 2000729c:	20009537          	lui	a0,0x20009
-200072a0:	15e00693          	li	a3,350
+200072a0:	16000693          	li	a3,352
 200072a4:	0fc60613          	addi	a2,a2,252 # 200090fc <__FUNCTION__.13228>
 200072a8:	26450513          	addi	a0,a0,612 # 20009264 <days_in_month+0xc4>
 200072ac:	16c010ef          	jal	ra,20008418 <printf>
@@ -8505,7 +8505,7 @@ Disassembly of section .text:
 200072f4:	02d14703          	lbu	a4,45(sp)
 200072f8:	20009637          	lui	a2,0x20009
 200072fc:	20009537          	lui	a0,0x20009
-20007300:	15d00693          	li	a3,349
+20007300:	15f00693          	li	a3,351
 20007304:	0fc60613          	addi	a2,a2,252 # 200090fc <__FUNCTION__.13228>
 20007308:	24050513          	addi	a0,a0,576 # 20009240 <days_in_month+0xa0>
 2000730c:	10c010ef          	jal	ra,20008418 <printf>
@@ -8534,7 +8534,7 @@ Disassembly of section .text:
 20007368:	0fc15703          	lhu	a4,252(sp)
 2000736c:	20009637          	lui	a2,0x20009
 20007370:	20009537          	lui	a0,0x20009
-20007374:	15b00693          	li	a3,347
+20007374:	15d00693          	li	a3,349
 20007378:	0fc60613          	addi	a2,a2,252 # 200090fc <__FUNCTION__.13228>
 2000737c:	1fc50513          	addi	a0,a0,508 # 200091fc <days_in_month+0x5c>
 20007380:	c272                	c.swsp	t3,4(sp)
@@ -8560,7 +8560,7 @@ Disassembly of section .text:
 200073cc:	01414703          	lbu	a4,20(sp)
 200073d0:	20009637          	lui	a2,0x20009
 200073d4:	20009537          	lui	a0,0x20009
-200073d8:	15400693          	li	a3,340
+200073d8:	15600693          	li	a3,342
 200073dc:	0fc60613          	addi	a2,a2,252 # 200090fc <__FUNCTION__.13228>
 200073e0:	1e050513          	addi	a0,a0,480 # 200091e0 <days_in_month+0x40>
 200073e4:	034010ef          	jal	ra,20008418 <printf>
@@ -8581,7 +8581,7 @@ Disassembly of section .text:
 20007420:	016010ef          	jal	ra,20008436 <strrchr>
 20007424:	00150593          	addi	a1,a0,1
 20007428:	20009537          	lui	a0,0x20009
-2000742c:	17e00693          	li	a3,382
+2000742c:	18000693          	li	a3,384
 20007430:	110a0613          	addi	a2,s4,272
 20007434:	4bc50513          	addi	a0,a0,1212 # 200094bc <days_in_month+0x31c>
 20007438:	7e1000ef          	jal	ra,20008418 <printf>
@@ -8634,7 +8634,7 @@ Disassembly of section .text:
 200074f4:	00150593          	addi	a1,a0,1
 200074f8:	20009637          	lui	a2,0x20009
 200074fc:	20009537          	lui	a0,0x20009
-20007500:	0af00693          	li	a3,175
+20007500:	0b100693          	li	a3,177
 20007504:	0dc60613          	addi	a2,a2,220 # 200090dc <__FUNCTION__.13148>
 20007508:	39050513          	addi	a0,a0,912 # 20009390 <days_in_month+0x1f0>
 2000750c:	70d000ef          	jal	ra,20008418 <printf>
@@ -8657,7 +8657,7 @@ Disassembly of section .text:
 20007550:	00150593          	addi	a1,a0,1
 20007554:	20009637          	lui	a2,0x20009
 20007558:	20009537          	lui	a0,0x20009
-2000755c:	09c00693          	li	a3,156
+2000755c:	09e00693          	li	a3,158
 20007560:	0c860613          	addi	a2,a2,200 # 200090c8 <__FUNCTION__.13124>
 20007564:	3d850513          	addi	a0,a0,984 # 200093d8 <days_in_month+0x238>
 20007568:	6b1000ef          	jal	ra,20008418 <printf>
@@ -8703,7 +8703,7 @@ Disassembly of section .text:
 20007608:	00150593          	addi	a1,a0,1
 2000760c:	20009637          	lui	a2,0x20009
 20007610:	20009537          	lui	a0,0x20009
-20007614:	15c00693          	li	a3,348
+20007614:	15e00693          	li	a3,350
 20007618:	0fc60613          	addi	a2,a2,252 # 200090fc <__FUNCTION__.13228>
 2000761c:	4bc50513          	addi	a0,a0,1212 # 200094bc <days_in_month+0x31c>
 20007620:	5f9000ef          	jal	ra,20008418 <printf>
@@ -8847,7 +8847,7 @@ Disassembly of section .text:
 200077f4:	20009637          	lui	a2,0x20009
 200077f8:	20009537          	lui	a0,0x20009
 200077fc:	1c0937db          	bfos	a5,s2,7,0
-20007800:	05100693          	li	a3,81
+20007800:	05300693          	li	a3,83
 20007804:	04c60613          	addi	a2,a2,76 # 2000904c <__FUNCTION__.13002>
 20007808:	40050513          	addi	a0,a0,1024 # 20009400 <days_in_month+0x260>
 2000780c:	00612023          	sw	t1,0(sp)
@@ -8871,7 +8871,7 @@ Disassembly of section .text:
 20007854:	00150593          	addi	a1,a0,1
 20007858:	20009637          	lui	a2,0x20009
 2000785c:	20009537          	lui	a0,0x20009
-20007860:	04e00693          	li	a3,78
+20007860:	05000693          	li	a3,80
 20007864:	04c60613          	addi	a2,a2,76 # 2000904c <__FUNCTION__.13002>
 20007868:	3d850513          	addi	a0,a0,984 # 200093d8 <days_in_month+0x238>
 2000786c:	3ad000ef          	jal	ra,20008418 <printf>
@@ -9318,7 +9318,7 @@ Disassembly of section .text:
 20007e94:	00150593          	addi	a1,a0,1
 20007e98:	20009637          	lui	a2,0x20009
 20007e9c:	20009537          	lui	a0,0x20009
-20007ea0:	10e00693          	li	a3,270
+20007ea0:	11000693          	li	a3,272
 20007ea4:	0e860613          	addi	a2,a2,232 # 200090e8 <__FUNCTION__.13198>
 20007ea8:	73c50513          	addi	a0,a0,1852 # 2000973c <days_in_month+0x59c>
 20007eac:	56c000ef          	jal	ra,20008418 <printf>

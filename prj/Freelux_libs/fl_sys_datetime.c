@@ -17,7 +17,7 @@
 /******************************************************************************/
 /******************************************************************************/
 #define RTC_STORAGE_ADDR  	0xFF100
-#define RTC_SYNC_SPREAD		10 // 10s : diff real-timetamp with curr-timetamp
+#define RTC_SYNC_SPREAD		2 // 10s : diff real-timetamp with curr-timetamp
 static const uint8_t days_in_month[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
 _attribute_data_retention_ u32 RTC_OFFSET_TIME = 1752473460; // 14/07/2025-11:31:00
@@ -88,10 +88,14 @@ uint32_t fl_rtc_get(void) {
 }
 
 void fl_rtc_sync(u32 timetamp_sync){
-	RTC_OFFSET_TIME = fl_rtc_get();
-	if (abs(timetamp_sync-RTC_OFFSET_TIME)> RTC_SYNC_SPREAD) {
-		ERR(FLA,"Synchronize system time !!!\r\n");
-		RTC_OFFSET_TIME = timetamp_sync;
+
+	int32_t time_spread =  (fl_rtc_get() - timetamp_sync)/32000;
+	if ((u32)abs(time_spread) > RTC_SYNC_SPREAD) {
+		datetime_t cur_dt;
+		fl_rtc_timestamp_to_datetime(timetamp_sync,&cur_dt);
+		LOGA(APP,"MASTERTIME:%02d/%02d/%02d - %02d:%02d:%02d\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second);
+		ERR(FLA,"Synchronize system time (spread:%d)!!!\r\n",time_spread);
+		RTC_OFFSET_TIME = timetamp_sync - clock_get_32k_tick()/32000;
 		fl_rtc_set(RTC_OFFSET_TIME);
 	}
 }

@@ -35,7 +35,7 @@ Section Headers:
   [11] .bss              NOBITS          00080074 00c04a 00082c 00  WA  0   0  4
   [12] .debug_info       PROGBITS        00000000 00c04a 0127f6 00      0   0  1
   [13] .debug_abbrev     PROGBITS        00000000 01e840 000d14 00      0   0  1
-  [14] .debug_loc        PROGBITS        00000000 01f554 008da4 00      0   0  1
+  [14] .debug_loc        PROGBITS        00000000 01f554 008da0 00      0   0  1
   [15] .debug_aranges    PROGBITS        00000000 0282f8 0005a8 00      0   0  8
   [16] .debug_ranges     PROGBITS        00000000 0288a0 0028e0 00      0   0  8
   [17] .debug_line       PROGBITS        00000000 02b180 008c2b 00      0   0  1
