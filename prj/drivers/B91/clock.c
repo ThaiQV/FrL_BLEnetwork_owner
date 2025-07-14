@@ -194,7 +194,7 @@ void clock_cal_32k_rc(void)
 	analog_write_reg8(0xc6, 0xf6);
 	analog_write_reg8(0x4f, ((analog_read_reg8(0x4f) & 0x3f) | 0x00));//manual on
 }
-
+#if 1
 /**
  * @brief  This function serves to set the 32k tick.
  * @param  tick - the value of to be set to 32k.
@@ -214,7 +214,7 @@ void clock_set_32k_tick(unsigned int tick)
 	__asm__("nop");__asm__("nop");__asm__("nop");__asm__("nop");
 	while(reg_system_st & FLD_SYSTEM_CMD_SYNC);//wait wr_busy = 0
 }
-
+#endif
 /**
  * @brief  This function serves to get the 32k tick.
  * @return none.
@@ -260,6 +260,7 @@ unsigned int clock_get_32k_tick(void)
 		}
 	}
 }
+
 #endif
 
 /**

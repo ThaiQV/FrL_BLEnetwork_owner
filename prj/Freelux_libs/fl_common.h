@@ -13,5 +13,6 @@
 
 #include "plog.h"
 #include "queue_fifo.h"
+#include "fl_sys_datetime.h"
 
 #endif /* FREELUX_LIBS_FL_COMMON_H_ */
