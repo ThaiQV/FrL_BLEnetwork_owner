@@ -213,7 +213,6 @@ void clock_set_32k_tick(unsigned int tick)
 	__asm__("nop");__asm__("nop");__asm__("nop");__asm__("nop");
 	__asm__("nop");__asm__("nop");__asm__("nop");__asm__("nop");
 	while(reg_system_st & FLD_SYSTEM_CMD_SYNC);//wait wr_busy = 0
-
 }
 
 /**

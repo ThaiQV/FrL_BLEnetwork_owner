@@ -111,6 +111,9 @@ _attribute_no_inline_ void user_init_normal(void) {
 	///////////////////// stimer Management initialization///////////////////
 	//blc_ll_initPowerManagement_module();
 	blt_soft_timer_init();
+	///////////////////// TIME SYSTEM initialization///////////////////
+	fl_rtc_init();
+
 }
 
 /**
