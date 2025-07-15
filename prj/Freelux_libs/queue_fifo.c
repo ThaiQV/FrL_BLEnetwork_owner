@@ -124,7 +124,7 @@ s8 FL_QUEUE_FIND(fl_data_container_t *pCont, fl_pack_t *pdata ,u8 _len){
 //		/* No items */
 //		return -1;
 //	}
-	if(_len < 2) return -1;
+	if(_len < 2) return 0;
 	for(int indx = 0; indx < pCont->mask + 1; indx++) {
 		if(memcmp(pCont->data[indx].data_arr,pdata->data_arr,_len) == 0){
 			return indx;
