@@ -8,6 +8,8 @@ C_SRCS += \
 ../vendor/FrL_Network/app_buffer.c \
 ../vendor/FrL_Network/fl_adv_proc.c \
 ../vendor/FrL_Network/fl_adv_repeat.c \
+../vendor/FrL_Network/fl_input_ext.c \
+../vendor/FrL_Network/fl_nwk_database.c \
 ../vendor/FrL_Network/fl_nwk_master_handler.c \
 ../vendor/FrL_Network/fl_nwk_slave_handler.c \
 ../vendor/FrL_Network/main.c 
@@ -17,6 +19,8 @@ OBJS += \
 ./vendor/FrL_Network/app_buffer.o \
 ./vendor/FrL_Network/fl_adv_proc.o \
 ./vendor/FrL_Network/fl_adv_repeat.o \
+./vendor/FrL_Network/fl_input_ext.o \
+./vendor/FrL_Network/fl_nwk_database.o \
 ./vendor/FrL_Network/fl_nwk_master_handler.o \
 ./vendor/FrL_Network/fl_nwk_slave_handler.o \
 ./vendor/FrL_Network/main.o 
@@ -26,6 +30,8 @@ C_DEPS += \
 ./vendor/FrL_Network/app_buffer.d \
 ./vendor/FrL_Network/fl_adv_proc.d \
 ./vendor/FrL_Network/fl_adv_repeat.d \
+./vendor/FrL_Network/fl_input_ext.d \
+./vendor/FrL_Network/fl_nwk_database.d \
 ./vendor/FrL_Network/fl_nwk_master_handler.d \
 ./vendor/FrL_Network/fl_nwk_slave_handler.d \
 ./vendor/FrL_Network/main.d 
