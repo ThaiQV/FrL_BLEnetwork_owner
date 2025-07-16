@@ -87,7 +87,7 @@ _attribute_no_inline_ void user_init_normal(void) {
 	blc_ll_initStandby_module(mac_public);		//mandatory
 	blc_ll_initLegacyAdvertising_module(); 		//legacy advertising module: mandatory for BLE slave
 //	blc_ll_initConnection_module();				//connection module  mandatory for BLE slave/master
-//	blc_ll_initSlaveRole_module();				//slave module: 	 mandatory for BLE slave,
+	blc_ll_initSlaveRole_module();				//slave module: 	 mandatory for BLE slave,
 
 	blc_ll_setAclConnMaxOctetsNumber(ACL_CONN_MAX_RX_OCTETS,ACL_CONN_MAX_TX_OCTETS);
 

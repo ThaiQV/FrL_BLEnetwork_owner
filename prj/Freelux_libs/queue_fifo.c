@@ -117,7 +117,7 @@ u8 FL_QUEUE_GETnCLEAR(fl_data_container_t *pCont, fl_pack_t *pdata) {
  * Returns the pack in a queue container.(FIFO)
  * @param pack in queue that find.
  * @param
- * @return index of quêu if have; -1 otherwise.
+ * @return index of queue if have; -1 otherwise.
  */
 s8 FL_QUEUE_FIND(fl_data_container_t *pCont, fl_pack_t *pdata ,u8 _len){
 //	if (FL_QUEUE_ISEMPTY(pCont)) {
@@ -125,7 +125,7 @@ s8 FL_QUEUE_FIND(fl_data_container_t *pCont, fl_pack_t *pdata ,u8 _len){
 //		return -1;
 //	}
 	if(_len < 2) return 0;
-	for(int indx = 0; indx < pCont->mask + 1; indx++) {
+	for(u16 indx = 0; indx < pCont->mask + 1; indx++) {
 		if(memcmp(pCont->data[indx].data_arr,pdata->data_arr,_len) == 0){
 			return indx;
 		}
