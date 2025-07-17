@@ -35,7 +35,7 @@
 #include "fl_adv_proc.h"
 
 
-#define SYNCHRONIZE_SYSTIME			1000*1000 //1s
+#define SYNCHRONIZE_SYSTIME			5000*1000 //1s
 
 _attribute_data_retention_ own_addr_type_t app_own_address_type = OWN_ADDRESS_PUBLIC;
 
@@ -49,11 +49,12 @@ _attribute_data_retention_ own_addr_type_t app_own_address_type = OWN_ADDRESS_PU
  ***************************************************/
 int app_system_time_sync(void) {
 	//SYNCHRONIZATION TIME
-	datetime_t cur_dt;
-	u32 cur_timetamp = fl_rtc_get();
+//	datetime_t cur_dt;
+//	u32 cur_timetamp = fl_rtc_get();
 //	LOGA(APP,"SYSTIME:%d\r\n",cur_timetamp);
-	fl_rtc_timestamp_to_datetime(cur_timetamp,&cur_dt);
-	LOGA(APP,"SYSTIME:%02d/%02d/%02d - %02d:%02d:%02d\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second);
+//	fl_rtc_timestamp_to_datetime(cur_timetamp,&cur_dt);
+//	LOGA(APP,"SYSTIME:%02d/%02d/%02d - %02d:%02d:%02d\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second);
+	fl_rtc_set(0);
 	return 0;
 }
 

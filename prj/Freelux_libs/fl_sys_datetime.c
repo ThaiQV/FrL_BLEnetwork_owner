@@ -52,6 +52,7 @@ static uint8_t is_leap_year(uint16_t year) {
 void fl_rtc_init(void) {
 	clock_32k_init(CLK_32K_RC);  //
 	clock_cal_32k_rc();
+	fl_db_rtc_init();
 	RTC_OFFSET_TIME = fl_db_rtc_load();
 	datetime_t cur_dt;
 	cur_dt.year = 0;
@@ -66,6 +67,9 @@ void fl_rtc_init(void) {
 }
 
 void fl_rtc_set(uint32_t timestamp_tick) {
+	if(timestamp_tick == 0){
+		timestamp_tick = fl_rtc_get();
+	}
 	fl_db_rtc_save(timestamp_tick);
 }
 
@@ -82,6 +86,7 @@ void fl_rtc_sync(u32 timetamp_sync){
 		fl_rtc_set(RTC_OFFSET_TIME);
 	}
 }
+
 
 uint32_t fl_rtc_datetime_to_timestamp(datetime_t* dt) {
 	uint32_t timestamp = 0;
