@@ -35,7 +35,7 @@
 #include "fl_adv_proc.h"
 
 
-#define SYNCHRONIZE_SYSTIME			5000*1000 //1s
+#define SYNCHRONIZE_SYSTIME			5000*1000 //5s
 
 _attribute_data_retention_ own_addr_type_t app_own_address_type = OWN_ADDRESS_PUBLIC;
 
