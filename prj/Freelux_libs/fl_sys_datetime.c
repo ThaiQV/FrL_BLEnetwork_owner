@@ -12,6 +12,7 @@
 #include "fl_sys_datetime.h"
 #include "vendor/FrL_Network/fl_nwk_database.h"
 
+
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -28,7 +29,40 @@ _attribute_data_retention_ u32 RTC_OFFSET_TIME = 1752473460; // 14/07/2025-11:31
 /***                           Private definitions                           **/
 /******************************************************************************/
 /******************************************************************************/
+datetime_t fl_parse_datetime(uint8_t *buf) {
 
+	datetime_t dt;
+
+    if (!buf ) return dt;
+
+    char temp[5];  //
+
+    // Year: buf[0]–[3]
+    memcpy(temp, &buf[0], 2); temp[2] = '\0';
+    dt.year = (uint16_t)atoi(temp);
+
+    // Month: buf[5]–[6]
+    memcpy(temp, &buf[2], 2); temp[2] = '\0';
+    dt.month = (uint8_t)atoi(temp);
+
+    // Day: buf[8]–[9]
+    memcpy(temp, &buf[4], 2); temp[2] = '\0';
+    dt.day = (uint8_t)atoi(temp);
+
+    // Hour: buf[11]–[12]
+    memcpy(temp, &buf[6], 2); temp[2] = '\0';
+    dt.hour = (uint8_t)atoi(temp);
+
+    // Minute: buf[14]–[15]
+    memcpy(temp, &buf[8], 2); temp[2] = '\0';
+    dt.minute = (uint8_t)atoi(temp);
+
+    // Second: buf[17]–[18]
+    memcpy(temp, &buf[10], 2); temp[2] = '\0';
+    dt.second = (uint8_t)atoi(temp);
+
+    return dt;  //
+}
 /******************************************************************************/
 /******************************************************************************/
 /***                       Functions declare                   		         **/

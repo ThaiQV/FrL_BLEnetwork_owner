@@ -43,28 +43,28 @@ typedef struct {
 volatile uint16_t FmDebug = PL_ALL;
 
 const plog_cmd_t plog_cmd[] = {
-		{ DRV, ( char *) "p drv", _set_plog },
-		{ INF, ( char *) "p inf", _set_plog },
-		{ INF_FILE,( char *) "p file", _set_plog },
-		{ ZIG, ( char *) "p zig",_set_plog },
-		{ ZIG_GP, ( char *) "p zgp",_set_plog },
-		{ APP, ( char *) "p app", _set_plog },
-		{ BOOTLOADER,( char *) "p bootloader", _set_plog },
-		{ FLA,( char *) "p fla", _set_plog },
-		{ USER, ( char *) "p users",_set_plog },
-		{ PERI, ( char *) "p peri", _set_plog },
-		{ BLE,( char *) "p ble", _set_plog },
-		{ ALL, ( char *) "p all",_set_plog },
-		{ DEFAULT, ( char *) "p default", _set_plog },
-		/**@Cmd for testing. Not save*/
-		{ HELP, ( char *) "p help", _help },
-//	{SETCMD,(const char *)"p set",_Simulate},
+	{ DRV, ( char *) "p drv", _set_plog },
+	{ INF, ( char *) "p inf", _set_plog },
+	{ INF_FILE,( char *) "p file", _set_plog },
+	{ ZIG, ( char *) "p zig",_set_plog },
+	{ ZIG_GP, ( char *) "p zgp",_set_plog },
+	{ APP, ( char *) "p app", _set_plog },
+	{ BOOTLOADER,( char *) "p bootloader", _set_plog },
+	{ FLA,( char *) "p fla", _set_plog },
+	{ USER, ( char *) "p users",_set_plog },
+	{ PERI, ( char *) "p peri", _set_plog },
+	{ BLE,( char *) "p ble", _set_plog },
+	{ ALL, ( char *) "p all",_set_plog },
+	{ DEFAULT, ( char *) "p default", _set_plog },
+	/**@Cmd for testing. Not save*/
+	{ HELP, ( char *) "p help", _help },
+	{SETCMD,(char *)"p set",_Simulate},
 //	{GETCMD,(const char *)"p get",_Simulate},
 //	{TESTCMD,(const char *)"p test",_Simulate},
 //	{ATCMD,(const char *)"p atcmd",_ATCmdTest},
 //	{RSTCMD,(const char *)"p reset",_ResetHW},
 //---------------------------------------
-		{ PLEND, ( char *) "None", NULL }, };
+	{ PLEND, ( char *) "None", NULL }, };
 
 
 /******************************************************************************/
@@ -72,12 +72,16 @@ const plog_cmd_t plog_cmd[] = {
 /***                                Global Parameters                        **/
 /******************************************************************************/
 /******************************************************************************/
-
+FncPassing Passing;
 /******************************************************************************/
 /******************************************************************************/
 /***                            Private functions                            **/
 /******************************************************************************/
 /******************************************************************************/
+void _Simulate(type_debug_t _type,void* arg){
+	u8 *_arr = (u8*)arg;
+	Passing(_type,_arr);
+}
 
 bool bool_dbg_fnc(char *_input) {
 	u8 ON[2] = {'o','n'};
@@ -91,9 +95,13 @@ bool bool_dbg_fnc(char *_input) {
 /***                            Private ProtoThreads                         **/
 /******************************************************************************/
 /******************************************************************************/
-const char help[] = {
-		"\r\n*************** FreeLux Log (v1.0) ********************\r\n"
-				"** p reset : Reset HW\r\n" };
+const char help[] ={
+	"\r\n*************** FreeLux Log (v1.0) ********************\r\n"
+	"** p reset : Reset HW\r\n"
+	"** p set utc <value>: set datetime(yyyy/MM/dd-hh:mm:ss)\r\n"
+	"** p get runtime: Get time running\r\n"
+};
+
 void _help(type_debug_t _type, void* arg) {
 	P_INFO("\r\n%s", help);
 	P_INFO("** Plog commands line: <cmd> on/off \r\n");
@@ -166,7 +174,9 @@ void PLOG_Parser_Cmd(u8 *_arr) {//, uint8_t _arr_sz
 /***                      Processing functions 					             **/
 /******************************************************************************/
 /******************************************************************************/
-
+void PLOG_RegisterCbk(FncPassing _fnc){
+	Passing=_fnc;
+}
 void PLOG_Stop(type_debug_t _type) {
 	_set_plog(_type, "off");
 }
