@@ -30,6 +30,38 @@
 #include <FreeRTOS.h>
 #include <task.h>
 #endif
+
+/**
+ * @brief      uart0 irq code for application
+ * @param[in]  none
+ * @return     none
+ */
+void uart0_recieve_irq(void) {
+	if (uart_get_irq_status(UART0,UART_TXDONE)) {
+		//		uart_dma_send_flag = 0;
+		uart_clr_tx_done(UART0);
+	}
+
+	if (uart_get_irq_status(UART0,UART_RXDONE)) //A0-SOC can't use RX-DONE status,so this interrupt can noly used in A1-SOC.
+			{
+		/************************cll rx_irq****************************/
+		uart_clr_irq_status(UART0,UART_CLR_RX);
+		fl_input_serial_rec();
+
+		if ((uart_get_irq_status(UART0,UART_RX_ERR))) {
+			uart_clr_irq_status(UART0,UART_CLR_RX);
+		}
+	}
+}
+
+/**
+ * @brief      uart0 irq code for application
+ * @param[in]  none
+ * @return     none
+ */
+void uart1_recieve_irq(void) {
+	LOGA(DRV,"UART1 Rec:%c\r\n",uart_read_byte(UART1));
+}
 /**
  * @brief		BLE SDK RF interrupt handler.
  * @param[in]	none
@@ -43,7 +75,30 @@ void rf_irq_handler(void) {
 
 	DBG_CHN14_LOW;
 }
-
+/**
+ * @brief		BLE SDK UART0 interrupt handler.
+ * @param[in]	none
+ * @return      none
+ */
+void uart0_irq_handler(void) {
+//	if (uart_get_irq_status(UART0,UART_RXBUF_IRQ_STATUS)) {
+//		extern void uart0_recieve_irq(void);
+//		uart0_recieve_irq();
+//	}
+	extern void uart0_recieve_irq(void);
+	uart0_recieve_irq();
+}
+/**
+ * @brief		BLE SDK UART1 interrupt handler.
+ * @param[in]	none
+ * @return      none
+ */
+void uart1_irq_handler(void) {
+	if (uart_get_irq_status(UART1,UART_RXBUF_IRQ_STATUS)) {
+		extern void uart1_recieve_irq(void);
+		uart1_recieve_irq();
+	}
+}
 /**
  * @brief		BLE SDK System timer interrupt handler.
  * @param[in]	none
