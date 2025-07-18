@@ -12,6 +12,7 @@
 #include "stdio.h"
 #include "stdint.h"
 #include "math.h"
+#include "string.h"
 
 #define PLOG_ENA         1                    /* printf for debug */ // defined into the setting project
 
@@ -388,9 +389,21 @@ typedef struct {
 	u8 minor;
 	u8 patch;
 } fl_version_t;
-//void PLG_PrintHexBuffer(type_debug_t _type,uint8_t *buffer, uint16_t size);
+
+inline s8 plog_IndexOf(u8 *data, u8 *pfind, u8 size) {
+	u8 data_len = size + 20;
+	if (!data || !pfind || size == 0 || data_len < size)
+		return -1;
+	for (u8 i = 0; i <= data_len - size; i++) {
+		if (memcmp(&data[i],pfind,size) == 0) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+void PLOG_Parser_Cmd(u8 *_arr);
 void PLOG_Stop(type_debug_t _type);
 void PLOG_Start(type_debug_t _type);
 void PLOG_HELP(void);
 void PLOG_DEVICE_PROFILE(fl_version_t _bootloader, fl_version_t _fw, fl_version_t _hw);
-//void PLG_PrintHexBuffer(type_debug_t _typedbg, uint8_t *buffer, uint16_t size);
