@@ -64,7 +64,6 @@ clk_32k_type_e g_clk_32k_src;
  *                                         global function implementation                                             *
  *********************************************************************************************************************/
 
-
 /**
  * @brief   	This function serves to set 32k clock source.
  * @param[in]   src - variable of 32k type.

@@ -12,8 +12,8 @@
 #define FREELUX_LIBS_QUEUE_FIFO_H_
 
 #include "types.h"
-#include "stdbool.h"
-#include "math.h"
+//#include "stdbool.h"
+//#include "math.h"
 
 typedef struct {
 	u8 length;

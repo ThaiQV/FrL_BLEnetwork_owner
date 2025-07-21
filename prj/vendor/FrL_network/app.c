@@ -33,7 +33,7 @@
 #include "battery_check.h"
 
 #include "fl_adv_proc.h"
-
+#include "fl_input_ext.h"
 
 #define SYNCHRONIZE_SYSTIME			5000*1000 //5s
 
@@ -125,9 +125,12 @@ _attribute_no_inline_ void user_init_normal(void) {
 	//////////// Host Initialization  End /////////////////////////
 
 	///////////////////// Power Management initialization///////////////////
-	//bls_pm_setSuspendMask(SUSPEND_DISABLE);
+	bls_pm_setSuspendMask(SUSPEND_DISABLE);
+
 	//////////////////////////// BLE stack Initialization  End //////////////////////////////////
+
 	///////////////////// freelux adv initialization///////////////////
+
 	////////////////// config adv scan /////////////////////
 	fl_adv_init();
 	///////////////////// stimer Management initialization///////////////////
@@ -136,7 +139,8 @@ _attribute_no_inline_ void user_init_normal(void) {
 	///////////////////// TIME SYSTEM initialization///////////////////
 	fl_rtc_init();
 	blt_soft_timer_add(&app_system_time_sync,SYNCHRONIZE_SYSTIME);
-
+	///////////////////// Serial initialization///////////////////
+	fl_input_serial_init(UART0,UART0_TX_PD2,UART0_RX_PD3,115200);
 }
 
 /**
