@@ -12,7 +12,6 @@
 #include "fl_sys_datetime.h"
 #include "vendor/FrL_Network/fl_nwk_database.h"
 
-
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -33,35 +32,18 @@ datetime_t fl_parse_datetime(uint8_t *buf) {
 
 	datetime_t dt;
 
-    if (!buf ) return dt;
+	//"utc 2507210823001";
+	u8 hdr_cmd[4] = { 'u', 't', 'c', ' ' };
+	s8 idx = plog_IndexOf(buf,hdr_cmd,sizeof(hdr_cmd)) + sizeof(hdr_cmd);
 
-    char temp[5];  //
-
-    // Year: buf[0]–[3]
-    memcpy(temp, &buf[0], 2); temp[2] = '\0';
-    dt.year = (uint16_t)atoi(temp);
-
-    // Month: buf[5]–[6]
-    memcpy(temp, &buf[2], 2); temp[2] = '\0';
-    dt.month = (uint8_t)atoi(temp);
-
-    // Day: buf[8]–[9]
-    memcpy(temp, &buf[4], 2); temp[2] = '\0';
-    dt.day = (uint8_t)atoi(temp);
-
-    // Hour: buf[11]–[12]
-    memcpy(temp, &buf[6], 2); temp[2] = '\0';
-    dt.hour = (uint8_t)atoi(temp);
-
-    // Minute: buf[14]–[15]
-    memcpy(temp, &buf[8], 2); temp[2] = '\0';
-    dt.minute = (uint8_t)atoi(temp);
-
-    // Second: buf[17]–[18]
-    memcpy(temp, &buf[10], 2); temp[2] = '\0';
-    dt.second = (uint8_t)atoi(temp);
-
-    return dt;  //
+	dt.year_u8 = (buf[idx + 0] - '0') * 10 + (buf[idx + 1] - '0');
+	dt.year = 2000 + dt.year_u8;
+	dt.month = (buf[idx + 2] - '0') * 10 + (buf[idx + 3] - '0');
+	dt.day = (buf[idx + 4] - '0') * 10 + (buf[idx + 5] - '0');
+	dt.hour = (buf[idx + 6] - '0') * 10 + (buf[idx + 7] - '0');
+	dt.minute = (buf[idx + 8] - '0') * 10 + (buf[idx + 9] - '0');
+	dt.second = (buf[idx + 10] - '0') * 10 + (buf[idx + 11] - '0');
+	return dt;
 }
 /******************************************************************************/
 /******************************************************************************/
@@ -101,26 +83,26 @@ void fl_rtc_init(void) {
 }
 
 void fl_rtc_set(uint32_t timestamp_tick) {
-	if(timestamp_tick == 0){
+	if (timestamp_tick == 0) {
 		timestamp_tick = fl_rtc_get();
 	}
-	fl_db_rtc_save(timestamp_tick);
+	RTC_OFFSET_TIME = timestamp_tick - clock_get_32k_tick() / 32000;;
+	fl_db_rtc_save(RTC_OFFSET_TIME);
 }
 
 uint32_t fl_rtc_get(void) {
-	uint32_t tick = RTC_OFFSET_TIME + clock_get_32k_tick()/32000;
+	uint32_t tick = RTC_OFFSET_TIME + clock_get_32k_tick() / 32000;
 	return tick;
 }
 
-void fl_rtc_sync(u32 timetamp_sync){
+void fl_rtc_sync(u32 timetamp_sync) {
 	int time_spread = timetamp_sync - fl_rtc_get();
-	if (abs(time_spread) > (int)RTC_SYNC_SPREAD ) {
+	if (abs(time_spread) > (int) RTC_SYNC_SPREAD) {
 		ERR(FLA,"Synchronize system time (spread:%d)!!!\r\n",time_spread);
-		RTC_OFFSET_TIME = timetamp_sync - clock_get_32k_tick()/32000;
+		RTC_OFFSET_TIME = timetamp_sync - clock_get_32k_tick() / 32000;
 		fl_rtc_set(RTC_OFFSET_TIME);
 	}
 }
-
 
 uint32_t fl_rtc_datetime_to_timestamp(datetime_t* dt) {
 	uint32_t timestamp = 0;

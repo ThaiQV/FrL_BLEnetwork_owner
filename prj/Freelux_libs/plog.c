@@ -98,7 +98,7 @@ bool bool_dbg_fnc(char *_input) {
 const char help[] ={
 	"\r\n*************** FreeLux Log (v1.0) ********************\r\n"
 	"** p reset : Reset HW\r\n"
-	"** p set utc <value>: set datetime(yyyy/MM/dd-hh:mm:ss)\r\n"
+	"** p set utc <value>: set datetime(yyMMddhhmmss)\r\n"
 	"** p get runtime: Get time running\r\n"
 };
 
