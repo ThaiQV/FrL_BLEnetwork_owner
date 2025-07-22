@@ -45,12 +45,9 @@ void uart1_recieve_irq(void) {
 		uart_clr_tx_done(UART1);
 	}
 	if (uart_get_irq_status(UART1,UART_RXDONE)) //A0-SOC can't use RX-DONE status,so this interrupt can noly used in A1-SOC.
-	{
-		u8 data_len = uart_get_dma_rev_data_len(UART1,DMA2);
-		LOGA(DRV,"DMA Len:%d\r\n",data_len);
-
+			{
 		/************************cll rx_irq****************************/
-//		fl_input_serial_rec();
+		fl_input_serial_rec();
 		uart_clr_irq_status(UART1,UART_CLR_RX);
 	}
 #endif
