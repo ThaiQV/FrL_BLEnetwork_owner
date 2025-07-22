@@ -107,7 +107,12 @@ int 	blt_soft_timer_add(blt_timer_callback_t func, u32 interval_us);
  */
 int 	blt_soft_timer_delete(blt_timer_callback_t func);
 
-
+/**
+ * @brief		This function is used to find timer registerd
+ * @param[in]	func - callback function for software timer task
+ * @return      index of array
+ */
+int blt_soft_timer_find(blt_timer_callback_t func) ;
 
 
 //////////////////////// SOFT TIMER MANAGEMENT  INTERFACE ///////////////////////////////////
