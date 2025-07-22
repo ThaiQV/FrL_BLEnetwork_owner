@@ -33,37 +33,38 @@
 #endif
 
 /**
- * @brief      uart0 irq code for application
+ * @brief      uart1 irq code for application
  * @param[in]  none
  * @return     none
  */
-void uart0_recieve_irq(void) {
+void uart1_recieve_irq(void) {
+#ifdef MASTER_CORE
 	extern unsigned char FLAG_uart_dma_send;
-	if (uart_get_irq_status(UART0,UART_TXDONE)) {
+	if (uart_get_irq_status(UART1,UART_TXDONE)) {
 		FLAG_uart_dma_send = 0;
-		uart_clr_tx_done(UART0);
+		uart_clr_tx_done(UART1);
 	}
-	if (uart_get_irq_status(UART0,UART_RXDONE)) //A0-SOC can't use RX-DONE status,so this interrupt can noly used in A1-SOC.
+	if (uart_get_irq_status(UART1,UART_RXDONE)) //A0-SOC can't use RX-DONE status,so this interrupt can noly used in A1-SOC.
 	{
-		/************************cll rx_irq****************************/
-//		uart_get_dma_rev_data_len(UART0,DMA2);
-//		LOGA(DRV,"Rec len:%d\r\n",uart_get_dma_rev_data_len(UART0,DMA2));
-		fl_input_serial_rec();
-		if ((uart_get_irq_status(UART0,UART_RX_ERR))) {
-			uart_clr_irq_status(UART0,UART_CLR_RX);
-		}
-		uart_clr_irq_status(UART0,UART_CLR_RX);
-	}
-}
+		u8 data_len = uart_get_dma_rev_data_len(UART1,DMA2);
+		LOGA(DRV,"DMA Len:%d\r\n",data_len);
 
+		/************************cll rx_irq****************************/
+//		fl_input_serial_rec();
+		uart_clr_irq_status(UART1,UART_CLR_RX);
+	}
+#endif
+}
+#ifdef MASTER_CORE
 /**
  * @brief      uart0 irq code for application
  * @param[in]  none
  * @return     none
  */
-void uart1_recieve_irq(void) {
-	LOGA(DRV,"UART1 Rec:%c\r\n",uart_read_byte(UART1));
+void uart0_recieve_irq(void) {
+	LOGA(DRV,"UART0 Rec:%c\r\n",uart_read_byte(UART0));
 }
+#endif
 /**
  * @brief		BLE SDK RF interrupt handler.
  * @param[in]	none
@@ -82,16 +83,16 @@ void rf_irq_handler(void) {
  * @param[in]	none
  * @return      none
  */
-void uart0_irq_handler(void) {
-	extern void uart0_recieve_irq(void);
-	uart0_recieve_irq();
+void uart1_irq_handler(void) {
+	extern void uart1_recieve_irq(void);
+	uart1_recieve_irq();
 }
 /**
  * @brief		BLE SDK UART1 interrupt handler.
  * @param[in]	none
  * @return      none
  */
-void uart1_irq_handler(void) {
+void uart0_irq_handler(void) {
 //	if (uart_get_irq_status(UART1,UART_RXBUF_IRQ_STATUS)) {
 //		extern void uart1_recieve_irq(void);
 //		uart1_recieve_irq();
@@ -206,8 +207,7 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 	irq_enable();
 	/// wdt init
 	wd_set_interval_ms(5000);     // 5s
-	wd_start();                   //
-
+	wd_start();
 	while (1) {
 		main_loop();
 		wd_clear();

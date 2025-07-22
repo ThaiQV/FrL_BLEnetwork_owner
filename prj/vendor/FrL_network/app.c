@@ -138,9 +138,12 @@ _attribute_no_inline_ void user_init_normal(void) {
 	blt_soft_timer_init();
 	///////////////////// TIME SYSTEM initialization///////////////////
 	fl_rtc_init();
+
 	blt_soft_timer_add(&app_system_time_sync,SYNCHRONIZE_SYSTIME);
 	///////////////////// Serial initialization///////////////////
-	fl_input_serial_init(UART0,UART0_TX_PD2,UART0_RX_PD3,115200);
+#ifdef MASTER_CORE
+	fl_input_serial_init(UART1,UART1_TX_PE0,UART1_RX_PE2,115200);
+#endif
 }
 
 /**
