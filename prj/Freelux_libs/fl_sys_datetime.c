@@ -17,7 +17,7 @@
 /***                                Global Parameters                        **/
 /******************************************************************************/
 /******************************************************************************/
-
+#define RTC_DIV_PPM			32768 //32.768 khz rtc
 #define RTC_SYNC_SPREAD		2 // 2s : diff real-timetamp with curr-timetamp
 static const uint8_t days_in_month[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
@@ -88,12 +88,12 @@ void fl_rtc_set(uint32_t timestamp_tick) {
 	if (timestamp_tick == 0) {
 		timestamp_tick = fl_rtc_get();
 	}
-	RTC_OFFSET_TIME = timestamp_tick - clock_get_32k_tick() / 32000;
+	RTC_OFFSET_TIME = timestamp_tick - clock_get_32k_tick() / RTC_DIV_PPM;
 	fl_db_rtc_save(timestamp_tick);
 }
 
 uint32_t fl_rtc_get(void) {
-	uint32_t tick = RTC_OFFSET_TIME + clock_get_32k_tick() / 32000;
+	uint32_t tick = RTC_OFFSET_TIME + clock_get_32k_tick() / RTC_DIV_PPM;
 	return tick;
 }
 
@@ -101,7 +101,7 @@ void fl_rtc_sync(u32 timetamp_sync) {
 	int time_spread = timetamp_sync - fl_rtc_get();
 	if (abs(time_spread) > (int) RTC_SYNC_SPREAD) {
 		ERR(FLA,"Synchronize system time (spread:%d)!!!\r\n",time_spread);
-		RTC_OFFSET_TIME = timetamp_sync - clock_get_32k_tick() / 32000;
+		RTC_OFFSET_TIME = timetamp_sync - clock_get_32k_tick() / RTC_DIV_PPM;
 		fl_rtc_set(timetamp_sync);
 	}
 }
