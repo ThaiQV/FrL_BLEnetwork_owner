@@ -76,8 +76,8 @@ typedef enum {
 //	/**@Cmd for testing. Not storage*/
 	HELP,
 	SETCMD,
-//	GETCMD,
-//	RSTCMD,
+	GETCMD,
+	RSTCMD,
 //	ATCMD,
 //	TESTCMD,
 //---------------------------------------

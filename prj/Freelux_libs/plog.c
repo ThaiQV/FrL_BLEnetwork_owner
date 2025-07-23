@@ -59,10 +59,10 @@ const plog_cmd_t plog_cmd[] = {
 	/**@Cmd for testing. Not save*/
 	{ HELP, ( char *) "p help", _help },
 	{SETCMD,(char *)"p set",_Simulate},
-//	{GETCMD,(const char *)"p get",_Simulate},
+	{GETCMD,(char *)"p get",_Simulate},
 //	{TESTCMD,(const char *)"p test",_Simulate},
 //	{ATCMD,(const char *)"p atcmd",_ATCmdTest},
-//	{RSTCMD,(const char *)"p reset",_ResetHW},
+	{RSTCMD,(char *)"p reset",_Simulate},
 //---------------------------------------
 	{ PLEND, ( char *) "None", NULL }, };
 
@@ -114,7 +114,7 @@ void _help(type_debug_t _type, void* arg) {
 	P_INFO("******************* (C)FreeLux-2025 **********************\r\n");
 }
 void _ResetHW(type_debug_t _type, void* arg) {
-	P_INFO("Reseting..........\r\n");
+	ERR(APP,"Reseting..........\r\n");
 }
 
 void _set_plog(type_debug_t _type, void * arg) {
