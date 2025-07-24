@@ -17,7 +17,7 @@
 /***                                Global Parameters                        **/
 /******************************************************************************/
 /******************************************************************************/
-#define RTC_DIV_PPM			32768 //32.768 khz rtc
+#define RTC_DIV_PPM			32500 //32.768 khz rtc
 #define RTC_SYNC_SPREAD		2 // 2s : diff real-timetamp with curr-timetamp
 static const uint8_t days_in_month[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
