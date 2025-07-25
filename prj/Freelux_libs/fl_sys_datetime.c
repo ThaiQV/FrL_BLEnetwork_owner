@@ -157,4 +157,6 @@ void fl_rtc_timestamp_to_datetime(uint32_t timestamp, datetime_t* dt) {
 	}
 
 	dt->day = days + 1;
+	//year u8
+	dt->year_u8 = dt->year - 2000;
 }
