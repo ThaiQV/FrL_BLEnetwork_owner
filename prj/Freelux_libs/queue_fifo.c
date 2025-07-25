@@ -49,8 +49,8 @@ void FL_QUEUE_CLEAR(fl_data_container_t *pCont, u16 _size) {
  * @return 1 if empty; 0 otherwise.
  */
 u16 FL_QUEUE_ISEMPTY(fl_data_container_t *pcontainer) {
-	return (pcontainer->head_index == pcontainer->tail_index);
-	//return (pcontainer->count == 0)
+	//return (pcontainer->head_index == pcontainer->tail_index);
+	return (pcontainer->count == 0);
 }
 /**
  * Returns whether a queue container is full.
