@@ -1,2 +1,2 @@
    text	   code	 rodata	   data	    bss	    dec	    hex	filename
-  70164	  65188	   4976	   4900	  13848	  88912	  15b50	FrL_Network_Master.elf
+  70372	  65396	   4976	   4896	  14104	  89372	  15d1c	FrL_Network_Master.elf
