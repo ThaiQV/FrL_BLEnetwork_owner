@@ -1,0 +1,2 @@
+   text	   code	 rodata	   data	    bss	    dec	    hex	filename
+  51504	  49164	   2340	   4162	    120	  55786	   d9ea	B91_ble_sample.elf
