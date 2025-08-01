@@ -97,14 +97,15 @@ uint32_t fl_rtc_get(void) {
 	return tick;
 }
 
+u64 fl_rtc_timetamp2milltampStep(fl_timetamp_withstep_t _timetamp){
+	return (_timetamp.timetamp*(UINT8_MAX*(sizeof(_timetamp.milstep)/sizeof(u8))) + _timetamp.milstep);
+}
 fl_timetamp_withstep_t fl_rtc_getWithMilliStep(void) {
 	fl_timetamp_withstep_t rlst;
 	rlst.timetamp = RTC_OFFSET_TIME + clock_get_32k_tick() / RTC_DIV_PPM;
 	u32 mill = 1000*(clock_get_32k_tick() % RTC_DIV_PPM)/RTC_DIV_PPM;
-	if(mill < 250) rlst.milstep = 0;
-	else if(mill < 500) rlst.milstep = 1;
-	else if(mill < 750) rlst.milstep = 2;
-	else rlst.milstep = 3;
+	//convert to u8 (range 0-255 )
+	rlst.milstep = (mill * 255) / 1000;
 	return rlst;
 }
 

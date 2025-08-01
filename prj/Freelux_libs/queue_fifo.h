@@ -17,7 +17,7 @@
 
 typedef struct {
 	u8 length;
-	u8 data_arr[31]; //modify if we need
+	u8 data_arr[31]; //modify if use external ADV
 }__attribute__((packed)) fl_pack_t;
 
 typedef struct {
