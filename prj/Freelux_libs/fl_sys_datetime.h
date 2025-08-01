@@ -23,10 +23,15 @@ typedef struct {
 	uint8_t second; // 0-59
 } datetime_t;
 
+typedef struct {
+	u32 timetamp;
+	u8 milstep;
+} fl_timetamp_withstep_t;
+
 void fl_rtc_init(void);
 void fl_rtc_set(uint32_t timestamp_seconds);
 uint32_t fl_rtc_get(void);
-
+fl_timetamp_withstep_t fl_rtc_getWithMilliStep(void);
 void fl_rtc_sync(u32 timetamp_sync);
 datetime_t fl_parse_datetime(uint8_t *buf);
 uint32_t fl_rtc_datetime_to_timestamp(datetime_t* dt);
