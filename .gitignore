@@ -54,9 +54,3 @@ dkms.conf
 # debug information files
 *.dwo
 
-#remove build folder
-FrL_network/
-B91_ble_sample/
-B91_module/
-B91_feature/
-ws/
