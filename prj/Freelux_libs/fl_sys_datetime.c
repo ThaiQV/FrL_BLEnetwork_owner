@@ -34,7 +34,7 @@ datetime_t fl_parse_datetime(uint8_t *buf) {
 
 	//"utc 2507210823001";
 	u8 hdr_cmd[4] = { 'u', 't', 'c', ' ' };
-	s8 idx = plog_IndexOf(buf,hdr_cmd,sizeof(hdr_cmd)) + sizeof(hdr_cmd);
+	s8 idx = plog_IndexOf(buf,hdr_cmd,sizeof(hdr_cmd),20) + sizeof(hdr_cmd);
 
 	dt.year_u8 = (buf[idx + 0] - '0') * 10 + (buf[idx + 1] - '0');
 	dt.year = 2000 + dt.year_u8;

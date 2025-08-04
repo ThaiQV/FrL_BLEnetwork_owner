@@ -160,7 +160,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 			_nwk_slave_syncFromPack(&packet.frame);
 			if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK && IsJoinedNetwork()) {
 				//Process rsp
-				s8 memid_idx = plog_IndexOf(packet.frame.payload,(u8*)&G_INFORMATION.slaveID.id_u8,1);
+				s8 memid_idx = plog_IndexOf(packet.frame.payload,(u8*)&G_INFORMATION.slaveID.id_u8,1,sizeof(packet.frame.payload));
 				u32 master_timetamp; //, slave_timetamp;
 				master_timetamp = MAKE_U32(packet.frame.timetamp[3],packet.frame.timetamp[2],packet.frame.timetamp[1],packet.frame.timetamp[0]);
 				datetime_t cur_dt;
@@ -219,7 +219,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 		{
 			_nwk_slave_syncFromPack(&packet.frame);
 			//Process rsp
-			s8 mymac_idx = plog_IndexOf(packet.frame.payload,G_INFORMATION.mac_short.byte,SIZEU8(G_INFORMATION.mac_short.byte));
+			s8 mymac_idx = plog_IndexOf(packet.frame.payload,G_INFORMATION.mac_short.byte,SIZEU8(G_INFORMATION.mac_short.byte),sizeof(packet.frame.payload));
 			if (mymac_idx != -1) {
 				G_INFORMATION.slaveID.id_u8 = packet.frame.slaveID.id_u8;
 				LOGA(INF,"UPDATE SlaveID: %d(grpID:%d|memID:%d)\r\n",G_INFORMATION.slaveID.id_u8,G_INFORMATION.slaveID.grpID,G_INFORMATION.slaveID.memID);

@@ -111,7 +111,7 @@ int REBOOT_DEV(void) {
 s8 CMD_EXCUTE_FUNC(fl_cmdlines_t *_pGcontainer, u8 _Gcontainer_size, u8* _data) {
 	s8 index_cmd = -1;
 	for (u8 idx = 0; idx < _Gcontainer_size; ++idx) {
-		index_cmd = plog_IndexOf(_data,_pGcontainer[idx].c_cmd,_pGcontainer[idx].len);
+		index_cmd = plog_IndexOf(_data,_pGcontainer[idx].c_cmd,_pGcontainer[idx].len,CMDLINE_MAXLEN);
 		if (index_cmd != -1) {
 			_pGcontainer[idx].ExcuteFunc(_data + index_cmd);
 			return idx;
@@ -132,7 +132,7 @@ void CMD_INSTALLMODE(u8* _data) {
 	extern volatile u8 MASTER_INSTALL_STATE;
 	u8 ON[2] = { 'o', 'n' };
 	u8 on_bool = 0;
-	if (plog_IndexOf(_data,ON,2) != -1) {
+	if (plog_IndexOf(_data,ON,2,CMDLINE_MAXLEN) != -1) {
 		on_bool = 1;
 	}
 	MASTER_INSTALL_STATE = on_bool;
@@ -142,7 +142,7 @@ void CMD_DEBUG(u8* _data) {
 	extern volatile u8 NWK_DEBUG_STT;
 	u8 ON[2] = { 'o', 'n' };
 	u8 on_bool = 0;
-	if (plog_IndexOf(_data,ON,2) != -1) {
+	if (plog_IndexOf(_data,ON,2,CMDLINE_MAXLEN) != -1) {
 		on_bool = 1;
 	}
 	NWK_DEBUG_STT = on_bool;
@@ -172,7 +172,7 @@ void CMD_REPEAT(u8* _data) {
 	extern volatile u8 NWK_REPEAT_MODE;
 	u8 ON[2] = { 'o', 'n' };
 	u8 on_bool = 0;
-	if (plog_IndexOf(_data,ON,2) != -1) {
+	if (plog_IndexOf(_data,ON,2,CMDLINE_MAXLEN) != -1) {
 		on_bool = 1;
 	}
 	NWK_REPEAT_MODE = on_bool;
@@ -214,7 +214,7 @@ void CMD_ADVSCAN(u8* _data) {
 void CMD_CLEARDB(u8* _data){
 	//p get clear slalist
 	u8 nodelist_c[8] = {'s','l','a','l','i','s','t'};
-	int rslt = plog_IndexOf(_data,nodelist_c,sizeof(nodelist_c));
+	int rslt = plog_IndexOf(_data,nodelist_c,sizeof(nodelist_c),CMDLINE_MAXLEN);
 	if (rslt != -1) {
 		LOG_P(DRV,"Clear NODELIST DB\r\n");
 		fl_db_nodelist_clearAll();
@@ -246,16 +246,16 @@ void CMD_GETINFOSLAVE(u8* _data) {
 	}
 	else if (slave_num >= 1) {
 		MASTER_GETINNFO_AUTORUN = 0;
-//		P_PRINTFHEX_A(DRV,slaveID,slave_num,"num(%d):",slave_num);
+		P_PRINTFHEX_A(DRV,slaveID,slave_num,"num(%d):",slave_num);
 		fl_pack_t info_pack = fl_master_packet_GetInfo_build(slaveID,slave_num);
-//		P_PRINTFHEX_A(DRV,info_pack.data_arr,info_pack.length,"%s(%d):","Info Pack",info_pack.length);
+		P_PRINTFHEX_A(DRV,info_pack.data_arr,info_pack.length,"%s(%d):","Info Pack",info_pack.length);
 		fl_adv_sendFIFO_add(info_pack);
 		G_SLA_INFO.num_sla = slave_num;
 		G_SLA_INFO.timetamp = clock_time();
 		memcpy(G_SLA_INFO.id,slaveID,slave_num);
 		//create timer checking to manage response
 		if(blt_soft_timer_find(&_RSP_CMD_GETINFOSLAVE) == -1){
-			blt_soft_timer_add(&_RSP_CMD_GETINFOSLAVE,100 * 1000); //ms
+			blt_soft_timer_add(&_RSP_CMD_GETINFOSLAVE,50 * 1000); //ms
 		}
 	}
 }

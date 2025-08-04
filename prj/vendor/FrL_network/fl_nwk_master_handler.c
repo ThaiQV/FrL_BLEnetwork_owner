@@ -313,7 +313,7 @@ void fl_master_StatusNodePrintf(void) {
 //	P_INFO("RspTime:%d ms\r\n",max_time);
 //}
 s16 fl_master_Node_find(u32 _mac_short) {
-	for (u8 var = 0; var <= G_NODE_LIST.slot_inused && G_NODE_LIST.slot_inused != 0xFF; ++var) {
+	for (u8 var = 0; var < G_NODE_LIST.slot_inused && G_NODE_LIST.slot_inused != 0xFF; ++var) {
 		if (G_NODE_LIST.sla_info[var].mac_short.mac_u32 == _mac_short) {
 			return var;
 		}
@@ -321,7 +321,7 @@ s16 fl_master_Node_find(u32 _mac_short) {
 	return -1;
 }
 s16 fl_master_SlaveID_find(u8 _id) {
-	for (u8 var = 0; var <= G_NODE_LIST.slot_inused && G_NODE_LIST.slot_inused != 0xFF; ++var) {
+	for (u8 var = 0; var < G_NODE_LIST.slot_inused && G_NODE_LIST.slot_inused != 0xFF; ++var) {
 		if (G_NODE_LIST.sla_info[var].slaveID.id_u8 == _id) {
 			return var;
 		}

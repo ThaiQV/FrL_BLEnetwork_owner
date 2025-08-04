@@ -390,19 +390,19 @@ typedef struct {
 	u8 patch;
 } fl_version_t;
 
-inline s8 plog_IndexOf(u8 *data, u8 *pfind, u8 size) {
-	u8 data_len = size + 20;
-	if (!data || !pfind || size == 0 || data_len < size)
+inline s8 plog_IndexOf(u8 *data, u8 *pfind, u8 find_size,u8 data_size) {
+	u8 data_len = data_size;
+	if (!data || !pfind || find_size == 0 || data_len < find_size)
 		return -1;
-	for (u8 i = 0; i <= data_len - size; i++) {
-		if (memcmp(&data[i],pfind,size) == 0) {
+	for (u8 i = 0; i <= data_len - find_size; i++) {
+		if (memcmp(&data[i],pfind,find_size) == 0) {
 			return i;
 		}
 	}
 	return -1;
 }
-typedef void (*FncPassing)(type_debug_t,u8*);
 
+typedef void (*FncPassing)(type_debug_t,u8*);
 void PLOG_Parser_Cmd(u8 *_arr);
 void PLOG_Stop(type_debug_t _type);
 void PLOG_Start(type_debug_t _type);

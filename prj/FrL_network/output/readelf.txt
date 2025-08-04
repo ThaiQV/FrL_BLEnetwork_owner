@@ -10,7 +10,7 @@ ELF Header:
   Version:                           0x1
   Entry point address:               0x20000000
   Start of program headers:          52 (bytes into file)
-  Start of section headers:          329576 (bytes into file)
+  Start of section headers:          329848 (bytes into file)
   Flags:                             0x3, RVC, single-float ABI
   Size of this header:               52 (bytes)
   Size of program headers:           32 (bytes)
@@ -33,19 +33,19 @@ Section Headers:
   [ 9] .data             PROGBITS        00080000 011000 000066 00  WA  0   0  4
   [10] .sbss             NOBITS          00080068 011066 000024 00  WA  0   0  4
   [11] .bss              NOBITS          0008008c 011066 001814 00  WA  0   0  4
-  [12] .debug_info       PROGBITS        00000000 011066 015e32 00      0   0  1
-  [13] .debug_abbrev     PROGBITS        00000000 026e98 000e1b 00      0   0  1
-  [14] .debug_loc        PROGBITS        00000000 027cb3 00acaa 00      0   0  1
-  [15] .debug_aranges    PROGBITS        00000000 032960 0006b8 00      0   0  8
-  [16] .debug_ranges     PROGBITS        00000000 033018 0033f8 00      0   0  8
-  [17] .debug_line       PROGBITS        00000000 036410 00b00c 00      0   0  1
-  [18] .debug_str        PROGBITS        00000000 04141c 0090d4 01  MS  0   0  1
-  [19] .comment          PROGBITS        00000000 04a4f0 000037 01  MS  0   0  1
-  [20] .riscv.attributes RISCV_ATTRIBUTE 00000000 04a527 00003b 00      0   0  1
-  [21] .debug_frame      PROGBITS        00000000 04a564 001cb0 00      0   0  4
-  [22] .symtab           SYMTAB          00000000 04c214 002220 10     23 404  4
-  [23] .strtab           STRTAB          00000000 04e434 00222f 00      0   0  1
-  [24] .shstrtab         STRTAB          00000000 050663 000103 00      0   0  1
+  [12] .debug_info       PROGBITS        00000000 011066 015eff 00      0   0  1
+  [13] .debug_abbrev     PROGBITS        00000000 026f65 000e05 00      0   0  1
+  [14] .debug_loc        PROGBITS        00000000 027d6a 00acd6 00      0   0  1
+  [15] .debug_aranges    PROGBITS        00000000 032a40 0006b8 00      0   0  8
+  [16] .debug_ranges     PROGBITS        00000000 0330f8 0033f8 00      0   0  8
+  [17] .debug_line       PROGBITS        00000000 0364f0 00b00c 00      0   0  1
+  [18] .debug_str        PROGBITS        00000000 0414fc 009103 01  MS  0   0  1
+  [19] .comment          PROGBITS        00000000 04a5ff 000037 01  MS  0   0  1
+  [20] .riscv.attributes RISCV_ATTRIBUTE 00000000 04a636 00003b 00      0   0  1
+  [21] .debug_frame      PROGBITS        00000000 04a674 001cb0 00      0   0  4
+  [22] .symtab           SYMTAB          00000000 04c324 002220 10     23 404  4
+  [23] .strtab           STRTAB          00000000 04e544 00222f 00      0   0  1
+  [24] .shstrtab         STRTAB          00000000 050773 000103 00      0   0  1
 Key to Flags:
   W (write), A (alloc), X (execute), M (merge), S (strings), I (info),
   L (link order), O (extra OS processing required), G (group), T (TLS),
@@ -62,7 +62,7 @@ Program Headers:
   LOAD           0x003300 0x00001300 0x200013d0 0x05002 0x05002 R E 0x1000
   LOAD           0x0083d8 0x200063d8 0x200063d8 0x083a0 0x083a0 R E 0x1000
   LOAD           0x011000 0x00080000 0x2000e778 0x00066 0x018a0 RW  0x1000
-  RISCV_ATTRIBUT 0x04a527 0x00000000 0x00000000 0x0003b 0x00000 R   0x1
+  RISCV_ATTRIBUT 0x04a636 0x00000000 0x00000000 0x0003b 0x00000 R   0x1
 
  Section to Segment mapping:
   Segment Sections...
@@ -430,24 +430,24 @@ Symbol table '.symtab' contains 546 entries:
    345: 00000ed4   384 OBJECT  LOCAL  DEFAULT    4 app_acl_rxfifo
    346: 00001054     8 OBJECT  LOCAL  DEFAULT    4 advData_backup
    347: 0000105c     1 OBJECT  LOCAL  DEFAULT    4 g_plic_preempt_en
-   348: 2000db88    17 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.10020
-   349: 2000db9c    14 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.10024
-   350: 2000dbac    21 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13000
-   351: 2000dbc4    17 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13022
-   352: 2000dbd8    18 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13061
-   353: 2000dbec    29 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13137
-   354: 2000dc0c    20 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13146
-   355: 2000dc20    24 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13165
-   356: 2000dc38    12 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13166
-   357: 2000dc44    26 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13188
-   358: 2000dc60    20 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13250
-   359: 2000dc74    24 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13389
-   360: 2000dc8c    11 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13410
-   361: 2000dc98    23 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13439
-   362: 2000dcb0    17 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13465
-   363: 2000dcc4    12 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.9880
-   364: 2000dcd0    12 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.9900
-   365: 2000dcdc    23 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.9992
+   348: 2000db88    17 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.10021
+   349: 2000db9c    14 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.10025
+   350: 2000dbac    21 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13001
+   351: 2000dbc4    17 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13023
+   352: 2000dbd8    18 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13062
+   353: 2000dbec    29 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13138
+   354: 2000dc0c    20 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13147
+   355: 2000dc20    24 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13166
+   356: 2000dc38    12 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13167
+   357: 2000dc44    26 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13189
+   358: 2000dc60    20 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13251
+   359: 2000dc74    24 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13390
+   360: 2000dc8c    11 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13411
+   361: 2000dc98    23 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13440
+   362: 2000dcb0    17 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13466
+   363: 2000dcc4    12 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.9881
+   364: 2000dcd0    12 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.9901
+   365: 2000dcdc    23 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.9993
    366: 2000de34    16 OBJECT  LOCAL  DEFAULT    7 att_access_err_enc
    367: 2000de44    16 OBJECT  LOCAL  DEFAULT    7 att_access_err_no_enc
    368: 2000de54    26 OBJECT  LOCAL  DEFAULT    7 cmd_length_array
