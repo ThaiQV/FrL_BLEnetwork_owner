@@ -235,12 +235,17 @@ void CMD_GETADVSETTING(u8* _data) {
 	LOG_P(DRV,"************************\r\n");
 }
 void CMD_GETINFOSLAVE(u8* _data) {
+	extern volatile u8 MASTER_GETINNFO_AUTORUN;
 	u8 slaveID[20]; //Max 20 slaves
 	int slave_num = sscanf((char*) _data,"info %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd",&slaveID[0],
 			&slaveID[1],&slaveID[2],&slaveID[3],&slaveID[4],&slaveID[5],&slaveID[6],&slaveID[7],&slaveID[8],&slaveID[9],&slaveID[10],&slaveID[11],
 			&slaveID[12],&slaveID[13],&slaveID[14],&slaveID[15],&slaveID[16],&slaveID[17],&slaveID[18],&slaveID[19]);
-
-	if (slave_num >= 1) {
+	if(slave_num == 2 && slaveID[0] == 0xFF){
+		MASTER_GETINNFO_AUTORUN = slaveID[1];
+		LOGA(DRV,"GET ALL INFO AUTORUN (%d s)!!\r\n",MASTER_GETINNFO_AUTORUN);
+	}
+	else if (slave_num >= 1) {
+		MASTER_GETINNFO_AUTORUN = 0;
 //		P_PRINTFHEX_A(DRV,slaveID,slave_num,"num(%d):",slave_num);
 		fl_pack_t info_pack = fl_master_packet_GetInfo_build(slaveID,slave_num);
 //		P_PRINTFHEX_A(DRV,info_pack.data_arr,info_pack.length,"%s(%d):","Info Pack",info_pack.length);

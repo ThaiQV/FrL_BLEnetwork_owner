@@ -176,12 +176,14 @@ int fl_adv_sendFIFO_add(fl_pack_t _pack) {
 void fl_adv_sendFIFO_run(void) {
 	fl_pack_t data_in_queue;
 	if (!F_SENDING_STATE) {
+
 #ifdef MASTER_CORE
 		if (FL_QUEUE_GET(&G_QUEUE_SENDING,&data_in_queue)) {
 #else
 		while (FL_QUEUE_GET_LOOP(&G_QUEUE_SENDING,&data_in_queue)) {
 //			u32 timetamp_inpack = fl_adv_timetampInPack(data_in_queue);
 			fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(data_in_queue);
+
 			if (fl_rtc_timetamp2milltampStep(timetamp_inpack) < fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME)){
 				return;
 			}
@@ -190,7 +192,7 @@ void fl_adv_sendFIFO_run(void) {
 //					data_in_queue.data_arr[data_in_queue.length - 1] & 0x03);
 //
 #endif
-			//LOGA(APP,"ADV FIFO(%d):%d/%d\r\n",G_QUEUE_SENDING.count,G_QUEUE_SENDING.head_index,G_QUEUE_SENDING.tail_index);
+//			LOGA(APP,"ADV FIFO(%d):%d/%d\r\n",G_QUEUE_SENDING.count,G_QUEUE_SENDING.head_index,G_QUEUE_SENDING.tail_index);
 			F_SENDING_STATE = 1;
 			fl_adv_send(data_in_queue.data_arr,data_in_queue.length,G_ADV_SETTINGS.adv_duration);
 			return;
@@ -300,7 +302,17 @@ void fl_adv_collection_channel_init(void){
 	//clear all G_SENDING
 	FL_QUEUE_CLEAR(&G_QUEUE_SENDING,QUEUE_SENDING_SIZE);
 	blc_ll_setAdvCustomedChannel(0,1,2);
-	LOGA(BLE,"Collection Init:%d\r\n",bls_ll_setAdvEnable(BLC_ADV_ENABLE));  //adv enable
+
+	blc_hci_le_setEventMask_cmd(HCI_LE_EVT_MASK_ADVERTISING_REPORT);
+	blc_hci_registerControllerEventHandler(fl_controller_event_callback);
+	//report all adv
+	blc_ll_setScanParameter(SCAN_TYPE_ACTIVE,G_ADV_SETTINGS.scan_interval,G_ADV_SETTINGS.scan_window,OWN_ADDRESS_PUBLIC,SCAN_FP_ALLOW_ADV_ANY);
+	blc_ll_addScanningInAdvState();  //add scan in adv state
+	blc_ll_setScanEnable(1,0);
+	bls_ll_setAdvEnable(BLC_ADV_ENABLE);  //adv enable
+	FL_QUEUE_CLEAR(&G_DATA_CONTAINER,IN_DATA_SIZE);
+
+	P_INFO("Collection Init:%d\r\n",bls_ll_setAdvEnable(BLC_ADV_ENABLE));  //adv enable
 
 }
 /***************************************************
@@ -319,8 +331,19 @@ void fl_adv_collection_channel_deinit(void){
 	bls_ll_setAdvEnable(BLC_ADV_DISABLE);  //adv disable
 	rf_set_power_level_index(MY_RF_POWER_INDEX);
 	FL_QUEUE_CLEAR(&G_QUEUE_SENDING,QUEUE_SENDING_SIZE);
+
 	blc_ll_setAdvCustomedChannel(G_ADV_SETTINGS.nwk_chn.chn1,G_ADV_SETTINGS.nwk_chn.chn2,G_ADV_SETTINGS.nwk_chn.chn3);
-	LOGA(BLE,"Collection Deinit:%d\r\n",bls_ll_setAdvEnable(BLC_ADV_ENABLE))
+
+	blc_hci_le_setEventMask_cmd(HCI_LE_EVT_MASK_ADVERTISING_REPORT);
+	blc_hci_registerControllerEventHandler(fl_controller_event_callback);
+	//report all adv
+	blc_ll_setScanParameter(SCAN_TYPE_ACTIVE,G_ADV_SETTINGS.scan_interval,G_ADV_SETTINGS.scan_window,OWN_ADDRESS_PUBLIC,SCAN_FP_ALLOW_ADV_ANY);
+	blc_ll_addScanningInAdvState();  //add scan in adv state
+	blc_ll_setScanEnable(1,0);
+	bls_ll_setAdvEnable(BLC_ADV_ENABLE);  //adv enable
+	FL_QUEUE_CLEAR(&G_DATA_CONTAINER,IN_DATA_SIZE);
+
+	P_INFO("Collection Deinit:%d\r\n",bls_ll_setAdvEnable(BLC_ADV_ENABLE))
 }
 
 void fl_adv_setting_update(void) {
@@ -473,6 +496,9 @@ void fl_adv_run(void) {
 	}
 #ifdef  MASTER_CORE
 	fl_nwk_master_process();
+#else
+	//Features processor
+	fl_nwk_slave_process();
 #endif
 	/* SEND ADV */
 	fl_adv_sendFIFO_run();

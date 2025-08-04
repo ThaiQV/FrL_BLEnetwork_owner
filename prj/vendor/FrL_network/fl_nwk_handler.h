@@ -113,6 +113,7 @@ void fl_nwk_master_nodelist_load(void);
 #else
 void fl_nwk_slave_init(void);
 void fl_nwk_slave_run(fl_pack_t *_pack_handle);
+void fl_nwk_slave_process(void);
 bool fl_nwk_slave_checkHDR(u8 _hdr);
 u32 fl_adv_timetampInPack(fl_pack_t _pack);
 fl_timetamp_withstep_t fl_adv_timetampStepInPack(fl_pack_t _pack);

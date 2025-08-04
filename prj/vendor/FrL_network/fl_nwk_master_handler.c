@@ -37,11 +37,12 @@ fl_data_container_t G_HANDLE_MASTER_CONTAINER = {
 fl_slaves_list_t G_NODE_LIST = { .slot_inused = 0xFF };
 
 volatile u8 MASTER_INSTALL_STATE = 0;
+volatile u8 MASTER_GETINNFO_AUTORUN = 0;
 
 //Period of the heartbeat
 u16 PERIOD_HEARTBEAT = 0 * 1000; //
 //flag debug of the network
-volatile u8 NWK_DEBUG_STT = 1; // it will be assigned into endpoint byte (dbg :1bit)
+volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into endpoint byte (dbg :1bit)
 volatile u8 NWK_REPEAT_MODE = 1; // slave repeat?
 
 //For getting automatic information
@@ -189,8 +190,9 @@ fl_pack_t fl_master_packet_assignSlaveID_build(u32 _mac_short) {
 	//Add new mill-step
 	packet.frame.milltamp = timetampStep.milstep;
 
-	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
+	//Add
 
+	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
 	packet.frame.payload[0] = U32_BYTE3(_mac_short);
 	packet.frame.payload[1] = U32_BYTE2(_mac_short);
 	packet.frame.payload[2] = U32_BYTE1(_mac_short);
@@ -566,6 +568,9 @@ void fl_nwk_master_getInfo_autorun(void) {
 	static u32 test_saving = 0;
 	//store time for getting
 	static u32 time_start = 0;
+	if(MASTER_GETINNFO_AUTORUN == 0){
+		goto END_PROCESS;
+	}
 
 	if (G_NODE_LIST.slot_inused != 0xFF || !MASTER_INSTALL_STATE) {
 		if (node_got == 0) {
@@ -615,16 +620,16 @@ void fl_nwk_master_getInfo_autorun(void) {
 				if (test_saving == 0) {
 					test_saving = clock_time();
 				} else {
-					if (clock_time_exceed(test_saving,10 * 1000 * 1000)) {
+					if (clock_time_exceed(test_saving,MASTER_GETINNFO_AUTORUN * 1000 * 1000)) {
 						node_got = 0;
 						test_saving = 0;
 					}
 				}
 				//manage time
-
 			}
 		}
 	} else {
+		END_PROCESS:
 		node_got = 0;
 		test_saving = 0;
 		time_start = 0;
@@ -647,7 +652,7 @@ void fl_nwk_master_process(void) {
 	//Heartbeat processor
 	fl_nwk_master_heartbeat_run();
 	//auto get information
-//	fl_nwk_master_getInfo_autorun();
+	fl_nwk_master_getInfo_autorun();
 }
 /***************************************************
  * @brief 		: execute response from nodes
