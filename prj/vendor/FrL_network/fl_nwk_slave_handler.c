@@ -165,10 +165,9 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 				master_timetamp = MAKE_U32(packet.frame.timetamp[3],packet.frame.timetamp[2],packet.frame.timetamp[1],packet.frame.timetamp[0]);
 				datetime_t cur_dt;
 				fl_rtc_timestamp_to_datetime(master_timetamp,&cur_dt);
-				u8 test_payload[20];
+				u8 test_payload[SIZEU8(packet.frame.payload)];
 				memset(test_payload,0,sizeof(test_payload));
-				sprintf((char*) test_payload,"%02d:%02d:%02d-%02d/%02d/%02d-%03d",cur_dt.hour,cur_dt.minute,cur_dt.second,cur_dt.year_u8,cur_dt.month,
-						cur_dt.day, packet.frame.milltamp);
+				sprintf((char*) test_payload,"%02d:%02d:%02d-%03d",cur_dt.hour,cur_dt.minute,cur_dt.second, packet.frame.milltamp);
 				LOGA(APP,"(%d)SlaveID:%X | inPack:%X\r\n",memid_idx,G_INFORMATION.slaveID.id_u8,packet.frame.payload[memid_idx]);
 				packet.frame.endpoint.dbg = NWK_DEBUG_STT;
 

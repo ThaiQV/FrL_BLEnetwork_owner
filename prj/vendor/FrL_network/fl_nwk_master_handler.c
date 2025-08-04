@@ -560,7 +560,7 @@ void fl_nwk_master_collection_run(void) {
  *
  ***************************************************/
 void fl_nwk_master_getInfo_autorun(void) {
-	const u8 max_slave = 4;
+	const u8 max_slave = 8;
 	static u8 node_got = 0;
 	u8 slave_arr[10];
 	fl_pack_t pack;
@@ -633,6 +633,7 @@ void fl_nwk_master_getInfo_autorun(void) {
 		node_got = 0;
 		test_saving = 0;
 		time_start = 0;
+		G_SLA_INFO_RSP.num_sla = 0;
 	}
 }
 

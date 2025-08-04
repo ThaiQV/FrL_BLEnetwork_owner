@@ -25,7 +25,7 @@ typedef struct {
 
 typedef struct {
 	u32 timetamp;
-	u8 milstep;
+	uint8_t milstep;
 } fl_timetamp_withstep_t;
 
 void fl_rtc_init(void);
