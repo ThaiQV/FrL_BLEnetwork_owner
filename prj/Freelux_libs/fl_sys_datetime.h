@@ -32,6 +32,7 @@ void fl_rtc_init(void);
 void fl_rtc_set(uint32_t timestamp_seconds);
 uint32_t fl_rtc_get(void);
 fl_timetamp_withstep_t fl_rtc_getWithMilliStep(void);
+u32 fl_rtc_timetamp2milltampStep(fl_timetamp_withstep_t _timetamp_step);
 void fl_rtc_sync(u32 timetamp_sync);
 datetime_t fl_parse_datetime(uint8_t *buf);
 uint32_t fl_rtc_datetime_to_timestamp(datetime_t* dt);

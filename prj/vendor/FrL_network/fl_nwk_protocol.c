@@ -212,8 +212,8 @@ void CMD_ADVSCAN(u8* _data) {
 	ERR(DRV,"ERR Scanner settings (%d)\r\n",rslt);
 }
 void CMD_CLEARDB(u8* _data){
-	//p clear nodelist
-	u8 nodelist_c[8] = {'n','o','d','e','l','i','s','t'};
+	//p get clear slalist
+	u8 nodelist_c[8] = {'s','l','a','l','i','s','t'};
 	int rslt = plog_IndexOf(_data,nodelist_c,sizeof(nodelist_c));
 	if (rslt != -1) {
 		LOG_P(DRV,"Clear NODELIST DB\r\n");

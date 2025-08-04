@@ -34,23 +34,23 @@ fl_pack_t g_handle_master_array[PACK_HANDLE_MASTER_SIZE];
 fl_data_container_t G_HANDLE_MASTER_CONTAINER = {
 		.data = g_handle_master_array, .head_index = 0, .tail_index = 0, .mask = PACK_HANDLE_MASTER_SIZE - 1, .count = 0 };
 
-fl_slaves_list_t G_NODE_LIST = {.slot_inused = 0xFF};
+fl_slaves_list_t G_NODE_LIST = { .slot_inused = 0xFF };
 
 volatile u8 MASTER_INSTALL_STATE = 0;
 
 //Period of the heartbeat
 u16 PERIOD_HEARTBEAT = 0 * 1000; //
 //flag debug of the network
-volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into endpoint byte (dbg :1bit)
+volatile u8 NWK_DEBUG_STT = 1; // it will be assigned into endpoint byte (dbg :1bit)
 volatile u8 NWK_REPEAT_MODE = 1; // slave repeat?
 
 //For getting automatic information
-typedef struct{
-		u8 num_sla;
-		fl_nodeinnetwork_t* id[10];
+typedef struct {
+	u8 num_sla;
+	fl_nodeinnetwork_t* id[10];
 }__attribute__((packed)) fl_master_getinfo_pointer_t;
 
-fl_master_getinfo_pointer_t G_SLA_INFO_RSP = {.num_sla = 0};
+fl_master_getinfo_pointer_t G_SLA_INFO_RSP = { .num_sla = 0 };
 /******************************************************************************/
 /******************************************************************************/
 /***                           Private definitions                           **/
@@ -64,16 +64,16 @@ void fl_nwk_master_nodelist_store(void);
 void fl_master_nodelist_AddRefesh(fl_nodeinnetwork_t _node) {
 	for (u8 var = 0; var < MAX_NODES; ++var) {
 		if (G_NODE_LIST.sla_info[var].mac_short.mac_u32 != 0) {
-			G_NODE_LIST.slot_inused = var+1;
+			G_NODE_LIST.slot_inused = var + 1;
 		} else {
 			//debug
 			u8 inused = 0xFF; //Empty
 			u8 grp_inused = 0xFF;
 			u8 mem_inused = 0xFF;
-			if(var != 0){
+			if (var != 0) {
 				inused = G_NODE_LIST.slot_inused;
-				grp_inused = G_NODE_LIST.sla_info[var-1].slaveID.grpID;
-				mem_inused = G_NODE_LIST.sla_info[var-1].slaveID.memID;
+				grp_inused = G_NODE_LIST.sla_info[var - 1].slaveID.grpID;
+				mem_inused = G_NODE_LIST.sla_info[var - 1].slaveID.memID;
 			}
 			LOGA(FLA,"NODE LIST: %d(grpID:%d,memID:%d)\r\n",inused,grp_inused,mem_inused);
 			break;
@@ -82,7 +82,7 @@ void fl_master_nodelist_AddRefesh(fl_nodeinnetwork_t _node) {
 	if (_node.mac_short.mac_u32 != 0) {
 		//update
 		u8 slot_ins = G_NODE_LIST.slot_inused++;
-		G_NODE_LIST.sla_info[slot_ins]=_node;
+		G_NODE_LIST.sla_info[slot_ins] = _node;
 		G_NODE_LIST.sla_info[slot_ins].slaveID.id_u8 = slot_ins;
 //		G_NODE_LIST.slot_inused++;
 		LOGA(FLA,"Update Node [%d]slaveID:%d\r\n",slot_ins,G_NODE_LIST.sla_info[slot_ins].slaveID.id_u8);
@@ -223,7 +223,7 @@ fl_pack_t fl_master_packet_GetInfo_build(u8 *_slave_mac_arr, u8 _slave_num) {
 	//clear lastest time rec
 	for (int var = 0; var < _slave_num; ++var) {
 		s16 idx = fl_master_SlaveID_find(_slave_mac_arr[var]);
-		if(idx != -1){
+		if (idx != -1) {
 			G_NODE_LIST.sla_info[idx].timelife = clock_time();
 			G_NODE_LIST.sla_info[idx].active = false;
 		}
@@ -311,7 +311,7 @@ void fl_master_StatusNodePrintf(void) {
 //	P_INFO("RspTime:%d ms\r\n",max_time);
 //}
 s16 fl_master_Node_find(u32 _mac_short) {
-	for (u8 var = 0; var <= G_NODE_LIST.slot_inused; ++var) {
+	for (u8 var = 0; var <= G_NODE_LIST.slot_inused && G_NODE_LIST.slot_inused != 0xFF; ++var) {
 		if (G_NODE_LIST.sla_info[var].mac_short.mac_u32 == _mac_short) {
 			return var;
 		}
@@ -319,17 +319,16 @@ s16 fl_master_Node_find(u32 _mac_short) {
 	return -1;
 }
 s16 fl_master_SlaveID_find(u8 _id) {
-	for (u8 var = 0; var <= G_NODE_LIST.slot_inused; ++var) {
-		if (G_NODE_LIST.sla_info[var].slaveID.id_u8== _id) {
+	for (u8 var = 0; var <= G_NODE_LIST.slot_inused && G_NODE_LIST.slot_inused != 0xFF; ++var) {
+		if (G_NODE_LIST.sla_info[var].slaveID.id_u8 == _id) {
 			return var;
 		}
 	}
 	return -1;
 }
-u8 fl_master_SlaveID_get(u32 _mac_short){
+u8 fl_master_SlaveID_get(u32 _mac_short) {
 	s8 indx = fl_master_Node_find(_mac_short);
-	if(indx != -1)
-	{
+	if (indx != -1) {
 		return G_NODE_LIST.sla_info[indx].slaveID.id_u8;
 	}
 	return 0xFF;
@@ -475,14 +474,15 @@ void fl_nwk_master_init(void) {
  * @return	  	:none
  *
  ***************************************************/
-void fl_nwk_master_nodelist_store(void){
+void fl_nwk_master_nodelist_store(void) {
 	fl_nodelist_db_t nodelist;
 	nodelist.num_slave = G_NODE_LIST.slot_inused;
-	for (u8 var = 0; var < nodelist.num_slave; ++var) {
+	for (u8 var = 0; var < nodelist.num_slave && nodelist.num_slave != 0xFF; ++var) {
 		nodelist.slave[var].slaveid = G_NODE_LIST.sla_info[var].slaveID.id_u8;
 		nodelist.slave[var].mac_u32 = G_NODE_LIST.sla_info[var].mac_short.mac_u32;
 	}
-	fl_db_nodelist_save(&nodelist);
+	if (nodelist.num_slave && nodelist.num_slave!= 0xFF)
+		fl_db_nodelist_save(&nodelist);
 }
 /***************************************************
  * @brief 		:load all nodelist from the flash and assign to G_NODE_LIST
@@ -492,12 +492,12 @@ void fl_nwk_master_nodelist_store(void){
  * @return	  	:none
  *
  ***************************************************/
-void fl_nwk_master_nodelist_load(void){
-	fl_nodelist_db_t nodelist = {};
-	if (fl_db_nodelist_load(&nodelist) && nodelist.num_slave) {
+void fl_nwk_master_nodelist_load(void) {
+	fl_nodelist_db_t nodelist = { .num_slave = 0xFF};
+	if (fl_db_nodelist_load(&nodelist) && nodelist.num_slave != 0xFF) {
 		G_NODE_LIST.slot_inused = nodelist.num_slave;
 		for (u8 var = 0; var < nodelist.num_slave; ++var) {
-			G_NODE_LIST.sla_info[var].slaveID.id_u8 = nodelist.slave[var].slaveid ;
+			G_NODE_LIST.sla_info[var].slaveID.id_u8 = nodelist.slave[var].slaveid;
 			G_NODE_LIST.sla_info[var].mac_short.mac_u32 = nodelist.slave[var].mac_u32;
 		}
 	}
@@ -535,7 +535,7 @@ void fl_nwk_master_collection_run(void) {
 			LOG_P(APP,"Install mode : On\r\n");
 			fl_nwk_master_nodelist_load();
 			fl_adv_collection_channel_init();
-			blt_soft_timer_add(&fl_send_collection_req,500 * 1000); // 1s
+			blt_soft_timer_add(&fl_send_collection_req,1000 * 1000); // 1s
 		}
 		previous_mode = MASTER_INSTALL_STATE;
 	} else {
@@ -557,7 +557,7 @@ void fl_nwk_master_collection_run(void) {
  * @return	  	:none
  *
  ***************************************************/
-void fl_nwk_master_getInfo_autorun(void){
+void fl_nwk_master_getInfo_autorun(void) {
 	const u8 max_slave = 4;
 	static u8 node_got = 0;
 	u8 slave_arr[10];
@@ -588,8 +588,8 @@ void fl_nwk_master_getInfo_autorun(void){
 			}
 		}
 		///
-		if(G_SLA_INFO_RSP.num_sla == 0 && node_got < G_NODE_LIST.slot_inused){
-			for (indx=0; indx < max_slave && ((indx + node_got) < G_NODE_LIST.slot_inused); ++indx) {
+		if (G_SLA_INFO_RSP.num_sla == 0 && node_got < G_NODE_LIST.slot_inused) {
+			for (indx = 0; indx < max_slave && ((indx + node_got) < G_NODE_LIST.slot_inused); ++indx) {
 				slave_arr[indx] = G_NODE_LIST.sla_info[indx + node_got].slaveID.id_u8;
 				G_SLA_INFO_RSP.id[indx] = &G_NODE_LIST.sla_info[indx + node_got];
 //				LOGA(INF,"Mac:0x%04X\r\n",G_SLA_INFO_RSP.id[indx]->mac_short);
@@ -597,37 +597,37 @@ void fl_nwk_master_getInfo_autorun(void){
 			G_SLA_INFO_RSP.num_sla = indx;
 			pack = fl_master_packet_GetInfo_build(slave_arr,indx);
 			fl_adv_sendFIFO_add(pack);
-			LOGA(INF,"GetInfo: %d->%d/%d\r\n",node_got,indx+node_got,G_NODE_LIST.slot_inused);
+			LOGA(INF,"GetInfo: %d->%d/%d\r\n",node_got,indx + node_got,G_NODE_LIST.slot_inused);
 			node_got = node_got + indx;
-		}
-		else{
-			if(G_SLA_INFO_RSP.num_sla != 0){
+		} else {
+			if (G_SLA_INFO_RSP.num_sla != 0) {
 				u8 i = 0;
-				for(i=0; i < G_SLA_INFO_RSP.num_sla ; i++){
-					if(G_SLA_INFO_RSP.id[i]->active == false) break;
+				for (i = 0; i < G_SLA_INFO_RSP.num_sla; i++) {
+					if (G_SLA_INFO_RSP.id[i]->active == false)
+						break;
 				}
-				if(i == G_SLA_INFO_RSP.num_sla) G_SLA_INFO_RSP.num_sla = 0;
+				if (i == G_SLA_INFO_RSP.num_sla)
+					G_SLA_INFO_RSP.num_sla = 0;
 			}
 			//got full slaves
-			if(node_got >= G_NODE_LIST.slot_inused){
+			if (node_got >= G_NODE_LIST.slot_inused) {
 				//add timeout period getting
-				if(test_saving == 0){
+				if (test_saving == 0) {
 					test_saving = clock_time();
 				} else {
-					if(clock_time_exceed(test_saving,10*1000*1000)){
+					if (clock_time_exceed(test_saving,10 * 1000 * 1000)) {
 						node_got = 0;
-						test_saving =0;
+						test_saving = 0;
 					}
 				}
 				//manage time
 
 			}
 		}
-	}
-	else{
+	} else {
 		node_got = 0;
-		test_saving =0;
-		time_start =0;
+		test_saving = 0;
+		time_start = 0;
 	}
 }
 

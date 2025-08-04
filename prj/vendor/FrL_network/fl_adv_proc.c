@@ -291,12 +291,17 @@ void fl_adv_init(void) {
  *
  ***************************************************/
 void fl_adv_collection_channel_init(void){
-	while ((blc_ll_getCurrentState() == BLS_LINK_STATE_SCAN && blc_ll_getCurrentState() == BLS_LINK_STATE_ADV)) {
-	};
+//	while ((blc_ll_getCurrentState() == BLS_LINK_STATE_SCAN && blc_ll_getCurrentState() == BLS_LINK_STATE_ADV)) {
+//	};
+//	while(F_SENDING_STATE){bls_ll_setAdvEnable(BLC_ADV_DISABLE); }; //adv disable
+
 	bls_ll_setAdvEnable(BLC_ADV_DISABLE);  //adv disable
-	blc_ll_setAdvCustomedChannel(0,1,2);
 	rf_set_power_level_index(MY_RF_POWER_INDEX);
-	bls_ll_setAdvEnable(BLC_ADV_ENABLE);  //adv enable
+	//clear all G_SENDING
+	FL_QUEUE_CLEAR(&G_QUEUE_SENDING,QUEUE_SENDING_SIZE);
+	blc_ll_setAdvCustomedChannel(0,1,2);
+	LOGA(BLE,"Collection Init:%d\r\n",bls_ll_setAdvEnable(BLC_ADV_ENABLE));  //adv enable
+
 }
 /***************************************************
  * @brief 		:de-init collection channel (0,1,2) => rollback nwk channel
@@ -307,13 +312,15 @@ void fl_adv_collection_channel_init(void){
  *
  ***************************************************/
 void fl_adv_collection_channel_deinit(void){
-	bls_ll_setAdvEnable(BLC_ADV_DISABLE);
-	while (blc_ll_getCurrentState() == BLS_LINK_STATE_SCAN && blc_ll_getCurrentState() == BLS_LINK_STATE_ADV) {
-	};
+//	bls_ll_setAdvEnable(BLC_ADV_DISABLE);
+//	while (blc_ll_getCurrentState() == BLS_LINK_STATE_SCAN && blc_ll_getCurrentState() == BLS_LINK_STATE_ADV) {
+//	};
+//	while(F_SENDING_STATE){bls_ll_setAdvEnable(BLC_ADV_DISABLE); }; //adv disable
 	bls_ll_setAdvEnable(BLC_ADV_DISABLE);  //adv disable
-	blc_ll_setAdvCustomedChannel(G_ADV_SETTINGS.nwk_chn.chn1,G_ADV_SETTINGS.nwk_chn.chn2,G_ADV_SETTINGS.nwk_chn.chn3);
 	rf_set_power_level_index(MY_RF_POWER_INDEX);
-	bls_ll_setAdvEnable(BLC_ADV_ENABLE);  //adv enable
+	FL_QUEUE_CLEAR(&G_QUEUE_SENDING,QUEUE_SENDING_SIZE);
+	blc_ll_setAdvCustomedChannel(G_ADV_SETTINGS.nwk_chn.chn1,G_ADV_SETTINGS.nwk_chn.chn2,G_ADV_SETTINGS.nwk_chn.chn3);
+	LOGA(BLE,"Collection Deinit:%d\r\n",bls_ll_setAdvEnable(BLC_ADV_ENABLE))
 }
 
 void fl_adv_setting_update(void) {
@@ -357,7 +364,7 @@ void fl_adv_scanner_init(void) {
  ***************************************************/
 u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt) {
 	fl_data_frame_u data_parse;
-	if (_pack.length >= SIZEU8(data_parse.bytes)) {
+	if (_pack.length == SIZEU8(data_parse.bytes)) {
 		memcpy(data_parse.bytes,_pack.data_arr,_pack.length);
 		*rslt = data_parse.frame;
 		return 1;
