@@ -235,15 +235,17 @@ void CMD_GETADVSETTING(u8* _data) {
 	LOG_P(DRV,"************************\r\n");
 }
 void CMD_GETINFOSLAVE(u8* _data) {
-	extern volatile u8 MASTER_GETINNFO_AUTORUN,MASTER_GETINFO_NUMSLAVE;
+	extern volatile u8 MASTER_GETINNFO_AUTORUN,MASTER_GETINFO_NUMSLAVE,MASTER_GETINFO_NUMVIRTUAL;
 	u8 slaveID[20]; //Max 20 slaves
 	int slave_num = sscanf((char*) _data,"info %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd",&slaveID[0],
 			&slaveID[1],&slaveID[2],&slaveID[3],&slaveID[4],&slaveID[5],&slaveID[6],&slaveID[7],&slaveID[8],&slaveID[9],&slaveID[10],&slaveID[11],
 			&slaveID[12],&slaveID[13],&slaveID[14],&slaveID[15],&slaveID[16],&slaveID[17],&slaveID[18],&slaveID[19]);
-	if(slave_num == 3 && slaveID[0] == 0xFF){
+	//p get info 255 <Period get again> <num slave for each> <num virtual slave>
+	if(slave_num == 4 && slaveID[0] == 0xFF){
 		MASTER_GETINNFO_AUTORUN = slaveID[1];
 		MASTER_GETINFO_NUMSLAVE = slaveID[2];
-		LOGA(DRV,"GET ALL INFO AUTORUN (%d s)!!\r\n",MASTER_GETINNFO_AUTORUN);
+		MASTER_GETINFO_NUMVIRTUAL= slaveID[3];
+		LOGA(DRV,"GET ALL INFO AUTORUN (%d s/%d/%d)!!\r\n",MASTER_GETINNFO_AUTORUN,MASTER_GETINFO_NUMSLAVE,MASTER_GETINFO_NUMVIRTUAL);
 	}
 	else if (slave_num >= 1) {
 		MASTER_GETINNFO_AUTORUN = 0;

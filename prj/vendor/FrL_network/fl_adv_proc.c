@@ -167,9 +167,9 @@ bool _align_QUEUE_SENDING(fl_pack_t _pack){
 	u32  timetamp_in_pack = fl_rtc_timetamp2milltampStep(fl_adv_timetampStepInPack(man_loop.two_pack[1]));
 	u32  timetamp_in_pre_pack = fl_rtc_timetamp2milltampStep(fl_adv_timetampStepInPack(man_loop.two_pack[0]));
 
-	if(timetamp_in_pack && timetamp_in_pre_pack){
+	if(timetamp_in_pack && timetamp_in_pre_pack){ //  parse success
 		//check master original of the previous with currently
-		if(timetamp_in_pack > timetamp_in_pre_pack){
+		if(timetamp_in_pack > timetamp_in_pre_pack && timetamp_in_pack >= fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME)){
 //			man_loop.origin_indx = idx_inQUEUE;
 			man_loop.loop_times = (man_loop.loop_times > REPEAT_LEVEL) ? 1 : man_loop.loop_times + 1;
 		}
@@ -233,12 +233,14 @@ void fl_adv_sendFIFO_run(void) {
 #else
 		while (FL_QUEUE_GET_LOOP(&G_QUEUE_SENDING,&data_in_queue)) {
 
-			//Add align packet with ttl + looptimes
-//			_align_QUEUE_SENDING(data_in_queue);
 			fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(data_in_queue);
-			if ( !_align_QUEUE_SENDING(data_in_queue) || (fl_rtc_timetamp2milltampStep(timetamp_inpack) < fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME))){
+			if ( (fl_rtc_timetamp2milltampStep(timetamp_inpack) < fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME))){
 				return;
 			}
+			//Add align packet with ttl + looptimes
+//			if(!_align_QUEUE_SENDING(data_in_queue)){
+//				continue;
+//			}
 
 			//For debuging
 //			P_PRINTFHEX_A(BLE,data_in_queue.data_arr,data_in_queue.length,"[%d]TTL(%d):",G_QUEUE_SENDING.head_index,
