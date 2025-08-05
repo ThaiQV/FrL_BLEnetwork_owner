@@ -32,7 +32,7 @@ _attribute_data_retention_ volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME 
 															ORIGINAL_MASTER_TIME.milstep = y;\
 														}while(0) //Sync original time-master req
 
-#define JOIN_NETWORK_TIME 		60*1000 //ms
+#define JOIN_NETWORK_TIME 		30*1000 //ms
 fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = { NWK_HDR_55, NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmd
 #define NWK_HDR_SIZE (sizeof(G_NWK_HDR_LIST)/sizeof(fl_hdr_nwk_type_e))
 /*---------------- Total Packet handling --------------------------*/
@@ -160,14 +160,14 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 			_nwk_slave_syncFromPack(&packet.frame);
 			if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK && IsJoinedNetwork()) {
 				//Process rsp
-				s8 memid_idx = plog_IndexOf(packet.frame.payload,(u8*)&G_INFORMATION.slaveID.id_u8,1);
+				s8 memid_idx = plog_IndexOf(packet.frame.payload,(u8*)&G_INFORMATION.slaveID.id_u8,1,sizeof(packet.frame.payload));
 				u32 master_timetamp; //, slave_timetamp;
 				master_timetamp = MAKE_U32(packet.frame.timetamp[3],packet.frame.timetamp[2],packet.frame.timetamp[1],packet.frame.timetamp[0]);
 				datetime_t cur_dt;
 				fl_rtc_timestamp_to_datetime(master_timetamp,&cur_dt);
-				u8 test_payload[19];
-				sprintf((char*) test_payload,"%02d:%02d:%02d-%02d/%02d/%02d",cur_dt.hour,cur_dt.minute,cur_dt.second,cur_dt.year_u8,cur_dt.month,
-						cur_dt.day);
+				u8 test_payload[SIZEU8(packet.frame.payload)];
+				memset(test_payload,0,sizeof(test_payload));
+				sprintf((char*) test_payload,"%02d:%02d:%02d-%03d",cur_dt.hour,cur_dt.minute,cur_dt.second, packet.frame.milltamp);
 				LOGA(APP,"(%d)SlaveID:%X | inPack:%X\r\n",memid_idx,G_INFORMATION.slaveID.id_u8,packet.frame.payload[memid_idx]);
 				packet.frame.endpoint.dbg = NWK_DEBUG_STT;
 
@@ -219,7 +219,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 		{
 			_nwk_slave_syncFromPack(&packet.frame);
 			//Process rsp
-			s8 mymac_idx = plog_IndexOf(packet.frame.payload,G_INFORMATION.mac_short.byte,SIZEU8(G_INFORMATION.mac_short.byte));
+			s8 mymac_idx = plog_IndexOf(packet.frame.payload,G_INFORMATION.mac_short.byte,SIZEU8(G_INFORMATION.mac_short.byte),sizeof(packet.frame.payload));
 			if (mymac_idx != -1) {
 				G_INFORMATION.slaveID.id_u8 = packet.frame.slaveID.id_u8;
 				LOGA(INF,"UPDATE SlaveID: %d(grpID:%d|memID:%d)\r\n",G_INFORMATION.slaveID.id_u8,G_INFORMATION.slaveID.grpID,G_INFORMATION.slaveID.memID);
@@ -281,9 +281,9 @@ int fl_slave_ProccesRSP_cbk(void) {
  *
  ***************************************************/
 int fl_nwk_joinnwk_timeout(void){
-	LOG_P(INF,"Join-network timeout!!!\r\n");
-	fl_adv_collection_channel_deinit();
+	ERR(INF,"Join-network timeout!!!\r\n");
 	G_INFORMATION.run_stt.join_nwk = 0;
+	fl_adv_collection_channel_deinit();
 	return -1;
 }
 void fl_nwk_slave_joinnwk_exc(void) {
@@ -387,7 +387,5 @@ void fl_nwk_slave_run(fl_pack_t *_pack_handle) {
 	} else {
 		LOG_P(INF,"Packet has processed!!!\r\n");
 	}
-	//Features processor
-	fl_nwk_slave_process();
 }
 #endif

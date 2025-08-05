@@ -85,7 +85,7 @@ void _Simulate(type_debug_t _type,void* arg){
 
 bool bool_dbg_fnc(char *_input) {
 	u8 ON[2] = {'o','n'};
-	if (plog_IndexOf((u8*)_input, ON, 2)!= -1)
+	if (plog_IndexOf((u8*)_input, ON, 2,10)!= -1)
 		return true;
 //	else if(strncmp(_input,"off",3) == 0)
 	return false;
@@ -151,7 +151,7 @@ void PLOG_Parser_Cmd(u8 *_arr) {//, uint8_t _arr_sz
 	uint8_t i = 0;
 	//P_INFO("%s",_arr);
 	while (PLEND != plog_cmd[i].type) {
-		if (plog_IndexOf( _arr,(u8*)plog_cmd[i].cmd_txt,strlen(plog_cmd[i].cmd_txt))!= -1) {
+		if (plog_IndexOf( _arr,(u8*)plog_cmd[i].cmd_txt,strlen(plog_cmd[i].cmd_txt),20)!= -1) {
 //			plog_cmd[i].Cbk_fnc(bool_dbg_fnc(&_arr[strlen(plog_cmd[i].cmd_txt)+1]),plog_cmd[i].type);
 			plog_cmd[i].Cbk_fnc(plog_cmd[i].type,&_arr[strlen(plog_cmd[i].cmd_txt) + 1]);
 		}
