@@ -39,6 +39,7 @@ fl_slaves_list_t G_NODE_LIST = { .slot_inused = 0xFF };
 volatile u8 MASTER_INSTALL_STATE = 0;
 volatile u8 MASTER_GETINNFO_AUTORUN = 0;
 volatile u8 MASTER_GETINFO_NUMSLAVE = 4;
+volatile u8 MASTER_GETINFO_NUMVIRTUAL = 1;
 
 //Period of the heartbeat
 u16 PERIOD_HEARTBEAT = 0 * 1000; //
@@ -563,6 +564,7 @@ void fl_nwk_master_collection_run(void) {
 void fl_nwk_master_getInfo_autorun(void) {
 //	const u8 max_slave = 4;
 	static u8 node_got = 0;
+	static u8 num_get_for_virtual_sla = 0;
 	u8 slave_arr[10];
 	fl_pack_t pack;
 	u8 indx = 0;
@@ -588,7 +590,7 @@ void fl_nwk_master_getInfo_autorun(void) {
 				if (G_NODE_LIST.sla_info[check].active == false)
 					break;
 			}
-			if (check == G_NODE_LIST.slot_inused) {
+			if (check == G_NODE_LIST.slot_inused && (num_get_for_virtual_sla >= MASTER_GETINFO_NUMVIRTUAL)) {
 				P_INFO("Total time:%d ms\r\n",(clock_time()-time_start)/SYSTEM_TIMER_TICK_1MS);
 				time_start = 0;
 			}
@@ -617,16 +619,20 @@ void fl_nwk_master_getInfo_autorun(void) {
 			}
 			//got full slaves
 			if (node_got >= G_NODE_LIST.slot_inused) {
-				//add timeout period getting
-				if (test_saving == 0) {
-					test_saving = clock_time();
-				} else {
-					if (clock_time_exceed(test_saving,MASTER_GETINNFO_AUTORUN * 1000 * 1000)) {
-						node_got = 0;
-						test_saving = 0;
+				//re-get for virtual slaves testing
+				num_get_for_virtual_sla++;
+				if(num_get_for_virtual_sla >= MASTER_GETINFO_NUMVIRTUAL){
+					//add timeout period getting
+					if (test_saving == 0) {
+						test_saving = clock_time();
+					} else {
+						if (clock_time_exceed(test_saving,MASTER_GETINNFO_AUTORUN * 1000 * 1000)) {
+							node_got = 0;
+							test_saving = 0;
+							num_get_for_virtual_sla=0;
+						}
 					}
 				}
-				//manage time
 			}
 		}
 	} else {
@@ -635,6 +641,7 @@ void fl_nwk_master_getInfo_autorun(void) {
 		test_saving = 0;
 		time_start = 0;
 		G_SLA_INFO_RSP.num_sla = 0;
+		num_get_for_virtual_sla=0;
 	}
 }
 
