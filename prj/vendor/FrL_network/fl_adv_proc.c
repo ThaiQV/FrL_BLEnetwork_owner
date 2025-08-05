@@ -143,6 +143,57 @@ void fl_durationADV_timeout_proccess(u8 e, u8 *p, int n) {
 /***                      Processing functions 					             **/
 /******************************************************************************/
 /******************************************************************************/
+#ifndef MASTER_CORE
+/***************************************************
+ * @brief 		:Align QUEUE SENDING
+ *
+ * @param[in] 	:none
+ *
+ * @return	  	:none
+ *
+ ***************************************************/
+bool _align_QUEUE_SENDING(fl_pack_t _pack){
+	typedef struct {
+		fl_pack_t two_pack[2];
+		u8 origin_indx;
+		u8 loop_times;
+	}manage_sending_loop_t;
+
+	static manage_sending_loop_t man_loop={.origin_indx = 0xFF,.loop_times = 1, .two_pack = {{.length = 0},{.length =0}}};
+	//update pack_arr
+	man_loop.two_pack[0] = man_loop.two_pack[1];
+	man_loop.two_pack[1] = _pack;
+	//find orginal index
+	u32  timetamp_in_pack = fl_rtc_timetamp2milltampStep(fl_adv_timetampStepInPack(man_loop.two_pack[1]));
+	u32  timetamp_in_pre_pack = fl_rtc_timetamp2milltampStep(fl_adv_timetampStepInPack(man_loop.two_pack[0]));
+
+	if(timetamp_in_pack && timetamp_in_pre_pack){
+		//check master original of the previous with currently
+		if(timetamp_in_pack > timetamp_in_pre_pack){
+//			man_loop.origin_indx = idx_inQUEUE;
+			man_loop.loop_times = (man_loop.loop_times > REPEAT_LEVEL) ? 1 : man_loop.loop_times + 1;
+		}
+		//Check loop_times to skip packet with ttl < loop_times
+		fl_dataframe_format_t data_parsed;
+		man_loop.two_pack[1].length+=1;
+		u8 rslt_parser=fl_packet_parse(man_loop.two_pack[1],&data_parsed);
+//		LOGA(BLE,"LoopTimes:%d|(%d)TTL:%d\r\n",man_loop.loop_times,rslt_parser,data_parsed.endpoint.repeat_cnt);
+//		LOGA(BLE,"[0].len:%d | [1].len:%d\r\n",man_loop.two_pack[0].length,man_loop.two_pack[1].length);
+		if (rslt_parser) {
+//			LOGA(BLE,"LoopTimes:%d|(%d)TTL:%d\r\n",man_loop.loop_times,rslt_parser,data_parsed.endpoint.repeat_cnt);
+			return (data_parsed.endpoint.repeat_cnt <= man_loop.loop_times);
+		}
+	}
+	else{
+		if (_pack.length != 0) {
+			man_loop.two_pack[0] = _pack;
+			man_loop.two_pack[1] = _pack;
+		}
+	}
+	return false;
+}
+#endif
+
 /***************************************************
  * @brief 		: add data payload adv into queue fifo
  *
@@ -167,7 +218,7 @@ int fl_adv_sendFIFO_add(fl_pack_t _pack) {
 /***************************************************
  * @brief 		: run and send adv from the queue
  *
- * @param[in] 	:none
+ * @param[in] 	: none
  *
  * @return	  	:
  *
@@ -181,12 +232,14 @@ void fl_adv_sendFIFO_run(void) {
 		if (FL_QUEUE_GET(&G_QUEUE_SENDING,&data_in_queue)) {
 #else
 		while (FL_QUEUE_GET_LOOP(&G_QUEUE_SENDING,&data_in_queue)) {
-//			u32 timetamp_inpack = fl_adv_timetampInPack(data_in_queue);
-			fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(data_in_queue);
 
-			if (fl_rtc_timetamp2milltampStep(timetamp_inpack) < fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME)){
+			//Add align packet with ttl + looptimes
+//			_align_QUEUE_SENDING(data_in_queue);
+			fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(data_in_queue);
+			if ( !_align_QUEUE_SENDING(data_in_queue) || (fl_rtc_timetamp2milltampStep(timetamp_inpack) < fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME))){
 				return;
 			}
+
 			//For debuging
 //			P_PRINTFHEX_A(BLE,data_in_queue.data_arr,data_in_queue.length,"[%d]TTL(%d):",G_QUEUE_SENDING.head_index,
 //					data_in_queue.data_arr[data_in_queue.length - 1] & 0x03);
