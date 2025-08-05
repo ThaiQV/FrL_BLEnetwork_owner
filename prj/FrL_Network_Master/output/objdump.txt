@@ -15627,7 +15627,7 @@ Disassembly of section .text:
 2000cb8c:	00150593          	addi	a1,a0,1
 2000cb90:	20013937          	lui	s2,0x20013
 2000cb94:	20013537          	lui	a0,0x20013
-2000cb98:	22200693          	li	a3,546
+2000cb98:	22400693          	li	a3,548
 2000cb9c:	b7490613          	addi	a2,s2,-1164 # 20012b74 <__FUNCTION__.13423>
 2000cba0:	e3850513          	addi	a0,a0,-456 # 20012e38 <days_in_month+0x114>
 2000cba4:	359020ef          	jal	ra,2000f6fc <printf>
@@ -15907,7 +15907,7 @@ Disassembly of section .text:
 2000cfbc:	00150593          	addi	a1,a0,1
 2000cfc0:	20013637          	lui	a2,0x20013
 2000cfc4:	20013537          	lui	a0,0x20013
-2000cfc8:	11c00693          	li	a3,284
+2000cfc8:	11e00693          	li	a3,286
 2000cfcc:	ad860613          	addi	a2,a2,-1320 # 20012ad8 <__FUNCTION__.13179>
 2000cfd0:	f5450513          	addi	a0,a0,-172 # 20012f54 <days_in_month+0x230>
 2000cfd4:	728020ef          	jal	ra,2000f6fc <printf>
@@ -16332,7 +16332,7 @@ Disassembly of section .text:
 2000d5bc:	1dc020ef          	jal	ra,2000f798 <strrchr>
 2000d5c0:	00150593          	addi	a1,a0,1
 2000d5c4:	20013537          	lui	a0,0x20013
-2000d5c8:	22300693          	li	a3,547
+2000d5c8:	22500693          	li	a3,549
 2000d5cc:	b7490613          	addi	a2,s2,-1164
 2000d5d0:	6e850513          	addi	a0,a0,1768 # 200136e8 <plog_cmd+0x2a4>
 2000d5d4:	128020ef          	jal	ra,2000f6fc <printf>
@@ -16519,7 +16519,7 @@ Disassembly of section .text:
 2000d8a8:	00150593          	addi	a1,a0,1
 2000d8ac:	20013637          	lui	a2,0x20013
 2000d8b0:	20013537          	lui	a0,0x20013
-2000d8b4:	11100693          	li	a3,273
+2000d8b4:	11300693          	li	a3,275
 2000d8b8:	ad860613          	addi	a2,a2,-1320 # 20012ad8 <__FUNCTION__.13179>
 2000d8bc:	f2450513          	addi	a0,a0,-220 # 20012f24 <days_in_month+0x200>
 2000d8c0:	63d010ef          	jal	ra,2000f6fc <printf>
@@ -17187,7 +17187,7 @@ Disassembly of section .text:
 2000e224:	00150593          	addi	a1,a0,1
 2000e228:	20013637          	lui	a2,0x20013
 2000e22c:	20013537          	lui	a0,0x20013
-2000e230:	19e00693          	li	a3,414
+2000e230:	1a000693          	li	a3,416
 2000e234:	b1060613          	addi	a2,a2,-1264 # 20012b10 <__FUNCTION__.13263>
 2000e238:	74850513          	addi	a0,a0,1864 # 20013748 <plog_cmd+0x304>
 2000e23c:	4c0010ef          	jal	ra,2000f6fc <printf>
