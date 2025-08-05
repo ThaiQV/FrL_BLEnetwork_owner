@@ -38,6 +38,7 @@ fl_slaves_list_t G_NODE_LIST = { .slot_inused = 0xFF };
 
 volatile u8 MASTER_INSTALL_STATE = 0;
 volatile u8 MASTER_GETINNFO_AUTORUN = 0;
+volatile u8 MASTER_GETINFO_NUMSLAVE = 4;
 
 //Period of the heartbeat
 u16 PERIOD_HEARTBEAT = 0 * 1000; //
@@ -560,7 +561,7 @@ void fl_nwk_master_collection_run(void) {
  *
  ***************************************************/
 void fl_nwk_master_getInfo_autorun(void) {
-	const u8 max_slave = 8;
+//	const u8 max_slave = 4;
 	static u8 node_got = 0;
 	u8 slave_arr[10];
 	fl_pack_t pack;
@@ -594,7 +595,7 @@ void fl_nwk_master_getInfo_autorun(void) {
 		}
 		///
 		if (G_SLA_INFO_RSP.num_sla == 0 && node_got < G_NODE_LIST.slot_inused) {
-			for (indx = 0; indx < max_slave && ((indx + node_got) < G_NODE_LIST.slot_inused); ++indx) {
+			for (indx = 0; indx < MASTER_GETINFO_NUMSLAVE && ((indx + node_got) < G_NODE_LIST.slot_inused); ++indx) {
 				slave_arr[indx] = G_NODE_LIST.sla_info[indx + node_got].slaveID.id_u8;
 				G_SLA_INFO_RSP.id[indx] = &G_NODE_LIST.sla_info[indx + node_got];
 //				LOGA(INF,"Mac:0x%04X\r\n",G_SLA_INFO_RSP.id[indx]->mac_short);
