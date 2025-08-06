@@ -37,9 +37,6 @@ fl_data_container_t G_HANDLE_MASTER_CONTAINER = {
 fl_slaves_list_t G_NODE_LIST = { .slot_inused = 0xFF };
 
 volatile u8 MASTER_INSTALL_STATE = 0;
-volatile u8 MASTER_GETINNFO_AUTORUN = 0;
-volatile u8 MASTER_GETINFO_NUMSLAVE = 4;
-volatile u8 MASTER_GETINFO_NUMVIRTUAL = 1;
 
 //Period of the heartbeat
 u16 PERIOD_HEARTBEAT = 0 * 1000; //
@@ -47,13 +44,7 @@ u16 PERIOD_HEARTBEAT = 0 * 1000; //
 volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into endpoint byte (dbg :1bit)
 volatile u8 NWK_REPEAT_MODE = 1; // slave repeat?
 
-//For getting automatic information
-typedef struct {
-	u8 num_sla;
-	fl_nodeinnetwork_t* id[10];
-}__attribute__((packed)) fl_master_getinfo_pointer_t;
 
-fl_master_getinfo_pointer_t G_SLA_INFO_RSP = { .num_sla = 0 };
 /******************************************************************************/
 /******************************************************************************/
 /***                           Private definitions                           **/
@@ -553,97 +544,6 @@ void fl_nwk_master_collection_run(void) {
 		}
 	}
 }
-/***************************************************
- * @brief 		:automatically get all information of slaves
- *
- * @param[in] 	:none
- *
- * @return	  	:none
- *
- ***************************************************/
-void fl_nwk_master_getInfo_autorun(void) {
-//	const u8 max_slave = 4;
-	static u8 node_got = 0;
-	static u8 num_get_for_virtual_sla = 0;
-	u8 slave_arr[10];
-	fl_pack_t pack;
-	u8 indx = 0;
-	static u32 test_saving = 0;
-	//store time for getting
-	static u32 time_start = 0;
-	if(MASTER_GETINNFO_AUTORUN == 0){
-		goto END_PROCESS;
-	}
-
-	if (G_NODE_LIST.slot_inused != 0xFF || !MASTER_INSTALL_STATE) {
-		if (node_got == 0) {
-			//re-get
-			time_start = clock_time();
-			//Clear all status of slaves => make sure
-			for (u8 stt = 0; stt < G_NODE_LIST.slot_inused; ++stt) {
-				G_NODE_LIST.sla_info[stt].active = false;
-			}
-
-		} else if (node_got >= G_NODE_LIST.slot_inused && time_start != 0) {
-			u8 check = 0;
-			for (check = 0; check < G_NODE_LIST.slot_inused; ++check) {
-				if (G_NODE_LIST.sla_info[check].active == false)
-					break;
-			}
-			if (check == G_NODE_LIST.slot_inused && (num_get_for_virtual_sla >= MASTER_GETINFO_NUMVIRTUAL)) {
-				P_INFO("Total time:%d ms\r\n",(clock_time()-time_start)/SYSTEM_TIMER_TICK_1MS);
-				time_start = 0;
-			}
-		}
-		///
-		if (G_SLA_INFO_RSP.num_sla == 0 && node_got < G_NODE_LIST.slot_inused) {
-			for (indx = 0; indx < MASTER_GETINFO_NUMSLAVE && ((indx + node_got) < G_NODE_LIST.slot_inused); ++indx) {
-				slave_arr[indx] = G_NODE_LIST.sla_info[indx + node_got].slaveID.id_u8;
-				G_SLA_INFO_RSP.id[indx] = &G_NODE_LIST.sla_info[indx + node_got];
-//				LOGA(INF,"Mac:0x%04X\r\n",G_SLA_INFO_RSP.id[indx]->mac_short);
-			}
-			G_SLA_INFO_RSP.num_sla = indx;
-			pack = fl_master_packet_GetInfo_build(slave_arr,indx);
-			fl_adv_sendFIFO_add(pack);
-			LOGA(INF,"GetInfo: %d->%d/%d\r\n",node_got,indx + node_got,G_NODE_LIST.slot_inused);
-			node_got = node_got + indx;
-		} else {
-			if (G_SLA_INFO_RSP.num_sla != 0) {
-				u8 i = 0;
-				for (i = 0; i < G_SLA_INFO_RSP.num_sla; i++) {
-					if (G_SLA_INFO_RSP.id[i]->active == false)
-						break;
-				}
-				if (i == G_SLA_INFO_RSP.num_sla)
-					G_SLA_INFO_RSP.num_sla = 0;
-			}
-			//got full slaves
-			if (node_got >= G_NODE_LIST.slot_inused) {
-				//re-get for virtual slaves testing
-				num_get_for_virtual_sla++;
-				if(num_get_for_virtual_sla >= MASTER_GETINFO_NUMVIRTUAL){
-					//add timeout period getting
-					if (test_saving == 0) {
-						test_saving = clock_time();
-					} else {
-						if (clock_time_exceed(test_saving,MASTER_GETINNFO_AUTORUN * 1000 * 1000)) {
-							node_got = 0;
-							test_saving = 0;
-							num_get_for_virtual_sla=0;
-						}
-					}
-				}
-			}
-		}
-	} else {
-		END_PROCESS:
-		node_got = 0;
-		test_saving = 0;
-		time_start = 0;
-		G_SLA_INFO_RSP.num_sla = 0;
-		num_get_for_virtual_sla=0;
-	}
-}
 
 /***************************************************
  * @brief 		:process about monitoring network via sending cmd
@@ -660,8 +560,6 @@ void fl_nwk_master_process(void) {
 	fl_nwk_master_collection_run();
 	//Heartbeat processor
 	fl_nwk_master_heartbeat_run();
-	//auto get information
-	fl_nwk_master_getInfo_autorun();
 }
 /***************************************************
  * @brief 		: execute response from nodes
