@@ -67,6 +67,7 @@ typedef struct {
 	fl_slaveID_u slaveID;
 	u32 timelife;
 	bool active;
+#ifndef MASTER_CORE
 //todo: parameters
 	union {
 		u8 stt_u8;
@@ -75,6 +76,7 @@ typedef struct {
 			u8 join_nwk :1;
 		};
 	} run_stt;
+#endif
 }__attribute__((packed)) fl_nodeinnetwork_t;
 
 #ifdef MASTER_CORE

@@ -1,0 +1,1190 @@
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:55:45
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:55:50
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:55:55
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:56:00
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:56:05
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:56:10
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:56:15
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:56:20
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:56:25
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:56:30
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:56:35
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:56:40
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:56:45
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:56:50
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:56:55
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:57:00
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:57:05
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:57:10
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:57:15
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:57:20
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:57:25
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:57:30
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:57:35
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:57:40
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:57:45
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:57:50
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:57:55
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:58:00
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:58:05
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:58:10
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:58:15
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:58:20
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:58:25
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:58:30
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:58:35
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:58:40
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:58:45
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:58:50
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:58:55
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:59:00
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:59:05
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:59:10
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:59:15
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:59:20
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:59:25
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:59:30
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:59:35
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:59:40
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:59:45
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:59:50
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 01:59:55
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:00:00
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:00:05
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:00:10
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:00:15
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:00:20
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:00:25
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:00:30
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:00:35
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:00:40
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:00:45
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:00:50
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:00:55
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:01:00
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:01:05
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:01:10
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:01:15
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:01:20
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:01:25
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:01:30
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:01:35
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:01:40
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:01:45
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:01:50
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:01:55
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:02:00
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:02:05
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:02:10
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:02:15
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:02:20
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:02:25
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:02:30
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:02:35
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:02:40
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:02:45
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:02:50
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(279):CMD(16):install on
+[LOG][fl_nwk_protocol.c] CMD_INSTALLMODE(139):Master installMode: ON
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_collection_run(539):Install mode : On
+[LOG][fl_nwk_database.c] fl_db_nodelist_load(104):Num_slave:21
+[LOG][fl_nwk_database.c] fl_db_nodelist_load(106):Load NODELIST at slot(3)-addr(2004214F)
+[LOG][fl_nwk_database.c] _nodelist_printf(89):******** NODELIST ********
+[LOG][fl_nwk_database.c] _nodelist_printf(91):[0]Mac:0x2F2245D1
+[LOG][fl_nwk_database.c] _nodelist_printf(91):[1]Mac:0xE1F92E77
+[LOG][fl_nwk_database.c] _nodelist_printf(91):[2]Mac:0xFF398AD1
+[LOG][fl_nwk_database.c] _nodelist_printf(91):[3]Mac:0x5A6CA377
+[LOG][fl_nwk_database.c] _nodelist_printf(91):[4]Mac:0xC643B3D1
+[LOG][fl_nwk_database.c] _nodelist_printf(91):[5]Mac:0x532FF477
+[LOG][fl_nwk_database.c] _nodelist_printf(91):[6]Mac:0xD78BD077
+[LOG][fl_nwk_database.c] _nodelist_printf(91):[7]Mac:0xC0F34177
+[LOG][fl_nwk_database.c] _nodelist_printf(91):[8]Mac:0x6A84BFD1
+[LOG][fl_nwk_database.c] _nodelist_printf(91):[9]Mac:0xD1B48177
+[LOG][fl_nwk_database.c] _nodelist_printf(91):[10]Mac:0x626CC877
+[LOG][fl_nwk_database.c] _nodelist_printf(91):[11]Mac:0x7099FE77
+[LOG][fl_nwk_database.c] _nodelist_printf(91):[12]Mac:0x5286CD1
+[LOG][fl_nwk_database.c] _nodelist_printf(91):[13]Mac:0x4F11CBD1
+[LOG][fl_nwk_database.c] _nodelist_printf(91):[14]Mac:0x3D2B5D1
+[LOG][fl_nwk_database.c] _nodelist_printf(91):[15]Mac:0x346553D1
+[LOG][fl_nwk_database.c] _nodelist_printf(91):[16]Mac:0xAED4F777
+[LOG][fl_nwk_database.c] _nodelist_printf(91):[17]Mac:0x7A715977
+[LOG][fl_nwk_database.c] _nodelist_printf(91):[18]Mac:0x54C5B677
+[LOG][fl_nwk_database.c] _nodelist_printf(91):[19]Mac:0xE288C877
+[LOG][fl_nwk_database.c] _nodelist_printf(91):[20]Mac:0xC67B4677
+[LOG][fl_nwk_database.c] _nodelist_printf(93):******** END *************
+Collection Init:0
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:02:55
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:02:55
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:02:56
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:02:58
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:02:59
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:03:00
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:00
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:01
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:02
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:04
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:03:05
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:05
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:06
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:07
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:08
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:10
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:03:10
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:11
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:12
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:13
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:14
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:03:15
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:16
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:17
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:18
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:19
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:03:20
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:20
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:22
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:23
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:24
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:03:25
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:25
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:26
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:28
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:29
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:03:30
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:30
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:31
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:32
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:34
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:03:35
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:35
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:36
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:37
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:38
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:40
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:03:40
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:41
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:42
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:43
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:44
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:03:45
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:46
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:47
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:48
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:49
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:03:50
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:50
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:52
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(353):CollectREQ:2025/08/05-02:03:53
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(279):CMD(16):install off
+[LOG][fl_nwk_protocol.c] CMD_INSTALLMODE(139):Master installMode: OFF
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_collection_run(547):Install mode : Off
+Collection Deinit:0
+[LOG][fl_nwk_database.c] fl_db_nodelist_save(142):Save NODELIST at slot(4)-addr(200421B8)
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:03:55
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:04:00
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(279):CMD(17):slalist
+[LOG][fl_nwk_master_handler.c] fl_master_nodelist_AddRefesh(81):NODE LIST: 21(grpID:2,memID:4)
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(279):CMD(17):slalist
+[LOG][fl_nwk_master_handler.c] fl_master_nodelist_AddRefesh(81):NODE LIST: 21(grpID:2,memID:4)
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:04:05
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(279):CMD(17):info 255 3 8 5
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(248):GET ALL INFO AUTORUN (3 s/8/5)!!
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 0->8/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(02)(28 ms)(0):02:04:08-196/093
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(07)(45 ms)(0):02:04:08-201/093
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(01)(58 ms)(0):02:04:08-197/093
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(04)(71 ms)(0):02:04:08-193/093
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(05)(84 ms)(0):02:04:08-193/093
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(03)(99 ms)(0):02:04:08-190/093
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(06)(112 ms)(0):02:04:08-199/093
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(00)(507 ms)(2):02:04:08-202/093
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 8->16/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0B)(108 ms)(0):02:04:08-138/228
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0C)(162 ms)(2):02:04:08-090/228
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(09)(182 ms)(1):02:04:08-087/228
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0F)(210 ms)(1):02:04:08-090/228
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0E)(231 ms)(2):02:04:08-090/228
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(08)(316 ms)(2):02:04:08-088/228
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0A)(410 ms)(2):02:04:08-093/228
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0D)(447 ms)(2):02:04:08-089/228
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 16->21/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(13)(38 ms)(1):02:04:09-192/089
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(10)(52 ms)(0):02:04:09-196/089
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(11)(69 ms)(1):02:04:09-192/089
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(12)(102 ms)(0):02:04:09-190/089
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(14)(250 ms)(1):02:04:09-188/089
+Total time:1248 ms
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:04:10
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 0->8/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(06)(140 ms)(0):02:04:12-219/092
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(07)(156 ms)(0):02:04:12-221/092
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(03)(169 ms)(0):02:04:12-210/092
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(01)(195 ms)(1):02:04:12-221/092
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(00)(215 ms)(0):02:04:12-220/092
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(02)(236 ms)(1):02:04:12-216/092
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(04)(250 ms)(1):02:04:12-211/092
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(05)(265 ms)(1):02:04:12-217/092
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 8->16/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0F)(42 ms)(0):02:04:12-015/164
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0B)(56 ms)(0):02:04:12-063/164
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(08)(91 ms)(1):02:04:12-016/164
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0C)(113 ms)(1):02:04:12-021/164
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(09)(129 ms)(1):02:04:12-020/164
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0E)(143 ms)(1):02:04:12-012/164
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0D)(527 ms)(2):02:04:12-023/164
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0A)(567 ms)(2):02:04:12-023/164
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 16->21/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(11)(25 ms)(0):02:04:13-158/057
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(10)(39 ms)(0):02:04:13-164/057
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(12)(53 ms)(0):02:04:13-158/057
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(14)(151 ms)(0):02:04:13-157/057
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(13)(168 ms)(1):02:04:13-160/057
+Total time:1047 ms
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:04:15
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 0->8/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(03)(77 ms)(0):02:04:16-157/060
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(07)(91 ms)(0):02:04:16-169/060
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(05)(129 ms)(2):02:04:16-165/060
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(02)(144 ms)(1):02:04:16-164/060
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(04)(158 ms)(1):02:04:16-160/060
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(00)(232 ms)(1):02:04:16-168/060
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(06)(249 ms)(2):02:04:16-171/060
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(01)(264 ms)(2):02:04:16-168/060
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 8->16/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0A)(33 ms)(0):02:04:16-238/132
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(08)(47 ms)(0):02:04:16-235/132
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0D)(68 ms)(1):02:04:16-240/132
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(09)(83 ms)(0):02:04:16-236/132
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0E)(99 ms)(1):02:04:16-236/132
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0C)(113 ms)(0):02:04:16-236/132
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0B)(401 ms)(1):02:04:16-032/132
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0F)(434 ms)(1):02:04:16-239/132
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 16->21/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(12)(53 ms)(0):02:04:16-099/247
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(13)(79 ms)(0):02:04:16-099/247
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(11)(116 ms)(1):02:04:16-099/247
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(10)(131 ms)(0):02:04:16-105/247
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(14)(159 ms)(1):02:04:16-100/247
+Total time:902 ms
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 0->8/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(05)(38 ms)(1):02:04:19-097/250
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(03)(61 ms)(1):02:04:19-097/250
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(06)(75 ms)(0):02:04:19-103/250
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(07)(98 ms)(0):02:04:19-104/250
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:04:20
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(02)(126 ms)(1):02:04:19-098/250
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(00)(253 ms)(1):02:04:19-102/250
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(04)(315 ms)(1):02:04:19-094/250
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(01)(501 ms)(2):02:04:19-105/250
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 8->16/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(09)(49 ms)(1):02:04:20-231/126
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(08)(63 ms)(0):02:04:20-229/126
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0B)(79 ms)(0):02:04:20-027/126
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0C)(92 ms)(1):02:04:20-238/126
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0D)(158 ms)(1):02:04:20-232/126
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0F)(277 ms)(1):02:04:20-234/126
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0E)(337 ms)(2):02:04:20-238/126
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0A)(449 ms)(2):02:04:20-247/126
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 16->21/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(12)(60 ms)(0):02:04:20-089/245
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(13)(82 ms)(0):02:04:20-097/245
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(10)(97 ms)(0):02:04:20-105/245
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(14)(112 ms)(1):02:04:20-097/245
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(11)(365 ms)(2):02:04:20-104/245
+Total time:1357 ms
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 0->8/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(03)(32 ms)(0):02:04:23-088/247
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(01)(45 ms)(0):02:04:23-096/247
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(06)(67 ms)(0):02:04:23-100/247
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(07)(81 ms)(0):02:04:23-102/247
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(00)(95 ms)(0):02:04:23-100/247
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(04)(111 ms)(0):02:04:23-090/247
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(05)(125 ms)(0):02:04:23-091/247
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(02)(300 ms)(1):02:04:23-096/247
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 8->16/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0B)(26 ms)(0):02:04:24-230/072
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(08)(49 ms)(0):02:04:24-183/072
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0C)(111 ms)(0):02:04:24-184/072
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(09)(132 ms)(0):02:04:24-184/072
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0A)(146 ms)(0):02:04:24-186/072
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0F)(163 ms)(0):02:04:24-188/072
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0D)(189 ms)(0):02:04:24-186/072
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0E)(205 ms)(0):02:04:24-184/072
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 16->21/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(12)(29 ms)(0):02:04:24-229/128
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(10)(43 ms)(1):02:04:24-240/128
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(14)(79 ms)(1):02:04:24-228/128
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(13)(99 ms)(1):02:04:24-232/128
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(11)(146 ms)(1):02:04:24-233/128
+Total time:694 ms
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:04:25
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 0->8/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(06)(83 ms)(0):02:04:27-240/131
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(07)(96 ms)(0):02:04:27-242/131
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(03)(111 ms)(1):02:04:27-228/131
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(00)(125 ms)(2):02:04:27-239/131
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(02)(163 ms)(1):02:04:27-235/131
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(04)(238 ms)(1):02:04:27-230/131
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(05)(370 ms)(2):02:04:27-249/131
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(01)(509 ms)(2):02:04:27-254/131
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 8->16/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0B)(94 ms)(0):02:04:28-168/008
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0C)(132 ms)(1):02:04:28-122/008
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0E)(154 ms)(0):02:04:28-123/008
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0A)(185 ms)(2):02:04:28-129/008
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0F)(214 ms)(0):02:04:28-126/008
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0D)(230 ms)(1):02:04:28-125/008
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(09)(265 ms)(1):02:04:28-123/008
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(08)(396 ms)(2):02:04:28-125/008
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 16->21/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(12)(35 ms)(1):02:04:28-218/114
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(13)(146 ms)(0):02:04:28-226/114
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(11)(160 ms)(1):02:04:28-224/114
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(14)(183 ms)(2):02:04:28-217/114
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(10)(254 ms)(0):02:04:28-244/114
+Total time:1202 ms
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:04:30
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 0->8/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(06)(70 ms)(2):02:04:31-233/118
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(05)(99 ms)(1):02:04:31-224/118
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(03)(113 ms)(0):02:04:31-215/118
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(01)(129 ms)(2):02:04:31-231/118
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(00)(142 ms)(1):02:04:31-233/118
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(02)(155 ms)(2):02:04:31-228/118
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(07)(193 ms)(2):02:04:31-236/118
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(04)(332 ms)(2):02:04:31-224/118
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 8->16/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0B)(66 ms)(0):02:04:31-110/207
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0A)(113 ms)(2):02:04:31-071/207
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0E)(128 ms)(0):02:04:31-056/207
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(08)(165 ms)(1):02:04:31-054/207
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(09)(182 ms)(2):02:04:31-069/207
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0C)(196 ms)(2):02:04:31-063/207
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0F)(210 ms)(1):02:04:31-060/207
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0D)(690 ms)(2):02:04:31-071/207
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 16->21/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(10)(77 ms)(0):02:04:32-240/131
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(13)(93 ms)(0):02:04:32-232/131
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(12)(107 ms)(0):02:04:32-232/131
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(14)(120 ms)(1):02:04:32-230/131
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(11)(159 ms)(1):02:04:32-236/131
+Total time:1225 ms
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:04:35
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 0->8/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(03)(79 ms)(0):02:04:35-230/133
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(06)(95 ms)(1):02:04:35-250/133
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(02)(119 ms)(2):02:04:35-245/133
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(00)(151 ms)(1):02:04:35-243/133
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(07)(169 ms)(1):02:04:35-252/133
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(04)(188 ms)(2):02:04:35-240/133
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(01)(206 ms)(2):02:04:35-252/133
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(05)(1194 ms)(2):02:04:35-243/133
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 8->16/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0B)(50 ms)(0):02:04:36-092/187
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0C)(64 ms)(1):02:04:36-040/187
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(09)(95 ms)(1):02:04:36-041/187
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0F)(113 ms)(0):02:04:36-041/187
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(08)(140 ms)(1):02:04:36-038/187
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0A)(157 ms)(2):02:04:36-043/187
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0D)(270 ms)(2):02:04:36-043/187
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0E)(318 ms)(1):02:04:36-037/187
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 16->21/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(12)(23 ms)(0):02:04:37-118/016
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(13)(61 ms)(0):02:04:37-118/016
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(10)(75 ms)(0):02:04:37-126/016
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(14)(89 ms)(0):02:04:37-115/016
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(11)(105 ms)(0):02:04:37-119/016
+Total time:1661 ms
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:04:40
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 0->8/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(06)(21 ms)(0):02:04:40-133/023
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(07)(84 ms)(0):02:04:40-135/023
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(03)(97 ms)(1):02:04:40-119/023
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(04)(136 ms)(0):02:04:40-122/023
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(02)(153 ms)(1):02:04:40-127/023
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(00)(172 ms)(1):02:04:40-133/023
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(05)(190 ms)(1):02:04:40-138/023
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(01)(206 ms)(1):02:04:40-135/023
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 8->16/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0B)(73 ms)(0):02:04:40-241/079
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(09)(98 ms)(1):02:04:40-188/079
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0F)(111 ms)(0):02:04:40-190/079
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0C)(126 ms)(2):02:04:40-188/079
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(08)(150 ms)(2):02:04:40-185/079
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0D)(186 ms)(2):02:04:40-195/079
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0A)(1083 ms)(2):02:04:40-228/079
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0E)(1340 ms)(2):02:04:40-190/079
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 16->21/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(12)(52 ms)(1):02:04:41-018/170
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(13)(70 ms)(0):02:04:41-015/170
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(14)(85 ms)(1):02:04:41-016/170
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(10)(100 ms)(0):02:04:41-024/170
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(11)(218 ms)(1):02:04:41-016/170
+Total time:1808 ms
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 0->8/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(02)(50 ms)(0):02:04:44-022/173
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(06)(80 ms)(1):02:04:44-029/173
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(07)(114 ms)(1):02:04:44-032/173
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(03)(130 ms)(0):02:04:44-013/173
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(05)(151 ms)(1):02:04:44-016/173
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(01)(164 ms)(1):02:04:44-024/173
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(04)(180 ms)(1):02:04:44-018/173
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(00)(300 ms)(1):02:04:44-027/173
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 8->16/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0B)(35 ms)(0):02:04:44-160/253
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:04:45
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0C)(125 ms)(1):02:04:44-103/253
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0E)(139 ms)(1):02:04:44-103/253
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(09)(154 ms)(2):02:04:44-107/253
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0D)(240 ms)(1):02:04:44-105/253
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0F)(254 ms)(1):02:04:44-108/253
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(08)(270 ms)(2):02:04:44-104/253
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0A)(323 ms)(1):02:04:44-106/253
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 16->21/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(12)(71 ms)(0):02:04:45-185/084
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(13)(85 ms)(0):02:04:45-185/084
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(11)(117 ms)(2):02:04:45-194/084
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(14)(131 ms)(1):02:04:45-183/084
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(10)(165 ms)(1):02:04:45-210/084
+Total time:831 ms
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 0->8/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(06)(37 ms)(0):02:04:48-198/087
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(04)(51 ms)(2):02:04:48-190/087
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(07)(89 ms)(2):02:04:48-204/087
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(01)(105 ms)(2):02:04:48-197/087
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(03)(119 ms)(0):02:04:48-183/087
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(02)(136 ms)(2):02:04:48-202/087
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(00)(149 ms)(2):02:04:48-201/087
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(05)(164 ms)(2):02:04:48-190/087
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 8->16/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0F)(39 ms)(0):02:04:48-244/133
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(09)(73 ms)(0):02:04:48-239/133
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0B)(86 ms)(0):02:04:48-040/133
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0C)(116 ms)(2):02:04:48-242/133
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(08)(158 ms)(1):02:04:48-237/133
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0D)(202 ms)(1):02:04:48-242/133
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0E)(337 ms)(2):02:04:48-242/133
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0A)(729 ms)(1):02:04:48-246/133
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 16->21/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(10)(34 ms)(0):02:04:49-178/067
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(12)(48 ms)(0):02:04:49-168/067
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(11)(65 ms)(0):02:04:49-169/067
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(13)(79 ms)(0):02:04:49-168/067
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(14)(271 ms)(2):02:04:49-169/067
+Total time:1207 ms
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:04:50
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 0->8/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(05)(34 ms)(0):02:04:52-169/069
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(06)(50 ms)(0):02:04:52-181/069
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(07)(87 ms)(0):02:04:52-184/069
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(00)(103 ms)(0):02:04:52-181/069
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(01)(147 ms)(0):02:04:52-177/069
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(02)(162 ms)(0):02:04:52-175/069
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(03)(396 ms)(1):02:04:52-165/069
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(04)(424 ms)(2):02:04:52-172/069
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 8->16/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0F)(33 ms)(0):02:04:52-038/182
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(08)(51 ms)(0):02:04:52-030/182
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0A)(67 ms)(0):02:04:52-036/182
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0C)(82 ms)(0):02:04:52-033/182
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0D)(95 ms)(0):02:04:52-035/182
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0B)(111 ms)(0):02:04:52-090/182
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(09)(436 ms)(1):02:04:52-033/182
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0E)(506 ms)(1):02:04:52-033/182
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 16->21/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(14)(30 ms)(0):02:04:53-159/059
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(12)(57 ms)(0):02:04:53-161/059
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(13)(78 ms)(0):02:04:53-161/059
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(10)(91 ms)(1):02:04:53-173/059
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(11)(475 ms)(1):02:04:53-164/059
+Total time:1450 ms
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:04:55
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 0->8/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(07)(64 ms)(0):02:04:56-178/063
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(00)(77 ms)(0):02:04:56-175/063
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(06)(93 ms)(0):02:04:56-175/063
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(03)(106 ms)(1):02:04:56-159/063
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(02)(158 ms)(2):02:04:56-168/063
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(04)(261 ms)(1):02:04:56-163/063
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(01)(356 ms)(2):02:04:56-184/063
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(05)(3712 ms)(2):02:04:56-171/063
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 8->16/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0B)(21 ms)(0):02:04:59-158/248
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0C)(84 ms)(0):02:04:59-105/248
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:05:00
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0F)(112 ms)(0):02:04:59-105/248
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(09)(155 ms)(0):02:04:59-107/248
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0D)(183 ms)(1):02:04:59-116/248
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0E)(200 ms)(1):02:04:59-113/248
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(08)(254 ms)(0):02:04:59-112/248
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0A)(268 ms)(0):02:04:59-110/248
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 16->21/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(12)(28 ms)(0):02:05:00-167/065
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(13)(46 ms)(0):02:05:00-167/065
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(11)(60 ms)(0):02:05:00-168/065
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(10)(73 ms)(0):02:05:00-177/065
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(14)(363 ms)(1):02:05:00-164/065
+Total time:4387 ms
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 0->8/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(04)(78 ms)(1):02:05:03-175/068
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(05)(95 ms)(0):02:05:03-175/068
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(07)(109 ms)(0):02:05:03-191/068
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(00)(135 ms)(1):02:05:03-195/068
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(03)(150 ms)(0):02:05:03-170/068
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(02)(164 ms)(1):02:05:03-187/068
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(06)(211 ms)(1):02:05:03-194/068
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(01)(442 ms)(2):02:05:03-200/068
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 8->16/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0F)(110 ms)(0):02:05:03-055/185
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0C)(133 ms)(0):02:05:03-055/185
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(08)(149 ms)(1):02:05:03-047/185
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0B)(166 ms)(0):02:05:03-110/185
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(09)(180 ms)(1):02:05:03-060/185
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0E)(213 ms)(0):02:05:03-049/185
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0A)(235 ms)(1):02:05:03-063/185
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0D)(261 ms)(1):02:05:03-061/185
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 16->21/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(14)(40 ms)(0):02:05:04-099/000
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(11)(53 ms)(0):02:05:04-103/000
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(13)(71 ms)(1):02:05:04-105/000
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(10)(87 ms)(0):02:05:04-113/000
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(12)(186 ms)(1):02:05:04-102/000
+Total time:936 ms
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:05:05
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 0->8/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(00)(70 ms)(0):02:05:07-116/003
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(06)(85 ms)(0):02:05:07-116/003
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(07)(102 ms)(0):02:05:07-120/003
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(01)(116 ms)(1):02:05:07-118/003
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(03)(132 ms)(1):02:05:07-102/003
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(04)(149 ms)(0):02:05:07-103/003
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(02)(165 ms)(0):02:05:07-109/003
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(05)(182 ms)(1):02:05:07-113/003
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 8->16/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0C)(35 ms)(1):02:05:07-163/053
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0B)(61 ms)(0):02:05:07-221/053
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0F)(75 ms)(0):02:05:07-167/053
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(09)(92 ms)(1):02:05:07-164/053
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0D)(111 ms)(2):02:05:07-167/053
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0E)(242 ms)(2):02:05:07-165/053
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0A)(257 ms)(2):02:05:07-167/053
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(08)(396 ms)(2):02:05:07-170/053
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 16->21/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(10)(52 ms)(0):02:05:07-015/158
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(13)(81 ms)(0):02:05:07-004/158
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(12)(94 ms)(1):02:05:07-011/158
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(14)(134 ms)(2):02:05:07-003/158
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(11)(161 ms)(1):02:05:07-014/158
+Total time:779 ms
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:05:10
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 0->8/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(04)(46 ms)(0):02:05:10-004/160
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(02)(59 ms)(0):02:05:10-010/160
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(03)(75 ms)(0):02:05:10-255/160
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(06)(88 ms)(0):02:05:10-018/160
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(07)(104 ms)(0):02:05:10-021/160
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(00)(139 ms)(0):02:05:10-018/160
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(05)(185 ms)(1):02:05:10-004/160
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(01)(366 ms)(2):02:05:10-018/160
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 8->16/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(09)(54 ms)(1):02:05:11-113/001
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0A)(70 ms)(1):02:05:11-116/001
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0D)(84 ms)(1):02:05:11-115/001
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0F)(97 ms)(0):02:05:11-115/001
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(08)(113 ms)(1):02:05:11-106/001
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0B)(128 ms)(1):02:05:11-174/001
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0C)(141 ms)(1):02:05:11-112/001
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0E)(157 ms)(0):02:05:11-109/001
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 16->21/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(14)(32 ms)(0):02:05:11-144/045
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(11)(60 ms)(0):02:05:11-148/045
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(12)(74 ms)(0):02:05:11-147/045
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(13)(88 ms)(1):02:05:11-151/045
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(10)(105 ms)(0):02:05:11-159/045
+Total time:668 ms
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 0->8/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(07)(93 ms)(0):02:05:14-165/048
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(00)(109 ms)(0):02:05:14-161/048
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(03)(123 ms)(0):02:05:14-143/048
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(01)(140 ms)(1):02:05:14-161/048
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(02)(154 ms)(1):02:05:14-154/048
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(05)(170 ms)(2):02:05:14-151/048
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(04)(296 ms)(1):02:05:14-147/048
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(06)(310 ms)(1):02:05:14-162/048
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 8->16/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0B)(81 ms)(0):02:05:14-045/131
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0F)(111 ms)(0):02:05:14-252/131
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0D)(137 ms)(2):02:05:14-251/131
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0E)(154 ms)(2):02:05:14-253/131
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0A)(172 ms)(2):02:05:14-012/131
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(09)(420 ms)(2):02:05:14-008/131
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(08)(449 ms)(2):02:05:14-251/131
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:05:15
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0C)(737 ms)(2):02:05:14-248/131
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 16->21/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(13)(38 ms)(0):02:05:15-171/068
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(12)(52 ms)(0):02:05:15-170/068
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(10)(85 ms)(0):02:05:15-182/068
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(14)(164 ms)(1):02:05:15-166/068
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(11)(321 ms)(1):02:05:15-171/068
+Total time:1413 ms
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 0->8/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(03)(78 ms)(2):02:05:18-168/070
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(02)(92 ms)(1):02:05:18-184/070
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(04)(108 ms)(1):02:05:18-170/070
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(05)(122 ms)(1):02:05:18-170/070
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(07)(135 ms)(1):02:05:18-191/070
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(06)(151 ms)(0):02:05:18-185/070
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(01)(200 ms)(1):02:05:18-180/070
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(00)(708 ms)(2):02:05:18-191/070
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 8->16/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0C)(39 ms)(1):02:05:19-111/000
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0B)(70 ms)(1):02:05:19-174/000
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(08)(89 ms)(1):02:05:19-108/000
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0D)(106 ms)(1):02:05:19-114/000
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0A)(121 ms)(2):02:05:19-120/000
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0E)(138 ms)(1):02:05:19-111/000
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0F)(401 ms)(2):02:05:19-117/000
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(09)(602 ms)(2):02:05:19-117/000
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 16->21/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(12)(23 ms)(0):02:05:19-004/157
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(13)(37 ms)(0):02:05:19-004/157
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(10)(51 ms)(0):02:05:19-016/157
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(14)(113 ms)(0):02:05:19-000/157
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(11)(171 ms)(0):02:05:19-005/157
+Total time:1526 ms
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:05:20
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 0->8/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(07)(38 ms)(0):02:05:22-023/160
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(02)(61 ms)(0):02:05:22-010/160
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(04)(75 ms)(1):02:05:22-004/160
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(00)(88 ms)(0):02:05:22-019/160
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(03)(102 ms)(1):02:05:22-255/160
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(06)(120 ms)(1):02:05:22-023/160
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(01)(163 ms)(1):02:05:22-017/160
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(05)(178 ms)(1):02:05:22-011/160
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 8->16/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0B)(25 ms)(0):02:05:22-125/209
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(09)(66 ms)(0):02:05:22-070/209
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0E)(82 ms)(0):02:05:22-069/209
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(08)(199 ms)(1):02:05:22-065/209
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0C)(250 ms)(1):02:05:22-068/209
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0F)(266 ms)(2):02:05:22-080/209
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0A)(310 ms)(1):02:05:22-073/209
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0D)(373 ms)(1):02:05:22-072/209
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 16->21/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(13)(58 ms)(0):02:05:23-164/053
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(12)(158 ms)(1):02:05:23-163/053
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(11)(196 ms)(2):02:05:23-168/053
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(14)(218 ms)(1):02:05:23-163/053
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(10)(274 ms)(1):02:05:23-197/053
+Total time:868 ms
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:05:25
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 0->8/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(04)(62 ms)(0):02:05:26-155/055
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(07)(75 ms)(0):02:05:26-174/055
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(03)(88 ms)(0):02:05:26-150/055
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(00)(107 ms)(0):02:05:26-170/055
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(06)(169 ms)(1):02:05:26-176/055
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(02)(230 ms)(1):02:05:26-162/055
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(01)(265 ms)(2):02:05:26-177/055
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(05)(301 ms)(2):02:05:26-168/055
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 8->16/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0B)(70 ms)(0):02:05:26-052/135
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0E)(85 ms)(0):02:05:26-244/135
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(08)(101 ms)(0):02:05:26-241/135
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0C)(116 ms)(0):02:05:26-244/135
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0A)(130 ms)(2):02:05:26-252/135
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0D)(143 ms)(0):02:05:26-248/135
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0F)(161 ms)(0):02:05:26-251/135
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(09)(175 ms)(0):02:05:26-245/135
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 16->21/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(14)(125 ms)(1):02:05:26-047/184
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(10)(168 ms)(0):02:05:26-071/184
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(12)(189 ms)(1):02:05:26-057/184
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(13)(204 ms)(0):02:05:26-065/184
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(11)(628 ms)(2):02:05:26-065/184
+Total time:1145 ms
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 0->8/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(07)(24 ms)(0):02:05:29-052/188
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(06)(69 ms)(0):02:05:29-048/188
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(03)(82 ms)(0):02:05:29-026/188
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(02)(95 ms)(1):02:05:29-039/188
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(05)(140 ms)(1):02:05:29-040/188
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(00)(155 ms)(1):02:05:29-048/188
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(04)(281 ms)(1):02:05:29-032/188
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:05:30
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(01)(668 ms)(2):02:05:29-063/188
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 8->16/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0B)(68 ms)(0):02:05:30-035/107
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0A)(160 ms)(1):02:05:30-237/107
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(08)(174 ms)(1):02:05:30-228/107
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0F)(208 ms)(1):02:05:30-239/107
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(09)(229 ms)(1):02:05:30-233/107
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0C)(265 ms)(1):02:05:30-234/107
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0D)(297 ms)(2):02:05:30-236/107
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0E)(356 ms)(2):02:05:30-235/107
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 16->21/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(14)(71 ms)(0):02:05:30-057/202
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(12)(100 ms)(0):02:05:30-060/202
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(11)(120 ms)(1):02:05:30-064/202
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(13)(174 ms)(1):02:05:30-061/202
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(10)(357 ms)(1):02:05:30-073/202
+Total time:1425 ms
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 0->8/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(07)(45 ms)(0):02:05:33-069/205
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(04)(58 ms)(0):02:05:33-049/205
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(02)(74 ms)(1):02:05:33-055/205
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(06)(87 ms)(0):02:05:33-065/205
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(03)(114 ms)(1):02:05:33-051/205
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(00)(148 ms)(1):02:05:33-065/205
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(01)(236 ms)(1):02:05:33-068/205
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(05)(268 ms)(1):02:05:33-049/205
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 8->16/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0B)(23 ms)(0):02:05:34-196/022
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0C)(57 ms)(0):02:05:34-130/022
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(08)(72 ms)(1):02:05:34-129/022
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0A)(88 ms)(0):02:05:34-136/022
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0E)(102 ms)(0):02:05:34-131/022
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0F)(117 ms)(0):02:05:34-138/022
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(09)(131 ms)(0):02:05:34-132/022
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0D)(342 ms)(1):02:05:34-134/022
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 16->21/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(13)(43 ms)(0):02:05:34-217/113
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(14)(91 ms)(1):02:05:34-211/113
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(11)(138 ms)(1):02:05:34-225/113
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(12)(167 ms)(1):02:05:34-224/113
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(10)(223 ms)(0):02:05:34-252/113
+Total time:879 ms
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:05:35
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 0->8/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(02)(40 ms)(0):02:05:37-223/116
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(05)(77 ms)(2):02:05:37-218/116
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(04)(109 ms)(2):02:05:37-215/116
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(00)(139 ms)(0):02:05:37-232/116
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(06)(154 ms)(1):02:05:37-241/116
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(07)(214 ms)(1):02:05:37-246/116
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(03)(244 ms)(1):02:05:37-225/116
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(01)(352 ms)(1):02:05:37-249/116
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 8->16/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0C)(48 ms)(0):02:05:37-063/210
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0A)(63 ms)(0):02:05:37-069/210
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(08)(80 ms)(0):02:05:37-060/210
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0B)(95 ms)(0):02:05:37-129/210
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0D)(110 ms)(1):02:05:37-072/210
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(09)(127 ms)(0):02:05:37-065/210
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0F)(141 ms)(0):02:05:37-071/210
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0E)(154 ms)(0):02:05:37-064/210
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 16->21/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(12)(31 ms)(0):02:05:37-100/253
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(13)(73 ms)(0):02:05:37-101/253
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(10)(102 ms)(0):02:05:37-113/253
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(14)(127 ms)(2):02:05:37-095/253
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(11)(368 ms)(2):02:05:37-109/253
+Total time:918 ms
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:05:40
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 0->8/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(06)(24 ms)(0):02:05:41-117/000
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(07)(91 ms)(0):02:05:41-122/000
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(02)(128 ms)(1):02:05:41-108/000
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(03)(203 ms)(1):02:05:41-098/000
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(00)(268 ms)(1):02:05:41-116/000
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(05)(286 ms)(2):02:05:41-113/000
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(04)(308 ms)(1):02:05:41-100/000
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(01)(322 ms)(2):02:05:41-121/000
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 8->16/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0D)(46 ms)(2):02:05:41-206/087
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0C)(60 ms)(0):02:05:41-196/087
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0E)(75 ms)(0):02:05:41-196/087
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(09)(91 ms)(0):02:05:41-198/087
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0F)(105 ms)(1):02:05:41-204/087
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(08)(121 ms)(0):02:05:41-192/087
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0A)(134 ms)(2):02:05:41-208/087
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0B)(151 ms)(0):02:05:41-006/087
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 16->21/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(12)(24 ms)(0):02:05:41-231/129
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(11)(80 ms)(2):02:05:41-238/129
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(13)(95 ms)(0):02:05:41-233/129
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(10)(222 ms)(1):02:05:41-005/129
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(14)(320 ms)(2):02:05:41-231/129
+Total time:836 ms
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 0->8/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(00)(61 ms)(1):02:05:44-248/131
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(03)(131 ms)(0):02:05:44-225/131
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(07)(144 ms)(1):02:05:44-007/131
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(06)(213 ms)(1):02:05:44-002/131
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(04)(263 ms)(2):02:05:44-240/131
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(01)(360 ms)(2):02:05:44-253/131
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:05:45
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(02)(600 ms)(2):02:05:44-001/131
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:05:50
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:05:55
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(05)(11372 ms)(2):02:05:44-249/131
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 8->16/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0D)(49 ms)(1):02:05:55-089/228
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(08)(65 ms)(1):02:05:55-081/228
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0B)(79 ms)(0):02:05:55-151/228
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0C)(93 ms)(1):02:05:55-084/228
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0E)(106 ms)(1):02:05:55-085/228
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(09)(121 ms)(1):02:05:55-087/228
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0A)(422 ms)(2):02:05:55-092/228
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0F)(452 ms)(2):02:05:55-095/228
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 16->21/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(12)(33 ms)(0):02:05:56-195/092
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(14)(184 ms)(2):02:05:56-207/092
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(10)(251 ms)(1):02:05:56-247/092
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(13)(267 ms)(0):02:05:56-218/092
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(11)(1390 ms)(2):02:05:56-245/092
+Total time:13258 ms
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 0->8/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(04)(89 ms)(2):02:05:59-202/095
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(03)(105 ms)(1):02:05:59-187/095
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(00)(197 ms)(1):02:05:59-213/095
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(01)(258 ms)(2):02:05:59-235/095
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(07)(280 ms)(2):02:05:59-246/095
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(06)(331 ms)(2):02:05:59-240/095
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:06:00
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(02)(1063 ms)(2):02:05:59-230/095
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(05)(1110 ms)(2):02:05:59-221/095
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 8->16/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0B)(31 ms)(0):02:06:00-050/126
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0D)(45 ms)(0):02:06:00-241/126
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0F)(110 ms)(1):02:06:00-245/126
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(09)(130 ms)(0):02:06:00-239/126
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0C)(146 ms)(0):02:06:00-236/126
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0E)(266 ms)(2):02:06:00-240/126
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0A)(312 ms)(1):02:06:00-244/126
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(08)(464 ms)(2):02:06:00-236/126
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 16->21/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(12)(52 ms)(0):02:06:00-096/249
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(14)(120 ms)(2):02:06:00-099/249
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(13)(150 ms)(2):02:06:00-128/249
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(10)(254 ms)(2):02:06:00-131/249
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(11)(1615 ms)(2):02:06:00-132/249
+Total time:3231 ms
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 0->8/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(07)(27 ms)(0):02:06:03-121/251
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(03)(124 ms)(1):02:06:03-088/251
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(06)(140 ms)(0):02:06:03-115/251
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(00)(154 ms)(1):02:06:03-114/251
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(05)(169 ms)(1):02:06:03-096/251
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(04)(191 ms)(1):02:06:03-096/251
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(02)(205 ms)(1):02:06:03-104/251
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(01)(342 ms)(2):02:06:03-112/251
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 8->16/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0B)(48 ms)(0):02:06:04-012/087
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0F)(161 ms)(0):02:06:04-219/087
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0E)(184 ms)(1):02:06:04-211/087
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0A)(229 ms)(1):02:06:04-218/087
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0D)(244 ms)(0):02:06:04-214/087
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0C)(357 ms)(1):02:06:04-210/087
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(08)(385 ms)(1):02:06:04-206/087
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(09)(499 ms)(1):02:06:04-212/087
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 16->21/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(12)(37 ms)(0):02:06:04-064/218
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(14)(50 ms)(0):02:06:04-059/218
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(13)(117 ms)(1):02:06:04-072/218
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:06:05
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(11)(210 ms)(1):02:06:04-075/218
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(10)(242 ms)(1):02:06:04-093/218
+Total time:1124 ms
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 0->8/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(06)(23 ms)(0):02:06:07-084/220
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(05)(65 ms)(1):02:06:07-073/220
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(01)(97 ms)(1):02:06:07-087/220
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(07)(110 ms)(1):02:06:07-099/220
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(00)(155 ms)(1):02:06:07-092/220
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(02)(246 ms)(2):02:06:07-088/220
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(04)(269 ms)(2):02:06:07-078/220
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(03)(649 ms)(2):02:06:07-074/220
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 8->16/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0F)(46 ms)(0):02:06:08-254/134
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(09)(65 ms)(1):02:06:08-253/134
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0B)(121 ms)(1):02:06:08-065/134
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0D)(137 ms)(0):02:06:08-250/134
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0A)(159 ms)(2):02:06:08-003/134
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(08)(173 ms)(1):02:06:08-241/134
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0C)(189 ms)(2):02:06:08-251/134
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0E)(953 ms)(1):02:06:08-002/134
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 16->21/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(12)(38 ms)(0):02:06:09-228/125
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(11)(53 ms)(1):02:06:09-234/125
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(10)(68 ms)(1):02:06:09-248/125
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(13)(82 ms)(1):02:06:09-233/125
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(14)(258 ms)(1):02:06:09-223/125
+Total time:1902 ms
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:06:10
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 0->8/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(03)(54 ms)(0):02:06:12-228/128
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(04)(71 ms)(1):02:06:12-234/128
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(06)(84 ms)(0):02:06:12-000/128
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(00)(118 ms)(0):02:06:12-248/128
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(07)(292 ms)(1):02:06:12-011/128
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(02)(358 ms)(0):02:06:12-251/128
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(05)(399 ms)(2):02:06:12-241/128
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(01)(416 ms)(0):02:06:12-001/128
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 8->16/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0D)(34 ms)(0):02:06:12-098/238
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0B)(50 ms)(0):02:06:12-165/238
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(08)(64 ms)(0):02:06:12-089/238
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(09)(80 ms)(1):02:06:12-100/238
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0E)(94 ms)(0):02:06:12-094/238
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0A)(108 ms)(1):02:06:12-106/238
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0C)(154 ms)(1):02:06:12-098/238
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0F)(632 ms)(2):02:06:12-107/238
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 16->21/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(10)(29 ms)(0):02:06:13-011/147
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(12)(95 ms)(1):02:06:13-253/147
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(13)(110 ms)(0):02:06:13-252/147
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(14)(144 ms)(2):02:06:13-244/147
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(11)(178 ms)(1):02:06:13-252/147
+Total time:1267 ms
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:06:15
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 0->8/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(01)(45 ms)(0):02:06:16-009/150
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(07)(59 ms)(0):02:06:16-021/150
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(05)(106 ms)(1):02:06:16-250/150
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(06)(120 ms)(1):02:06:16-018/150
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(02)(136 ms)(1):02:06:16-006/150
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(04)(152 ms)(1):02:06:16-250/150
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(00)(278 ms)(1):02:06:16-014/150
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(03)(446 ms)(1):02:06:16-242/150
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 8->16/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0A)(27 ms)(0):02:06:17-132/012
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0E)(55 ms)(0):02:06:17-124/012
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0C)(78 ms)(0):02:06:17-123/012
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(09)(95 ms)(0):02:06:17-126/012
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0B)(109 ms)(0):02:06:17-196/012
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(08)(144 ms)(1):02:06:17-119/012
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0D)(338 ms)(1):02:06:17-128/012
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0F)(580 ms)(1):02:06:17-133/012
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 16->21/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(12)(28 ms)(0):02:06:17-012/165
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(10)(47 ms)(0):02:06:17-029/165
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(13)(64 ms)(0):02:06:17-014/165
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(14)(112 ms)(0):02:06:17-006/165
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(11)(128 ms)(0):02:06:17-014/165
+Total time:1200 ms
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/05 - 02:06:20
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 0->8/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(03)(104 ms)(2):02:06:20-019/167
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(02)(121 ms)(0):02:06:20-041/167
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(01)(136 ms)(2):02:06:20-044/167
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(06)(149 ms)(0):02:06:20-053/167
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(04)(165 ms)(2):02:06:20-028/167
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(07)(178 ms)(2):02:06:20-055/167
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(05)(194 ms)(1):02:06:20-026/167
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(00)(362 ms)(1):02:06:20-052/167
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 8->16/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0C)(97 ms)(1):02:06:21-137/007
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0B)(147 ms)(1):02:06:21-210/007
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(08)(172 ms)(2):02:06:21-132/007
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0A)(186 ms)(1):02:06:21-145/007
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0D)(200 ms)(1):02:06:21-142/007
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0E)(217 ms)(2):02:06:21-140/007
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(09)(231 ms)(1):02:06:21-140/007
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(0F)(247 ms)(1):02:06:21-146/007
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_getInfo_autorun(608):GetInfo: 16->21/21
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(14)(54 ms)(2):02:06:21-175/074
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(10)(71 ms)(1):02:06:21-197/074
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(12)(85 ms)(1):02:06:21-177/074
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(11)(102 ms)(2):02:06:21-182/074
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(429):INFO(1)(13)(117 ms)(1):02:06:21-181/074
+Total time:765 ms
+Total time:2266 ms
+Total time:1140 ms
+Total time:1197 ms
+Total time:753 ms
+Total time:1446 ms
+Total time:669 ms
+Total time:819 ms
+Total time:494 ms
+Total time:620 ms
+Total time:1036 ms
+Total time:1041 ms
+Total time:1266 ms
+Total time:691 ms
+Total time:1850 ms
+Total time:6341 ms
+Total time:982 ms
+Total time:889 ms
+Total time:544 ms
+Total time:827 ms
+Total time:6954 ms
+Total time:9460 ms
+Total time:1065 ms
+Total time:672 ms
+Total time:2760 ms
+Total time:1068 ms
+Total time:787 ms
+Total time:1083 ms
+Total time:2412 ms
+Total time:1067 ms
+Total time:589 ms
+Total time:580 ms
+Total time:688 ms
+Total time:1947 ms
+Total time:3702 ms
+Total time:1193 ms
+Total time:917 ms
+Total time:328 ms
+Total time:636 ms
+Total time:833 ms
+Total time:1360 ms
+Total time:1486 ms
+Total time:395 ms
+Total time:830 ms
+Total time:1734 ms
+Total time:524 ms
+Total time:1187 ms
+Total time:917 ms
+Total time:1043 ms
+Total time:4730 ms
+Total time:4289 ms
+Total time:1210 ms
+Total time:1296 ms
+Total time:949 ms
+Total time:680 ms
+Total time:643 ms
+Total time:686 ms
+Total time:1246 ms
+Total time:1051 ms
+Total time:1025 ms
+Total time:855 ms
+Total time:778 ms
+Total time:390 ms
+Total time:1307 ms
+Total time:1533 ms
+Total time:1186 ms
+Total time:1003 ms
+Total time:537 ms
+Total time:416 ms
+Total time:975 ms
+Total time:728 ms
+Total time:489 ms
+Total time:661 ms
+Total time:976 ms
+Total time:450 ms
+Total time:651 ms
+Total time:805 ms
+Total time:1471 ms
+Total time:1039 ms
+
+Total time:959 ms[0;37mTotal time:1087 ms
+[1;30m[0;37mTotal time:642 ms
+[1;30m[0;37mTotal time:554 ms
+[1;30m[0;37mTotal time:673 ms
+[1;30m[0;37mTotal time:631 ms
+[1;30m[0;37mTotal time:1056 ms
+[1;30m[0;37mTotal time:1074 ms
+[1;30m[0;37mTotal time:774 ms
+[1;30m[0;37mTotal time:537 ms
+[1;30m[0;37mTotal time:929 ms
+[1;30m[0;37mTotal time:1443 ms
+[1;30m[0;37mTotal time:779 ms
+[1;30m[0;37mTotal time:528 ms
+[1;30m[0;37mTotal time:818 ms
+[1;30m[0;37mTotal time:540 ms
+[1;30m[0;37mTotal time:725 ms
+[1;30m[0;37mTotal time:810 ms
+[1;30m[0;37mTotal time:638 ms
+[1;30m[0;37mTotal time:717 ms
+[1;30m[0;37mTotal time:1079 ms
+[1;30m[0;37mTotal time:931 ms
+[1;30m[0;37mTotal time:486 ms
+[1;30m[0;37mTotal time:826 ms
+[1;30m[0;37mTotal time:1179 ms
+[1;30m[0;37mTotal time:639 ms
+[1;30m[0;37mTotal time:499 ms
+[1;30m[0;37mTotal time:1308 ms
+[1;30m[0;37mTotal time:305 ms
+[1;30m[0;37mTotal time:1133 ms
+[1;30m[0;37mTotal time:1051 ms
+[1;30m[0;37mTotal time:1137 ms
+[1;30m[0;37mTotal time:946 ms
+[1;30m[0;37mTotal time:820 ms
+[1;30m[0;37mTotal time:697 ms
+[1;30m[0;37mTotal time:444 ms
+[1;30m[0;37mTotal time:458 ms
+[1;30m[0;37mTotal time:694 ms
+[1;30m[0;37mTotal time:1090 ms
+[1;30m[0;37mTotal time:1114 ms
+[1;30m[0;37mTotal time:422 ms
+[1;30m[0;37mTotal time:917 ms
+[1;30m[0;37mTotal time:1071 ms
+[1;30m[0;37mTotal time:698 ms
+[1;30m[0;37mTotal time:824 ms
+[1;30m[0;37mTotal time:1167 ms
+[1;30m[0;37mTotal time:464 ms
+[1;30m[0;37mTotal time:771 ms
+[1;30m[0;37mTotal time:884 ms
+[1;30m[0;37mTotal time:529 ms
+[1;30m[0;37mTotal time:440 ms
+[1;30m[0;37mTotal time:903 ms
+[1;30m[0;37mTotal time:478 ms
+[1;30m[0;37mTotal time:605 ms
+[1;30m[0;37mTotal time:886 ms
+[1;30m[0;37mTotal time:939 ms
+[1;30m[0;37mTotal time:977 ms
+[1;30m[0;37mTotal time:558 ms
+[1;30m[0;37mTotal time:941 ms
+[1;30m[0;37mTotal time:643 ms
+[1;30m[0;37mTotal time:1123 ms
+[1;30m[0;37mTotal time:845 ms
+[1;30m[0;37mTotal time:7914 ms
+[1;30m[0;37mTotal time:727 ms
+[1;30m[0;37mTotal time:2952 ms
+[1;30m[0;37mTotal time:1049 ms
+[1;30m[0;37mTotal time:2253 ms
+[1;30m[0;37mTotal time:1139 ms
+[1;30m[0;37mTotal time:2087 ms
+[1;30m[0;37mTotal time:1004 ms
+[1;30m[0;37mTotal time:830 ms
+[1;30m[0;37mTotal time:506 ms
+[1;30m[0;37mTotal time:402 ms
+[1;30m[0;37mTotal time:1191 ms
+[1;30m[0;37mTotal time:1683 ms
+[1;30m[0;37mTotal time:663 ms
+[1;30m[0;37mTotal time:978 ms
+[1;30m[0;37mTotal time:2399 ms
+[1;30m[0;37mTotal time:789 ms
+[1;30m[0;37mTotal time:533 ms
+[1;30m[0;37mTotal time:526 ms
+[1;30m[0;37mTotal time:932 ms
+[1;30m[0;37mTotal time:883 ms
+[1;30m[0;37mTotal time:1458 ms
+[1;30m[0;37mTotal time:559 ms
+[1;30m[0;37mTotal time:1108 ms
+[1;30m[0;37mTotal time:1541 ms
+[1;30m[0;37mTotal time:1180 ms
+[1;30m[0;37mTotal time:1524 ms
+[1;30m[0;37mTotal time:937 ms
+[1;30m[0;37mTotal time:404 ms
+[1;30m[0;37mTotal time:987 ms
+[1;30m[0;37mTotal time:780 ms
+[1;30m[0;37mTotal time:720 ms
+[1;30m[0;37mTotal time:1022 ms
+[1;30m[0;37mTotal time:1229 ms
+[1;30m[0;37mTotal time:1419 ms
+[1;30m[0;37mTotal time:973 ms
+[1;30m[0;37mTotal time:793 ms
+[1;30m[0;37mTotal time:775 ms
+[1;30m[0;37mTotal time:1051 ms
+[1;30m[0;37mTotal time:1032 ms
+[1;30m[0;37mTotal time:786 ms
+[1;30m[0;37mTotal time:904 ms
+[1;30m[0;37mTotal time:1642 ms
+[1;30m[0;37mTotal time:927 ms
+[1;30m[0;37mTotal time:1238 ms
+[1;30m[0;37mTotal time:871 ms
+[1;30m[0;37mTotal time:1269 ms
+[1;30m[0;37mTotal time:4223 ms
+[1;30m[0;37mTotal time:966 ms
+[1;30m[0;37mTotal time:1104 ms
+[1;30m[0;37mTotal time:1134 ms
+[1;30m[0;37mTotal time:867 ms
+[1;30m[0;37mTotal time:1065 ms
+[1;30m[0;37mTotal time:4077 ms
+[1;30m[0;37mTotal time:872 ms
+[1;30m[0;37mTotal time:948 ms
+[1;30m[0;37mTotal time:933 ms
+[1;30m

@@ -75,7 +75,6 @@
 #define HCI_SUB_EVT_LE_SCAN_REQUEST_RECEIVED                         0x13   //core_5.0 - LE Scan Request Received Event - [5]7.7.65.19
 #define HCI_SUB_EVT_LE_CHANNEL_SELECTION_ALGORITHM                	 0x14   //core_5.0 - LE Channel Selection Algorithm Event - [5]7.7.65.20
 
-
 #define HCI_SUB_EVT_LE_CONNECTIONLESS_IQ_REPORT               	     0x15	//core_5.1	7.7.65.21 LE Connectionless IQ Report event
 #define HCI_SUB_EVT_LE_CONNECTION_IQ_REPORT               		 	 0x16	//core_5.1	7.7.65.22 LE Connection IQ Report event
 #define HCI_SUB_EVT_LE_CTE_REQUEST_FAILED                		     0x17	//core_5.1	7.7.65.23 LE CTE Request Failed event
@@ -92,7 +91,6 @@
 #define HCI_SUB_EVT_LE_PATH_LOSS_THRESHOLD							 0x20	//core_5.2	7.7.65.32 LE Path Loss Threshold event
 #define HCI_SUB_EVT_LE_TRANSMIT_POWER_REPORTING						 0x21	//core_5.2	7.7.65.33 LE Transmit Power Reporting event
 #define HCI_SUB_EVT_LE_BIGINFO_ADVERTISING_REPORT					 0x22	//core_5.2	7.7.65.34 LE BIGInfo Advertising Report event
-
 
 
 #define HCI_SUB_EVT_LE_CONNECTION_ESTABLISH					         0xFF   //Telink private
