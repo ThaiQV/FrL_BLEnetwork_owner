@@ -45,7 +45,7 @@ typedef struct {
 	u32 time_start;
 	struct {
 		u8 num_onl;
-		fl_nodeinnetwork_t off[MAX_NODES];
+		fl_nodeinnetwork_t offline[MAX_NODES];
 		u32 total_time;
 	} rslt;
 }__attribute__((packed)) fl_master_getinfo_pointer_t;
@@ -128,6 +128,13 @@ int _getInfo_autorun(void) {
 			if (G_SLA_INFO_RSP.num_retrieved >= G_SLA_INFO_RSP.total_slaves) {
 				goto OUTPUT_RESULT;
 			}
+			//store offline
+			for (idx_get = 0; idx_get < G_SLA_INFO_RSP.num_1_times; ++idx_get) {
+				if (G_SLA_INFO_RSP.id[idx_get]->active == false) {
+					G_SLA_INFO_RSP.rslt.offline[idx_get] = *G_SLA_INFO_RSP.id[idx_get];
+				}
+			}
+			//continue to get
 			goto NEXT_STEP;
 		}else return GETINFO_FREQUENCY*1000;
 	} else
@@ -165,9 +172,15 @@ int _getInfo_autorun(void) {
 	return GETINFO_FREQUENCY*1000;
 
 	OUTPUT_RESULT:
-	LOGA(DRV,"Online:%d/%d\r\n",G_SLA_INFO_RSP.rslt.num_onl,G_SLA_INFO_RSP.total_slaves);
-	LOGA(DRV,"Round-trip Time(RTT):%d ms\r\n",(clock_time() - G_SLA_INFO_RSP.time_start)/SYSTEM_TIMER_TICK_1MS);
-
+	P_INFO("RTT    :%d ms\r\n",(clock_time() - G_SLA_INFO_RSP.time_start)/SYSTEM_TIMER_TICK_1MS);
+	P_INFO("Online :%d/%d\r\n",G_SLA_INFO_RSP.rslt.num_onl,G_SLA_INFO_RSP.total_slaves);
+	if (G_SLA_INFO_RSP.rslt.num_onl < G_SLA_INFO_RSP.total_slaves) {
+		u8 num_off = G_SLA_INFO_RSP.total_slaves - G_SLA_INFO_RSP.rslt.num_onl;
+		P_INFO("Offline:%d/%d\r\n",num_off,G_SLA_INFO_RSP.total_slaves);
+		for (idx_get = 0; idx_get < num_off; ++idx_get) {
+			P_INFO("[%d]Mac:0x%08X\r\n",G_SLA_INFO_RSP.rslt.offline[idx_get].slaveID.id_u8,G_SLA_INFO_RSP.rslt.offline[idx_get].mac_short.mac_u32);
+		}
+	}
 	//Clear and Restart get all
 	G_SLA_INFO_RSP.num_retrieved = 0xFF;
 	G_SLA_INFO_RSP.rslt.num_onl = 0;
@@ -368,7 +381,7 @@ void CMD_GETINFOSLAVE(u8* _data) {
 		//create timer checking to manage response
 		//Clear and re-start
 		blt_soft_timer_delete(&_getInfo_autorun);
-		blt_soft_timer_add(&_getInfo_autorun,50 * 1000); //ms
+		blt_soft_timer_add(&_getInfo_autorun,GETINFO_FREQUENCY * 1000); //ms
 	} else if (slave_num >= 1) {
 		//Clear and re-start
 		blt_soft_timer_delete(&_getInfo_autorun);
