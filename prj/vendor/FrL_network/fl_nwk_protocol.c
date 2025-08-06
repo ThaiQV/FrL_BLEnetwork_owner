@@ -107,6 +107,10 @@ fl_cmdlines_t G_CMDGET[] = { { { 's', 'l', 'a', 'l', 'i', 's', 't' }, 7, CMD_GET
  *
  ***************************************************/
 int _getInfo_autorun(void) {
+	//debug
+	datetime_t cur_dt;
+	u32 cur_timetamp = fl_rtc_get();
+	fl_rtc_timestamp_to_datetime(cur_timetamp,&cur_dt);
 	//1. get real total slaves in the container
 	u8 slave_arr[GETINFO_1_TIMES_MAX];
 	u8 var = 0;
@@ -123,7 +127,7 @@ int _getInfo_autorun(void) {
 			}
 		}
 		//Check timeout expired
-		if (clock_time_exceed(G_SLA_INFO_RSP.timeout_rsp_start,G_SLA_INFO_RSP.num_1_times * G_SLA_INFO_RSP.timeout_rsp * 1000)) { //convert to ms
+		if (clock_time_exceed(G_SLA_INFO_RSP.timeout_rsp_start,(G_SLA_INFO_RSP.num_1_times)* G_SLA_INFO_RSP.timeout_rsp * 1000)) { //convert to ms
 			//Check complete
 			if (G_SLA_INFO_RSP.num_retrieved >= G_SLA_INFO_RSP.total_slaves) {
 				goto OUTPUT_RESULT;
@@ -139,6 +143,8 @@ int _getInfo_autorun(void) {
 		}else return GETINFO_FREQUENCY*1000;
 	} else
 	{
+		//LOGA(APP,"SYSTIME:%02d/%02d/%02d - %02d:%02d:%02d\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second);
+		P_INFO("[%02d/%02d/%02d-%02d:%02d:%02d]Start GetInfo!!\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second);
 		G_SLA_INFO_RSP.num_retrieved = 0;
 		G_SLA_INFO_RSP.time_start = clock_time();
 	}
@@ -181,6 +187,8 @@ int _getInfo_autorun(void) {
 			P_INFO("[%d]Mac:0x%08X\r\n",G_SLA_INFO_RSP.rslt.offline[idx_get].slaveID.id_u8,G_SLA_INFO_RSP.rslt.offline[idx_get].mac_short.mac_u32);
 		}
 	}
+	P_INFO("[%02d/%02d/%02d-%02d:%02d:%02d]End GetInfo!!\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second);
+
 	//Clear and Restart get all
 	G_SLA_INFO_RSP.num_retrieved = 0xFF;
 	G_SLA_INFO_RSP.rslt.num_onl = 0;
@@ -374,7 +382,7 @@ void CMD_GETINFOSLAVE(u8* _data) {
 		G_SLA_INFO_RSP.time_interval = slaveID[1];
 		G_SLA_INFO_RSP.num_1_times = slaveID[2];
 		G_SLA_INFO_RSP.num_1_times_setting = slaveID[2];
-		G_SLA_INFO_RSP.total_slaves = slaveID[3];
+		G_SLA_INFO_RSP.total_slaves = slaveID[3] > MAX_NODES ? MAX_NODES : slaveID[3];
 		G_SLA_INFO_RSP.timeout_rsp = slaveID[4];
 		LOGA(DRV,"GET ALL INFO AUTORUN (interval:%d s|NumOfTimes:%d |Total:%d |Timeout:%d ms)!!\r\n",G_SLA_INFO_RSP.time_interval,G_SLA_INFO_RSP.num_1_times,
 				G_SLA_INFO_RSP.total_slaves,G_SLA_INFO_RSP.timeout_rsp);
