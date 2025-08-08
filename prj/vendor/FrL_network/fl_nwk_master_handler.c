@@ -416,7 +416,7 @@ int fl_master_ProccesRSP_cbk(void) {
 					if (node_indx != -1) {
 						G_NODE_LIST.sla_info[node_indx].active = true;
 						G_NODE_LIST.sla_info[node_indx].timelife = (clock_time() - G_NODE_LIST.sla_info[node_indx].timelife) / SYSTEM_TIMER_TICK_1MS;
-						LOGA(INF,"INFO(%d)(%02X)(%d ms)(%d):%s\r\n",packet.frame.endpoint.rep_mode,slave_id,G_NODE_LIST.sla_info[node_indx].timelife,
+						LOGA(INF,"INFO(%d)(%d)(%d ms)(%d):%s\r\n",packet.frame.endpoint.rep_mode,slave_id,G_NODE_LIST.sla_info[node_indx].timelife,
 								packet.frame.endpoint.repeat_cnt,packet.frame.payload);
 					} else {
 						ERR(INF,"ID not foud:%02X\r\n",slave_id);
