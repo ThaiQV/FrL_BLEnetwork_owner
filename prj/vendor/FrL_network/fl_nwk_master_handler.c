@@ -20,6 +20,7 @@
 #include "fl_input_ext.h"
 #include "fl_adv_repeat.h"
 #include "fl_nwk_database.h"
+#include "fl_nwk_protocol.h"
 
 #ifdef MASTER_CORE
 /******************************************************************************/
@@ -167,6 +168,7 @@ fl_pack_t fl_master_packet_collect_build(void) {
  *
  ***************************************************/
 fl_pack_t fl_master_packet_assignSlaveID_build(u32 _mac_short) {
+	extern fl_adv_settings_t G_ADV_SETTINGS ;
 	fl_pack_t packet_built;
 
 	fl_data_frame_u packet;
@@ -183,13 +185,18 @@ fl_pack_t fl_master_packet_assignSlaveID_build(u32 _mac_short) {
 	//Add new mill-step
 	packet.frame.milltamp = timetampStep.milstep;
 
-	//Add
-
+	//Add slave's mac
 	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
 	packet.frame.payload[0] = U32_BYTE3(_mac_short);
 	packet.frame.payload[1] = U32_BYTE2(_mac_short);
 	packet.frame.payload[2] = U32_BYTE1(_mac_short);
 	packet.frame.payload[3] = U32_BYTE0(_mac_short);
+	//Add channel communication
+	packet.frame.payload[4] = G_ADV_SETTINGS.nwk_chn.chn1;
+	packet.frame.payload[5] = G_ADV_SETTINGS.nwk_chn.chn2;
+	packet.frame.payload[6] = G_ADV_SETTINGS.nwk_chn.chn3;
+	//Add master's mac
+	memcpy(&packet.frame.payload[7],blc_ll_get_macAddrPublic(),4);
 
 	//Create payload assignment
 	packet.frame.slaveID.id_u8 = fl_master_SlaveID_get(_mac_short);

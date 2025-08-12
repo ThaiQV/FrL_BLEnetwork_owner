@@ -17,6 +17,8 @@
 #define SYSTEM_RUNTIME_SIZE				SECTOR_FLASH_SIZE
 
 #define NODELIST_SIZE					SECTOR_FLASH_SIZE
+
+#define SLAVEPROFILE_SIZE				SECTOR_FLASH_SIZE
 //////// ======================================================================
 #define ADDR_RTC_START					(ADDR_USERAREA_START+SECTOR_FLASH_SIZE)
 
@@ -36,12 +38,38 @@ typedef struct {
 #define ADDR_NODELIST_NUMSLAVE			ADDR_NODELIST_START
 #define NODELIST_NUMSLAVE_SIZE			0x14 //20 bytes
 #define ADDR_NODELIST_DATA				(ADDR_NODELIST_START + NODELIST_NUMSLAVE_SIZE)
+#else
+typedef struct {
+	u8 slaveid;
+	struct {
+		u8 chn[3];
+//		u8 key[];//todo: encrypt
+		u32 mac_parent;
+	} nwk;
+	struct {
+		u8 rst_factory;
+		u8 join_nwk;
+	} run_stt;
+	//Don't change
+	u32 magic; // constant for LSB
+}__attribute__((packed)) fl_slave_profiles_t;
+
+#define ADDR_SLAVE_PROFILE_START  		(ADDR_RTC_START+SYSTEM_RUNTIME_SIZE)
+#define SLAVE_PROFILE_MAGIC 			0xEDEDEDED
+#define SLAVE_PROFILE_ENTRY_SIZE        (sizeof(fl_slave_profiles_t)/sizeof(u8))
+#define SLAVE_PROFILE_MAX_ENTRIES       (SLAVEPROFILE_SIZE / SLAVE_PROFILE_ENTRY_SIZE)
+
+fl_slave_profiles_t fl_db_slaveprofile_init(void);
+void fl_db_slaveprofile_save(fl_slave_profiles_t entry);
+fl_slave_profiles_t fl_db_slaveprofile_load(void);
+
 #endif
 //////// ======================================================================
+uint32_t fl_db_crc32(uint8_t *data, size_t len);
 void fl_db_rtc_factory(void);
 void fl_db_rtc_init(void);
 void fl_db_rtc_save(u32 _timetamp);
-u32 fl_db_rtc_load(void) ;
+u32 fl_db_rtc_load(void);
 void fl_db_all_save(void);
 #ifdef MASTER_CORE
 void fl_db_nodelist_init(void);

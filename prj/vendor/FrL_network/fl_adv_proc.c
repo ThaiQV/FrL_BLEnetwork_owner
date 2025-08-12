@@ -32,8 +32,8 @@
 extern _attribute_data_retention_ volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME;
 #endif
 _attribute_data_retention_ volatile u8 F_SENDING_STATE = 0;
-//_attribute_data_retention_ volatile u32 TICK_GET_PROCESSING_TIME = 0;
-_attribute_data_retention_ fl_adv_settings_t G_ADV_SETTINGS = {
+
+fl_adv_settings_t G_ADV_SETTINGS = {
 		.adv_interval_min = ADV_INTERVAL_20MS,
 		.adv_interval_max = ADV_INTERVAL_50MS,
 		.adv_duration = SEND_TIMEOUT_MS,
@@ -44,7 +44,7 @@ _attribute_data_retention_ fl_adv_settings_t G_ADV_SETTINGS = {
 #define IN_DATA_SIZE 		128
 fl_pack_t g_data_array[IN_DATA_SIZE];
 fl_data_container_t G_DATA_CONTAINER = { .data = g_data_array, .head_index = 0, .tail_index = 0, .mask = IN_DATA_SIZE - 1, .count = 0 };
-//_attribute_data_retention_ u32 LAST_REC_TIMEOUT = 0;
+
 /*---------------- ADV SEND QUEUE --------------------------*/
 #define QUEUE_SENDING_SIZE 		16
 fl_pack_t g_sending_array[QUEUE_SENDING_SIZE];
@@ -322,17 +322,24 @@ void fl_adv_sendtest(void) {
  *
  ***************************************************/
 void fl_adv_init(void) {
-	rf_set_power_level_index(MY_RF_POWER_INDEX);
 
-	blc_ll_setAdvCustomedChannel(G_ADV_SETTINGS.nwk_chn.chn1,G_ADV_SETTINGS.nwk_chn.chn2,G_ADV_SETTINGS.nwk_chn.chn3);
-
-	fl_adv_scanner_init();
 #ifdef MASTER_CORE
-
+	//fl_adv_sendtest();
+	fl_nwk_master_init();
+	fl_input_external_init();
 #else
-	//TEST SEND
-//	fl_adv_sendtest();
+	extern fl_nodeinnetwork_t G_INFORMATION;
+	fl_nwk_slave_init();
+	fl_repeater_init();
+
+	G_ADV_SETTINGS.nwk_chn.chn1 = G_INFORMATION.profile.nwk.chn[0];
+	G_ADV_SETTINGS.nwk_chn.chn2 = G_INFORMATION.profile.nwk.chn[1];
+	G_ADV_SETTINGS.nwk_chn.chn3 = G_INFORMATION.profile.nwk.chn[2];
 #endif
+
+	rf_set_power_level_index(MY_RF_POWER_INDEX);
+	blc_ll_setAdvCustomedChannel(G_ADV_SETTINGS.nwk_chn.chn1,G_ADV_SETTINGS.nwk_chn.chn2,G_ADV_SETTINGS.nwk_chn.chn3);
+	fl_adv_scanner_init();
 }
 /***************************************************
  * @brief 		:init collection channel (0,1,2)
@@ -417,15 +424,6 @@ void fl_adv_scanner_init(void) {
 	blc_ll_setScanEnable(1,0);
 	bls_ll_setAdvEnable(BLC_ADV_ENABLE);  //adv enable
 	FL_QUEUE_CLEAR(&G_DATA_CONTAINER,IN_DATA_SIZE);
-
-#ifdef MASTER_CORE
-	//fl_adv_sendtest();
-	fl_nwk_master_init();
-	fl_input_external_init();
-#else
-	fl_nwk_slave_init();
-	fl_repeater_init();
-#endif
 }
 /***************************************************
  * @brief 		: parse data array to data fields

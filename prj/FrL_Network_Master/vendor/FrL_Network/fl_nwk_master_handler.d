@@ -168,9 +168,10 @@ vendor/FrL_Network/fl_nwk_master_handler.d vendor/FrL_Network/fl_nwk_master_hand
  /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/service/hids.h \
  /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/service/uuid.h \
  ../vendor/FrL_Network/app.h ../vendor/FrL_Network/fl_nwk_handler.h \
+ ../vendor/FrL_Network/fl_nwk_database.h \
  ../vendor/FrL_Network/fl_adv_proc.h ../vendor/FrL_Network/fl_input_ext.h \
  ../vendor/FrL_Network/fl_adv_repeat.h \
- ../vendor/FrL_Network/fl_nwk_database.h
+ ../vendor/FrL_Network/fl_nwk_protocol.h
 
 /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/tl_common.h:
 
@@ -526,10 +527,12 @@ vendor/FrL_Network/fl_nwk_master_handler.d vendor/FrL_Network/fl_nwk_master_hand
 
 ../vendor/FrL_Network/fl_nwk_handler.h:
 
+../vendor/FrL_Network/fl_nwk_database.h:
+
 ../vendor/FrL_Network/fl_adv_proc.h:
 
 ../vendor/FrL_Network/fl_input_ext.h:
 
 ../vendor/FrL_Network/fl_adv_repeat.h:
 
-../vendor/FrL_Network/fl_nwk_database.h:
+../vendor/FrL_Network/fl_nwk_protocol.h:

@@ -170,6 +170,7 @@ vendor/FrL_Network/fl_adv_proc.d vendor/FrL_Network/fl_adv_proc.o: \
  ../vendor/FrL_Network/app.h ../vendor/FrL_Network/fl_adv_repeat.h \
  ../vendor/FrL_Network/fl_adv_proc.h \
  ../vendor/FrL_Network/fl_nwk_handler.h \
+ ../vendor/FrL_Network/fl_nwk_database.h \
  ../vendor/FrL_Network/fl_input_ext.h \
  ../vendor/FrL_Network/fl_nwk_protocol.h
 
@@ -530,6 +531,8 @@ vendor/FrL_Network/fl_adv_proc.d vendor/FrL_Network/fl_adv_proc.o: \
 ../vendor/FrL_Network/fl_adv_proc.h:
 
 ../vendor/FrL_Network/fl_nwk_handler.h:
+
+../vendor/FrL_Network/fl_nwk_database.h:
 
 ../vendor/FrL_Network/fl_input_ext.h:
 
