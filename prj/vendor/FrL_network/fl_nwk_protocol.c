@@ -32,20 +32,26 @@ fl_slave_getinfo_t G_SLA_INFO; //for cmdlines
 extern fl_slaves_list_t G_NODE_LIST;
 //For getting automatic information
 #define GETINFO_1_TIMES_MAX			20
-#define GETINFO_FREQUENCY			50 //us
+#define GETINFO_FREQUENCY			20 //ms
 typedef struct {
-	u8 num_1_times;
 	fl_nodeinnetwork_t* id[GETINFO_1_TIMES_MAX];
 	u8 num_retrieved; // number of slaves retrieved out
 	u8 total_slaves; //
-	u8 time_interval; //second
-	u8 num_1_times_setting; //
-	u8 timeout_rsp; //ms - max 200ms for each slave
+	u8 num_1_times;
+	u8 num_retry;
 	u32 timeout_rsp_start;
 	u32 time_start;
 	struct {
+			u8 time_interval; //second
+			u8 total_slaves;
+			u8 num_1_times; //
+			u8 num_retry;
+			u16 timeout_rsp; //ms
+	}settings;
+	struct {
 		u8 num_onl;
-		fl_nodeinnetwork_t off[MAX_NODES];
+		u8 num_off;
+		fl_nodeinnetwork_t* offline[MAX_NODES];
 		u32 total_time;
 	} rslt;
 }__attribute__((packed)) fl_master_getinfo_pointer_t;
@@ -54,10 +60,19 @@ fl_master_getinfo_pointer_t G_SLA_INFO_RSP = { .num_1_times = 0, .num_retrieved 
 
 #define CLEAR_INFO_RSP() 	do { \
 								G_SLA_INFO_RSP.num_1_times = 0; \
-								G_SLA_INFO_RSP.num_retrieved = 0xFF; \
 								G_SLA_INFO_RSP.time_start = 0; \
 								G_SLA_INFO_RSP.total_slaves = 0; \
+								G_SLA_INFO_RSP.num_retrieved = 0xFF; \
+								G_SLA_INFO_RSP.num_retry = 0; \
+								G_SLA_INFO_RSP.timeout_rsp_start=0;\
+								G_SLA_INFO_RSP.settings.time_interval = 0; \
+								G_SLA_INFO_RSP.settings.timeout_rsp = 0; \
+								G_SLA_INFO_RSP.settings.num_1_times = 0; \
+								G_SLA_INFO_RSP.settings.num_retry = 0; \
+								G_SLA_INFO_RSP.settings.total_slaves = 0; \
 								G_SLA_INFO_RSP.rslt.num_onl = 0;\
+								G_SLA_INFO_RSP.rslt.num_off = 0;\
+								G_SLA_INFO_RSP.rslt.total_time = 0;\
 							} while(0)
 
 /********************* Functions SET CMD declare ********************/
@@ -107,12 +122,17 @@ fl_cmdlines_t G_CMDGET[] = { { { 's', 'l', 'a', 'l', 'i', 's', 't' }, 7, CMD_GET
  *
  ***************************************************/
 int _getInfo_autorun(void) {
+	//debug
+	datetime_t cur_dt;
+	u32 cur_timetamp = fl_rtc_get();
+	fl_rtc_timestamp_to_datetime(cur_timetamp,&cur_dt);
 	//1. get real total slaves in the container
 	u8 slave_arr[GETINFO_1_TIMES_MAX];
 	u8 var = 0;
 	//check rsp of the slaves
 	u8 idx_get = 0;
 	u8 get_num_reported = 0;
+	static u8 slot_offline = 0;
 	if (G_SLA_INFO_RSP.num_retrieved != 0xFF) {
 		for (idx_get = 0; idx_get < G_SLA_INFO_RSP.num_1_times; ++idx_get) {
 			if (G_SLA_INFO_RSP.id[idx_get]->active == true) {
@@ -123,32 +143,54 @@ int _getInfo_autorun(void) {
 			}
 		}
 		//Check timeout expired
-		if (clock_time_exceed(G_SLA_INFO_RSP.timeout_rsp_start,G_SLA_INFO_RSP.num_1_times * G_SLA_INFO_RSP.timeout_rsp * 1000)) { //convert to ms
+		if (clock_time_exceed(G_SLA_INFO_RSP.timeout_rsp_start,(G_SLA_INFO_RSP.settings.num_1_times)* G_SLA_INFO_RSP.settings.timeout_rsp * 1000)) { //convert to ms
+			//store offline
+			for (idx_get = 0; idx_get < G_SLA_INFO_RSP.num_1_times; ++idx_get) {
+				if (G_SLA_INFO_RSP.id[idx_get]->active == false) {
+					G_SLA_INFO_RSP.rslt.offline[slot_offline++] = G_SLA_INFO_RSP.id[idx_get];
+				}
+			}
 			//Check complete
 			if (G_SLA_INFO_RSP.num_retrieved >= G_SLA_INFO_RSP.total_slaves) {
+				G_SLA_INFO_RSP.rslt.num_onl += get_num_reported;
+				G_SLA_INFO_RSP.timeout_rsp_start = clock_time();
 				goto OUTPUT_RESULT;
 			}
+			//continue to get
 			goto NEXT_STEP;
 		}else return GETINFO_FREQUENCY*1000;
 	} else
 	{
 		G_SLA_INFO_RSP.num_retrieved = 0;
-		G_SLA_INFO_RSP.time_start = clock_time();
+		if(G_SLA_INFO_RSP.time_start ==0){
+
+			P_INFO("[%02d/%02d/%02d-%02d:%02d:%02d]Start GetInfo!!\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second);
+			G_SLA_INFO_RSP.time_start = clock_time();
+		}
 	}
+//======== NEXT
 	NEXT_STEP:
 	//check rsp and full data
+	//LOGA(INF,"get_num_reported:%d\r\n",get_num_reported);
 	G_SLA_INFO_RSP.rslt.num_onl += get_num_reported;
+	LOGA(INF,"get_num_reported:%d-%d/%d\r\n",get_num_reported,G_SLA_INFO_RSP.rslt.num_onl,G_SLA_INFO_RSP.total_slaves);
+	G_SLA_INFO_RSP.timeout_rsp_start = clock_time();
 	if (G_SLA_INFO_RSP.rslt.num_onl == G_SLA_INFO_RSP.total_slaves)
 		goto OUTPUT_RESULT;
 	//next slaves
-	G_SLA_INFO_RSP.timeout_rsp_start = clock_time();
 	for (var = 0; var < G_SLA_INFO_RSP.num_1_times && var + G_SLA_INFO_RSP.num_retrieved < G_SLA_INFO_RSP.total_slaves; ++var) {
-		G_SLA_INFO_RSP.id[var] = &G_NODE_LIST.sla_info[(var + G_SLA_INFO_RSP.num_retrieved)%G_NODE_LIST.slot_inused];
+		if(G_SLA_INFO_RSP.num_retry == 0){
+			G_SLA_INFO_RSP.id[var] = &G_NODE_LIST.sla_info[(var + G_SLA_INFO_RSP.num_retrieved)%G_NODE_LIST.slot_inused];
+		}
+		else{
+			G_SLA_INFO_RSP.id[var] = G_SLA_INFO_RSP.rslt.offline[(var + G_SLA_INFO_RSP.num_retrieved)%G_SLA_INFO_RSP.rslt.num_off];
+		}
 		slave_arr[var] = G_SLA_INFO_RSP.id[var]->slaveID.id_u8;
 		//clear status of slave
 		G_SLA_INFO_RSP.id[var]->active = false;
 		G_SLA_INFO_RSP.id[var]->timelife = clock_time();
 	}
+
 	if(var == 0) goto OUTPUT_RESULT; //done
 
 	LOGA(DRV,"GetInfo: %d->%d/%d\r\n",G_SLA_INFO_RSP.num_retrieved,var + G_SLA_INFO_RSP.num_retrieved - 1,G_SLA_INFO_RSP.total_slaves);
@@ -163,17 +205,49 @@ int _getInfo_autorun(void) {
 		G_SLA_INFO_RSP.num_1_times = var;
 
 	return GETINFO_FREQUENCY*1000;
-
+//======== OUTPUT
 	OUTPUT_RESULT:
-	LOGA(DRV,"Online:%d/%d\r\n",G_SLA_INFO_RSP.rslt.num_onl,G_SLA_INFO_RSP.total_slaves);
-	LOGA(DRV,"Round-trip Time(RTT):%d ms\r\n",(clock_time() - G_SLA_INFO_RSP.time_start)/SYSTEM_TIMER_TICK_1MS);
-
+	P_INFO("**Online :%d/%d\r\n",G_SLA_INFO_RSP.rslt.num_onl,G_SLA_INFO_RSP.total_slaves);
+	if (G_SLA_INFO_RSP.rslt.num_onl < G_SLA_INFO_RSP.total_slaves) {
+		G_SLA_INFO_RSP.rslt.num_off = G_SLA_INFO_RSP.total_slaves - G_SLA_INFO_RSP.rslt.num_onl;
+		P_INFO("**Offline:%d/%d\r\n",G_SLA_INFO_RSP.rslt.num_off,G_SLA_INFO_RSP.total_slaves);
+		for (idx_get = 0; idx_get < G_SLA_INFO_RSP.rslt.num_off; ++idx_get) {
+			P_INFO("[%d]Mac:0x%08X\r\n",G_SLA_INFO_RSP.rslt.offline[idx_get]->slaveID.id_u8,
+					G_SLA_INFO_RSP.rslt.offline[idx_get]->mac_short.mac_u32);
+		}
+// ======= RETRY
+		if(G_SLA_INFO_RSP.num_retry < G_SLA_INFO_RSP.settings.num_retry){
+			//for debuging
+			//PLOG_Start(INF);
+			G_SLA_INFO_RSP.num_retry++;
+			G_SLA_INFO_RSP.num_retrieved = 0xFF;
+			G_SLA_INFO_RSP.total_slaves = G_SLA_INFO_RSP.rslt.num_off;
+			G_SLA_INFO_RSP.num_1_times = (G_SLA_INFO_RSP.settings.num_1_times<G_SLA_INFO_RSP.total_slaves)?G_SLA_INFO_RSP.settings.num_1_times:G_SLA_INFO_RSP.rslt.num_off;
+			G_SLA_INFO_RSP.rslt.num_onl = 0;
+			G_SLA_INFO_RSP.rslt.num_off = 0;
+			slot_offline = 0;
+			P_INFO("#Retry offline list:%d/%d\r\n",G_SLA_INFO_RSP.num_retry,G_SLA_INFO_RSP.settings.num_retry);
+			return GETINFO_FREQUENCY*1000;
+		}
+		ERR(DRV,"**Offline:%d/%d\r\n",G_SLA_INFO_RSP.rslt.num_off,G_SLA_INFO_RSP.total_slaves);
+		for (idx_get = 0; idx_get < G_SLA_INFO_RSP.rslt.num_off; ++idx_get) {
+			ERR(DRV,"[%d]Mac:0x%08X\r\n",G_SLA_INFO_RSP.rslt.offline[idx_get]->slaveID.id_u8,G_SLA_INFO_RSP.rslt.offline[idx_get]->mac_short.mac_u32);
+		}
+	}
+	//PLOG_Stop(INF);
+	P_INFO("**RTT    :%d ms\r\n",(clock_time() - G_SLA_INFO_RSP.time_start)/SYSTEM_TIMER_TICK_1MS);
+	P_INFO("[%02d/%02d/%02d-%02d:%02d:%02d]End GetInfo!!\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second);
+	P_INFO("=========================================\r\n");
 	//Clear and Restart get all
 	G_SLA_INFO_RSP.num_retrieved = 0xFF;
 	G_SLA_INFO_RSP.rslt.num_onl = 0;
+	G_SLA_INFO_RSP.rslt.num_off = 0;
 	G_SLA_INFO_RSP.time_start = 0;
-	G_SLA_INFO_RSP.num_1_times = G_SLA_INFO_RSP.num_1_times_setting;
-	return (G_SLA_INFO_RSP.time_interval > 1 ? G_SLA_INFO_RSP.time_interval*1000*1000 : -1);
+	G_SLA_INFO_RSP.num_1_times = G_SLA_INFO_RSP.settings.num_1_times;
+	G_SLA_INFO_RSP.total_slaves = G_SLA_INFO_RSP.settings.total_slaves;
+	G_SLA_INFO_RSP.num_retry = 0;
+	slot_offline = 0;
+	return (G_SLA_INFO_RSP.settings.time_interval > 1 ? G_SLA_INFO_RSP.settings.time_interval*1000*1000 : -1);
 }
 
 /***************************************************
@@ -355,25 +429,30 @@ void CMD_GETINFOSLAVE(u8* _data) {
 			&slaveID[1],&slaveID[2],&slaveID[3],&slaveID[4],&slaveID[5],&slaveID[6],&slaveID[7],&slaveID[8],&slaveID[9],&slaveID[10],&slaveID[11],
 			&slaveID[12],&slaveID[13],&slaveID[14],&slaveID[15],&slaveID[16],&slaveID[17],&slaveID[18],&slaveID[19]);
 	//p get info 255 <Period get again> <num slave for each> <num virtual slave> <timeout rsp>
-	if (slave_num == 5 && slaveID[0] == 0xFF) {
-		CLEAR_INFO_RSP()
-		;
-		G_SLA_INFO_RSP.time_interval = slaveID[1];
-		G_SLA_INFO_RSP.num_1_times = slaveID[2];
-		G_SLA_INFO_RSP.num_1_times_setting = slaveID[2];
-		G_SLA_INFO_RSP.total_slaves = slaveID[3];
-		G_SLA_INFO_RSP.timeout_rsp = slaveID[4];
-		LOGA(DRV,"GET ALL INFO AUTORUN (interval:%d s|NumOfTimes:%d |Total:%d |Timeout:%d ms)!!\r\n",G_SLA_INFO_RSP.time_interval,G_SLA_INFO_RSP.num_1_times,
-				G_SLA_INFO_RSP.total_slaves,G_SLA_INFO_RSP.timeout_rsp);
+	if (slave_num == 6 && slaveID[0] == 0xFF) {
+		CLEAR_INFO_RSP();
+		G_SLA_INFO_RSP.settings.time_interval = slaveID[1];
+
+		G_SLA_INFO_RSP.settings.num_1_times = slaveID[2];
+		G_SLA_INFO_RSP.num_1_times = G_SLA_INFO_RSP.settings.num_1_times;
+
+		G_SLA_INFO_RSP.settings.total_slaves = slaveID[3] > MAX_NODES ? MAX_NODES : slaveID[3];
+		G_SLA_INFO_RSP.total_slaves = G_SLA_INFO_RSP.settings.total_slaves;
+
+		G_SLA_INFO_RSP.settings.timeout_rsp = slaveID[4]+100;
+		G_SLA_INFO_RSP.settings.num_retry = slaveID[5];
+
+		LOGA(DRV,"GET ALL INFO AUTORUN (interval:%d s|NumOfTimes:%d |Total:%d |Timeout:%d ms)!!\r\n",G_SLA_INFO_RSP.settings.time_interval,
+				G_SLA_INFO_RSP.settings.num_1_times,
+				G_SLA_INFO_RSP.settings.total_slaves,G_SLA_INFO_RSP.settings.timeout_rsp);
 		//create timer checking to manage response
 		//Clear and re-start
 		blt_soft_timer_delete(&_getInfo_autorun);
-		blt_soft_timer_add(&_getInfo_autorun,50 * 1000); //ms
+		blt_soft_timer_add(&_getInfo_autorun,GETINFO_FREQUENCY * 1000); //ms
 	} else if (slave_num >= 1) {
 		//Clear and re-start
 		blt_soft_timer_delete(&_getInfo_autorun);
-		CLEAR_INFO_RSP()
-		;
+		CLEAR_INFO_RSP();
 		P_PRINTFHEX_A(DRV,slaveID,slave_num,"num(%d):",slave_num);
 		fl_pack_t info_pack = fl_master_packet_GetInfo_build(slaveID,slave_num);
 		P_PRINTFHEX_A(DRV,info_pack.data_arr,info_pack.length,"%s(%d):","Info Pack",info_pack.length);
