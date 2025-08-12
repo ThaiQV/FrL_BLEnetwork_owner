@@ -115,7 +115,7 @@ void fl_repeater_init(void) {
 }
 void fl_repeat_run(fl_pack_t *_pack_repeat) {
 	//LOGA(ZIG_GP,"REPEAT(%d)-> run\r\n",_pack_repeat->length - 1);
-	if (FL_QUEUE_FIND(&G_REPEAT_CONTAINER,_pack_repeat,_pack_repeat->length - 1/*skip rssi + repeat_cnt*/) == -1) {
+	if (FL_QUEUE_FIND(&G_REPEAT_CONTAINER,_pack_repeat,_pack_repeat->length - 1/*skip rssi*/) == -1) { // + repeat_cnt
 		if (FL_QUEUE_ADD(&G_REPEAT_CONTAINER,_pack_repeat) < 0) {
 			ERR(ZIG_GP,"Err <QUEUE ADD> - G_REPEAT_CONTAINER!!\r\n");
 		} else {

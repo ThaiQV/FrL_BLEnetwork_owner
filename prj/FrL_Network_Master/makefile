@@ -69,14 +69,22 @@ $(foreach subdir,$(SUBDIRS),$(wildcard $(subdir)/*.gcda) $(wildcard $(subdir)/*.
 
 SYMBOL_OUTPUTS += \
 $(SECONDARY_OUTPUT_PATH)/symbol.txt \
+$(SECONDARY_OUTPUT_PATH)/symbol.txt \
+$(SECONDARY_OUTPUT_PATH)/symbol.txt \
 
 READELF_OUTPUTS += \
+$(SECONDARY_OUTPUT_PATH)/readelf.txt \
+$(SECONDARY_OUTPUT_PATH)/readelf.txt \
 $(SECONDARY_OUTPUT_PATH)/readelf.txt \
 
 OBJDUMP_OUTPUTS += \
 $(SECONDARY_OUTPUT_PATH)/objdump.txt \
+$(SECONDARY_OUTPUT_PATH)/objdump.txt \
+$(SECONDARY_OUTPUT_PATH)/objdump.txt \
 
 SIZE_OUTPUTS += \
+$(SECONDARY_OUTPUT_PATH)/.PHONY.size \
+$(SECONDARY_OUTPUT_PATH)/.PHONY.size \
 $(SECONDARY_OUTPUT_PATH)/.PHONY.size \
 
 
