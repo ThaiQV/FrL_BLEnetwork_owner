@@ -234,14 +234,9 @@ void fl_adv_sendFIFO_run(void) {
 		while (FL_QUEUE_GET_LOOP(&G_QUEUE_SENDING,&data_in_queue)) {
 
 			fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(data_in_queue);
-			if ( (fl_rtc_timetamp2milltampStep(timetamp_inpack) < fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME))){
+			if ( (fl_rtc_timetamp2milltampStep(timetamp_inpack) != fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME))){
 				return;
 			}
-			//Add align packet with ttl + looptimes
-//			if(!_align_QUEUE_SENDING(data_in_queue)){
-//				continue;
-//			}
-
 			//For debuging
 //			P_PRINTFHEX_A(BLE,data_in_queue.data_arr,data_in_queue.length,"[%d]TTL(%d):",G_QUEUE_SENDING.head_index,
 //					data_in_queue.data_arr[data_in_queue.length - 1] & 0x03);
