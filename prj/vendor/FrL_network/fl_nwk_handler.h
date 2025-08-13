@@ -83,6 +83,15 @@ typedef struct {
 	fl_nodeinnetwork_t sla_info[MAX_NODES];
 }__attribute__((packed)) fl_slaves_list_t;
 
+typedef struct {
+	struct {
+		u8 collect_chn[3];
+		u8 chn[3];
+
+	} nwk;
+	u32 my_mac;
+}__attribute__((packed)) fl_master_config_t;
+
 #endif
 
 /*******************************************************************************

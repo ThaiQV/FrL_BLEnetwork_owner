@@ -18,9 +18,9 @@ typedef struct {
 	u16 scan_window;
 	u16 scan_interval;
 	struct {
-		u8 chn1;
-		u8 chn2;
-		u8 chn3;
+		u8 *chn1;
+		u8 *chn2;
+		u8 *chn3;
 	} nwk_chn;
 }__attribute__((packed)) fl_adv_settings_t;
 

@@ -84,6 +84,7 @@ void CMD_REPEAT(u8* _data);
 void CMD_ADVINTERVAL(u8* _data);
 void CMD_ADVSCAN(u8* _data);
 void CMD_CLEARDB(u8* _data);
+void CMD_CHANNELCONFIG(u8* _data);
 /********************* Functions GET CMD declare ********************/
 void CMD_GETSLALIST(u8* _data);
 void CMD_GETINFOSLAVE(u8* _data);
@@ -97,6 +98,7 @@ fl_cmdlines_t G_CMDSET[] = { { { 'u', 't', 'c' }, 3, CMD_SETUTC }, 			// p set u
 		{ { 'a', 'd', 'v' }, 3, CMD_ADVINTERVAL },							// p set adv <interval_min> <interval_max) : use to set adv settings
 		{ { 's', 'c', 'a', 'n' }, 4, CMD_ADVSCAN },							// p set scan <window> <interval> : use to set scanner adv settings
 		{ { 'c', 'l', 'e', 'a', 'r' }, 5, CMD_CLEARDB },					// p set clear <nodelist>
+		{ { 'c', 'h', 'n' }, 3, CMD_CHANNELCONFIG },						// p set chn <chn1> <chn2> <chn3>
 		};
 
 fl_cmdlines_t G_CMDGET[] = { { { 's', 'l', 'a', 'l', 'i', 's', 't' }, 7, CMD_GETSLALIST },		// p get list
@@ -410,6 +412,20 @@ void CMD_CLEARDB(u8* _data) {
 		REBOOT_DEV();
 	}
 }
+void CMD_CHANNELCONFIG(u8* _data) {
+	extern fl_master_config_t G_MASTER_INFO;
+	u16 channels[3] = {0,0,0};
+	//p set chn 10 11 12
+	int rslt = sscanf((char*) _data,"chn %hd %hd %hd",&channels[0],&channels[1],&channels[2]);
+	if (rslt == 3) {
+		G_MASTER_INFO.nwk.chn[0] = channels[0];
+		G_MASTER_INFO.nwk.chn[1] = channels[1];
+		G_MASTER_INFO.nwk.chn[2] = channels[2];
+		LOGA(DRV,"Channels setting:%d |%d |%d\r\n",G_MASTER_INFO.nwk.chn[0],G_MASTER_INFO.nwk.chn[1],G_MASTER_INFO.nwk.chn[2]);
+		return;
+	}
+	ERR(DRV,"ERR Channels setting (%d)\r\n",rslt);
+}
 /********************* Functions GET CMD ********************/
 void CMD_GETSLALIST(u8* _data) {
 	fl_nodeinnetwork_t _node = { .mac_short = 0 };
@@ -421,6 +437,7 @@ void CMD_GETADVSETTING(u8* _data) {
 	LOGA(DRV,"ADV interval:%d-%d|%d\r\n",(u8 )(G_ADV_SETTINGS.adv_interval_min * 0.625),(u8 )(G_ADV_SETTINGS.adv_interval_max * 0.625),
 			G_ADV_SETTINGS.adv_duration);
 	LOGA(DRV,"ADV scanner :%d-%d\r\n",(u8 )(G_ADV_SETTINGS.scan_window * 0.625),(u8 )(G_ADV_SETTINGS.scan_window * 0.625));
+	LOGA(DRV,"Channels: %d |%d |%d \r\n",*G_ADV_SETTINGS.nwk_chn.chn1,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3);
 	LOG_P(DRV,"************************\r\n");
 }
 void CMD_GETINFOSLAVE(u8* _data) {

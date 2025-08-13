@@ -91,16 +91,16 @@ void fl_nwk_slave_init(void) {
 	memcpy(G_INFORMATION.mac_short.byte,blc_ll_get_macAddrPublic(),SIZEU8(G_INFORMATION.mac_short.byte));
 
 	//Load from db
-	fl_slave_profiles_t my_profile = fl_db_slaveprofile_init();
-	G_INFORMATION.slaveID.id_u8 = my_profile.slaveid;
-	G_INFORMATION.profile = my_profile;
+//	fl_slave_profiles_t my_profile = fl_db_slaveprofile_init();
+//	G_INFORMATION.slaveID.id_u8 = my_profile.slaveid;
+//	G_INFORMATION.profile = my_profile;
 
 	//Test join network + factory
-//	G_INFORMATION.profile.run_stt.join_nwk = 1; //access to join network
-//	G_INFORMATION.profile.run_stt.rst_factory  = 1 ; //has reset factory device
-////
-//	G_INFORMATION.slaveID.id_u8 = 0xFF;
-//	G_INFORMATION.profile.slaveid = 0xFF;
+	G_INFORMATION.profile.run_stt.join_nwk = 1; //access to join network
+	G_INFORMATION.profile.run_stt.rst_factory  = 1 ; //has reset factory device
+//
+	G_INFORMATION.slaveID.id_u8 = 0xFF;
+	G_INFORMATION.profile.slaveid = 0xFF;
 
 	LOG_P(INF,"Freelux network SLAVE init\r\n");
 	LOGA(INF,"** MAC    :%08X\r\n",G_INFORMATION.mac_short.mac_u32);
@@ -110,7 +110,7 @@ void fl_nwk_slave_init(void) {
 	LOGA(INF,"** JoinNWK:%d\r\n",G_INFORMATION.profile.run_stt.join_nwk);
 	LOGA(INF,"** RstFac :%d\r\n",G_INFORMATION.profile.run_stt.rst_factory);
 
-	blt_soft_timer_add(_nwk_slave_backup,2*1000*1000);
+//	blt_soft_timer_add(_nwk_slave_backup,2*1000*1000);
 }
 /***************************************************
  * @brief 		:synchronization status from packet
@@ -307,11 +307,14 @@ int fl_slave_ProccesRSP_cbk(void) {
  * @return	  	:none
  *
  ***************************************************/
-int fl_nwk_joinnwk_timeout(void){
-	ERR(INF,"Join-network timeout!!!\r\n");
-	G_INFORMATION.profile.run_stt.join_nwk = 0;
-	fl_adv_collection_channel_deinit();
-	return -1;
+int fl_nwk_joinnwk_timeout(void) {
+	ERR(INF,"Join-network timeout and re-scan!!!\r\n");
+	if (IsJoinedNetwork()) {
+		G_INFORMATION.profile.run_stt.join_nwk = 0;
+		fl_adv_collection_channel_deinit();
+		return -1;
+	} else
+		return 0;
 }
 void fl_nwk_slave_joinnwk_exc(void) {
 	if (G_INFORMATION.profile.run_stt.join_nwk) {

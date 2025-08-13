@@ -39,7 +39,8 @@ fl_adv_settings_t G_ADV_SETTINGS = {
 		.adv_duration = SEND_TIMEOUT_MS,
 		.scan_interval = SCAN_INTERVAL_60MS,
 		.scan_window = SCAN_WINDOW_60MS,
-		.nwk_chn = {10,11,12}};
+		//.nwk_chn = {10,11,12}
+		};
 /*---------------- Total ADV Rec --------------------------*/
 #define IN_DATA_SIZE 		128
 fl_pack_t g_data_array[IN_DATA_SIZE];
@@ -324,21 +325,28 @@ void fl_adv_sendtest(void) {
 void fl_adv_init(void) {
 
 #ifdef MASTER_CORE
+	extern fl_master_config_t G_MASTER_INFO;
 	//fl_adv_sendtest();
 	fl_nwk_master_init();
 	fl_input_external_init();
+
+	G_ADV_SETTINGS.nwk_chn.chn1 = &G_MASTER_INFO.nwk.chn[0];
+	G_ADV_SETTINGS.nwk_chn.chn2 = &G_MASTER_INFO.nwk.chn[1];
+	G_ADV_SETTINGS.nwk_chn.chn3 = &G_MASTER_INFO.nwk.chn[2];
+
+
 #else
 	extern fl_nodeinnetwork_t G_INFORMATION;
 	fl_nwk_slave_init();
 	fl_repeater_init();
 
-	G_ADV_SETTINGS.nwk_chn.chn1 = G_INFORMATION.profile.nwk.chn[0];
-	G_ADV_SETTINGS.nwk_chn.chn2 = G_INFORMATION.profile.nwk.chn[1];
-	G_ADV_SETTINGS.nwk_chn.chn3 = G_INFORMATION.profile.nwk.chn[2];
+	G_ADV_SETTINGS.nwk_chn.chn1 = &G_INFORMATION.profile.nwk.chn[0];
+	G_ADV_SETTINGS.nwk_chn.chn2 = &G_INFORMATION.profile.nwk.chn[1];
+	G_ADV_SETTINGS.nwk_chn.chn3 = &G_INFORMATION.profile.nwk.chn[2];
 #endif
 
 	rf_set_power_level_index(MY_RF_POWER_INDEX);
-	blc_ll_setAdvCustomedChannel(G_ADV_SETTINGS.nwk_chn.chn1,G_ADV_SETTINGS.nwk_chn.chn2,G_ADV_SETTINGS.nwk_chn.chn3);
+	blc_ll_setAdvCustomedChannel(*G_ADV_SETTINGS.nwk_chn.chn1,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3);
 	fl_adv_scanner_init();
 }
 /***************************************************
@@ -369,7 +377,7 @@ void fl_adv_collection_channel_init(void){
 	bls_ll_setAdvEnable(BLC_ADV_ENABLE);  //adv enable
 	FL_QUEUE_CLEAR(&G_DATA_CONTAINER,IN_DATA_SIZE);
 
-	P_INFO("Collection Init:%d\r\n",bls_ll_setAdvEnable(BLC_ADV_ENABLE));  //adv enable
+	P_INFO("Collection Init(%d): %d| %d| %d\r\n",bls_ll_setAdvEnable(BLC_ADV_ENABLE),*G_ADV_SETTINGS.nwk_chn.chn1,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3);  //adv enable
 
 }
 /***************************************************
@@ -389,7 +397,7 @@ void fl_adv_collection_channel_deinit(void){
 	rf_set_power_level_index(MY_RF_POWER_INDEX);
 	FL_QUEUE_CLEAR(&G_QUEUE_SENDING,QUEUE_SENDING_SIZE);
 
-	blc_ll_setAdvCustomedChannel(G_ADV_SETTINGS.nwk_chn.chn1,G_ADV_SETTINGS.nwk_chn.chn2,G_ADV_SETTINGS.nwk_chn.chn3);
+	blc_ll_setAdvCustomedChannel(*G_ADV_SETTINGS.nwk_chn.chn1,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3);
 
 	blc_hci_le_setEventMask_cmd(HCI_LE_EVT_MASK_ADVERTISING_REPORT);
 	blc_hci_registerControllerEventHandler(fl_controller_event_callback);
@@ -400,7 +408,7 @@ void fl_adv_collection_channel_deinit(void){
 	bls_ll_setAdvEnable(BLC_ADV_ENABLE);  //adv enable
 	FL_QUEUE_CLEAR(&G_DATA_CONTAINER,IN_DATA_SIZE);
 
-	P_INFO("Collection Deinit:%d\r\n",bls_ll_setAdvEnable(BLC_ADV_ENABLE))
+	P_INFO("Collection Deinit(%d):%d |%d |%d\r\n",bls_ll_setAdvEnable(BLC_ADV_ENABLE),*G_ADV_SETTINGS.nwk_chn.chn1,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3)
 }
 
 void fl_adv_setting_update(void) {

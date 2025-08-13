@@ -36,9 +36,9 @@ fl_data_container_t G_HANDLE_MASTER_CONTAINER = {
 		.data = g_handle_master_array, .head_index = 0, .tail_index = 0, .mask = PACK_HANDLE_MASTER_SIZE - 1, .count = 0 };
 
 fl_slaves_list_t G_NODE_LIST = { .slot_inused = 0xFF };
+fl_master_config_t G_MASTER_INFO ={.nwk ={.chn = {10,11,12},.collect_chn ={0,1,2}}};
 
 volatile u8 MASTER_INSTALL_STATE = 0;
-
 //Period of the heartbeat
 u16 PERIOD_HEARTBEAT = 0 * 1000; //
 //flag debug of the network
@@ -192,9 +192,9 @@ fl_pack_t fl_master_packet_assignSlaveID_build(u32 _mac_short) {
 	packet.frame.payload[2] = U32_BYTE1(_mac_short);
 	packet.frame.payload[3] = U32_BYTE0(_mac_short);
 	//Add channel communication
-	packet.frame.payload[4] = G_ADV_SETTINGS.nwk_chn.chn1;
-	packet.frame.payload[5] = G_ADV_SETTINGS.nwk_chn.chn2;
-	packet.frame.payload[6] = G_ADV_SETTINGS.nwk_chn.chn3;
+	packet.frame.payload[4] = *G_ADV_SETTINGS.nwk_chn.chn1;
+	packet.frame.payload[5] = *G_ADV_SETTINGS.nwk_chn.chn2;
+	packet.frame.payload[6] = *G_ADV_SETTINGS.nwk_chn.chn3;
 	//Add master's mac
 	memcpy(&packet.frame.payload[7],blc_ll_get_macAddrPublic(),4);
 
