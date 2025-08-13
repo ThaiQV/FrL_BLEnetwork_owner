@@ -165,7 +165,6 @@ int _getInfo_autorun(void) {
 	{
 		G_SLA_INFO_RSP.num_retrieved = 0;
 		if(G_SLA_INFO_RSP.time_start ==0){
-
 			P_INFO("[%02d/%02d/%02d-%02d:%02d:%02d]Start GetInfo!!\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second);
 			G_SLA_INFO_RSP.time_start = clock_time();
 		}
@@ -175,7 +174,7 @@ int _getInfo_autorun(void) {
 	//check rsp and full data
 	//LOGA(INF,"get_num_reported:%d\r\n",get_num_reported);
 	G_SLA_INFO_RSP.rslt.num_onl += get_num_reported;
-	LOGA(INF,"get_num_reported:%d-%d/%d\r\n",get_num_reported,G_SLA_INFO_RSP.rslt.num_onl,G_SLA_INFO_RSP.total_slaves);
+	//LOGA(INF,"get_num_reported:%d-%d/%d\r\n",get_num_reported,G_SLA_INFO_RSP.rslt.num_onl,G_SLA_INFO_RSP.total_slaves);
 	G_SLA_INFO_RSP.timeout_rsp_start = clock_time();
 	if (G_SLA_INFO_RSP.rslt.num_onl == G_SLA_INFO_RSP.total_slaves)
 		goto OUTPUT_RESULT;
@@ -196,6 +195,7 @@ int _getInfo_autorun(void) {
 	if(var == 0) goto OUTPUT_RESULT; //done
 
 	LOGA(DRV,"GetInfo: %d->%d/%d\r\n",G_SLA_INFO_RSP.num_retrieved,var + G_SLA_INFO_RSP.num_retrieved - 1,G_SLA_INFO_RSP.total_slaves);
+	P_INFO("Loading...(%d->%d/%d)\r\n",G_SLA_INFO_RSP.num_retrieved,var + G_SLA_INFO_RSP.num_retrieved - 1,G_SLA_INFO_RSP.total_slaves);
 	fl_pack_t info_pack = fl_master_packet_GetInfo_build(slave_arr,var);
 	P_PRINTFHEX_A(DRV,info_pack.data_arr,info_pack.length,"%s(%d):","Info Pack",info_pack.length);
 	fl_adv_sendFIFO_add(info_pack);
