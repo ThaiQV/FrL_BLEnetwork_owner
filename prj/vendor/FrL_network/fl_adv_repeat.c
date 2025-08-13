@@ -23,7 +23,7 @@
 fl_pack_t g_pack_array[PACK_REPEAT_SIZE];
 fl_data_container_t G_REPEAT_CONTAINER = { .data = g_pack_array, .head_index = 0, .tail_index = 0, .mask = PACK_REPEAT_SIZE - 1, .count = 0 };
 
-fl_repeat_settings_t G_REPEATER_SETTINGS = { .level = REPEAT_LEVEL, .threshold_rssi = REPEAT_RSSI_THRES };
+//fl_repeat_settings_t G_REPEATER_SETTINGS = { .level = REPEAT_LEVEL, .threshold_rssi = REPEAT_RSSI_THRES };
 
 /******************************************************************************/
 /******************************************************************************/

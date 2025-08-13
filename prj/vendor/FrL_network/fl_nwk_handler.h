@@ -11,6 +11,8 @@
 #ifndef VENDOR_FRL_NETWORK_FL_NWK_HANDLER_H_
 #define VENDOR_FRL_NETWORK_FL_NWK_HANDLER_H_
 
+#include "fl_nwk_database.h"
+
 #define RAND(min, max)				((rand() % ((max) - (min) + 1)) + (min))
 #define RAND_INT(min, max)  		((rand() % ((min) + (max) + 1)) - (min))
 #define SIZEU8(x)					(sizeof(x)/sizeof(u8))
@@ -69,13 +71,7 @@ typedef struct {
 	bool active;
 #ifndef MASTER_CORE
 //todo: parameters
-	union {
-		u8 stt_u8;
-		struct {
-			u8 rst_factory :1;
-			u8 join_nwk :1;
-		};
-	} run_stt;
+	fl_slave_profiles_t profile;
 #endif
 }__attribute__((packed)) fl_nodeinnetwork_t;
 
@@ -86,6 +82,14 @@ typedef struct {
 	u8 slot_inused;
 	fl_nodeinnetwork_t sla_info[MAX_NODES];
 }__attribute__((packed)) fl_slaves_list_t;
+
+typedef struct {
+	struct {
+		u8 collect_chn[3];
+		u8 chn[3];
+	} nwk;
+	u32 my_mac;
+}__attribute__((packed)) fl_master_config_t;
 
 #endif
 

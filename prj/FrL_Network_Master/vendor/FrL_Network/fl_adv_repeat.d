@@ -126,6 +126,7 @@ vendor/FrL_Network/fl_adv_repeat.d vendor/FrL_Network/fl_adv_repeat.o: \
  ../vendor/FrL_Network/fl_adv_repeat.h \
  ../vendor/FrL_Network/fl_adv_proc.h \
  ../vendor/FrL_Network/fl_nwk_handler.h \
+ ../vendor/FrL_Network/fl_nwk_database.h \
  ../vendor/FrL_Network/fl_nwk_protocol.h
 
 /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/tl_common.h:
@@ -395,5 +396,7 @@ vendor/FrL_Network/fl_adv_repeat.d vendor/FrL_Network/fl_adv_repeat.o: \
 ../vendor/FrL_Network/fl_adv_proc.h:
 
 ../vendor/FrL_Network/fl_nwk_handler.h:
+
+../vendor/FrL_Network/fl_nwk_database.h:
 
 ../vendor/FrL_Network/fl_nwk_protocol.h:

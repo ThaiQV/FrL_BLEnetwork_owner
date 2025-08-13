@@ -20,6 +20,7 @@
 #include "fl_input_ext.h"
 #include "fl_adv_repeat.h"
 #include "fl_nwk_database.h"
+#include "fl_nwk_protocol.h"
 
 #ifdef MASTER_CORE
 /******************************************************************************/
@@ -35,9 +36,9 @@ fl_data_container_t G_HANDLE_MASTER_CONTAINER = {
 		.data = g_handle_master_array, .head_index = 0, .tail_index = 0, .mask = PACK_HANDLE_MASTER_SIZE - 1, .count = 0 };
 
 fl_slaves_list_t G_NODE_LIST = { .slot_inused = 0xFF };
+fl_master_config_t G_MASTER_INFO ={.nwk ={.chn = {10,11,12},.collect_chn ={0,1,2}}};
 
 volatile u8 MASTER_INSTALL_STATE = 0;
-
 //Period of the heartbeat
 u16 PERIOD_HEARTBEAT = 0 * 1000; //
 //flag debug of the network
@@ -167,6 +168,7 @@ fl_pack_t fl_master_packet_collect_build(void) {
  *
  ***************************************************/
 fl_pack_t fl_master_packet_assignSlaveID_build(u32 _mac_short) {
+	extern fl_adv_settings_t G_ADV_SETTINGS ;
 	fl_pack_t packet_built;
 
 	fl_data_frame_u packet;
@@ -183,13 +185,18 @@ fl_pack_t fl_master_packet_assignSlaveID_build(u32 _mac_short) {
 	//Add new mill-step
 	packet.frame.milltamp = timetampStep.milstep;
 
-	//Add
-
+	//Add slave's mac
 	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
 	packet.frame.payload[0] = U32_BYTE3(_mac_short);
 	packet.frame.payload[1] = U32_BYTE2(_mac_short);
 	packet.frame.payload[2] = U32_BYTE1(_mac_short);
 	packet.frame.payload[3] = U32_BYTE0(_mac_short);
+	//Add channel communication
+	packet.frame.payload[4] = *G_ADV_SETTINGS.nwk_chn.chn1;
+	packet.frame.payload[5] = *G_ADV_SETTINGS.nwk_chn.chn2;
+	packet.frame.payload[6] = *G_ADV_SETTINGS.nwk_chn.chn3;
+	//Add master's mac
+	memcpy(&packet.frame.payload[7],blc_ll_get_macAddrPublic(),4);
 
 	//Create payload assignment
 	packet.frame.slaveID.id_u8 = fl_master_SlaveID_get(_mac_short);
@@ -366,7 +373,28 @@ int fl_send_heartbeat(void) {
 	fl_adv_sendFIFO_add(packet_built);
 	return -1; //
 }
-
+/***************************************************
+ * @brief 		: check change and store
+ *
+ * @param[in] 	:none
+ *
+ * @return	  	:none
+ *
+ ***************************************************/
+int _nwk_master_backup(void){
+	static u32 pre_crc32 = 0;
+	u32 crc32  = fl_db_crc32((u8*)&G_MASTER_INFO,sizeof(fl_master_config_t)/sizeof(u8));
+	if(crc32 != pre_crc32){
+		pre_crc32 = crc32;
+		fl_db_master_profile_t profile;
+		profile.nwk.chn[0] = G_MASTER_INFO.nwk.chn[0];
+		profile.nwk.chn[1] = G_MASTER_INFO.nwk.chn[1];
+		profile.nwk.chn[2] = G_MASTER_INFO.nwk.chn[2];
+		fl_db_masterprofile_save(profile);
+		LOGA(INF,"** Channels:%d |%d |%d\r\n",profile.nwk.chn[0],profile.nwk.chn[1],profile.nwk.chn[2])
+	}
+	return 0;
+}
 /******************************************************************************/
 /******************************************************************************/
 /***                            Functions callback                           **/
@@ -460,6 +488,13 @@ void fl_nwk_master_init(void) {
 	FL_QUEUE_CLEAR(&G_HANDLE_MASTER_CONTAINER,PACK_HANDLE_MASTER_SIZE);
 	//todo: load database into the flash
 	fl_nwk_master_nodelist_load();
+	//todo: load master profile
+	fl_db_master_profile_t master_profile = fl_db_masterprofile_init();
+	G_MASTER_INFO.nwk.chn[0] = master_profile.nwk.chn[0];
+	G_MASTER_INFO.nwk.chn[1] = master_profile.nwk.chn[1];
+	G_MASTER_INFO.nwk.chn[2] = master_profile.nwk.chn[2];
+
+	blt_soft_timer_add(_nwk_master_backup,2*1000*1000);
 }
 /***************************************************
  * @brief 		: store nodelist into the flash

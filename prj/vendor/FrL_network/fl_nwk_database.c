@@ -27,19 +27,42 @@ typedef struct {
 	uint32_t magic; //
 }__attribute__((packed)) fl_rtc_entry_t;
 
-
 /******************************************************************************/
 /******************************************************************************/
 /***                           Private definitions                           **/
 /******************************************************************************/
 /******************************************************************************/
-
+#ifdef MASTER_CORE
+fl_db_master_profile_t MASTER_PROFILE_DEFAULT = {
+		.magic = MASTER_PROFILE_MAGIC,
+		.nwk = {.chn ={10,11,12}},
+};
+#else
+fl_slave_profiles_t SLAVE_PROFILE_DEFAULT = {
+											.slaveid = 0xFF,
+											.magic= SLAVE_PROFILE_MAGIC,
+											.run_stt.rst_factory = 0,
+											.run_stt.join_nwk = 0,
+											.nwk = {.chn = {37,38,39},.mac_parent = 0xFF},
+											};
+#endif
 
 /******************************************************************************/
 /******************************************************************************/
 /***                       Functions declare                   		         **/
 /******************************************************************************/
 /******************************************************************************/
+
+uint32_t fl_db_crc32(uint8_t *data, size_t len) {
+    uint32_t crc = 0xFFFFFFFF;
+    while (len--) {
+        crc ^= *data++;
+        for (int i = 0; i < 8; i++)
+            crc = (crc >> 1) ^ (0xEDB88320 & -(crc & 1));
+    }
+    return ~crc;
+}
+
 /******************** RTC FUNCTIONs *******************/
 void fl_db_rtc_save(u32 _timetamp) {
 	fl_rtc_entry_t entry = { .timestamp = _timetamp, .magic = RTC_MAGIC };
@@ -156,6 +179,138 @@ bool fl_db_nodelist_save(fl_nodelist_db_t *_pnodelist){
 void fl_db_nodelist_clearAll(void){
 	flash_erase_sector(ADDR_NODELIST_NUMSLAVE);
 	delay_ms(100);
+}
+
+/******************** MASTER PROFILE FUNCTIONs *******************/
+/***************************************************
+ * @brief 		: read profile in flash
+ *
+ * @param[in] 	:none
+ *
+ * @return	  	:profile struct
+ *
+ ***************************************************/
+fl_db_master_profile_t fl_db_masterprofile_load(void) {
+	fl_db_master_profile_t entry = { .magic = 0xFFFFFFFF};
+	for (s16 i = MASTER_PROFILE_MAX_ENTRIES - 1; i >= 0; i--) {
+		flash_read_page(ADDR_MASTER_PROFILE_START + i * MASTER_PROFILE_ENTRY_SIZE,MASTER_PROFILE_ENTRY_SIZE,(uint8_t*) &entry);
+		if (entry.magic == MASTER_PROFILE_MAGIC) {
+			LOGA(FLA,"MASTER PROFILE Load(0x%X):%d|%d|%d\r\n",ADDR_MASTER_PROFILE_START + i * MASTER_PROFILE_ENTRY_SIZE,
+					entry.nwk.chn[0],entry.nwk.chn[1],entry.nwk.chn[2]);
+			return entry;
+		}
+	}
+	return entry;
+}
+/***************************************************
+ * @brief 		:store profile into the flash
+ *
+ * @param[in] 	:none
+ *
+ * @return	  	:profile struct
+ *
+ ***************************************************/
+void fl_db_masterprofile_save(fl_db_master_profile_t entry) {
+	entry.magic = MASTER_PROFILE_MAGIC;
+	fl_db_master_profile_t check;
+	for (u16 i = 0; i < MASTER_PROFILE_MAX_ENTRIES; i++) {
+		check.magic = 0;
+		flash_read_page(ADDR_MASTER_PROFILE_START + i * MASTER_PROFILE_ENTRY_SIZE,MASTER_PROFILE_ENTRY_SIZE,(uint8_t*) &check);
+		if (check.magic != MASTER_PROFILE_MAGIC) {
+			flash_write_page(ADDR_MASTER_PROFILE_START + i * MASTER_PROFILE_ENTRY_SIZE,MASTER_PROFILE_ENTRY_SIZE,(uint8_t*) &entry);
+			LOGA(FLA,"MASTER PROFILE Stored(0x%X):%d|%d|%d\r\n",ADDR_MASTER_PROFILE_START + i * MASTER_PROFILE_ENTRY_SIZE,
+					entry.nwk.chn[0],entry.nwk.chn[1],entry.nwk.chn[2]);
+			return;
+		}
+	}
+	flash_erase_sector(ADDR_MASTER_PROFILE_START);
+	flash_write_page(ADDR_MASTER_PROFILE_START,MASTER_PROFILE_ENTRY_SIZE,(uint8_t*) &entry);
+}
+fl_db_master_profile_t fl_db_masterprofile_init(void) {
+	fl_db_master_profile_t profile = { .magic = 0xFFFFFFFF};
+	profile = fl_db_masterprofile_load();
+	if (profile.magic != MASTER_PROFILE_MAGIC) {
+		//clear all and write default profiles
+		flash_erase_sector(ADDR_MASTER_PROFILE_START);
+		fl_db_masterprofile_save(MASTER_PROFILE_DEFAULT);
+		profile = fl_db_masterprofile_load();
+	}
+	//for debugging
+	LOGA(FLA,"Magic: 0x%X\r\n",profile.magic);
+	LOGA(FLA,"NWK channel:%d |%d |%d \r\n",profile.nwk.chn[0],profile.nwk.chn[1],profile.nwk.chn[2]);
+	return profile;
+}
+#endif
+/******************** SLAVE PROFILE FUNCTIONs *******************/
+#ifndef MASTER_CORE
+
+/***************************************************
+ * @brief 		: read profile in flash
+ *
+ * @param[in] 	:none
+ *
+ * @return	  	:profile struct
+ *
+ ***************************************************/
+fl_slave_profiles_t fl_db_slaveprofile_load(void) {
+	fl_slave_profiles_t entry = {.slaveid = 0xFF};
+	for (s16 i = SLAVE_PROFILE_MAX_ENTRIES - 1; i >= 0; i--) {
+		flash_read_page(ADDR_SLAVE_PROFILE_START + i * SLAVE_PROFILE_ENTRY_SIZE,SLAVE_PROFILE_ENTRY_SIZE,(uint8_t*) &entry);
+		if (entry.magic == SLAVE_PROFILE_MAGIC) {
+			LOGA(FLA,"SLAVE PROFILE Load(0x%X):%d\r\n",ADDR_SLAVE_PROFILE_START + i * SLAVE_PROFILE_ENTRY_SIZE,entry.slaveid);
+			return entry;
+		}
+	}
+	return entry;
+}
+/***************************************************
+ * @brief 		:store profile into the flash
+ *
+ * @param[in] 	:none
+ *
+ * @return	  	:profile struct
+ *
+ ***************************************************/
+void fl_db_slaveprofile_save(fl_slave_profiles_t entry) {
+	entry.magic = SLAVE_PROFILE_MAGIC;
+	fl_slave_profiles_t check;
+	for (u16 i = 0; i < SLAVE_PROFILE_MAX_ENTRIES; i++) {
+		check.magic = 0;
+		flash_read_page(ADDR_SLAVE_PROFILE_START + i * SLAVE_PROFILE_ENTRY_SIZE,SLAVE_PROFILE_ENTRY_SIZE,(uint8_t*) &check);
+		if (check.magic != SLAVE_PROFILE_MAGIC) {
+			flash_write_page(ADDR_SLAVE_PROFILE_START + i * SLAVE_PROFILE_ENTRY_SIZE,SLAVE_PROFILE_ENTRY_SIZE,(uint8_t*) &entry);
+			LOGA(FLA,"SLAVE PROFILE Stored(0x%X):%d\r\n",ADDR_SLAVE_PROFILE_START + i * SLAVE_PROFILE_ENTRY_SIZE,entry.slaveid);
+			return;
+		}
+	}
+	flash_erase_sector(ADDR_SLAVE_PROFILE_START);
+	flash_write_page(ADDR_SLAVE_PROFILE_START,SLAVE_PROFILE_ENTRY_SIZE,(uint8_t*) &entry);
+}
+/***************************************************
+ * @brief 		: initialization slave profile database
+ *
+ * @param[in] 	: none
+ *
+ * @return	  	: none
+ *
+ ***************************************************/
+fl_slave_profiles_t fl_db_slaveprofile_init(void){
+	fl_slave_profiles_t profile = {.slaveid = 0xFF};
+	profile = fl_db_slaveprofile_load();
+	if(profile.magic != SLAVE_PROFILE_MAGIC){
+		//clear all and write default profiles
+		flash_erase_sector(ADDR_SLAVE_PROFILE_START);
+		fl_db_slaveprofile_save(SLAVE_PROFILE_DEFAULT);
+		profile = fl_db_slaveprofile_load();
+	}
+	//for debugging
+	LOGA(FLA,"Magic: 0x%X\r\n",profile.magic);
+	LOGA(FLA,"SlaveID:%d\r\n",profile.slaveid);
+	LOGA(FLA,"NWK channel:%d |%d |%d \r\n",profile.nwk.chn[0],profile.nwk.chn[1],profile.nwk.chn[2]);
+	LOGA(FLA,"NWK Parent(%d):0x%X\r\n",profile.run_stt.join_nwk,profile.nwk.mac_parent);
+	LOGA(FLA,"Factory Reset:%d\r\n",profile.run_stt.rst_factory);
+
+	return profile;
 }
 #endif
 /******************************************************************************/

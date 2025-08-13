@@ -18,6 +18,7 @@
 #include "fl_nwk_handler.h"
 #include "fl_nwk_protocol.h"
 
+
 #ifndef MASTER_CORE
 /******************************************************************************/
 /******************************************************************************/
@@ -28,9 +29,9 @@
 _attribute_data_retention_ volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME = {.timetamp = 0,.milstep = 0};
 
 #define SYNC_ORIGIN_MASTER(x,y) 			do{	\
-															ORIGINAL_MASTER_TIME.timetamp = x;\
-															ORIGINAL_MASTER_TIME.milstep = y;\
-														}while(0) //Sync original time-master req
+												ORIGINAL_MASTER_TIME.timetamp = x;\
+												ORIGINAL_MASTER_TIME.milstep = y;\
+											}while(0) //Sync original time-master req
 
 #define JOIN_NETWORK_TIME 		30*1000 //ms
 fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = { NWK_HDR_55, NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmd
@@ -64,28 +65,52 @@ volatile u8 NWK_REPEAT_MODE = 1; // slave repeat?
 /***                       Functions declare                   		         **/
 /******************************************************************************/
 /******************************************************************************/
+
+int _nwk_slave_backup(void){
+	static u32 pre_crc32 = 0;
+	u32 crc32  = fl_db_crc32((u8*)&G_INFORMATION.profile,SLAVE_PROFILE_ENTRY_SIZE);
+	if(crc32 != pre_crc32){
+		pre_crc32 = crc32;
+		fl_db_slaveprofile_save(G_INFORMATION.profile);
+		LOGA(INF,"** MAC     :%08X\r\n",G_INFORMATION.mac_short.mac_u32);
+		LOGA(INF,"** SlaveID :%d\r\n",G_INFORMATION.slaveID.id_u8);
+		LOGA(INF,"** grpID   :%d\r\n",G_INFORMATION.slaveID.grpID);
+		LOGA(INF,"** memID   :%d\r\n",G_INFORMATION.slaveID.memID);
+		LOGA(INF,"** JoinNWK :%d\r\n",G_INFORMATION.profile.run_stt.join_nwk);
+		LOGA(INF,"** RstFac  :%d\r\n",G_INFORMATION.profile.run_stt.rst_factory);
+		LOGA(INF,"** Channels:%d |%d |%d\r\n",G_INFORMATION.profile.nwk.chn[0],G_INFORMATION.profile.nwk.chn[1],G_INFORMATION.profile.nwk.chn[2])
+	}
+	return 0;
+}
+
 void fl_nwk_slave_init(void) {
 	FL_QUEUE_CLEAR(&G_HANDLE_CONTAINER,PACK_HANDLE_SIZE);
 	//Generate information
 	G_INFORMATION.active = false;
 	G_INFORMATION.timelife = 0;
-	//u8 mac_short[4];
-//	memcpy(mac_short,blc_ll_get_macAddrPublic(),SIZEU8(mac_short));
-//	G_INFORMATION.mac_short = MAKE_U32(mac_short[3],mac_short[2],mac_short[1],mac_short[0]);
 	memcpy(G_INFORMATION.mac_short.byte,blc_ll_get_macAddrPublic(),SIZEU8(G_INFORMATION.mac_short.byte));
 
+	//Load from db
+//	fl_slave_profiles_t my_profile = fl_db_slaveprofile_init();
+//	G_INFORMATION.slaveID.id_u8 = my_profile.slaveid;
+//	G_INFORMATION.profile = my_profile;
+
 	//Test join network + factory
-	G_INFORMATION.run_stt.join_nwk = 1; //access to join network
-	G_INFORMATION.run_stt.rst_factory  = 1 ; //has reset factory device
+	G_INFORMATION.profile.run_stt.join_nwk = 1; //access to join network
+	G_INFORMATION.profile.run_stt.rst_factory  = 1 ; //has reset factory device
+//
 	G_INFORMATION.slaveID.id_u8 = 0xFF;
+	G_INFORMATION.profile.slaveid = 0xFF;
 
 	LOG_P(INF,"Freelux network SLAVE init\r\n");
 	LOGA(INF,"** MAC    :%08X\r\n",G_INFORMATION.mac_short.mac_u32);
 	LOGA(INF,"** SlaveID:%d\r\n",G_INFORMATION.slaveID.id_u8);
 	LOGA(INF,"** grpID  :%d\r\n",G_INFORMATION.slaveID.grpID);
 	LOGA(INF,"** memID  :%d\r\n",G_INFORMATION.slaveID.memID);
-	LOGA(INF,"** JoinNWK:%d\r\n",G_INFORMATION.run_stt.join_nwk);
-	LOGA(INF,"** RstFac :%d\r\n",G_INFORMATION.run_stt.rst_factory);
+	LOGA(INF,"** JoinNWK:%d\r\n",G_INFORMATION.profile.run_stt.join_nwk);
+	LOGA(INF,"** RstFac :%d\r\n",G_INFORMATION.profile.run_stt.rst_factory);
+
+//	blt_soft_timer_add(_nwk_slave_backup,2*1000*1000);
 }
 /***************************************************
  * @brief 		:synchronization status from packet
@@ -199,14 +224,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 				if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
 					//Process rsp
 					memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
-
 					memcpy(packet.frame.payload,G_INFORMATION.mac_short.byte,SIZEU8(G_INFORMATION.mac_short.byte));
-
-//					packet.frame.payload[0] = U32_BYTE0(G_INFORMATION.mac_short);
-//					packet.frame.payload[1] = U32_BYTE1(G_INFORMATION.mac_short);
-//					packet.frame.payload[2] = U32_BYTE2(G_INFORMATION.mac_short);
-//					packet.frame.payload[3] = U32_BYTE3(G_INFORMATION.mac_short);
-//					packet.frame.endpoint.dbg = NWK_DEBUG_STT;
 					//change endpoint to node source
 					packet.frame.endpoint.master = FL_FROM_SLAVE;
 				}
@@ -225,6 +243,13 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 			if (mymac_idx != -1) {
 				G_INFORMATION.slaveID.id_u8 = packet.frame.slaveID.id_u8;
 				LOGA(INF,"UPDATE SlaveID: %d(grpID:%d|memID:%d)\r\n",G_INFORMATION.slaveID.id_u8,G_INFORMATION.slaveID.grpID,G_INFORMATION.slaveID.memID);
+				G_INFORMATION.profile.slaveid = G_INFORMATION.slaveID.id_u8 ;
+				G_INFORMATION.profile.run_stt.rst_factory = 0;
+				G_INFORMATION.profile.nwk.chn[0] = packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac_short.byte)];
+				G_INFORMATION.profile.nwk.chn[1] = packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac_short.byte) + 1];
+				G_INFORMATION.profile.nwk.chn[2] = packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac_short.byte) + 2];
+				//get master's mac
+				G_INFORMATION.profile.nwk.mac_parent = MAKE_U32(packet.frame.payload[7],packet.frame.payload[8],packet.frame.payload[9],packet.frame.payload[10]);
 			}
 			//debug
 			else{
@@ -282,14 +307,17 @@ int fl_slave_ProccesRSP_cbk(void) {
  * @return	  	:none
  *
  ***************************************************/
-int fl_nwk_joinnwk_timeout(void){
-	ERR(INF,"Join-network timeout!!!\r\n");
-	G_INFORMATION.run_stt.join_nwk = 0;
-	fl_adv_collection_channel_deinit();
-	return -1;
+int fl_nwk_joinnwk_timeout(void) {
+	ERR(INF,"Join-network timeout and re-scan!!!\r\n");
+	if (IsJoinedNetwork()) {
+		G_INFORMATION.profile.run_stt.join_nwk = 0;
+		fl_adv_collection_channel_deinit();
+		return -1;
+	} else
+		return 0;
 }
 void fl_nwk_slave_joinnwk_exc(void) {
-	if (G_INFORMATION.run_stt.join_nwk) {
+	if (G_INFORMATION.profile.run_stt.join_nwk) {
 		if (blt_soft_timer_find(&fl_nwk_joinnwk_timeout) == -1) {
 			fl_adv_collection_channel_init();
 			blt_soft_timer_add(&fl_nwk_joinnwk_timeout,JOIN_NETWORK_TIME * 1000);
