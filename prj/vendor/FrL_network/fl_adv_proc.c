@@ -41,6 +41,9 @@ fl_adv_settings_t G_ADV_SETTINGS = {
 		.scan_window = SCAN_WINDOW_60MS,
 		//.nwk_chn = {10,11,12}
 		};
+
+extern volatile u8  REPEAT_LEVEL;
+
 /*---------------- Total ADV Rec --------------------------*/
 #define IN_DATA_SIZE 		128
 fl_pack_t g_data_array[IN_DATA_SIZE];
@@ -261,7 +264,6 @@ void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms) {
 	if (_data && _size >= 2) {
 //		LOG_P(APP,"Sending..... \r\n");
 		rf_set_power_level_index(MY_RF_POWER_INDEX);
-		blc_ll_setAdvCustomedChannel(*G_ADV_SETTINGS.nwk_chn.chn1,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3);
 //		bls_ll_setAdvEnable(BLC_ADV_ENABLE);
 		u8 mac[6];
 		own_addr_type_t app_own_address_type = OWN_ADDRESS_PUBLIC;
@@ -496,7 +498,7 @@ fl_pack_t fl_packet_build(u8 *payload, u8 _len) {
 	//for testing repeat level
 //	static u8 rep_level = 0;
 	packet.frame.endpoint.ep_u8 = 0;
-	packet.frame.endpoint.repeat_cnt = 0;
+	packet.frame.endpoint.repeat_cnt = REPEAT_LEVEL;
 
 	pack_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
 	memcpy(pack_built.data_arr,packet.bytes,pack_built.length);
@@ -542,7 +544,7 @@ void fl_adv_run(void) {
 				fl_nwk_slave_run(&data_in_queue);
 			}
 			//Todo: Repeat process
-			if (data_parsed.endpoint.repeat_cnt < REPEAT_LEVEL && data_parsed.endpoint.rep_mode != 0) {
+			if (data_parsed.endpoint.repeat_cnt > 0 /*&& data_parsed.endpoint.rep_mode != 0*/) {
 				fl_repeat_run(&data_in_queue);
 			}
 #endif

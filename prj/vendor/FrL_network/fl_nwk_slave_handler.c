@@ -133,7 +133,7 @@ void _nwk_slave_syncFromPack(fl_dataframe_format_t *packet){
 	NWK_DEBUG_STT = packet->endpoint.dbg;
 	DEBUG_TURN(NWK_DEBUG_STT);
 	//Sync repeat mode
-	NWK_REPEAT_MODE = packet->endpoint.rep_mode;
+//	NWK_REPEAT_MODE = packet->endpoint.rep_mode;
 	//Sync mastertime origin
 	SYNC_ORIGIN_MASTER(master_timetamp,packet->milltamp);
 	LOGA(INF,"ORIGINAL MASTER-TIME:%d\r\n",ORIGINAL_MASTER_TIME.milstep);

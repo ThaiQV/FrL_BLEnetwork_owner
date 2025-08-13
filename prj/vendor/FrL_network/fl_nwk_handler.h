@@ -48,7 +48,7 @@ typedef struct {
 			u8 repeat_cnt :2;   // 2 bits
 			u8 master :2;  		// 2 bits
 			u8 dbg:1;			// 1 bit
-			u8 rep_mode:1;
+//			u8 rep_mode:1;
 			//u8 millis_step :2;  // 1000 millisecond / 4 = 250
 		};
 	} endpoint;

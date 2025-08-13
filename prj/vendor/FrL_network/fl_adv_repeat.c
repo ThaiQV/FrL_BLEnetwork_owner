@@ -50,7 +50,7 @@ fl_pack_t fl_repeat_packet_build(fl_pack_t _pack) {
 	extern u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
 	fl_packet_parse(_pack,&packet.frame);
 
-	packet.frame.endpoint.repeat_cnt += 1;
+	packet.frame.endpoint.repeat_cnt -= 1;
 
 	pack_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
 	memcpy(pack_built.data_arr,packet.bytes,pack_built.length);
@@ -59,25 +59,7 @@ fl_pack_t fl_repeat_packet_build(fl_pack_t _pack) {
 
 	return pack_built;
 }
-/***************************************************
- * @brief 		:filter rssi before repeating
- *
- * @param[in] 	:none
- *
- * @return	  	:true : near otherwise far
- *
- ***************************************************/
-bool fl_repeat_filter_rssi(fl_pack_t *_pack) {
-//	double envFactor = 2.5;
-//	double txPower = 9.1;
-	s8 rssi_s8 = _pack->data_arr[_pack->length - 1];
-//    double_t exponent = pow(10.0, ((double)(txPower - rssi_s8)) / (10.0 * envFactor));
-//    LOGA(ZIG_GP,"Distance:%f cm(%d |%f)\r\n",exponent,rssi_s8,txPower);  //
-//    return true;
 
-	//todo something filter
-	return (rssi_s8 >= REPEAT_RSSI_THRES);
-}
 /******************************************************************************/
 /******************************************************************************/
 /***                            Functions callback                           **/

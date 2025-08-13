@@ -94,7 +94,7 @@ fl_cmdlines_t G_CMDSET[] = { { { 'u', 't', 'c' }, 3, CMD_SETUTC }, 			// p set u
 		{ { 'i', 'n', 's', 't', 'a', 'l', 'l' }, 7, CMD_INSTALLMODE },		// p install on/off
 		{ { 'd', 'e', 'b', 'u', 'g' }, 5, CMD_DEBUG },						// p set debug on/off : use to set for the slaves
 		{ { 'h', 'b' }, 2, CMD_HEARTBEAT },									// p set hb <time> : use to set period time for heartbeat packet
-		{ { 'r', 'e', 'p', 'e', 'a', 't' }, 5, CMD_REPEAT },				// p set repeat on/off : use to set repeat-mode for slaves
+		{ { 'r', 'e', 'p', 'e', 'a', 't' }, 5, CMD_REPEAT },				// p set repeat <ttl count> : use to set repeat-mode for slaves (0 :off)
 		{ { 'a', 'd', 'v' }, 3, CMD_ADVINTERVAL },							// p set adv <interval_min> <interval_max) : use to set adv settings
 		{ { 's', 'c', 'a', 'n' }, 4, CMD_ADVSCAN },							// p set scan <window> <interval> : use to set scanner adv settings
 		{ { 'c', 'l', 'e', 'a', 'r' }, 5, CMD_CLEARDB },					// p set clear <nodelist>
@@ -360,14 +360,21 @@ void CMD_HEARTBEAT(u8* _data) {
 
 }
 void CMD_REPEAT(u8* _data) {
-	extern volatile u8 NWK_REPEAT_MODE;
-	u8 ON[2] = { 'o', 'n' };
-	u8 on_bool = 0;
-	if (plog_IndexOf(_data,ON,2,CMDLINE_MAXLEN) != -1) {
-		on_bool = 1;
+//	extern volatile u8 NWK_REPEAT_MODE;
+//	u8 ON[2] = { 'o', 'n' };
+//	u8 on_bool = 0;
+//	if (plog_IndexOf(_data,ON,2,CMDLINE_MAXLEN) != -1) {
+//		on_bool = 1;
+//	}
+//	NWK_REPEAT_MODE = on_bool;
+	extern volatile u8  REPEAT_LEVEL;
+	u16 repeat_cnt = 0;
+	//p set repeat 2
+	int rslt = sscanf((char*) _data,"repeat %hd",&repeat_cnt);
+	if(rslt == 1){
+		REPEAT_LEVEL = repeat_cnt;
+		LOGA(DRV,"Repeat Mode: %s\r\n",(repeat_cnt) ? "ON-" + REPEAT_LEVEL : "OFF");
 	}
-	NWK_REPEAT_MODE = on_bool;
-	LOGA(DRV,"Repeat Mode: %s\r\n",(on_bool) ? "ON" : "OFF");
 }
 void CMD_ADVINTERVAL(u8* _data) {
 	extern fl_adv_settings_t G_ADV_SETTINGS;
