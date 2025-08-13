@@ -43,8 +43,8 @@ volatile u8 MASTER_INSTALL_STATE = 0;
 u16 PERIOD_HEARTBEAT = 0 * 1000; //
 //flag debug of the network
 volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into endpoint byte (dbg :1bit)
-volatile u8 NWK_REPEAT_MODE = 1; // slave repeat?
-
+//volatile u8 NWK_REPEAT_MODE = 1; // slave repeat?
+volatile u8  REPEAT_LEVEL = 2;
 
 /******************************************************************************/
 /******************************************************************************/
@@ -113,10 +113,10 @@ fl_pack_t fl_master_packet_heartbeat_build(void) {
 
 	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
 
-	packet.frame.endpoint.repeat_cnt = 0;
+	packet.frame.endpoint.repeat_cnt = REPEAT_LEVEL;
 	packet.frame.endpoint.master = FL_FROM_MASTER; //non-ack
 	packet.frame.endpoint.dbg = NWK_DEBUG_STT;
-	packet.frame.endpoint.rep_mode = NWK_REPEAT_MODE;
+	packet.frame.endpoint.rep_mode = REPEAT_LEVEL;
 
 	packet_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
 	memcpy(packet_built.data_arr,packet.bytes,packet_built.length);
@@ -150,10 +150,10 @@ fl_pack_t fl_master_packet_collect_build(void) {
 	packet.frame.slaveID.id_u8 = 0xFF;
 	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
 
-	packet.frame.endpoint.repeat_cnt = 0;
+	packet.frame.endpoint.repeat_cnt = REPEAT_LEVEL;
 	packet.frame.endpoint.master = FL_FROM_MASTER_ACK; //ack
 	packet.frame.endpoint.dbg = NWK_DEBUG_STT;
-	packet.frame.endpoint.rep_mode = NWK_REPEAT_MODE;
+	packet.frame.endpoint.rep_mode = REPEAT_LEVEL;
 
 	packet_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
 	memcpy(packet_built.data_arr,packet.bytes,packet_built.length);
@@ -201,10 +201,10 @@ fl_pack_t fl_master_packet_assignSlaveID_build(u32 _mac_short) {
 	//Create payload assignment
 	packet.frame.slaveID.id_u8 = fl_master_SlaveID_get(_mac_short);
 
-	packet.frame.endpoint.repeat_cnt = 0;
+	packet.frame.endpoint.repeat_cnt = REPEAT_LEVEL;
 	packet.frame.endpoint.master = FL_FROM_MASTER; //non-ack
 	packet.frame.endpoint.dbg = NWK_DEBUG_STT;
-	packet.frame.endpoint.rep_mode = NWK_REPEAT_MODE;
+	packet.frame.endpoint.rep_mode = REPEAT_LEVEL;
 
 	packet_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
 	memcpy(packet_built.data_arr,packet.bytes,packet_built.length);
@@ -254,10 +254,10 @@ fl_pack_t fl_master_packet_GetInfo_build(u8 *_slave_mac_arr, u8 _slave_num) {
 	//crc
 	packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
 
-	packet.frame.endpoint.repeat_cnt = 0;
+	packet.frame.endpoint.repeat_cnt = REPEAT_LEVEL;
 	packet.frame.endpoint.master = FL_FROM_MASTER_ACK;
 	packet.frame.endpoint.dbg = NWK_DEBUG_STT;
-	packet.frame.endpoint.rep_mode = NWK_REPEAT_MODE;
+	packet.frame.endpoint.rep_mode = REPEAT_LEVEL;
 
 	packet_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
 	memcpy(packet_built.data_arr,packet.bytes,packet_built.length);
@@ -444,7 +444,7 @@ int fl_master_ProccesRSP_cbk(void) {
 					if (node_indx != -1) {
 						G_NODE_LIST.sla_info[node_indx].active = true;
 						G_NODE_LIST.sla_info[node_indx].timelife = (clock_time() - G_NODE_LIST.sla_info[node_indx].timelife) / SYSTEM_TIMER_TICK_1MS;
-						LOGA(INF,"INFO(%d)(%d)(%d ms)(%d):%s\r\n",packet.frame.endpoint.rep_mode,slave_id,G_NODE_LIST.sla_info[node_indx].timelife,
+						LOGA(INF,"INFO(%d)(%d ms)(%d):%s\r\n",slave_id,G_NODE_LIST.sla_info[node_indx].timelife,
 								packet.frame.endpoint.repeat_cnt,packet.frame.payload);
 					} else {
 						ERR(INF,"ID not foud:%02X\r\n",slave_id);

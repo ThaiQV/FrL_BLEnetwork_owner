@@ -15,8 +15,8 @@
 #include "stdbool.h"
 #include "math.h"
 
-#define REPEAT_LEVEL			2
-#define REPEAT_RSSI_THRES		-60
+//#define REPEAT_LEVEL			2
+//#define REPEAT_RSSI_THRES		-60
 
 void fl_repeater_init(void);
 void fl_repeat_run(fl_pack_t *_pack);

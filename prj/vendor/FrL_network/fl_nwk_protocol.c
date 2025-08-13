@@ -94,7 +94,7 @@ fl_cmdlines_t G_CMDSET[] = { { { 'u', 't', 'c' }, 3, CMD_SETUTC }, 			// p set u
 		{ { 'i', 'n', 's', 't', 'a', 'l', 'l' }, 7, CMD_INSTALLMODE },		// p install on/off
 		{ { 'd', 'e', 'b', 'u', 'g' }, 5, CMD_DEBUG },						// p set debug on/off : use to set for the slaves
 		{ { 'h', 'b' }, 2, CMD_HEARTBEAT },									// p set hb <time> : use to set period time for heartbeat packet
-		{ { 'r', 'e', 'p', 'e', 'a', 't' }, 5, CMD_REPEAT },				// p set repeat on/off : use to set repeat-mode for slaves
+		{ { 'r', 'e', 'p', 'e', 'a', 't' }, 5, CMD_REPEAT },				// p set repeat <ttl count> : use to set repeat-mode for slaves (0 :off)
 		{ { 'a', 'd', 'v' }, 3, CMD_ADVINTERVAL },							// p set adv <interval_min> <interval_max) : use to set adv settings
 		{ { 's', 'c', 'a', 'n' }, 4, CMD_ADVSCAN },							// p set scan <window> <interval> : use to set scanner adv settings
 		{ { 'c', 'l', 'e', 'a', 'r' }, 5, CMD_CLEARDB },					// p set clear <nodelist>
@@ -165,7 +165,6 @@ int _getInfo_autorun(void) {
 	{
 		G_SLA_INFO_RSP.num_retrieved = 0;
 		if(G_SLA_INFO_RSP.time_start ==0){
-
 			P_INFO("[%02d/%02d/%02d-%02d:%02d:%02d]Start GetInfo!!\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second);
 			G_SLA_INFO_RSP.time_start = clock_time();
 		}
@@ -175,7 +174,7 @@ int _getInfo_autorun(void) {
 	//check rsp and full data
 	//LOGA(INF,"get_num_reported:%d\r\n",get_num_reported);
 	G_SLA_INFO_RSP.rslt.num_onl += get_num_reported;
-	LOGA(INF,"get_num_reported:%d-%d/%d\r\n",get_num_reported,G_SLA_INFO_RSP.rslt.num_onl,G_SLA_INFO_RSP.total_slaves);
+	//LOGA(INF,"get_num_reported:%d-%d/%d\r\n",get_num_reported,G_SLA_INFO_RSP.rslt.num_onl,G_SLA_INFO_RSP.total_slaves);
 	G_SLA_INFO_RSP.timeout_rsp_start = clock_time();
 	if (G_SLA_INFO_RSP.rslt.num_onl == G_SLA_INFO_RSP.total_slaves)
 		goto OUTPUT_RESULT;
@@ -196,6 +195,7 @@ int _getInfo_autorun(void) {
 	if(var == 0) goto OUTPUT_RESULT; //done
 
 	LOGA(DRV,"GetInfo: %d->%d/%d\r\n",G_SLA_INFO_RSP.num_retrieved,var + G_SLA_INFO_RSP.num_retrieved - 1,G_SLA_INFO_RSP.total_slaves);
+	P_INFO("Loading...(%d->%d/%d)\r\n",G_SLA_INFO_RSP.num_retrieved,var + G_SLA_INFO_RSP.num_retrieved - 1,G_SLA_INFO_RSP.total_slaves);
 	fl_pack_t info_pack = fl_master_packet_GetInfo_build(slave_arr,var);
 	P_PRINTFHEX_A(DRV,info_pack.data_arr,info_pack.length,"%s(%d):","Info Pack",info_pack.length);
 	fl_adv_sendFIFO_add(info_pack);
@@ -360,14 +360,21 @@ void CMD_HEARTBEAT(u8* _data) {
 
 }
 void CMD_REPEAT(u8* _data) {
-	extern volatile u8 NWK_REPEAT_MODE;
-	u8 ON[2] = { 'o', 'n' };
-	u8 on_bool = 0;
-	if (plog_IndexOf(_data,ON,2,CMDLINE_MAXLEN) != -1) {
-		on_bool = 1;
+//	extern volatile u8 NWK_REPEAT_MODE;
+//	u8 ON[2] = { 'o', 'n' };
+//	u8 on_bool = 0;
+//	if (plog_IndexOf(_data,ON,2,CMDLINE_MAXLEN) != -1) {
+//		on_bool = 1;
+//	}
+//	NWK_REPEAT_MODE = on_bool;
+	extern volatile u8  REPEAT_LEVEL;
+	u16 repeat_cnt = 0;
+	//p set repeat 2
+	int rslt = sscanf((char*) _data,"repeat %hd",&repeat_cnt);
+	if(rslt == 1){
+		REPEAT_LEVEL = repeat_cnt;
+		LOGA(DRV,"Repeat Mode: %d\r\n",REPEAT_LEVEL);
 	}
-	NWK_REPEAT_MODE = on_bool;
-	LOGA(DRV,"Repeat Mode: %s\r\n",(on_bool) ? "ON" : "OFF");
 }
 void CMD_ADVINTERVAL(u8* _data) {
 	extern fl_adv_settings_t G_ADV_SETTINGS;
