@@ -373,7 +373,7 @@ void CMD_REPEAT(u8* _data) {
 	int rslt = sscanf((char*) _data,"repeat %hd",&repeat_cnt);
 	if(rslt == 1){
 		REPEAT_LEVEL = repeat_cnt;
-		LOGA(DRV,"Repeat Mode: %s\r\n",(repeat_cnt) ? "ON-" + REPEAT_LEVEL : "OFF");
+		LOGA(DRV,"Repeat Mode: %d\r\n",REPEAT_LEVEL);
 	}
 }
 void CMD_ADVINTERVAL(u8* _data) {

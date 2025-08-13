@@ -55,7 +55,7 @@ fl_pack_t fl_repeat_packet_build(fl_pack_t _pack) {
 	pack_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
 	memcpy(pack_built.data_arr,packet.bytes,pack_built.length);
 
-	LOGA(ZIG_GP,"Repeat lvl: %d\r\n",packet.frame.endpoint.repeat_cnt);
+	LOGA(ZIG_GP,"%s:%d,TTL: %d\r\n",(packet.frame.endpoint.master == FL_FROM_SLAVE)?"SlaveID":"Master",packet.frame.slaveID.id_u8,packet.frame.endpoint.repeat_cnt);
 
 	return pack_built;
 }
@@ -101,9 +101,9 @@ void fl_repeat_run(fl_pack_t *_pack_repeat) {
 		if (FL_QUEUE_ADD(&G_REPEAT_CONTAINER,_pack_repeat) < 0) {
 			ERR(ZIG_GP,"Err <QUEUE ADD> - G_REPEAT_CONTAINER!!\r\n");
 		} else {
-			s8 rssi = _pack_repeat->data_arr[_pack_repeat->length - 1];
-			LOGA(ZIG_GP,"QUEUE REPEAT ADD (len:%d|RSSI:%d): (%d)%d-%d\r\n",_pack_repeat->length,rssi,G_REPEAT_CONTAINER.count,
-					G_REPEAT_CONTAINER.head_index,G_REPEAT_CONTAINER.tail_index);
+//			s8 rssi = _pack_repeat->data_arr[_pack_repeat->length - 1];
+//			LOGA(ZIG_GP,"QUEUE REPEAT ADD (len:%d|RSSI:%d): (%d)%d-%d\r\n",_pack_repeat->length,rssi,G_REPEAT_CONTAINER.count,
+//					G_REPEAT_CONTAINER.head_index,G_REPEAT_CONTAINER.tail_index);
 			fl_repeat_send_cbk();
 		}
 	} else {

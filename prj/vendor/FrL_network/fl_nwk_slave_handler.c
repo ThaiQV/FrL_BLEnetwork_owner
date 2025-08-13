@@ -18,7 +18,6 @@
 #include "fl_nwk_handler.h"
 #include "fl_nwk_protocol.h"
 
-
 #ifndef MASTER_CORE
 /******************************************************************************/
 /******************************************************************************/
@@ -46,8 +45,9 @@ fl_data_container_t G_HANDLE_CONTAINER = { .data = g_handle_array, .head_index =
 fl_nodeinnetwork_t G_INFORMATION;
 
 //flag debug of the network
-volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into end-point byte (dbg :1bit)
+volatile u8 NWK_DEBUG_STT = 1; // it will be assigned into end-point byte (dbg :1bit)
 volatile u8 NWK_REPEAT_MODE = 1; // slave repeat?
+volatile u8  REPEAT_LEVEL = 2;
 /******************************************************************************/
 /******************************************************************************/
 /***                           Private definitions                           **/
@@ -134,6 +134,8 @@ void _nwk_slave_syncFromPack(fl_dataframe_format_t *packet){
 	DEBUG_TURN(NWK_DEBUG_STT);
 	//Sync repeat mode
 //	NWK_REPEAT_MODE = packet->endpoint.rep_mode;
+	//add repeat_cnt
+	REPEAT_LEVEL = packet->endpoint.rep_mode;
 	//Sync mastertime origin
 	SYNC_ORIGIN_MASTER(master_timetamp,packet->milltamp);
 	LOGA(INF,"ORIGINAL MASTER-TIME:%d\r\n",ORIGINAL_MASTER_TIME.milstep);
@@ -175,6 +177,8 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 				packet.frame.endpoint.dbg = NWK_DEBUG_STT;
 				//change endpoint to node source
 				packet.frame.endpoint.master = FL_FROM_SLAVE;
+				//add repeat_cnt
+				packet.frame.endpoint.repeat_cnt = REPEAT_LEVEL;
 			} else {
 				//Non-rsp
 				packet_built.length = 0;
@@ -211,6 +215,8 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 				}
 				//change endpoint to node source
 				packet.frame.endpoint.master = FL_FROM_SLAVE;
+				//add repeat_cnt
+				packet.frame.endpoint.repeat_cnt = REPEAT_LEVEL;
 			} else {
 				//Non-rsp
 				packet_built.length = 0;
@@ -227,6 +233,8 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 					memcpy(packet.frame.payload,G_INFORMATION.mac_short.byte,SIZEU8(G_INFORMATION.mac_short.byte));
 					//change endpoint to node source
 					packet.frame.endpoint.master = FL_FROM_SLAVE;
+					//add repeat_cnt
+					packet.frame.endpoint.repeat_cnt = REPEAT_LEVEL;
 				}
 			} else {
 				//Non-rsp

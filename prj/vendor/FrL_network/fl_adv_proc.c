@@ -544,7 +544,7 @@ void fl_adv_run(void) {
 				fl_nwk_slave_run(&data_in_queue);
 			}
 			//Todo: Repeat process
-			if (data_parsed.endpoint.repeat_cnt > 0 /*&& data_parsed.endpoint.rep_mode != 0*/) {
+			if (data_parsed.endpoint.repeat_cnt > 0 && data_parsed.endpoint.rep_mode != 0) {
 				fl_repeat_run(&data_in_queue);
 			}
 #endif

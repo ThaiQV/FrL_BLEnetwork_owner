@@ -116,7 +116,7 @@ fl_pack_t fl_master_packet_heartbeat_build(void) {
 	packet.frame.endpoint.repeat_cnt = REPEAT_LEVEL;
 	packet.frame.endpoint.master = FL_FROM_MASTER; //non-ack
 	packet.frame.endpoint.dbg = NWK_DEBUG_STT;
-//	packet.frame.endpoint.rep_mode = NWK_REPEAT_MODE;
+	packet.frame.endpoint.rep_mode = REPEAT_LEVEL;
 
 	packet_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
 	memcpy(packet_built.data_arr,packet.bytes,packet_built.length);
@@ -153,7 +153,7 @@ fl_pack_t fl_master_packet_collect_build(void) {
 	packet.frame.endpoint.repeat_cnt = REPEAT_LEVEL;
 	packet.frame.endpoint.master = FL_FROM_MASTER_ACK; //ack
 	packet.frame.endpoint.dbg = NWK_DEBUG_STT;
-//	packet.frame.endpoint.rep_mode = NWK_REPEAT_MODE;
+	packet.frame.endpoint.rep_mode = REPEAT_LEVEL;
 
 	packet_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
 	memcpy(packet_built.data_arr,packet.bytes,packet_built.length);
@@ -204,7 +204,7 @@ fl_pack_t fl_master_packet_assignSlaveID_build(u32 _mac_short) {
 	packet.frame.endpoint.repeat_cnt = REPEAT_LEVEL;
 	packet.frame.endpoint.master = FL_FROM_MASTER; //non-ack
 	packet.frame.endpoint.dbg = NWK_DEBUG_STT;
-//	packet.frame.endpoint.rep_mode = NWK_REPEAT_MODE;
+	packet.frame.endpoint.rep_mode = REPEAT_LEVEL;
 
 	packet_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
 	memcpy(packet_built.data_arr,packet.bytes,packet_built.length);
@@ -257,7 +257,7 @@ fl_pack_t fl_master_packet_GetInfo_build(u8 *_slave_mac_arr, u8 _slave_num) {
 	packet.frame.endpoint.repeat_cnt = REPEAT_LEVEL;
 	packet.frame.endpoint.master = FL_FROM_MASTER_ACK;
 	packet.frame.endpoint.dbg = NWK_DEBUG_STT;
-//	packet.frame.endpoint.rep_mode = NWK_REPEAT_MODE;
+	packet.frame.endpoint.rep_mode = REPEAT_LEVEL;
 
 	packet_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
 	memcpy(packet_built.data_arr,packet.bytes,packet_built.length);
