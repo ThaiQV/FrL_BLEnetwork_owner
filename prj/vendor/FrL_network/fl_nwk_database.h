@@ -19,10 +19,13 @@
 #define NODELIST_SIZE					SECTOR_FLASH_SIZE
 
 #define SLAVEPROFILE_SIZE				SECTOR_FLASH_SIZE
+
+#define MASTERPROFILE_SIZE				SECTOR_FLASH_SIZE
 //////// ======================================================================
 #define ADDR_RTC_START					(ADDR_USERAREA_START+SECTOR_FLASH_SIZE)
 
 #ifdef MASTER_CORE
+
 /******************** NODE LIST ********************/
 #define NODELIST_SLAVE_MAX				200
 typedef struct {
@@ -34,10 +37,28 @@ typedef struct {
 	fl_node_data_t slave[NODELIST_SLAVE_MAX];
 }__attribute__((packed)) fl_nodelist_db_t;
 
+typedef struct {
+	struct {
+		u8 chn[3];
+		//key
+	} nwk;
+	//Don't change
+	u32 magic;
+}__attribute__((packed)) fl_db_master_profile_t;
+
 #define ADDR_NODELIST_START				(ADDR_RTC_START+SYSTEM_RUNTIME_SIZE)
 #define ADDR_NODELIST_NUMSLAVE			ADDR_NODELIST_START
 #define NODELIST_NUMSLAVE_SIZE			0x14 //20 bytes
 #define ADDR_NODELIST_DATA				(ADDR_NODELIST_START + NODELIST_NUMSLAVE_SIZE)
+
+#define ADDR_MASTER_PROFILE_START 		(ADDR_NODELIST_START + NODELIST_SIZE)
+#define MASTER_PROFILE_MAGIC			0xECECECEC
+#define MASTER_PROFILE_ENTRY_SIZE		(sizeof(fl_db_master_profile_t)/sizeof(u8))
+#define MASTER_PROFILE_MAX_ENTRIES		(MASTERPROFILE_SIZE / MASTER_PROFILE_ENTRY_SIZE)
+
+fl_db_master_profile_t fl_db_masterprofile_init(void);
+void fl_db_masterprofile_save(fl_db_master_profile_t entry);
+fl_db_master_profile_t fl_db_masterprofile_load(void);
 #else
 typedef struct {
 	u8 slaveid;

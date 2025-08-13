@@ -261,6 +261,7 @@ void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms) {
 	if (_data && _size >= 2) {
 //		LOG_P(APP,"Sending..... \r\n");
 		rf_set_power_level_index(MY_RF_POWER_INDEX);
+		blc_ll_setAdvCustomedChannel(*G_ADV_SETTINGS.nwk_chn.chn1,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3);
 //		bls_ll_setAdvEnable(BLC_ADV_ENABLE);
 		u8 mac[6];
 		own_addr_type_t app_own_address_type = OWN_ADDRESS_PUBLIC;

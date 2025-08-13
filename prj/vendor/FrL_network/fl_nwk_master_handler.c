@@ -373,7 +373,28 @@ int fl_send_heartbeat(void) {
 	fl_adv_sendFIFO_add(packet_built);
 	return -1; //
 }
-
+/***************************************************
+ * @brief 		: check change and store
+ *
+ * @param[in] 	:none
+ *
+ * @return	  	:none
+ *
+ ***************************************************/
+int _nwk_master_backup(void){
+	static u32 pre_crc32 = 0;
+	u32 crc32  = fl_db_crc32((u8*)&G_MASTER_INFO,sizeof(fl_master_config_t)/sizeof(u8));
+	if(crc32 != pre_crc32){
+		pre_crc32 = crc32;
+		fl_db_master_profile_t profile;
+		profile.nwk.chn[0] = G_MASTER_INFO.nwk.chn[0];
+		profile.nwk.chn[1] = G_MASTER_INFO.nwk.chn[1];
+		profile.nwk.chn[2] = G_MASTER_INFO.nwk.chn[2];
+		fl_db_masterprofile_save(profile);
+		LOGA(INF,"** Channels:%d |%d |%d\r\n",profile.nwk.chn[0],profile.nwk.chn[1],profile.nwk.chn[2])
+	}
+	return 0;
+}
 /******************************************************************************/
 /******************************************************************************/
 /***                            Functions callback                           **/
@@ -467,6 +488,13 @@ void fl_nwk_master_init(void) {
 	FL_QUEUE_CLEAR(&G_HANDLE_MASTER_CONTAINER,PACK_HANDLE_MASTER_SIZE);
 	//todo: load database into the flash
 	fl_nwk_master_nodelist_load();
+	//todo: load master profile
+	fl_db_master_profile_t master_profile = fl_db_masterprofile_init();
+	G_MASTER_INFO.nwk.chn[0] = master_profile.nwk.chn[0];
+	G_MASTER_INFO.nwk.chn[1] = master_profile.nwk.chn[1];
+	G_MASTER_INFO.nwk.chn[2] = master_profile.nwk.chn[2];
+
+	blt_soft_timer_add(_nwk_master_backup,2*1000*1000);
 }
 /***************************************************
  * @brief 		: store nodelist into the flash
