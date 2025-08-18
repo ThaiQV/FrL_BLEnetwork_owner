@@ -35,7 +35,7 @@ _attribute_data_retention_ volatile u8 F_SENDING_STATE = 0;
 
 fl_adv_settings_t G_ADV_SETTINGS = {
 		.adv_interval_min = ADV_INTERVAL_20MS,
-		.adv_interval_max = ADV_INTERVAL_50MS,
+		.adv_interval_max = ADV_INTERVAL_30MS,
 		.adv_duration = SEND_TIMEOUT_MS,
 		.scan_interval = SCAN_INTERVAL_60MS,
 		.scan_window = SCAN_WINDOW_60MS,
@@ -69,7 +69,7 @@ fl_data_container_t G_QUEUE_SENDING = { .data = g_sending_array, .head_index = 0
 /******************************************************************************/
 void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms);
 fl_pack_t fl_packet_build(u8 *payload, u8 _len);
-s8 fl_adv_IsFormMaster(fl_pack_t data_in_queue);
+s8 fl_adv_IsFromMaster(fl_pack_t data_in_queue);
 u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
 /******************************************************************************/
 /******************************************************************************/
@@ -95,7 +95,7 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 
 #ifdef MASTER_CORE
 				//skip from  master
-				if (fl_adv_IsFormMaster(incomming_data)) {
+				if (fl_adv_IsFromMaster(incomming_data)) {
 					return 0;
 				}
 #else
@@ -461,7 +461,7 @@ u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt) {
  * @return	  	:-1 : fail, 0: SLAVE /REPEATER , 1 MASTER
  *
  ***************************************************/
-s8 fl_adv_IsFormMaster(fl_pack_t data_in_queue) {
+s8 fl_adv_IsFromMaster(fl_pack_t data_in_queue) {
 	fl_dataframe_format_t data_parsed;
 	if (fl_packet_parse(data_in_queue,&data_parsed)) {
 		if(data_parsed.endpoint.master != FL_FROM_SLAVE){
@@ -471,7 +471,27 @@ s8 fl_adv_IsFormMaster(fl_pack_t data_in_queue) {
 	}
 	return -1;
 }
-
+#ifndef MASTER_CORE
+/***************************************************
+ * @brief 		:check packet rec From ME (only for slave)
+ *
+ * @param[in] 	:none
+ *
+ * @return	  	:
+ *
+ ***************************************************/
+bool fl_adv_IsFromMe(fl_pack_t data_in_queue) {
+	extern fl_nodeinnetwork_t G_INFORMATION;
+	fl_dataframe_format_t data_parsed;
+	if (fl_packet_parse(data_in_queue,&data_parsed)) {
+		if(data_parsed.endpoint.master == FL_FROM_SLAVE && data_parsed.slaveID.id_u8 == G_INFORMATION.slaveID.id_u8
+				&& G_INFORMATION.slaveID.id_u8 != 0xFF){
+			return true;
+		}
+	}
+	return false;
+}
+#endif
 /***************************************************
  * @brief 		: build packet adv via the freelux protocol
  *
@@ -539,13 +559,13 @@ void fl_adv_run(void) {
 #ifdef MASTER_CORE
 			fl_nwk_master_run(&data_in_queue); //process reponse from the slaves
 #else //SLAVE
-//			Todo: Handle FORM MASTER REQ
-			if (fl_adv_IsFormMaster(data_in_queue)) {
-				fl_nwk_slave_run(&data_in_queue);
-			}
 			//Todo: Repeat process
-			if (data_parsed.endpoint.repeat_cnt > 0 && data_parsed.endpoint.rep_mode != 0) {
+			if (fl_adv_IsFromMe(data_in_queue) == false && data_parsed.endpoint.repeat_cnt > 0) {
 				fl_repeat_run(&data_in_queue);
+			}
+			//Todo: Handle FORM MASTER REQ
+			if (fl_adv_IsFromMaster(data_in_queue)) {
+				fl_nwk_slave_run(&data_in_queue);
 			}
 #endif
 		} else {

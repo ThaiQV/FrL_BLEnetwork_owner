@@ -92,6 +92,7 @@ void fl_db_rtc_init(void);
 void fl_db_rtc_save(u32 _timetamp);
 u32 fl_db_rtc_load(void);
 void fl_db_all_save(void);
+void fl_db_clearAll(void);
 #ifdef MASTER_CORE
 void fl_db_nodelist_init(void);
 bool fl_db_nodelist_save(fl_nodelist_db_t *_pnodelist);

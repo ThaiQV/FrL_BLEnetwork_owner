@@ -443,14 +443,15 @@ int fl_master_ProccesRSP_cbk(void) {
 					node_indx = fl_master_SlaveID_find(slave_id);
 					if (node_indx != -1) {
 						G_NODE_LIST.sla_info[node_indx].active = true;
-						G_NODE_LIST.sla_info[node_indx].timelife = (clock_time() - G_NODE_LIST.sla_info[node_indx].timelife) / SYSTEM_TIMER_TICK_1MS;
-						LOGA(INF,"INFO(%d)(%d ms)(%d):%s\r\n",slave_id,G_NODE_LIST.sla_info[node_indx].timelife,
+						G_NODE_LIST.sla_info[node_indx].timelife = (clock_time() - G_NODE_LIST.sla_info[node_indx].timelife) ;
+						LOGA(INF,"INFO(%d)(%d ms)(%d):%s\r\n",slave_id,G_NODE_LIST.sla_info[node_indx].timelife/ SYSTEM_TIMER_TICK_1MS,
 								packet.frame.endpoint.repeat_cnt,packet.frame.payload);
 					} else {
 						ERR(INF,"ID not foud:%02X\r\n",slave_id);
 					}
 				} else {
 					ERR(INF,"CRC Fail!!\r\n");
+					P_PRINTFHEX_A(INF,packet.bytes,SIZEU8(packet.bytes),"[ERR]PACK:");
 				}
 			}
 			break;
@@ -460,7 +461,7 @@ int fl_master_ProccesRSP_cbk(void) {
 				if (node_indx == -1) {
 					fl_nodeinnetwork_t new_slave;
 					new_slave.active = true;
-					new_slave.timelife = clock_time() / SYSTEM_TIMER_TICK_1MS;
+					new_slave.timelife = clock_time();
 					new_slave.mac_short.mac_u32 = mac_short;
 					P_PRINTFHEX_A(INF,packet.frame.payload,4,"0x%04X(%d):",mac_short,packet.frame.endpoint.repeat_cnt);
 					//assign SlaveID (grpID + memID) to the slave

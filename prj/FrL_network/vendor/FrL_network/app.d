@@ -171,7 +171,8 @@ vendor/FrL_Network/app.d vendor/FrL_Network/app.o: \
  ../vendor/FrL_Network/app_buffer.h \
  /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/application/keyboard/keyboard.h \
  ../vendor/Common/battery_check.h ../vendor/FrL_Network/fl_adv_proc.h \
- ../vendor/FrL_Network/fl_input_ext.h
+ ../vendor/FrL_Network/fl_input_ext.h \
+ ../vendor/FrL_Network/fl_nwk_database.h
 
 /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/tl_common.h:
 
@@ -536,3 +537,5 @@ vendor/FrL_Network/app.d vendor/FrL_Network/app.o: \
 ../vendor/FrL_Network/fl_adv_proc.h:
 
 ../vendor/FrL_Network/fl_input_ext.h:
+
+../vendor/FrL_Network/fl_nwk_database.h:

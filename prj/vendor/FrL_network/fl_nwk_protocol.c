@@ -278,7 +278,7 @@ int _RSP_CMD_GETINFOSLAVE(void) {
 	}
 	if (num_rsp == G_SLA_INFO.num_sla) {
 		P_INFO("Online :%d/%d\r\n",num_rsp,G_SLA_INFO.num_sla);
-		P_INFO("LongestTime:%d ms\r\n",max_time);
+		//P_INFO("LongestTime:%d ms\r\n",max_time/SYSTEM_TIMER_TICK_1MS);
 		total_time = (clock_time() - G_SLA_INFO.timetamp) / SYSTEM_TIMER_TICK_1MS;
 		P_INFO("RspTime:%d ms\r\n",total_time);
 		return -1;

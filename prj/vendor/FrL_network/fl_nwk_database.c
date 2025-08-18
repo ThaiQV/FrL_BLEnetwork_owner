@@ -321,6 +321,15 @@ fl_slave_profiles_t fl_db_slaveprofile_init(void){
 void fl_db_all_save(void){
 	fl_rtc_set(0); // storage currently time
 }
+
+void fl_db_clearAll(void){
+	flash_erase_sector(ADDR_RTC_START);
+#ifdef MASTER_CORE
+	flash_erase_sector(ADDR_MASTER_PROFILE_START);
+#else
+	flash_erase_sector(ADDR_SLAVE_PROFILE_START);
+#endif
+}
 /******************************************************************************/
 /******************************************************************************/
 /***                      Processing functions 					             **/
