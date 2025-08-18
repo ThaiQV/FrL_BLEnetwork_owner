@@ -33,8 +33,21 @@ _attribute_data_retention_ volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME 
 											}while(0) //Sync original time-master req
 
 #define JOIN_NETWORK_TIME 		30*1000 //ms
-fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = { NWK_HDR_55, NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmd
+
+fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
+fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_55}; // register cmdid REQ
+
 #define NWK_HDR_SIZE (sizeof(G_NWK_HDR_LIST)/sizeof(fl_hdr_nwk_type_e))
+#define NWK_HDR_REQ_SIZE (sizeof(G_NWK_HDR_REQLIST)/sizeof(fl_hdr_nwk_type_e))
+static inline u8 IsREQHDR(fl_hdr_nwk_type_e cmdid) {
+	for (u8 i = 0; i < NWK_HDR_REQ_SIZE; i++) {
+		if (cmdid == G_NWK_HDR_REQLIST[i]) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
 /*---------------- Total Packet handling --------------------------*/
 
 #define PACK_HANDLE_SIZE 		32 // bcs : slave need to rec its req and repeater of the neighbors
@@ -141,6 +154,62 @@ void _nwk_slave_syncFromPack(fl_dataframe_format_t *packet){
 	LOGA(INF,"ORIGINAL MASTER-TIME:%d\r\n",ORIGINAL_MASTER_TIME.milstep);
 }
 /***************************************************
+ * @brief 		: create and send packet request to master via the freelux protocol
+ *
+ * @param[in] 	: _cmdid : id cmd
+ * 				  _data : pointer to data
+ * 				  _len  : size data
+ *
+ * @return	  	: 0: fail, 1: success
+ *
+ ***************************************************/
+bool fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
+	/*****************************************************************/
+	/* | HDR | Timetamp | Mill_time | SlaveID | payload | crc8 | Ep | */
+	/* | 1B  |   4Bs    |    1B     |    1B   |   20Bs  |  1B  | 1B | -> .master = FL_FROM_SLAVE_ACK / FL_FROM_SLAVE */
+	/*****************************************************************/
+	//**todo: Need to convert _data to payload base on special command ID
+	//
+	fl_pack_t rslt = {.length = 0};
+	fl_hdr_nwk_type_e cmdid = (fl_hdr_nwk_type_e)_cmdid;
+	if(!IsREQHDR(cmdid)){return false;}
+	fl_data_frame_u req_pack;
+	switch (cmdid) {
+		case NWK_HDR_55: {
+			LOGA(INF,"Send 55 REQ to Master:%d/%d\r\n",ORIGINAL_MASTER_TIME.timetamp,ORIGINAL_MASTER_TIME.milstep);
+			req_pack.frame.hdr = NWK_HDR_55;
+			req_pack.frame.timetamp[0] = U32_BYTE0(ORIGINAL_MASTER_TIME.timetamp);
+			req_pack.frame.timetamp[1] = U32_BYTE1(ORIGINAL_MASTER_TIME.timetamp);
+			req_pack.frame.timetamp[2] = U32_BYTE2(ORIGINAL_MASTER_TIME.timetamp);
+			req_pack.frame.timetamp[3] = U32_BYTE3(ORIGINAL_MASTER_TIME.timetamp);
+
+			req_pack.frame.milltamp = ORIGINAL_MASTER_TIME.milstep;
+			req_pack.frame.slaveID.id_u8 = G_INFORMATION.slaveID.id_u8;
+			//Create payload
+			/*Test max len adv*/
+			memset(req_pack.frame.payload,0,SIZEU8(req_pack.frame.payload));
+			for(u8 i =0; i < SIZEU8(req_pack.frame.payload);i++){
+				req_pack.frame.payload[i] = i;
+			}
+			//create endpoint
+			req_pack.frame.endpoint.dbg = NWK_DEBUG_STT;
+			req_pack.frame.endpoint.repeat_cnt = REPEAT_LEVEL;
+			req_pack.frame.endpoint.rep_mode = REPEAT_LEVEL;
+			//Create packet from slave
+			req_pack.frame.endpoint.master = FL_FROM_SLAVE_ACK;
+		}
+		break;
+		default:
+		break;
+	}
+	//copy to data struct
+	rslt.length = SIZEU8(req_pack.bytes) - 1; //skip rssi
+	memcpy(rslt.data_arr,req_pack.bytes,rslt.length );
+	//Send ADV
+	fl_adv_sendFIFO_add(rslt);
+	return true;
+}
+/***************************************************
  * @brief 		: build packet response via the freelux protocol
  *
  * @param[in] 	: none
@@ -164,10 +233,6 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 
 	LOGA(INF,"(%d|%x)HDR_REQ ID: %02X - ACK:%d\r\n",IsJoinedNetwork(),G_INFORMATION.slaveID.id_u8,packet.frame.hdr,packet.frame.endpoint.master);
 	switch ((fl_hdr_nwk_type_e) packet.frame.hdr) {
-		case NWK_HDR_55:
-			//todo:
-			return packet_built;
-		break;
 		case NWK_HDR_HEARTBEAT:
 			_nwk_slave_syncFromPack(&packet.frame);
 			if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {

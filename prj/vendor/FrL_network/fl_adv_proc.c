@@ -339,6 +339,7 @@ void fl_adv_init(void) {
 
 
 #else
+	fl_input_external_init();
 	extern fl_nodeinnetwork_t G_INFORMATION;
 	fl_nwk_slave_init();
 	fl_repeater_init();
@@ -464,7 +465,7 @@ u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt) {
 s8 fl_adv_IsFromMaster(fl_pack_t data_in_queue) {
 	fl_dataframe_format_t data_parsed;
 	if (fl_packet_parse(data_in_queue,&data_parsed)) {
-		if(data_parsed.endpoint.master != FL_FROM_SLAVE){
+		if(data_parsed.endpoint.master == FL_FROM_MASTER || data_parsed.endpoint.master == FL_FROM_MASTER_ACK){
 			return 1;
 		}
 		else return 0;
@@ -484,7 +485,7 @@ bool fl_adv_IsFromMe(fl_pack_t data_in_queue) {
 	extern fl_nodeinnetwork_t G_INFORMATION;
 	fl_dataframe_format_t data_parsed;
 	if (fl_packet_parse(data_in_queue,&data_parsed)) {
-		if(data_parsed.endpoint.master == FL_FROM_SLAVE && data_parsed.slaveID.id_u8 == G_INFORMATION.slaveID.id_u8
+		if((data_parsed.endpoint.master == FL_FROM_SLAVE || data_parsed.endpoint.master == FL_FROM_SLAVE_ACK) && data_parsed.slaveID.id_u8 == G_INFORMATION.slaveID.id_u8
 				&& G_INFORMATION.slaveID.id_u8 != 0xFF){
 			return true;
 		}

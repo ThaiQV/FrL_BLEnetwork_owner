@@ -19,8 +19,9 @@
 
 typedef enum {
 	NWK_HDR_NONE = 0,
-	NWK_HDR_55 = 0x55,
-	//
+	// slave -> req -> master -> rsp
+	NWK_HDR_55 = 0x55, //
+	// master -> req -> slave -> rsp
 	NWK_HDR_F5_INFO = 0xF5,
 	NWK_HDR_ASSIGN = 0xFC,//Use to assign SlaveID to slave
 	NWK_HDR_HEARTBEAT = 0xFD,
@@ -122,6 +123,7 @@ void fl_nwk_slave_process(void);
 bool fl_nwk_slave_checkHDR(u8 _hdr);
 u32 fl_adv_timetampInPack(fl_pack_t _pack);
 fl_timetamp_withstep_t fl_adv_timetampStepInPack(fl_pack_t _pack);
+bool fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len);
 #endif
 void fl_adv_setting_update(void);
 int fl_adv_sendFIFO_add(fl_pack_t _pack);
