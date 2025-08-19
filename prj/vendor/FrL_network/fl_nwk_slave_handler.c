@@ -39,6 +39,7 @@ fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_55}; // register cmdid REQ
 
 #define NWK_HDR_SIZE (sizeof(G_NWK_HDR_LIST)/sizeof(G_NWK_HDR_LIST[0]))
 #define NWK_HDR_REQ_SIZE (sizeof(G_NWK_HDR_REQLIST)/sizeof(G_NWK_HDR_REQLIST[0]))
+
 static inline u8 IsREQHDR(fl_hdr_nwk_type_e cmdid) {
 	for (u8 i = 0; i < NWK_HDR_REQ_SIZE; i++) {
 		if (cmdid == G_NWK_HDR_REQLIST[i]) {
@@ -178,6 +179,7 @@ bool fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 		case NWK_HDR_55: {
 			LOGA(INF,"Send 55 REQ to Master:%d/%d\r\n",ORIGINAL_MASTER_TIME.timetamp,ORIGINAL_MASTER_TIME.milstep);
 			req_pack.frame.hdr = NWK_HDR_55;
+
 			req_pack.frame.timetamp[0] = U32_BYTE0(ORIGINAL_MASTER_TIME.timetamp);
 			req_pack.frame.timetamp[1] = U32_BYTE1(ORIGINAL_MASTER_TIME.timetamp);
 			req_pack.frame.timetamp[2] = U32_BYTE2(ORIGINAL_MASTER_TIME.timetamp);
@@ -189,7 +191,9 @@ bool fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 			//Create payload
 			/*Test max len adv*/
 			memset(req_pack.frame.payload,0,SIZEU8(req_pack.frame.payload));
-			for(u8 i =0; i < SIZEU8(req_pack.frame.payload);i++){
+			fl_timetamp_withstep_t millstep = fl_rtc_getWithMilliStep();
+			req_pack.frame.payload[0] = millstep.milstep;
+			for(u8 i =1; i < SIZEU8(req_pack.frame.payload);i++){
 				req_pack.frame.payload[i] = i;
 			}
 			//create endpoint
@@ -405,13 +409,13 @@ void TEST_slave_sendREQ(void){
 	if(IsJoinedNetwork()){
 		if(last_time == 0 || rand_time_send == 0){
 			last_time = clock_time();
-			rand_time_send  = RAND_INT(-3,5);
+			rand_time_send  = RAND_INT(500,5000);//500ms - 5 s
 		}
-		if(clock_time_exceed(last_time,rand_time_send*1000*1000)){
+		if(clock_time_exceed(last_time,rand_time_send*1000)){
 			LOGA(APP,"TEST REQ %d s\r\n",rand_time_send);
 			fl_req_slave_packet_createNsend(NWK_HDR_55,0,0);
 			last_time = clock_time();
-			rand_time_send  = RAND_INT(-3,5);
+			rand_time_send  = RAND_INT(500,5000);//500ms - 5 s
 		}
 	}
 	else{
@@ -433,8 +437,14 @@ void TEST_slave_sendREQ(void){
  *
  ***************************************************/
 bool fl_nwk_slave_checkHDR(u8 _hdr) {
+	//scan RSP HDR
 	for (int var = 0; var < SIZEU8(G_NWK_HDR_LIST); ++var) {
 		if (G_NWK_HDR_LIST[var] == _hdr)
+			return true;
+	}
+	//scan REQ HDR
+	for (int var = 0; var < SIZEU8(G_NWK_HDR_REQLIST); ++var) {
+		if (G_NWK_HDR_REQLIST[var] == _hdr)
 			return true;
 	}
 	return false;

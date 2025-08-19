@@ -238,15 +238,17 @@ void fl_adv_sendFIFO_run(void) {
 		while (FL_QUEUE_GET_LOOP(&G_QUEUE_SENDING,&data_in_queue)) {
 
 			fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(data_in_queue);
-			if ( (fl_rtc_timetamp2milltampStep(timetamp_inpack) != fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME))){
-				P_PRINTFHEX_A(APP,data_in_queue.data_arr,data_in_queue.length,"[%d]TTL(%d):",G_QUEUE_SENDING.head_index,
-						data_in_queue.data_arr[data_in_queue.length - 1] & 0x03);
-
+			u32 inpack = fl_rtc_timetamp2milltampStep(timetamp_inpack);
+			u32 origin_pack = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
+			if ( inpack < origin_pack){
+//				LOGA(APP,"timetamp:%d | %d \r\n",inpack,origin_pack);
+//				P_PRINTFHEX_A(APP,data_in_queue.data_arr,data_in_queue.length,"[%d]TTL(%d):",G_QUEUE_SENDING.head_index,
+//						data_in_queue.data_arr[data_in_queue.length - 1] & 0x03);
 				return;
 			}
 			//For debuging
-			P_PRINTFHEX_A(BLE,data_in_queue.data_arr,data_in_queue.length,"[%d]TTL(%d):",G_QUEUE_SENDING.head_index,
-					data_in_queue.data_arr[data_in_queue.length - 1] & 0x03);
+//			P_PRINTFHEX_A(BLE,data_in_queue.data_arr,data_in_queue.length,"[%d]TTL(%d):",G_QUEUE_SENDING.head_index,
+//					data_in_queue.data_arr[data_in_queue.length - 1] & 0x03);
 
 #endif
 //			LOGA(APP,"ADV FIFO(%d):%d/%d\r\n",G_QUEUE_SENDING.count,G_QUEUE_SENDING.head_index,G_QUEUE_SENDING.tail_index);
