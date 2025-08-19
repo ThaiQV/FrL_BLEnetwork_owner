@@ -332,6 +332,7 @@ void fl_adv_sendtest(void) {
  ***************************************************/
 void fl_adv_init(void) {
 
+
 #ifdef MASTER_CORE
 	extern fl_master_config_t G_MASTER_INFO;
 	//fl_adv_sendtest();
@@ -352,7 +353,9 @@ void fl_adv_init(void) {
 	G_ADV_SETTINGS.nwk_chn.chn2 = &G_INFORMATION.profile.nwk.chn[1];
 	G_ADV_SETTINGS.nwk_chn.chn3 = &G_INFORMATION.profile.nwk.chn[2];
 #endif
-
+	// Init REQ call RSP
+	fl_queue_REQnRSP_TimeoutStart();
+	//
 	rf_set_power_level_index(MY_RF_POWER_INDEX);
 	blc_ll_setAdvCustomedChannel(*G_ADV_SETTINGS.nwk_chn.chn1,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3);
 	fl_adv_scanner_init();

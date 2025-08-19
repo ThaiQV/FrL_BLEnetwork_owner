@@ -171,7 +171,7 @@ vendor/FrL_Network/fl_nwk_slave_handler.d vendor/FrL_Network/fl_nwk_slave_handle
  ../vendor/FrL_Network/fl_adv_proc.h \
  ../vendor/FrL_Network/fl_nwk_handler.h \
  ../vendor/FrL_Network/fl_nwk_database.h \
- ../vendor/FrL_Network/fl_nwk_protocol.h
+ ../vendor/FrL_Network/fl_nwk_protocol.h ../vendor/FrL_Network/test_api.h
 
 /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/tl_common.h:
 
@@ -534,3 +534,5 @@ vendor/FrL_Network/fl_nwk_slave_handler.d vendor/FrL_Network/fl_nwk_slave_handle
 ../vendor/FrL_Network/fl_nwk_database.h:
 
 ../vendor/FrL_Network/fl_nwk_protocol.h:
+
+../vendor/FrL_Network/test_api.h:

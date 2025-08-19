@@ -17,6 +17,8 @@
  * @brief	callback function for rsp
  */
 typedef void (*fl_rsp_callback_fnc)(void*);
+#define QUEUE_RSP_SLOT_MAX		10
+#define QUEUQ_REQcRSP_INTERVAL  20*1000 //ms
 
 #define RAND(min, max)				((rand() % ((max) - (min) + 1)) + (min))
 #define RAND_INT(min, max)  		((rand() % ((min) + (max) + 1)) - (min))
@@ -113,6 +115,7 @@ inline u8 fl_crc8(u8* _pdata, u8 _len) {
 	return (u8) (crc % 256);
 }
 
+
 #ifdef MASTER_CORE
 void fl_nwk_master_init(void);
 void fl_nwk_master_run(fl_pack_t *_pack_handle);
@@ -122,6 +125,7 @@ void fl_master_nodelist_AddRefesh(fl_nodeinnetwork_t _node);
 s16 fl_master_SlaveID_find(u8 _id) ;
 void fl_nwk_master_nodelist_load(void);
 #else
+bool IsJoinedNetwork(void);
 void fl_nwk_slave_init(void);
 void fl_nwk_slave_run(fl_pack_t *_pack_handle);
 void fl_nwk_slave_process(void);
@@ -130,6 +134,9 @@ u32 fl_adv_timetampInPack(fl_pack_t _pack);
 fl_timetamp_withstep_t fl_adv_timetampStepInPack(fl_pack_t _pack);
 bool fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len);
 #endif
+s8 fl_queueREQcRSP_add(u8 cmdid,u8 slaveid,fl_rsp_callback_fnc *_cb, u32 _timeout_ms);
+void fl_queue_REQcRSP_ScanRec(fl_pack_t _pack);
+int fl_queue_REQnRSP_TimeoutStart(void);
 void fl_adv_setting_update(void);
 int fl_adv_sendFIFO_add(fl_pack_t _pack);
 

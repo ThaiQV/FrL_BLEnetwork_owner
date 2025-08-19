@@ -1,5 +1,5 @@
-vendor/FrL_Network/fl_nwk_slave_handler.d vendor/FrL_Network/fl_nwk_slave_handler.o: \
- ../vendor/FrL_Network/fl_nwk_slave_handler.c \
+vendor/FrL_Network/test_api.d vendor/FrL_Network/test_api.o: \
+ ../vendor/FrL_Network/test_api.c \
  /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/tl_common.h \
  /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/common/types.h \
  /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/common/bit.h \
@@ -123,55 +123,9 @@ vendor/FrL_Network/fl_nwk_slave_handler.d vendor/FrL_Network/fl_nwk_slave_handle
  /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/plog.h \
  /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/queue_fifo.h \
  /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/fl_sys_datetime.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/ble.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/ble_common.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/ble_format.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/ble_common.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/controller/ble_controller.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/ble_format.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/hci/hci.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/hci/hci_const.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/hci/hci_cmd.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/hci/hci_event.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/controller/ll/ll.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/controller/ll/ll_adv.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/controller/ll/ll_pm.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/controller/ll/ll_scan.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/controller/ll/ll_whitelist.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/controller/ll/ll_resolvlist.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/controller/ll/ll_conn/ll_conn.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/controller/ll/ll_conn/ll_slave.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/controller/ll/ll_conn/ll_conn_csa.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/controller/ll/ll_ext_adv.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/device/multi_device.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/controller/phy/phy.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/controller/phy/phy_test.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/algorithm/ecc/ecc_ll.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/algorithm/ecc/ecc_curve.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/algorithm/aes_ccm/aes_ccm.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/host/ble_host.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/host/l2cap/l2cap.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/host/attr/att.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/host/attr/gatt.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/host/smp/smp.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/host/smp/smp_alg.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/host/smp/smp_peripheral.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/host/smp/smp_storage.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/host/gap/gap.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/host/gap/gap_event.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/hci/hci_const.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/hci/hci_cmd.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/hci/hci_event.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/service/ota/ota.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/service/ota/ota_server.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/service/device_information.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/service/hids.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/service/uuid.h \
- ../vendor/FrL_Network/app.h ../vendor/FrL_Network/fl_adv_repeat.h \
- ../vendor/FrL_Network/fl_adv_proc.h \
+ ../vendor/FrL_Network/fl_nwk_api.h \
  ../vendor/FrL_Network/fl_nwk_handler.h \
- ../vendor/FrL_Network/fl_nwk_database.h \
- ../vendor/FrL_Network/fl_nwk_protocol.h ../vendor/FrL_Network/test_api.h
+ ../vendor/FrL_Network/fl_nwk_database.h
 
 /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/tl_common.h:
 
@@ -435,104 +389,8 @@ vendor/FrL_Network/fl_nwk_slave_handler.d vendor/FrL_Network/fl_nwk_slave_handle
 
 /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/fl_sys_datetime.h:
 
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/ble.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/ble_common.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/ble_format.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/ble_common.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/controller/ble_controller.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/ble_format.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/hci/hci.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/hci/hci_const.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/hci/hci_cmd.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/hci/hci_event.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/controller/ll/ll.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/controller/ll/ll_adv.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/controller/ll/ll_pm.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/controller/ll/ll_scan.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/controller/ll/ll_whitelist.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/controller/ll/ll_resolvlist.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/controller/ll/ll_conn/ll_conn.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/controller/ll/ll_conn/ll_slave.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/controller/ll/ll_conn/ll_conn_csa.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/controller/ll/ll_ext_adv.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/device/multi_device.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/controller/phy/phy.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/controller/phy/phy_test.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/algorithm/ecc/ecc_ll.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/algorithm/ecc/ecc_curve.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/algorithm/aes_ccm/aes_ccm.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/host/ble_host.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/host/l2cap/l2cap.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/host/attr/att.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/host/attr/gatt.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/host/smp/smp.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/host/smp/smp_alg.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/host/smp/smp_peripheral.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/host/smp/smp_storage.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/host/gap/gap.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/host/gap/gap_event.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/hci/hci_const.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/hci/hci_cmd.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/hci/hci_event.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/service/ota/ota.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/service/ota/ota_server.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/service/device_information.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/service/hids.h:
-
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/service/uuid.h:
-
-../vendor/FrL_Network/app.h:
-
-../vendor/FrL_Network/fl_adv_repeat.h:
-
-../vendor/FrL_Network/fl_adv_proc.h:
+../vendor/FrL_Network/fl_nwk_api.h:
 
 ../vendor/FrL_Network/fl_nwk_handler.h:
 
 ../vendor/FrL_Network/fl_nwk_database.h:
-
-../vendor/FrL_Network/fl_nwk_protocol.h:
-
-../vendor/FrL_Network/test_api.h:

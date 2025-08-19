@@ -10,10 +10,12 @@ C_SRCS += \
 ../vendor/FrL_Network/fl_adv_repeat.c \
 ../vendor/FrL_Network/fl_input_ext.c \
 ../vendor/FrL_Network/fl_nwk_database.c \
+../vendor/FrL_Network/fl_nwk_handler.c \
 ../vendor/FrL_Network/fl_nwk_master_handler.c \
 ../vendor/FrL_Network/fl_nwk_protocol.c \
 ../vendor/FrL_Network/fl_nwk_slave_handler.c \
-../vendor/FrL_Network/main.c 
+../vendor/FrL_Network/main.c \
+../vendor/FrL_Network/test_api.c 
 
 OBJS += \
 ./vendor/FrL_Network/app.o \
@@ -22,10 +24,12 @@ OBJS += \
 ./vendor/FrL_Network/fl_adv_repeat.o \
 ./vendor/FrL_Network/fl_input_ext.o \
 ./vendor/FrL_Network/fl_nwk_database.o \
+./vendor/FrL_Network/fl_nwk_handler.o \
 ./vendor/FrL_Network/fl_nwk_master_handler.o \
 ./vendor/FrL_Network/fl_nwk_protocol.o \
 ./vendor/FrL_Network/fl_nwk_slave_handler.o \
-./vendor/FrL_Network/main.o 
+./vendor/FrL_Network/main.o \
+./vendor/FrL_Network/test_api.o 
 
 C_DEPS += \
 ./vendor/FrL_Network/app.d \
@@ -34,10 +38,12 @@ C_DEPS += \
 ./vendor/FrL_Network/fl_adv_repeat.d \
 ./vendor/FrL_Network/fl_input_ext.d \
 ./vendor/FrL_Network/fl_nwk_database.d \
+./vendor/FrL_Network/fl_nwk_handler.d \
 ./vendor/FrL_Network/fl_nwk_master_handler.d \
 ./vendor/FrL_Network/fl_nwk_protocol.d \
 ./vendor/FrL_Network/fl_nwk_slave_handler.d \
-./vendor/FrL_Network/main.d 
+./vendor/FrL_Network/main.d \
+./vendor/FrL_Network/test_api.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
