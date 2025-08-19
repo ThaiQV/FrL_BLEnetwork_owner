@@ -37,8 +37,8 @@ _attribute_data_retention_ volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME 
 fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
 fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_55}; // register cmdid REQ
 
-#define NWK_HDR_SIZE (sizeof(G_NWK_HDR_LIST)/sizeof(fl_hdr_nwk_type_e))
-#define NWK_HDR_REQ_SIZE (sizeof(G_NWK_HDR_REQLIST)/sizeof(fl_hdr_nwk_type_e))
+#define NWK_HDR_SIZE (sizeof(G_NWK_HDR_LIST)/sizeof(G_NWK_HDR_LIST[0]))
+#define NWK_HDR_REQ_SIZE (sizeof(G_NWK_HDR_REQLIST)/sizeof(G_NWK_HDR_REQLIST[0]))
 static inline u8 IsREQHDR(fl_hdr_nwk_type_e cmdid) {
 	for (u8 i = 0; i < NWK_HDR_REQ_SIZE; i++) {
 		if (cmdid == G_NWK_HDR_REQLIST[i]) {
@@ -184,6 +184,7 @@ bool fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 			req_pack.frame.timetamp[3] = U32_BYTE3(ORIGINAL_MASTER_TIME.timetamp);
 
 			req_pack.frame.milltamp = ORIGINAL_MASTER_TIME.milstep;
+
 			req_pack.frame.slaveID.id_u8 = G_INFORMATION.slaveID.id_u8;
 			//Create payload
 			/*Test max len adv*/
@@ -205,6 +206,7 @@ bool fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 	//copy to data struct
 	rslt.length = SIZEU8(req_pack.bytes) - 1; //skip rssi
 	memcpy(rslt.data_arr,req_pack.bytes,rslt.length );
+	P_PRINTFHEX_A(INF,rslt.data_arr,rslt.length,"REQ 55");
 	//Send ADV
 	fl_adv_sendFIFO_add(rslt);
 	return true;
@@ -397,7 +399,26 @@ void fl_nwk_slave_joinnwk_exc(void) {
 		}
 	}
 }
-
+void TEST_slave_sendREQ(void){
+	static int rand_time_send = 0;
+	static u32 last_time = 0;
+	if(IsJoinedNetwork()){
+		if(last_time == 0 || rand_time_send == 0){
+			last_time = clock_time();
+			rand_time_send  = RAND_INT(-3,5);
+		}
+		if(clock_time_exceed(last_time,rand_time_send*1000*1000)){
+			LOGA(APP,"TEST REQ %d s\r\n",rand_time_send);
+			fl_req_slave_packet_createNsend(NWK_HDR_55,0,0);
+			last_time = clock_time();
+			rand_time_send  = RAND_INT(-3,5);
+		}
+	}
+	else{
+		last_time =  0;
+		rand_time_send = 0;
+	}
+}
 /******************************************************************************/
 /******************************************************************************/
 /***                      Processing functions 					             **/
@@ -468,6 +489,8 @@ fl_timetamp_withstep_t fl_adv_timetampStepInPack(fl_pack_t _pack) {
 void fl_nwk_slave_process(void){
 	//todo : join- network
 	fl_nwk_slave_joinnwk_exc();
+	//test random send req
+	TEST_slave_sendREQ();
 }
 /***************************************************
  * @brief 		:Main functions to process income packet

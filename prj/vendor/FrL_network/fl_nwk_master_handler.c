@@ -415,7 +415,8 @@ int fl_master_ProccesRSP_cbk(void) {
 		fl_data_frame_u packet;
 		extern u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
 		fl_packet_parse(data_in_queue,&packet.frame);
-//		LOGA(INF,"HDR_RSP ID: %02X\r\n",packet.frame.hdr);
+		LOGA(INF,"HDR_RSP ID: %02X\r\n",packet.frame.hdr);
+		P_PRINTFHEX_A(INF,packet.frame.payload,SIZEU8(packet.frame.payload),"%d:",packet.frame.slaveID.id_u8);
 		switch ((fl_hdr_nwk_type_e) packet.frame.hdr) {
 			case NWK_HDR_HEARTBEAT: {
 				/** - NON-RSP
