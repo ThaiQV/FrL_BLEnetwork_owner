@@ -79,6 +79,8 @@ volatile u8  REPEAT_LEVEL = 2;
 /***                       Functions declare                   		         **/
 /******************************************************************************/
 /******************************************************************************/
+int TEST_slave_sendREQ(void);
+int fl_queue_REQnRSP_TimeoutStart(void);
 
 int _nwk_slave_backup(void){
 	static u32 pre_crc32 = 0;
@@ -125,6 +127,10 @@ void fl_nwk_slave_init(void) {
 	LOGA(INF,"** RstFac :%d\r\n",G_INFORMATION.profile.run_stt.rst_factory);
 
 //	blt_soft_timer_add(_nwk_slave_backup,2*1000*1000);
+
+	fl_queue_REQnRSP_TimeoutStart();
+	//test random send req
+	TEST_slave_sendREQ();
 }
 /***************************************************
  * @brief 		:synchronization status from packet
@@ -154,6 +160,128 @@ void _nwk_slave_syncFromPack(fl_dataframe_format_t *packet){
 	SYNC_ORIGIN_MASTER(master_timetamp,packet->milltamp);
 	LOGA(INF,"ORIGINAL MASTER-TIME:%d\r\n",ORIGINAL_MASTER_TIME.milstep);
 }
+
+
+/***************************************************
+ * @brief 		: API for user send req and receive rsp
+ *
+ * @param[in] 	:_cmdid: ID HDR of the req
+ * 				 _data : pointer to data
+ * 				 _len  : size of data
+ * 				 _cb   : function callback when receipt rsp from the master
+ * 				 _timeout_ms: timeout for waiting rsp (expired to callback fnc with NULL)
+ *
+ * @return	  	:-1: fail otherwise success
+ *
+ ***************************************************/
+#define QUEUE_RSP_SLOT_MAX		10
+#define QUEUQ_REQcRSP_INTERVAL  20*1000 //ms
+typedef struct {
+	fl_rsp_callback_fnc rsp_cb;
+	s32 timeout;
+}__attribute__((packed)) fl_queue_rsp_container_t;
+
+typedef struct {
+	fl_queue_rsp_container_t sl_queue[QUEUE_RSP_SLOT_MAX];
+	blt_timer_callback_t timeout_cb;
+}__attribute__((packed)) fl_rsp_container_t; //use to store packet rsp after sent req
+
+fl_rsp_container_t G_QUEUE_REQ_CALL_RSP;
+
+void _queueREQcRSP_clear(fl_rsp_container_t *_in){
+	u8 indx = 0;
+	_in->timeout_cb = 0;
+	for (indx = 0; indx < QUEUE_RSP_SLOT_MAX; ++indx) {
+		_in->sl_queue[indx].timeout = 0;
+		_in->sl_queue[indx].rsp_cb = 0;
+	}
+}
+
+u8 _queueREQcRSP_sort(void){
+	u8 indx = 0;
+	fl_rsp_container_t swap;
+	_queueREQcRSP_clear(&swap);
+	swap.timeout_cb = G_QUEUE_REQ_CALL_RSP.timeout_cb;
+	//copy to buffer
+	for (indx = 0; indx < QUEUE_RSP_SLOT_MAX; ++indx) {
+		swap.sl_queue[indx] = G_QUEUE_REQ_CALL_RSP.sl_queue[indx];
+	}
+	//remove empty slot
+	_queueREQcRSP_clear(&G_QUEUE_REQ_CALL_RSP);
+	 G_QUEUE_REQ_CALL_RSP.timeout_cb = swap.timeout_cb;
+	u8 avai_slot = 0;
+	for (indx = 0; indx < QUEUE_RSP_SLOT_MAX; ++indx) {
+		if(swap.sl_queue[indx].rsp_cb != 0){
+			G_QUEUE_REQ_CALL_RSP.sl_queue[avai_slot] = swap.sl_queue[indx];
+			avai_slot++;
+		}
+	}
+	//
+	return (avai_slot >= QUEUE_RSP_SLOT_MAX?avai_slot=0xFF:avai_slot );
+}
+
+s8 _queueREQcRSP_find(fl_rsp_callback_fnc *_cb,u32 _timeout_ms, u8 *o_avaislot){
+	u8 indx = 0;
+	*o_avaislot=_queueREQcRSP_sort();
+	for (indx = 0; indx < QUEUE_RSP_SLOT_MAX; ++indx) {
+		if(G_QUEUE_REQ_CALL_RSP.sl_queue[indx].rsp_cb == *_cb && G_QUEUE_REQ_CALL_RSP.sl_queue[indx].timeout == (s32)_timeout_ms)
+		{
+			*o_avaislot = 0xFF;
+			return indx;
+		}
+	}
+	return -1;
+}
+
+s8 _queueREQcRSP_add(fl_rsp_callback_fnc *_cb, u32 _timeout_ms){
+	u8 avai_slot= 0xFF;
+	if(_queueREQcRSP_find(_cb,_timeout_ms,&avai_slot) == -1){
+		G_QUEUE_REQ_CALL_RSP.sl_queue[avai_slot].timeout = (s32)_timeout_ms;
+		G_QUEUE_REQ_CALL_RSP.sl_queue[avai_slot].rsp_cb = *_cb;
+		return avai_slot;
+	}
+	ERR(API,"queueREQcRSP Add %d/%d ms \r\n",(u32)_cb,_timeout_ms);
+	return -1;
+}
+/***************************************************
+ * @brief 		:Run checking rsp and timeout
+ *
+ * @param[in] 	:none
+ *
+ * @return	  	:none
+ *
+ ***************************************************/
+
+int fl_queue_REQnRSP_TimeoutStart(void){
+	if(blt_soft_timer_find(&fl_queue_REQnRSP_TimeoutStart)==-1){
+		blt_soft_timer_add(&fl_queue_REQnRSP_TimeoutStart,QUEUQ_REQcRSP_INTERVAL);
+	}else{
+		u8 avai_slot = _queueREQcRSP_sort();
+		for(u8 i =0;i < avai_slot && avai_slot != 0xFF;i++){
+			if(G_QUEUE_REQ_CALL_RSP.sl_queue[i].timeout > 0){
+				G_QUEUE_REQ_CALL_RSP.sl_queue[i].timeout -= QUEUQ_REQcRSP_INTERVAL;
+				if(G_QUEUE_REQ_CALL_RSP.sl_queue[i].timeout <= 0){
+					G_QUEUE_REQ_CALL_RSP.sl_queue[i].rsp_cb((void*)&G_QUEUE_REQ_CALL_RSP.sl_queue[i].rsp_cb); //timeout
+					//clear event
+					G_QUEUE_REQ_CALL_RSP.sl_queue[i].rsp_cb = 0;
+					G_QUEUE_REQ_CALL_RSP.sl_queue[i].timeout = 0;
+				}
+			}
+		}
+	}
+	return 0;
+}
+
+s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms) {
+	//register timeout cb
+	if (_cb != 0 && _timeout_ms*1000 >= 2*QUEUQ_REQcRSP_INTERVAL) {
+		_queueREQcRSP_add(&_cb,_timeout_ms*1000);
+	} else {
+		ERR(API,"Cann't set timeout (%d/%d ms)!!\r\n",(u32)_cb,_timeout_ms);
+	}
+	return -1;
+}
+
 /***************************************************
  * @brief 		: create and send packet request to master via the freelux protocol
  *
@@ -177,6 +305,7 @@ bool fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 	fl_data_frame_u req_pack;
 	switch (cmdid) {
 		case NWK_HDR_55: {
+
 			LOGA(INF,"Send 55 REQ to Master:%d/%d\r\n",ORIGINAL_MASTER_TIME.timetamp,ORIGINAL_MASTER_TIME.milstep);
 			req_pack.frame.hdr = NWK_HDR_55;
 
@@ -189,13 +318,8 @@ bool fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 
 			req_pack.frame.slaveID.id_u8 = G_INFORMATION.slaveID.id_u8;
 			//Create payload
-			/*Test max len adv*/
-			memset(req_pack.frame.payload,0,SIZEU8(req_pack.frame.payload));
-			fl_timetamp_withstep_t millstep = fl_rtc_getWithMilliStep();
-			req_pack.frame.payload[0] = millstep.milstep;
-			for(u8 i =1; i < SIZEU8(req_pack.frame.payload);i++){
-				req_pack.frame.payload[i] = i;
-			}
+			memset(req_pack.frame.payload,0xFF,SIZEU8(req_pack.frame.payload));
+			memcpy(req_pack.frame.payload,_data,_len);
 			//create endpoint
 			req_pack.frame.endpoint.dbg = NWK_DEBUG_STT;
 			req_pack.frame.endpoint.repeat_cnt = REPEAT_LEVEL;
@@ -236,7 +360,6 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 		packet_built.length = 0;
 		return packet_built;
 	}
-
 	LOGA(INF,"(%d|%x)HDR_REQ ID: %02X - ACK:%d\r\n",IsJoinedNetwork(),G_INFORMATION.slaveID.id_u8,packet.frame.hdr,packet.frame.endpoint.master);
 	switch ((fl_hdr_nwk_type_e) packet.frame.hdr) {
 		case NWK_HDR_HEARTBEAT:
@@ -403,25 +526,54 @@ void fl_nwk_slave_joinnwk_exc(void) {
 		}
 	}
 }
-void TEST_slave_sendREQ(void){
-	static int rand_time_send = 0;
-	static u32 last_time = 0;
-	if(IsJoinedNetwork()){
-		if(last_time == 0 || rand_time_send == 0){
-			last_time = clock_time();
-			rand_time_send  = RAND_INT(500,5000);//500ms - 5 s
+
+void _rsp_callback(void *_data){
+	u32 *data =  (u32*)_data;
+	LOGA(API,"Timeout:%d\r\n",*data);
+}
+void _rsp_callback1(void *_data){
+	u32 *data =  (u32*)_data;
+	LOGA(API,"Timeout:%d\r\n",*data);
+}
+void _rsp_callback2(void *_data){
+	u32 *data =  (u32*)_data;
+	LOGA(API,"Timeout:%d\r\n",*data);
+}
+void _rsp_callback3(void *_data){
+	u32 *data =  (u32*)_data;
+	LOGA(API,"Timeout:%d\r\n",*data);
+}
+void _rsp_callback4(void *_data){
+	u32 *data =  (u32*)_data;
+	LOGA(API,"Timeout:%d\r\n",*data);
+}
+
+int TEST_slave_sendREQ(void) {
+	u32 rand_time_send = 0;
+	static u32 test_pack_cnt = 0;
+	if (blt_soft_timer_find(&TEST_slave_sendREQ) == -1) {
+		blt_soft_timer_add(&TEST_slave_sendREQ,rand_time_send * 1000);
+	} else {
+		rand_time_send = 5000;//RAND(500,4500);
+		LOGA(APP,"TEST REQ %d ms\r\n",rand_time_send);
+		if (IsJoinedNetwork()) {
+			test_pack_cnt++;
+			u8 test_u8[4];
+			test_u8[0] = U32_BYTE0(test_pack_cnt);
+			test_u8[1] = U32_BYTE1(test_pack_cnt);
+			test_u8[2] = U32_BYTE2(test_pack_cnt);
+			test_u8[3] = U32_BYTE3(test_pack_cnt);
+
+			//fl_req_slave_packet_createNsend(NWK_HDR_55,test_u8,SIZEU8(test_u8));
+			fl_api_slave_req(NWK_HDR_55,test_u8,SIZEU8(test_u8),&_rsp_callback,429);
+			fl_api_slave_req(NWK_HDR_55,test_u8,SIZEU8(test_u8),&_rsp_callback1,100);
+			fl_api_slave_req(NWK_HDR_55,test_u8,SIZEU8(test_u8),&_rsp_callback2,250);
+			fl_api_slave_req(NWK_HDR_55,test_u8,SIZEU8(test_u8),&_rsp_callback3,300);
+			fl_api_slave_req(NWK_HDR_55,test_u8,SIZEU8(test_u8),&_rsp_callback4,730);
 		}
-		if(clock_time_exceed(last_time,rand_time_send*1000)){
-			LOGA(APP,"TEST REQ %d s\r\n",rand_time_send);
-			fl_req_slave_packet_createNsend(NWK_HDR_55,0,0);
-			last_time = clock_time();
-			rand_time_send  = RAND_INT(500,5000);//500ms - 5 s
-		}
+		return rand_time_send * 1000;
 	}
-	else{
-		last_time =  0;
-		rand_time_send = 0;
-	}
+	return 0;
 }
 /******************************************************************************/
 /******************************************************************************/
@@ -499,8 +651,8 @@ fl_timetamp_withstep_t fl_adv_timetampStepInPack(fl_pack_t _pack) {
 void fl_nwk_slave_process(void){
 	//todo : join- network
 	fl_nwk_slave_joinnwk_exc();
-	//test random send req
-	TEST_slave_sendREQ();
+//	//test random send req
+//	TEST_slave_sendREQ();
 }
 /***************************************************
  * @brief 		:Main functions to process income packet

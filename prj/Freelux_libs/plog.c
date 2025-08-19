@@ -54,6 +54,7 @@ const plog_cmd_t plog_cmd[] = {
 	{ USER, ( char *) "p users",_set_plog },
 	{ PERI, ( char *) "p peri", _set_plog },
 	{ BLE,( char *) "p ble", _set_plog },
+	{ API,( char *) "p api", _set_plog },
 	{ ALL, ( char *) "p all",_set_plog },
 	{ DEFAULT, ( char *) "p default", _set_plog },
 	/**@Cmd for testing. Not save*/

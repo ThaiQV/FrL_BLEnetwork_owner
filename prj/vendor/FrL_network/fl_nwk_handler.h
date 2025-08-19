@@ -13,6 +13,11 @@
 
 #include "fl_nwk_database.h"
 
+/**
+ * @brief	callback function for rsp
+ */
+typedef void (*fl_rsp_callback_fnc)(void*);
+
 #define RAND(min, max)				((rand() % ((max) - (min) + 1)) + (min))
 #define RAND_INT(min, max)  		((rand() % ((min) + (max) + 1)) - (min))
 #define SIZEU8(x)					(sizeof(x)/sizeof(u8))
