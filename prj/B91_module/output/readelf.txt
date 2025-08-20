@@ -1,0 +1,654 @@
+ELF Header:
+  Magic:   7f 45 4c 46 01 01 01 00 00 00 00 00 00 00 00 00 
+  Class:                             ELF32
+  Data:                              2's complement, little endian
+  Version:                           1 (current)
+  OS/ABI:                            UNIX - System V
+  ABI Version:                       0
+  Type:                              EXEC (Executable file)
+  Machine:                           RISC-V
+  Version:                           0x1
+  Entry point address:               0x20000000
+  Start of program headers:          52 (bytes into file)
+  Start of section headers:          343784 (bytes into file)
+  Flags:                             0x3, RVC, single-float ABI
+  Size of this header:               52 (bytes)
+  Size of program headers:           32 (bytes)
+  Number of program headers:         9
+  Size of section headers:           40 (bytes)
+  Number of section headers:         25
+  Section header string table index: 24
+
+Section Headers:
+  [Nr] Name              Type            Addr     Off    Size   ES Flg Lk Inf Al
+  [ 0]                   NULL            00000000 000000 000000 00      0   0  0
+  [ 1] .vectors          PROGBITS        20000000 001000 00018a 00  AX  0   0  4
+  [ 2] .retention_reset  PROGBITS        00000000 002000 000154 00  AX  0   0  4
+  [ 3] .aes_data         NOBITS          00000158 002154 000020 00  WA  0   0  4
+  [ 4] .retention_data   PROGBITS        00000178 002178 0012e4 00  WA  0   0  4
+  [ 5] .ram_code         PROGBITS        00001500 003500 005702 00  AX  0   0 256
+  [ 6] .text             PROGBITS        20006cd8 008cd8 006940 00  AX  0   0  4
+  [ 7] .rodata           PROGBITS        2000d618 00f618 0006d2 00   A  0   0  4
+  [ 8] .eh_frame         PROGBITS        2000dd00 010d00 000000 00   A  0   0  4
+  [ 9] .data             PROGBITS        00080000 010000 000030 00  WA  0   0  4
+  [10] .sbss             NOBITS          00080030 011030 00001a 00  WA  0   0  4
+  [11] .bss              NOBITS          0008004c 011030 00004c 00  WA  0   0  4
+  [12] .debug_info       PROGBITS        00000000 010d00 015c2e 00      0   0  1
+  [13] .debug_abbrev     PROGBITS        00000000 02692e 000a0d 00      0   0  1
+  [14] .debug_loc        PROGBITS        00000000 02733b 00cb11 00      0   0  1
+  [15] .debug_aranges    PROGBITS        00000000 033e50 000730 00      0   0  8
+  [16] .debug_ranges     PROGBITS        00000000 034580 003318 00      0   0  8
+  [17] .debug_line       PROGBITS        00000000 037898 00c606 00      0   0  1
+  [18] .debug_str        PROGBITS        00000000 043e9e 009653 01  MS  0   0  1
+  [19] .comment          PROGBITS        00000000 04d4f1 000037 01  MS  0   0  1
+  [20] .riscv.attributes RISCV_ATTRIBUTE 00000000 04d528 00003b 00      0   0  1
+  [21] .debug_frame      PROGBITS        00000000 04d564 002008 00      0   0  4
+  [22] .symtab           SYMTAB          00000000 04f56c 002300 10     23 463  4
+  [23] .strtab           STRTAB          00000000 05186c 002577 00      0   0  1
+  [24] .shstrtab         STRTAB          00000000 053de3 000103 00      0   0  1
+Key to Flags:
+  W (write), A (alloc), X (execute), M (merge), S (strings), I (info),
+  L (link order), O (extra OS processing required), G (group), T (TLS),
+  C (compressed), x (unknown), o (OS specific), E (exclude),
+  p (processor specific)
+
+There are no section groups in this file.
+
+Program Headers:
+  Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align
+  LOAD           0x001000 0x20000000 0x20000000 0x0018a 0x0018a R E 0x1000
+  LOAD           0x002000 0x00000000 0x20000190 0x00154 0x00178 RWE 0x1000
+  LOAD           0x002178 0x00000178 0x200002e8 0x012e4 0x012e4 RW  0x1000
+  LOAD           0x003500 0x00001500 0x200015d0 0x05702 0x05702 R E 0x1000
+  LOAD           0x008cd8 0x20006cd8 0x20006cd8 0x07012 0x07012 R E 0x1000
+  LOAD           0x010000 0x00080000 0x2000dd00 0x00030 0x00030 RW  0x1000
+  LOAD           0x010d00 0x2000dd00 0x2000dd00 0x00000 0x00000 R   0x1000
+  LOAD           0x011030 0x00080030 0x2000dd30 0x00000 0x00068 RW  0x1000
+  RISCV_ATTRIBUT 0x04d528 0x00000000 0x00000000 0x0003b 0x00000 R   0x1
+
+ Section to Segment mapping:
+  Segment Sections...
+   00     .vectors 
+   01     .retention_reset .aes_data 
+   02     .retention_data 
+   03     .ram_code 
+   04     .text .rodata 
+   05     .data 
+   06     .eh_frame 
+   07     .sbss .bss 
+   08     .riscv.attributes 
+
+There is no dynamic section in this file.
+
+There are no relocations in this file.
+
+The decoding of unwind sections for machine type RISC-V is not currently supported.
+
+Symbol table '.symtab' contains 560 entries:
+   Num:    Value  Size Type    Bind   Vis      Ndx Name
+     0: 00000000     0 NOTYPE  LOCAL  DEFAULT  UND 
+     1: 20000000     0 SECTION LOCAL  DEFAULT    1 
+     2: 00000000     0 SECTION LOCAL  DEFAULT    2 
+     3: 00000158     0 SECTION LOCAL  DEFAULT    3 
+     4: 00000178     0 SECTION LOCAL  DEFAULT    4 
+     5: 00001500     0 SECTION LOCAL  DEFAULT    5 
+     6: 20006cd8     0 SECTION LOCAL  DEFAULT    6 
+     7: 2000d618     0 SECTION LOCAL  DEFAULT    7 
+     8: 2000dd00     0 SECTION LOCAL  DEFAULT    8 
+     9: 00080000     0 SECTION LOCAL  DEFAULT    9 
+    10: 00080030     0 SECTION LOCAL  DEFAULT   10 
+    11: 0008004c     0 SECTION LOCAL  DEFAULT   11 
+    12: 00000000     0 SECTION LOCAL  DEFAULT   12 
+    13: 00000000     0 SECTION LOCAL  DEFAULT   13 
+    14: 00000000     0 SECTION LOCAL  DEFAULT   14 
+    15: 00000000     0 SECTION LOCAL  DEFAULT   15 
+    16: 00000000     0 SECTION LOCAL  DEFAULT   16 
+    17: 00000000     0 SECTION LOCAL  DEFAULT   17 
+    18: 00000000     0 SECTION LOCAL  DEFAULT   18 
+    19: 00000000     0 SECTION LOCAL  DEFAULT   19 
+    20: 00000000     0 SECTION LOCAL  DEFAULT   20 
+    21: 00000000     0 SECTION LOCAL  DEFAULT   21 
+    22: 00000000     0 FILE    LOCAL  DEFAULT  ABS ./boot/B91/cstartup_B91.o
+    23: 20000028     0 NOTYPE  LOCAL  DEFAULT    1 _START
+    24: 20000030     0 NOTYPE  LOCAL  DEFAULT    1 _SWS_USB_DIS
+    25: 2000008e     0 NOTYPE  LOCAL  DEFAULT    1 _RETENTION_RESET_INIT
+    26: 200000a6     0 NOTYPE  LOCAL  DEFAULT    1 _RETENTION_RESET_BEGIN
+    27: 200000b8     0 NOTYPE  LOCAL  DEFAULT    1 _RETENTION_DATA_INIT
+    28: 200000cc     0 NOTYPE  LOCAL  DEFAULT    1 _RETENTION_DATA_INIT_BEGI
+    29: 200000de     0 NOTYPE  LOCAL  DEFAULT    1 _RAMCODE_INIT
+    30: 200000f6     0 NOTYPE  LOCAL  DEFAULT    1 _RAMCODE_INIT_BEGIN
+    31: 20000108     0 NOTYPE  LOCAL  DEFAULT    1 _DATA_INIT
+    32: 20000120     0 NOTYPE  LOCAL  DEFAULT    1 _DATA_INIT_BEGIN
+    33: 20000132     0 NOTYPE  LOCAL  DEFAULT    1 _ZERO_BSS
+    34: 20000146     0 NOTYPE  LOCAL  DEFAULT    1 _ZERO_BSS_BEGIN
+    35: 20000152     0 NOTYPE  LOCAL  DEFAULT    1 _ZERO_AES
+    36: 20000166     0 NOTYPE  LOCAL  DEFAULT    1 _ZERO_AES_BEGIN
+    37: 20000172     0 NOTYPE  LOCAL  DEFAULT    1 _FILL_STK
+    38: 20000172     0 NOTYPE  LOCAL  DEFAULT    1 _MAIN_FUNC
+    39: 20000188     0 NOTYPE  LOCAL  DEFAULT    1 _END
+    40: 00000022     0 NOTYPE  LOCAL  DEFAULT    2 _ISTART
+    41: 0000002a     0 NOTYPE  LOCAL  DEFAULT    2 _ISWS_USB_DIS
+    42: 00000088     0 NOTYPE  LOCAL  DEFAULT    2 _WAKEUP_FLASH
+    43: 000000a2     0 NOTYPE  LOCAL  DEFAULT    2 _MSPI_WAIT
+    44: 000000bc     0 NOTYPE  LOCAL  DEFAULT    2 _WAIT_EFUSE_LOAD_FINISH
+    45: 000000c2     0 NOTYPE  LOCAL  DEFAULT    2 _MULTI_ADDRESS_BEGIN
+    46: 000000d2     0 NOTYPE  LOCAL  DEFAULT    2 _IDATA_INIT
+    47: 000000ea     0 NOTYPE  LOCAL  DEFAULT    2 _IDATA_INIT_BEGIN
+    48: 000000fc     0 NOTYPE  LOCAL  DEFAULT    2 _IZERO_BSS
+    49: 00000110     0 NOTYPE  LOCAL  DEFAULT    2 _IZERO_BSS_BEGIN
+    50: 0000011c     0 NOTYPE  LOCAL  DEFAULT    2 _IZERO_AES
+    51: 00000130     0 NOTYPE  LOCAL  DEFAULT    2 _IZERO_AES_BEGIN
+    52: 0000013c     0 NOTYPE  LOCAL  DEFAULT    2 _IFILL_STK
+    53: 0000013c     0 NOTYPE  LOCAL  DEFAULT    2 _IMAIN_FUNC
+    54: 00000152     0 NOTYPE  LOCAL  DEFAULT    2 _IEND
+    55: 00000040     0 NOTYPE  LOCAL  DEFAULT  ABS irqno
+    56: 00000000     0 FILE    LOCAL  DEFAULT  ABS 
+    57: 20006d78   138 FUNC    LOCAL  DEFAULT    6 uart_receive_dma.constpro
+    58: 00001500    52 FUNC    LOCAL  DEFAULT    5 rf_set_power_level_index.
+    59: 00001534    16 FUNC    LOCAL  DEFAULT    5 smemset.constprop.23
+    60: 00001544    36 FUNC    LOCAL  DEFAULT    5 blt_reset_conn_phy_param.
+    61: 20006e04    48 FUNC    LOCAL  DEFAULT    6 blt_ll_unknown_rsp.constp
+    62: 20006e38   108 FUNC    LOCAL  DEFAULT    6 blc_gatt_requestServiceAc
+    63: 20006ea8    42 FUNC    LOCAL  DEFAULT    6 crc32_half_cal.constprop.
+    64: 20006ed4    50 FUNC    LOCAL  DEFAULT    6 blt_ota_setResult.constpr
+    65: 00001568    24 FUNC    LOCAL  DEFAULT    5 smemcpy
+    66: 00001580   436 FUNC    LOCAL  DEFAULT    5 aes_ccmBaseTran.isra.0.co
+    67: 00001734   444 FUNC    LOCAL  DEFAULT    5 aes_ccmAuthTran.constprop
+    68: 000018f0   212 FUNC    LOCAL  DEFAULT    5 aes_ll_ccm_decryption.con
+    69: 20006f08   118 FUNC    LOCAL  DEFAULT    6 aes_ll_encryption
+    70: 20006f80   230 FUNC    LOCAL  DEFAULT    6 blt_smp_alg_c1.constprop.
+    71: 20007068    56 FUNC    LOCAL  DEFAULT    6 crc16
+    72: 200070a0    78 FUNC    LOCAL  DEFAULT    6 bls_smp_param_getIndexByF
+    73: 200070f0    36 FUNC    LOCAL  DEFAULT    6 blc_smp_pushParingFailed
+    74: 20007118    20 FUNC    LOCAL  DEFAULT    6 blc_gap_send_event
+    75: 20007130    90 FUNC    LOCAL  DEFAULT    6 blc_smp_procParingEnd
+    76: 2000718c    86 FUNC    LOCAL  DEFAULT    6 blc_gap_peripheral_conn_t
+    77: 200071e4    58 FUNC    LOCAL  DEFAULT    6 blc_gap_peripheral_conn_c
+    78: 20007220   138 FUNC    LOCAL  DEFAULT    6 att_Find_end_group
+    79: 200072ac   158 FUNC    LOCAL  DEFAULT    6 l2cap_att_search
+    80: 2000734c    20 FUNC    LOCAL  DEFAULT    6 blc_hci_send_event
+    81: 20007364   124 FUNC    LOCAL  DEFAULT    6 ll_searchAddrInWhiteListT
+    82: 000019c4   132 FUNC    LOCAL  DEFAULT    5 blt_ll_searchAddr_in_Whit
+    83: 200073e4   102 FUNC    LOCAL  DEFAULT    6 bls_ll_send_read_remote_f
+    84: 2000744c    40 FUNC    LOCAL  DEFAULT    6 blc_hci_ltkRequestNegativ
+    85: 20007478    72 FUNC    LOCAL  DEFAULT    6 blc_hci_ltkRequestReply
+    86: 00001a48   144 FUNC    LOCAL  DEFAULT    5 blt_terminate_proc
+    87: 00001ad8   132 FUNC    LOCAL  DEFAULT    5 blt_terminate_pending_pro
+    88: 00001b5c   172 FUNC    LOCAL  DEFAULT    5 bls_ll_setNewConnection_t
+    89: 00001c08   312 FUNC    LOCAL  DEFAULT    5 blt_brx_timing_update
+    90: 00001d40    68 FUNC    LOCAL  DEFAULT    5 blt_brx_timing_update_ini
+    91: 00001d84   120 FUNC    LOCAL  DEFAULT    5 blt_set_fsmTimeout_intLev
+    92: 00001dfc   404 FUNC    LOCAL  DEFAULT    5 blt_ll_channel_conn_updat
+    93: 00001f90    80 FUNC    LOCAL  DEFAULT    5 bls_ll_procUpdateReq
+    94: 00001fe0   436 FUNC    LOCAL  DEFAULT    5 irq_blc_slave_rx_data
+    95: 00002194    96 FUNC    LOCAL  DEFAULT    5 irq_blc_slave_tx
+    96: 000021f4   228 FUNC    LOCAL  DEFAULT    5 blt_push_fifo_hw
+    97: 000022d8    72 FUNC    LOCAL  DEFAULT    5 blc_calc_remapping_table
+    98: 00002320   164 FUNC    LOCAL  DEFAULT    5 blt_ll_channelTable_calc
+    99: 000023c4   304 FUNC    LOCAL  DEFAULT    5 connUpdate_mapUpdate_proc
+   100: 000024f4   336 FUNC    LOCAL  DEFAULT    5 blt_brx_post
+   101: 00002644   248 FUNC    LOCAL  DEFAULT    5 blt_ll_connect_common
+   102: 200074c0   550 FUNC    LOCAL  DEFAULT    6 blt_connect
+   103: 200076e8   196 FUNC    LOCAL  DEFAULT    6 bls_ll_setAdvData
+   104: 0000273c   208 FUNC    LOCAL  DEFAULT    5 bls_ll_setAdvEnable
+   105: 0000280c   456 FUNC    LOCAL  DEFAULT    5 blc_ll_recoverDeepRetenti
+   106: 000029d4    36 FUNC    LOCAL  DEFAULT    5 irq_ll_system_timer
+   107: 200077ac   164 FUNC    LOCAL  DEFAULT    6 blt_ll_exchangeDataLength
+   108: 20007854   414 FUNC    LOCAL  DEFAULT    6 blt_slave_main_loop_post
+   109: 000029f8    64 FUNC    LOCAL  DEFAULT    5 blt_event_callback_func
+   110: 00002a38    76 FUNC    LOCAL  DEFAULT    5 trng_rand
+   111: 00002a84    72 FUNC    LOCAL  DEFAULT    5 pm_tim_recover_32k_rc
+   112: 00002acc    72 FUNC    LOCAL  DEFAULT    5 pm_get_32k_rc_calib
+   113: 00002b14    92 FUNC    LOCAL  DEFAULT    5 pm_update_32k_rc_sleep_ti
+   114: 00002b70    84 FUNC    LOCAL  DEFAULT    5 pm_cal_32k_rc_offset
+   115: 00002bc4   312 FUNC    LOCAL  DEFAULT    5 rf_set_ble_channel
+   116: 00002cfc   176 FUNC    LOCAL  DEFAULT    5 blt_ll_start_common
+   117: 00002dac    96 FUNC    LOCAL  DEFAULT    5 rf_start_fsm
+   118: 00002e0c    28 FUNC    LOCAL  DEFAULT    5 ble_rx_dma_config
+   119: 00002e28    28 FUNC    LOCAL  DEFAULT    5 ble_tx_dma_config
+   120: 00002e44    80 FUNC    LOCAL  DEFAULT    5 blc_ll_initBasicMCU
+   121: 00002e94    72 FUNC    LOCAL  DEFAULT    5 ble_rf_set_tx_dma
+   122: 00002edc    72 FUNC    LOCAL  DEFAULT    5 ble_rf_set_rx_dma
+   123: 00002f24   276 FUNC    LOCAL  DEFAULT    5 blt_brx_start
+   124: 00003038   348 FUNC    LOCAL  DEFAULT    5 irq_slave_system_timer
+   125: 00003194   488 FUNC    LOCAL  DEFAULT    5 irq_blc_ll_rx
+   126: 0000337c   432 FUNC    LOCAL  DEFAULT    5 irq_blt_sdk_handler
+   127: 200079f4    72 FUNC    LOCAL  DEFAULT    6 generateRandomNum
+   128: 0000352c     4 FUNC    LOCAL  DEFAULT    5 stimer_irq_handler
+   129: 00003530     4 FUNC    LOCAL  DEFAULT    5 rf_irq_handler
+   130: 20007a3c    64 FUNC    LOCAL  DEFAULT    6 app_module_busy
+   131: 20007a80    62 FUNC    LOCAL  DEFAULT    6 uart_is_prime
+   132: 20007ac0   324 FUNC    LOCAL  DEFAULT    6 uart_cal_div_and_bwpc.con
+   133: 00003534    36 FUNC    LOCAL  DEFAULT    5 delay_ms
+   134: 20007c08   104 FUNC    LOCAL  DEFAULT    6 pwm_kick_32k_pad.constpro
+   135: 00003558    28 FUNC    LOCAL  DEFAULT    5 delay_us
+   136: 00003574    68 FUNC    LOCAL  DEFAULT    5 flash_send_addr
+   137: 000035b8    76 FUNC    LOCAL  DEFAULT    5 flash_send_cmd
+   138: 00003604   360 FUNC    LOCAL  DEFAULT    5 flash_mspi_read_ram
+   139: 20007c70   194 FUNC    LOCAL  DEFAULT    6 blc_readFlashSize_autoCon
+   140: 0000376c    72 FUNC    LOCAL  DEFAULT    5 flash_wait_done
+   141: 000037b4   204 FUNC    LOCAL  DEFAULT    5 flash_mspi_write_ram.cons
+   142: 20007d34   176 FUNC    LOCAL  DEFAULT    6 smp_erase_flash_sector
+   143: 20006cd8    88 FUNC    LOCAL  DEFAULT    6 flash_page_program
+   144: 20006d30    44 FUNC    LOCAL  DEFAULT    6 flash_dread
+   145: 00003880    96 FUNC    LOCAL  DEFAULT    5 clock_set_32k_tick
+   146: 20007de8    36 FUNC    LOCAL  DEFAULT    6 my_fifo_get
+   147: 20007e10    66 FUNC    LOCAL  DEFAULT    6 analog_read_reg32.constpr
+   148: 000038e0    48 FUNC    LOCAL  DEFAULT    5 clock_get_32k_tick
+   149: 00003910   152 FUNC    LOCAL  DEFAULT    5 smp_quickResolvPrivateAdd
+   150: 000039a8   112 FUNC    LOCAL  DEFAULT    5 blt_ll_searchAddr_in_Reso
+   151: 00003a18    44 FUNC    LOCAL  DEFAULT    5 ll_searchAddr_in_WhiteLis
+   152: 20007e54   446 FUNC    LOCAL  DEFAULT    6 bls_ll_pushTxFifo
+   153: 20008014   150 FUNC    LOCAL  DEFAULT    6 bls_ll_pushEncPkt
+   154: 200080ac   104 FUNC    LOCAL  DEFAULT    6 bls_ll_terminateConnectio
+   155: 00003a44    96 FUNC    LOCAL  DEFAULT    5 blt_ll_getRealTxFifoNumbe
+   156: 00003aa4   120 FUNC    LOCAL  DEFAULT    5 blc_ll_getTxFifoNumber
+   157: 20008114   528 FUNC    LOCAL  DEFAULT    6 blc_l2cap_pushData_2_cont
+   158: 20008328   138 FUNC    LOCAL  DEFAULT    6 blc_gatt_pushHandleValueN
+   159: 200083b4    76 FUNC    LOCAL  DEFAULT    6 blt_ota_pushVersionRsp
+   160: 00003b1c   148 FUNC    LOCAL  DEFAULT    5 cpu_stall_WakeUp_By_RF_Sy
+   161: 00003bb0    60 FUNC    LOCAL  DEFAULT    5 analog_write_reg8
+   162: 20008400   128 FUNC    LOCAL  DEFAULT    6 pwm_kick_32k_pad_times.co
+   163: 00003bec   260 FUNC    LOCAL  DEFAULT    5 rf_drv_ble_init
+   164: 00003cf0  1616 FUNC    LOCAL  DEFAULT    5 blt_brx_sleep
+   165: 00004340    68 FUNC    LOCAL  DEFAULT    5 analog_read_reg8
+   166: 00004384   324 FUNC    LOCAL  DEFAULT    5 clock_init.constprop.76
+   167: 20008484    68 FUNC    LOCAL  DEFAULT    6 pm_set_gpio_wakeup.constp
+   168: 000044c8   192 FUNC    LOCAL  DEFAULT    5 pm_wait_bbpll_done
+   169: 00004588   432 FUNC    LOCAL  DEFAULT    5 pm_sleep_start
+   170: 00004738  1144 FUNC    LOCAL  DEFAULT    5 cpu_sleep_wakeup_32k_rc_r
+   171: 20006d5c    26 FUNC    LOCAL  DEFAULT    6 cpu_sleep_wakeup_32k_rc
+   172: 200084cc   450 FUNC    LOCAL  DEFAULT    6 cpu_wakeup_no_deepretn_ba
+   173: 20008690   114 FUNC    LOCAL  DEFAULT    6 gpio_set_up_down_res
+   174: 20008690   114 FUNC    LOCAL  DEFAULT    6 gpio_setup_up_down_resist
+   175: 20008704    80 FUNC    LOCAL  DEFAULT    6 app_suspend_exit
+   176: 20008754    28 FUNC    LOCAL  DEFAULT    6 app_suspend_enter
+   177: 20008774   156 FUNC    LOCAL  DEFAULT    6 uart_set_pin.constprop.68
+   178: 00004bb0   448 FUNC    LOCAL  DEFAULT    5 user_init_deepRetn
+   179: 00004d70   140 FUNC    LOCAL  DEFAULT    5 clock_cal_24m_rc
+   180: 00004dfc   972 FUNC    LOCAL  DEFAULT    5 blt_sdk_main_loop
+   181: 20008810   268 FUNC    LOCAL  DEFAULT    6 main_loop
+   182: 20008920   194 FUNC    LOCAL  DEFAULT    6 spp_send_data.constprop.2
+   183: 200089e4   880 FUNC    LOCAL  DEFAULT    6 bls_smp_pushPkt
+   184: 20008d58    26 FUNC    LOCAL  DEFAULT    6 blc_smp_sendSecurityReque
+   185: 20008d74  2014 FUNC    LOCAL  DEFAULT    6 blt_slave_main_loop_data
+   186: 20009554   298 FUNC    LOCAL  DEFAULT    6 tx_to_uart_cb
+   187: 20009680   198 FUNC    LOCAL  DEFAULT    6 controller_event_handler
+   188: 20009748    78 FUNC    LOCAL  DEFAULT    6 module_onReceiveData
+   189: 000051c8   596 FUNC    LOCAL  DEFAULT    5 sys_init.constprop.25
+   190: 0000541c   708 FUNC    LOCAL  DEFAULT    5 bls_ll_procRxPacket.const
+   191: 20009798  1244 FUNC    LOCAL  DEFAULT    6 blt_send_adv
+   192: 20009c74   170 FUNC    LOCAL  DEFAULT    6 ota_save_data
+   193: 20009d20  1022 FUNC    LOCAL  DEFAULT    6 otaWrite
+   194: 2000a120   108 FUNC    LOCAL  DEFAULT    6 smp_write_flash_page
+   195: 2000a18c   258 FUNC    LOCAL  DEFAULT    6 bls_smp_multi_device_para
+   196: 2000a290   238 FUNC    LOCAL  DEFAULT    6 bls_smp_param_deleteByInd
+   197: 2000a380   392 FUNC    LOCAL  DEFAULT    6 bls_smp_param_saveBonding
+   198: 2000a50c   340 FUNC    LOCAL  DEFAULT    6 bls_smp_pairing_success.p
+   199: 2000a660   240 FUNC    LOCAL  DEFAULT    6 bls_smp_sendInfo
+   200: 2000a754   306 FUNC    LOCAL  DEFAULT    6 bls_smp_encryption_done
+   201: 2000a888   274 FUNC    LOCAL  DEFAULT    6 bls_smp_param_Cleanflash
+   202: 2000a99c   734 FUNC    LOCAL  DEFAULT    6 blc_gap_peripheral_mainlo
+   203: 2000ac7c   940 FUNC    LOCAL  DEFAULT    6 bls_smp_getLtkReq
+   204: 2000b028   556 FUNC    LOCAL  DEFAULT    6 bls_smp_setAddress
+   205: 2000b258  5100 FUNC    LOCAL  DEFAULT    6 blc_l2cap_packet_receive
+   206: 2000c648   918 FUNC    LOCAL  DEFAULT    6 rx_from_uart_cb
+   207: 2000c9e0  2626 FUNC    LOCAL  DEFAULT    6 user_init_normal
+   208: 00000158    32 OBJECT  LOCAL  DEFAULT    3 aes_data_buff
+   209: 0008004c    74 OBJECT  LOCAL  DEFAULT   11 T_txdata_buf
+   210: 00000178    12 OBJECT  LOCAL  DEFAULT    4 blt_conn_phy
+   211: 00000184    16 OBJECT  LOCAL  DEFAULT    4 bltPHYs
+   212: 00000194     4 OBJECT  LOCAL  DEFAULT    4 ll_push_tx_fifo_handler
+   213: 00000198   112 OBJECT  LOCAL  DEFAULT    4 tbl_bondDevice
+   214: 00000208    40 OBJECT  LOCAL  DEFAULT    4 blc_cyrpt_para
+   215: 00000230    64 OBJECT  LOCAL  DEFAULT    4 crc32_half_tbl
+   216: 00000270    88 OBJECT  LOCAL  DEFAULT    4 blotaSvr
+   217: 000002c8    72 OBJECT  LOCAL  DEFAULT    4 smp_param_own
+   218: 00000310    80 OBJECT  LOCAL  DEFAULT    4 smp_param_peer
+   219: 00000360     4 OBJECT  LOCAL  DEFAULT    4 crc16_poly
+   220: 00000364    36 OBJECT  LOCAL  DEFAULT    4 mlDevMng
+   221: 00000388    28 OBJECT  LOCAL  DEFAULT    4 smpResSignalPkt
+   222: 000003a4     4 OBJECT  LOCAL  DEFAULT    4 blc_gap_event_handler
+   223: 000003a8     4 OBJECT  LOCAL  DEFAULT    4 smp_timeout_start_tick
+   224: 000003ac    24 OBJECT  LOCAL  DEFAULT    4 blc_smpMng
+   225: 000003c4    44 OBJECT  LOCAL  DEFAULT    4 bltParam
+   226: 000003f0     1 OBJECT  LOCAL  DEFAULT    4 smpDistirbuteKeyOrder
+   227: 000003f4     1 OBJECT  LOCAL  DEFAULT    4 smp_DistributeKeyInit
+   228: 000003f8     1 OBJECT  LOCAL  DEFAULT    4 smp_DistributeKeyResp
+   229: 000003fc     4 OBJECT  LOCAL  DEFAULT    4 smp_phase_record
+   230: 00000400     4 OBJECT  LOCAL  DEFAULT    4 gap_eventMask
+   231: 00000404    10 OBJECT  LOCAL  DEFAULT    4 bltAtt
+   232: 00000410     4 OBJECT  LOCAL  DEFAULT    4 blc_SecReq_ctrl
+   233: 00000414     4 OBJECT  LOCAL  DEFAULT    4 host_ota_terminate_cb
+   234: 00000418    12 OBJECT  LOCAL  DEFAULT    4 para_upReq
+   235: 00000424     4 OBJECT  LOCAL  DEFAULT    4 func_smp_init
+   236: 00000428     4 OBJECT  LOCAL  DEFAULT    4 gAttributes
+   237: 0000042c     4 OBJECT  LOCAL  DEFAULT    4 blc_hci_event_handler
+   238: 00000430    34 OBJECT  LOCAL  DEFAULT    4 ll_whiteList_tbl
+   239: 00000454   104 OBJECT  LOCAL  DEFAULT    4 bltc
+   240: 000004bc    16 OBJECT  LOCAL  DEFAULT    4 enc_ltk
+   241: 000004cc     4 OBJECT  LOCAL  DEFAULT    4 blc_tlkEvent_pending
+   242: 000004d0    20 OBJECT  LOCAL  DEFAULT    4 bltData
+   243: 000004e4    88 OBJECT  LOCAL  DEFAULT    4 blttcon
+   244: 0000053c     4 OBJECT  LOCAL  DEFAULT    4 pFunc_ll_SetAdv_Enable
+   245: 00000540    48 OBJECT  LOCAL  DEFAULT    4 bltPm
+   246: 00000570    16 OBJECT  LOCAL  DEFAULT    4 blt_txfifo
+   247: 00000580     4 OBJECT  LOCAL  DEFAULT    4 pkt_slave_terminate
+   248: 00000584    16 OBJECT  LOCAL  DEFAULT    4 bls_timing
+   249: 00000594     4 OBJECT  LOCAL  DEFAULT    4 CONN_SHORT_TOLERANCE_TIME
+   250: 00000598     4 OBJECT  LOCAL  DEFAULT    4 blt_miscParam
+   251: 0000059c    16 OBJECT  LOCAL  DEFAULT    4 blc_tlkEvent_data
+   252: 000005ac    24 OBJECT  LOCAL  DEFAULT    4 blt_buff_conn
+   253: 000005c4     4 OBJECT  LOCAL  DEFAULT    4 blt_bb
+   254: 000005c8     1 OBJECT  LOCAL  DEFAULT    4 blt_smp_empty_pkt_entry
+   255: 000005c9     1 OBJECT  LOCAL  DEFAULT    4 g_num_used_chans
+   256: 000005ca     1 OBJECT  LOCAL  DEFAULT    4 conn_new_interval_flag
+   257: 000005cc     4 OBJECT  LOCAL  DEFAULT    4 ll_conn_phy_update_cb
+   258: 000005d0     4 OBJECT  LOCAL  DEFAULT    4 blc_rf_pa_cb
+   259: 000005d4     4 OBJECT  LOCAL  DEFAULT    4 lmp_tick
+   260: 000005d8     4 OBJECT  LOCAL  DEFAULT    4 lmp_timeout
+   261: 000005dc     1 OBJECT  LOCAL  DEFAULT    4 bls_peer_start_enc_flag
+   262: 000005e0     1 OBJECT  LOCAL  DEFAULT    4 blt_ll_version_ind_rsp_fl
+   263: 000005e4     4 OBJECT  LOCAL  DEFAULT    4 blc_rcvd_connReq_tick
+   264: 000005e8     4 OBJECT  LOCAL  DEFAULT    4 blt_pconn
+   265: 000005ec     4 OBJECT  LOCAL  DEFAULT    4 ll_connComplete_handler
+   266: 000005f0     4 OBJECT  LOCAL  DEFAULT    4 ble_first_rx_tick_last
+   267: 000005f4     4 OBJECT  LOCAL  DEFAULT    4 ble_first_rx_tick_pre
+   268: 000005f8     4 OBJECT  LOCAL  DEFAULT    4 ble_actual_conn_interval_
+   269: 000005fc     4 OBJECT  LOCAL  DEFAULT    4 hci_le_eventMask
+   270: 00000600    24 OBJECT  LOCAL  DEFAULT    4 blta
+   271: 00000618     8 OBJECT  LOCAL  DEFAULT    4 advData_backup
+   272: 00000620    43 OBJECT  LOCAL  DEFAULT    4 pkt_adv
+   273: 0000064c     4 OBJECT  LOCAL  DEFAULT    4 blt_advExpectTime
+   274: 00000650     4 OBJECT  LOCAL  DEFAULT    4 blt_p_event_callback
+   275: 00000654     4 OBJECT  LOCAL  DEFAULT    4 blt_next_event_tick
+   276: 00000658     4 OBJECT  LOCAL  DEFAULT    4 ll_irq_systemTick_conn_cb
+   277: 0000065c     4 OBJECT  LOCAL  DEFAULT    4 blt_dleSendTime_tick
+   278: 00000660     4 OBJECT  LOCAL  DEFAULT    4 ll_connTerminate_handler
+   279: 00000664     4 OBJECT  LOCAL  DEFAULT    4 hci_eventMask
+   280: 00000668     4 OBJECT  LOCAL  DEFAULT    4 hci_tlk_module_eventMask
+   281: 0000066c    80 OBJECT  LOCAL  DEFAULT    4 blt_event_func
+   282: 000006bc     4 OBJECT  LOCAL  DEFAULT    4 g_rnd_m_w
+   283: 000006c0     4 OBJECT  LOCAL  DEFAULT    4 g_rnd_m_z
+   284: 000006c4    41 OBJECT  LOCAL  DEFAULT    4 pmcd
+   285: 000006f0     4 OBJECT  LOCAL  DEFAULT    4 g_pm_tick_32k_calib
+   286: 000006f4     1 OBJECT  LOCAL  DEFAULT    4 g_pm_long_suspend
+   287: 000006f8     4 OBJECT  LOCAL  DEFAULT    4 ll_chn_index_calc_cb
+   288: 000006fc     4 OBJECT  LOCAL  DEFAULT    4 ll_conn_phy_swicth_cb
+   289: 00000700     4 OBJECT  LOCAL  DEFAULT    4 tx_stl_auto_mode_high_fre
+   290: 00000704     4 OBJECT  LOCAL  DEFAULT    4 tx_stl_auto_mode
+   291: 00000708     4 OBJECT  LOCAL  DEFAULT    4 ll_module_advSlave_cb
+   292: 0000070c    24 OBJECT  LOCAL  DEFAULT    4 blts
+   293: 00000724     4 OBJECT  LOCAL  DEFAULT    4 ll_enter_pri_chn_scan_cb
+   294: 00000728     1 OBJECT  LOCAL  DEFAULT    4 x_freertos_on
+   295: 0000072c    16 OBJECT  LOCAL  DEFAULT    4 blt_rxfifo
+   296: 0000073c     4 OBJECT  LOCAL  DEFAULT    4 ll_irq_rx_data_cb
+   297: 00000740     4 OBJECT  LOCAL  DEFAULT    4 ll_irq_scan_rx_pri_chn_cb
+   298: 00000744     4 OBJECT  LOCAL  DEFAULT    4 ll_irq_tx_cb
+   299: 00000748    12 OBJECT  LOCAL  DEFAULT    4 spp_tx_fifo
+   300: 0000121c   576 OBJECT  LOCAL  DEFAULT    4 spp_tx_fifo_b
+   301: 00000754     1 OBJECT  LOCAL  DEFAULT    4 uart_dma_send_flag
+   302: 00000758    12 OBJECT  LOCAL  DEFAULT    4 spp_rx_fifo
+   303: 000007f0   144 OBJECT  LOCAL  DEFAULT    4 spp_rx_fifo_b
+   304: 00000764     4 OBJECT  LOCAL  DEFAULT    4 flash_sector_mac_address
+   305: 00000768     4 OBJECT  LOCAL  DEFAULT    4 flash_sector_calibration
+   306: 0000076c     4 OBJECT  LOCAL  DEFAULT    4 flash_capacity
+   307: 00000770     4 OBJECT  LOCAL  DEFAULT    4 flash_read_page
+   308: 00000774    50 OBJECT  LOCAL  DEFAULT    4 ll_resolvingList_tbl
+   309: 000007a8     8 OBJECT  LOCAL  DEFAULT    4 enc_skds
+   310: 000007b0     4 OBJECT  LOCAL  DEFAULT    4 enc_ivs
+   311: 000007b4     4 OBJECT  LOCAL  DEFAULT    4 att_service_discover_tick
+   312: 000007b8     4 OBJECT  LOCAL  DEFAULT    4 pm_get_32k_tick
+   313: 000007bc     4 OBJECT  LOCAL  DEFAULT    4 conn_rx_offset_limit
+   314: 000007c0     4 OBJECT  LOCAL  DEFAULT    4 cpu_sleep_wakeup
+   315: 000007c4     4 OBJECT  LOCAL  DEFAULT    4 pm_appWakeupLowPowerCb
+   316: 000007c8     1 OBJECT  LOCAL  DEFAULT    4 g_pm_suspend_power_cfg
+   317: 000007cc     4 OBJECT  LOCAL  DEFAULT    4 func_before_suspend
+   318: 000007d0     4 OBJECT  LOCAL  DEFAULT    4 g_pm_tick_32k_cur
+   319: 000007d4     4 OBJECT  LOCAL  DEFAULT    4 g_pm_tick_cur
+   320: 000007dc     6 OBJECT  LOCAL  DEFAULT    4 adc_vref_cfg
+   321: 000007e4     4 OBJECT  LOCAL  DEFAULT    4 ota_program_offset
+   322: 000007e8     4 OBJECT  LOCAL  DEFAULT    4 ota_program_bootAddr
+   323: 000007ec     4 OBJECT  LOCAL  DEFAULT    4 tick_wakeup
+   324: 00000880     4 OBJECT  LOCAL  DEFAULT    4 blc_main_loop_phyTest_cb
+   325: 00000884     4 OBJECT  LOCAL  DEFAULT    4 blc_main_loop_data_cb
+   326: 00000888     8 OBJECT  LOCAL  DEFAULT    4 scan_priRxFifo
+   327: 00000890     4 OBJECT  LOCAL  DEFAULT    4 ll_leg_scan_mlp_task_cb
+   328: 00000894     4 OBJECT  LOCAL  DEFAULT    4 blc_main_loop_post_cb
+   329: 00000898     4 OBJECT  LOCAL  DEFAULT    4 ll_host_main_loop_cb
+   330: 0000089c     4 OBJECT  LOCAL  DEFAULT    4 blc_hci_rx_handler
+   331: 000008a0     4 OBJECT  LOCAL  DEFAULT    4 blc_hci_tx_handler
+   332: 000008a4     4 OBJECT  LOCAL  DEFAULT    4 pm_check_32k_clk_stable
+   333: 000008a8     4 OBJECT  LOCAL  DEFAULT    4 ll_module_pm_cb
+   334: 000008ac     4 OBJECT  LOCAL  DEFAULT    4 ll_module_adv_cb
+   335: 000008b0     4 OBJECT  LOCAL  DEFAULT    4 tick_rc24mCal
+   336: 000008b4     4 OBJECT  LOCAL  DEFAULT    4 module_uart_data_flg
+   337: 000008b8     4 OBJECT  LOCAL  DEFAULT    4 module_wakeup_module_tick
+   338: 000008bc     4 OBJECT  LOCAL  DEFAULT    4 spp_cmd_restart_flag
+   339: 000008c0     4 OBJECT  LOCAL  DEFAULT    4 func_smp_sc_pushPkt_proc
+   340: 000008c4    16 OBJECT  LOCAL  DEFAULT    4 smpOwnRand_const
+   341: 000008d4    16 OBJECT  LOCAL  DEFAULT    4 smpOwnParingConfirm
+   342: 000008e4    12 OBJECT  LOCAL  DEFAULT    4 bltMac
+   343: 000008f0    16 OBJECT  LOCAL  DEFAULT    4 smpParingOwnIRK
+   344: 00000900    16 OBJECT  LOCAL  DEFAULT    4 smpParingOwnCSRK
+   345: 00000910     1 OBJECT  LOCAL  DEFAULT    4 restart_encryption
+   346: 00000914     8 OBJECT  LOCAL  DEFAULT    4 enc_skdm
+   347: 0000091c     4 OBJECT  LOCAL  DEFAULT    4 enc_ivm
+   348: 00000920     4 OBJECT  LOCAL  DEFAULT    4 blt_ltk_request
+   349: 00000924     4 OBJECT  LOCAL  DEFAULT    4 ll_encryption_done_cb
+   350: 00000928     4 OBJECT  LOCAL  DEFAULT    4 LL_FEATURE_MASK_0
+   351: 0000092c     4 OBJECT  LOCAL  DEFAULT    4 LL_FEATURE_MASK_1
+   352: 00000930     4 OBJECT  LOCAL  DEFAULT    4 blc_l2cap_handler
+   353: 00000934     4 OBJECT  LOCAL  DEFAULT    4 pm_tim_recover
+   354: 00000938    64 OBJECT  LOCAL  DEFAULT    4 adv_rx_buff
+   355: 00000978    43 OBJECT  LOCAL  DEFAULT    4 pkt_scan_rsp
+   356: 000009a3     1 OBJECT  LOCAL  DEFAULT    4 adv_peak_current_opt
+   357: 000009a4     4 OBJECT  LOCAL  DEFAULT    4 ll_adv2conn_cb
+   358: 000009a8     4 OBJECT  LOCAL  DEFAULT    4 advertise_prepare_handler
+   359: 000009ac     4 OBJECT  LOCAL  DEFAULT    4 ll_phy_switch_cb
+   360: 000009b0     3 OBJECT  LOCAL  DEFAULT    4 blc_adv_channel
+   361: 000009b3     1 OBJECT  LOCAL  DEFAULT    4 adv_decrease_time_opt
+   362: 000009b4     4 OBJECT  LOCAL  DEFAULT    4 flash_write_page
+   363: 000009b8     4 OBJECT  LOCAL  DEFAULT    4 otaVersionCb
+   364: 000009bc     4 OBJECT  LOCAL  DEFAULT    4 otaStartCb
+   365: 000009c0     4 OBJECT  LOCAL  DEFAULT    4 ota_firmware_max_size
+   366: 000009c4     4 OBJECT  LOCAL  DEFAULT    4 ota_write_fw_cb
+   367: 000009c8     4 OBJECT  LOCAL  DEFAULT    4 bond_device_flash_cfg_idx
+   368: 000009cc     4 OBJECT  LOCAL  DEFAULT    4 smp_param_next_start_addr
+   369: 000009d0     4 OBJECT  LOCAL  DEFAULT    4 smp_param_current_start_a
+   370: 000009d4     4 OBJECT  LOCAL  DEFAULT    4 blc_connUpdateSendTime_us
+   371: 000009d8     4 OBJECT  LOCAL  DEFAULT    4 blt_mtuReqSendTime_tick
+   372: 000009dc     4 OBJECT  LOCAL  DEFAULT    4 func_smp_info
+   373: 000009e0     4 OBJECT  LOCAL  DEFAULT    4 host_ota_main_loop_cb
+   374: 000009e4     1 OBJECT  LOCAL  DEFAULT    4 smp_bound_mask
+   375: 000009e5     1 OBJECT  LOCAL  DEFAULT    4 smpPkShftCnt
+   376: 000009e8    11 OBJECT  LOCAL  DEFAULT    4 pkt_errRsp
+   377: 000009f4   256 OBJECT  LOCAL  DEFAULT    4 blt_buff_prepare_write
+   378: 00000af4     9 OBJECT  LOCAL  DEFAULT    4 pkt_mtu_rsp
+   379: 00000b00    12 OBJECT  LOCAL  DEFAULT    4 l2cap_buff
+   380: 0000111c   256 OBJECT  LOCAL  DEFAULT    4 blt_buff_ll_rx
+   381: 0000101c   256 OBJECT  LOCAL  DEFAULT    4 blt_buff_att_tx
+   382: 00000b0c     4 OBJECT  LOCAL  DEFAULT    4 func_smp_sc_proc
+   383: 00000b10     4 OBJECT  LOCAL  DEFAULT    4 pAppPrepareWriteBuff
+   384: 00000b14     2 OBJECT  LOCAL  DEFAULT    4 prepare_pkt_current_len
+   385: 00000b16     2 OBJECT  LOCAL  DEFAULT    4 pAppPrepareWrite_max_len
+   386: 00000b18     4 OBJECT  LOCAL  DEFAULT    4 hid_reportmap_psrc
+   387: 00000b1c     4 OBJECT  LOCAL  DEFAULT    4 hid_reportmap_len
+   388: 00000b20     4 OBJECT  LOCAL  DEFAULT    4 att_client_handler
+   389: 00000b24     4 OBJECT  LOCAL  DEFAULT    4 att_sig_hander
+   390: 00000b28     4 OBJECT  LOCAL  DEFAULT    4 l2cap_connUpdateRsp_cb
+   391: 00000b2c    18 OBJECT  LOCAL  DEFAULT    4 ble_devName
+   392: 00000b40     4 OBJECT  LOCAL  DEFAULT    4 app_own_address_type
+   393: 00000b44   816 OBJECT  LOCAL  DEFAULT    4 app_acl_txfifo
+   394: 00000e74   384 OBJECT  LOCAL  DEFAULT    4 app_acl_rxfifo
+   395: 00000ff4     4 OBJECT  LOCAL  DEFAULT    4 SMP_PARAM_NV_ADDR_START
+   396: 00000ff8     4 OBJECT  LOCAL  DEFAULT    4 uart0_ndmairq_cnt
+   397: 00000ffc     4 OBJECT  LOCAL  DEFAULT    4 uart0_ndma_tick
+   398: 00001000     1 OBJECT  LOCAL  DEFAULT    4 uart0_flag
+   399: 00001001     1 OBJECT  LOCAL  DEFAULT    4 g_plic_preempt_en
+   400: 00001004     2 OBJECT  LOCAL  DEFAULT    4 otaDataCCC
+   401: 00001006     1 OBJECT  LOCAL  DEFAULT    4 my_OtaData
+   402: 00001008     1 OBJECT  LOCAL  DEFAULT    4 SppDataClient2ServerData
+   403: 0000100c     2 OBJECT  LOCAL  DEFAULT    4 SppDataServer2ClientDataC
+   404: 00001010     1 OBJECT  LOCAL  DEFAULT    4 SppDataServer2ClientData
+   405: 00001014     2 OBJECT  LOCAL  DEFAULT    4 serviceChangeCCC
+   406: 00001018     4 OBJECT  LOCAL  DEFAULT    4 serviceChangeVal
+   407: 2000d810    26 OBJECT  LOCAL  DEFAULT    7 TelinkSPPC2SDescriptor
+   408: 2000d82c    26 OBJECT  LOCAL  DEFAULT    7 TelinkSPPS2CDescriptor
+   409: 2000d848    19 OBJECT  LOCAL  DEFAULT    7 TelinkSppDataClient2Serve
+   410: 2000d85c    16 OBJECT  LOCAL  DEFAULT    7 TelinkSppDataClient2Serve
+   411: 2000d86c    19 OBJECT  LOCAL  DEFAULT    7 TelinkSppDataServer2Clien
+   412: 2000d880    16 OBJECT  LOCAL  DEFAULT    7 TelinkSppDataServer2Clien
+   413: 2000d890    16 OBJECT  LOCAL  DEFAULT    7 TelinkSppServiceUUID
+   414: 2000d8a0    16 OBJECT  LOCAL  DEFAULT    7 att_access_err_enc
+   415: 2000d8b0    16 OBJECT  LOCAL  DEFAULT    7 att_access_err_no_enc
+   416: 2000d8c0    26 OBJECT  LOCAL  DEFAULT    7 cmd_length_array
+   417: 2000d8dc   100 OBJECT  LOCAL  DEFAULT    7 gen_method_legacy
+   418: 2000d940   100 OBJECT  LOCAL  DEFAULT    7 gen_method_sc
+   419: 2000d9a4   672 OBJECT  LOCAL  DEFAULT    7 my_Attributes
+   420: 2000dcc8     2 OBJECT  LOCAL  DEFAULT    7 my_primaryServiceUUID
+   421: 2000dcb2     2 OBJECT  LOCAL  DEFAULT    7 my_gapServiceUUID
+   422: 2000dca4     2 OBJECT  LOCAL  DEFAULT    7 my_characterUUID
+   423: 2000dca8     5 OBJECT  LOCAL  DEFAULT    7 my_devNameCharVal
+   424: 2000dcae     2 OBJECT  LOCAL  DEFAULT    7 my_devNameUUID
+   425: 2000dc9c     5 OBJECT  LOCAL  DEFAULT    7 my_appearanceCharVal
+   426: 2000dca2     2 OBJECT  LOCAL  DEFAULT    7 my_appearanceUIID
+   427: 2000dc98     2 OBJECT  LOCAL  DEFAULT    7 my_appearance
+   428: 2000dcb8     5 OBJECT  LOCAL  DEFAULT    7 my_periConnParamCharVal
+   429: 2000dcbe     2 OBJECT  LOCAL  DEFAULT    7 my_periConnParamUUID
+   430: 2000dcc0     8 OBJECT  LOCAL  DEFAULT    7 my_periConnParameters
+   431: 2000dcb4     2 OBJECT  LOCAL  DEFAULT    7 my_gattServiceUUID
+   432: 2000dccc     5 OBJECT  LOCAL  DEFAULT    7 my_serviceChangeCharVal
+   433: 2000dcdc     2 OBJECT  LOCAL  DEFAULT    7 serviceChangeUUID
+   434: 2000dc82     2 OBJECT  LOCAL  DEFAULT    7 clientCharacterCfgUUID
+   435: 2000dcb0     2 OBJECT  LOCAL  DEFAULT    7 my_devServiceUUID
+   436: 2000dc88     5 OBJECT  LOCAL  DEFAULT    7 my_PnCharVal
+   437: 2000dc8e     2 OBJECT  LOCAL  DEFAULT    7 my_PnPUUID
+   438: 2000dc90     7 OBJECT  LOCAL  DEFAULT    7 my_PnPtrs
+   439: 2000dce8     2 OBJECT  LOCAL  DEFAULT    7 userdesc_UUID
+   440: 2000dc58    16 OBJECT  LOCAL  DEFAULT    7 my_OtaServiceUUID
+   441: 2000dc44    19 OBJECT  LOCAL  DEFAULT    7 my_OtaCharVal
+   442: 2000dc68    16 OBJECT  LOCAL  DEFAULT    7 my_OtaUUID
+   443: 2000dc84     3 OBJECT  LOCAL  DEFAULT    7 my_OtaName
+   444: 2000dc78     9 OBJECT  LOCAL  DEFAULT    7 tbl_advData
+   445: 00080030     4 OBJECT  LOCAL  DEFAULT   10 g_chip_version
+   446: 00080034     4 OBJECT  LOCAL  DEFAULT   10 g_pm_status_info
+   447: 00080038     1 OBJECT  LOCAL  DEFAULT   10 g_single_tong_freqoffset
+   448: 0008003c     4 OBJECT  LOCAL  DEFAULT   10 mcause
+   449: 00080040     4 OBJECT  LOCAL  DEFAULT   10 mepc
+   450: 00080044     2 OBJECT  LOCAL  DEFAULT   10 uart_dma_rx_chn
+   451: 00080048     2 OBJECT  LOCAL  DEFAULT   10 uart_dma_tx_chn
+   452: 00080000     4 OBJECT  LOCAL  DEFAULT    9 TXADDR
+   453: 00080004     6 OBJECT  LOCAL  DEFAULT    9 blt_tx_empty_packet
+   454: 0008000c     8 OBJECT  LOCAL  DEFAULT    9 g_pm_early_wakeup_time_us
+   455: 00080014     4 OBJECT  LOCAL  DEFAULT    9 g_pm_r_delay_cycle
+   456: 00080018     6 OBJECT  LOCAL  DEFAULT    9 sys_clk
+   457: 00080020     8 OBJECT  LOCAL  DEFAULT    9 uart_rx_dma_config
+   458: 00080028     8 OBJECT  LOCAL  DEFAULT    9 uart_tx_dma_config
+   459: 2000dcd4     4 OBJECT  LOCAL  DEFAULT    7 rf_rx_dma_config
+   460: 2000dcd8     4 OBJECT  LOCAL  DEFAULT    7 rf_tx_dma_config
+   461: 2000dce0     8 OBJECT  LOCAL  DEFAULT    7 tbl_scanRsp
+   462: 00000000     0 FILE    LOCAL  DEFAULT  ABS memcpy.c
+   463: 00005b74    72 FUNC    GLOBAL DEFAULT    5 entry_irq55
+   464: 000066b0    68 FUNC    GLOBAL DEFAULT    5 entry_irq13
+   465: 00006598   212 FUNC    GLOBAL DEFAULT    5 entry_irq15
+   466: 00006124    68 FUNC    GLOBAL DEFAULT    5 entry_irq27
+   467: 00005a0c    72 FUNC    GLOBAL DEFAULT    5 entry_irq60
+   468: 000069e0   212 FUNC    GLOBAL DEFAULT    5 entry_irq1
+   469: 00005c4c    72 FUNC    GLOBAL DEFAULT    5 entry_irq52
+   470: 00005cdc    72 FUNC    GLOBAL DEFAULT    5 entry_irq50
+   471: 0000597c    72 FUNC    GLOBAL DEFAULT    5 entry_irq62
+   472: 00080800     0 NOTYPE  GLOBAL DEFAULT    9 __global_pointer$
+   473: 00005a9c    72 FUNC    GLOBAL DEFAULT    5 entry_irq58
+   474: 0000145c     0 NOTYPE  GLOBAL DEFAULT    4 _RETENTION_DATA_VMA_END
+   475: 00000000     0 NOTYPE  GLOBAL DEFAULT    2 _RETENTION_RESET_VMA_STAR
+   476: 0000677c    68 FUNC    GLOBAL DEFAULT    5 entry_irq10
+   477: 000062bc    68 FUNC    GLOBAL DEFAULT    5 entry_irq21
+   478: 00000158     0 NOTYPE  GLOBAL DEFAULT    3 _AES_VMA_START
+   479: 00005d28     4 FUNC    GLOBAL DEFAULT    5 entry_irq48
+   480: 00006804    68 FUNC    GLOBAL DEFAULT    5 entry_irq8
+   481: 00005f84    72 FUNC    GLOBAL DEFAULT    5 entry_irq33
+   482: 00080098     0 NOTYPE  GLOBAL DEFAULT   11 _BSS_VMA_END
+   483: 2000d474   250 FUNC    GLOBAL DEFAULT    6 memcpy
+   484: 20000190     0 NOTYPE  GLOBAL DEFAULT  ABS _RETENTION_RESET_LMA_STAR
+   485: 000066f4    68 FUNC    GLOBAL DEFAULT    5 entry_irq12
+   486: 0000666c    68 FUNC    GLOBAL DEFAULT    5 entry_irq14
+   487: 0000699c    68 FUNC    GLOBAL DEFAULT    5 entry_irq2
+   488: 00005c94    72 FUNC    GLOBAL DEFAULT    5 entry_irq51
+   489: 000060e0    68 FUNC    GLOBAL DEFAULT    5 entry_irq28
+   490: 00005dc4    72 FUNC    GLOBAL DEFAULT    5 entry_irq43
+   491: 00006300    68 FUNC    GLOBAL DEFAULT    5 entry_irq20
+   492: 00080030     0 NOTYPE  GLOBAL DEFAULT   10 _BSS_VMA_START
+   493: 00005934    72 FUNC    GLOBAL DEFAULT    5 entry_irq63
+   494: 00080030     0 NOTYPE  GLOBAL DEFAULT    9 _DATA_VMA_END
+   495: 00005d30    72 FUNC    GLOBAL DEFAULT    5 entry_irq46
+   496: 00006014    68 FUNC    GLOBAL DEFAULT    5 entry_irq31
+   497: 00006554    68 FUNC    GLOBAL DEFAULT    5 entry_irq16
+   498: 00100000     0 NOTYPE  GLOBAL DEFAULT  ABS FLASH_SIZE
+   499: 00080000     0 NOTYPE  GLOBAL DEFAULT    9 _DATA_VMA_START
+   500: 00005c04    72 FUNC    GLOBAL DEFAULT    5 entry_irq53
+   501: 00006738    68 FUNC    GLOBAL DEFAULT    5 entry_irq11
+   502: 00000154     0 NOTYPE  GLOBAL DEFAULT    2 _RETENTION_RESET_VMA_END
+   503: 000068d0    68 FUNC    GLOBAL DEFAULT    5 entry_irq5
+   504: 00006234    68 FUNC    GLOBAL DEFAULT    5 entry_irq23
+   505: 00005f3c    72 FUNC    GLOBAL DEFAULT    5 entry_irq34
+   506: 00005eac    72 FUNC    GLOBAL DEFAULT    5 entry_irq36
+   507: 00005d7c    72 FUNC    GLOBAL DEFAULT    5 entry_irq44
+   508: 00005d78     4 FUNC    GLOBAL DEFAULT    5 entry_irq45
+   509: 00006168    68 FUNC    GLOBAL DEFAULT    5 entry_irq26
+   510: 00005e54     4 FUNC    GLOBAL DEFAULT    5 entry_irq41
+   511: 000059c4    72 FUNC    GLOBAL DEFAULT    5 entry_irq61
+   512: 20000000     0 NOTYPE  GLOBAL DEFAULT    1 BIN_BEGIN
+   513: 00005e60     4 FUNC    GLOBAL DEFAULT    5 entry_irq38
+   514: 00006b00     0 NOTYPE  GLOBAL DEFAULT    5 __vectors
+   515: 0000dd30     0 NOTYPE  GLOBAL DEFAULT  ABS BIN_SIZE
+   516: 200015d0     0 NOTYPE  GLOBAL DEFAULT  ABS _RAMCODE_LMA_START
+   517: 00005a54    72 FUNC    GLOBAL DEFAULT    5 entry_irq59
+   518: 2000d424    78 FUNC    GLOBAL DEFAULT    6 memcmp
+   519: 0000688c    68 FUNC    GLOBAL DEFAULT    5 entry_irq6
+   520: 2000dd00     0 NOTYPE  GLOBAL DEFAULT  ABS _DATA_LMA_START
+   521: 20000000     0 NOTYPE  GLOBAL DEFAULT  ABS NDS_SAG_LMA_FLASH
+   522: 20000000     0 NOTYPE  WEAK   DEFAULT    1 _RELAX_END_
+   523: 2000d56e   170 FUNC    GLOBAL DEFAULT    6 memset
+   524: 000056e0   596 FUNC    GLOBAL DEFAULT    5 main
+   525: 00006958    68 FUNC    GLOBAL DEFAULT    5 entry_irq3
+   526: 00006ab4    52 FUNC    GLOBAL DEFAULT    5 trap_entry
+   527: 00000178     0 NOTYPE  GLOBAL DEFAULT    3 _AES_VMA_END
+   528: 00005e5c     4 FUNC    GLOBAL DEFAULT    5 entry_irq39
+   529: 00005d24     4 FUNC    GLOBAL DEFAULT    5 entry_irq49
+   530: 000007d8     4 OBJECT  GLOBAL DEFAULT    4 g_pm_multi_addr
+   531: 00005ae4    72 FUNC    GLOBAL DEFAULT    5 entry_irq57
+   532: 00005d2c     4 FUNC    GLOBAL DEFAULT    5 entry_irq47
+   533: 200002e8     0 NOTYPE  GLOBAL DEFAULT  ABS _RETENTION_DATA_LMA_START
+   534: 20000000     0 FUNC    GLOBAL DEFAULT    1 _RESET_ENTRY
+   535: 00000178     0 NOTYPE  GLOBAL DEFAULT    4 _RETENTION_DATA_VMA_START
+   536: 00006914    68 FUNC    GLOBAL DEFAULT    5 entry_irq4
+   537: 000a0000     0 NOTYPE  GLOBAL DEFAULT  ABS _STACK_TOP
+   538: 00006278    68 FUNC    GLOBAL DEFAULT    5 entry_irq22
+   539: 00006058    68 FUNC    GLOBAL DEFAULT    5 entry_irq30
+   540: 00005e0c    72 FUNC    GLOBAL DEFAULT    5 entry_irq42
+   541: 000061f0    68 FUNC    GLOBAL DEFAULT    5 entry_irq24
+   542: 00006c02     0 NOTYPE  GLOBAL DEFAULT    5 _RAMCODE_VMA_END
+   543: 00000000     0 NOTYPE  WEAK   DEFAULT  ABS _ITB_BASE_
+   544: 00006344   392 FUNC    GLOBAL DEFAULT    5 entry_irq19
+   545: 00080098     0 NOTYPE  GLOBAL DEFAULT   11 _end
+   546: 00006510    68 FUNC    GLOBAL DEFAULT    5 entry_irq17
+   547: 000067c0    68 FUNC    GLOBAL DEFAULT    5 entry_irq9
+   548: 00005b2c    72 FUNC    GLOBAL DEFAULT    5 entry_irq56
+   549: 00005ef4    72 FUNC    GLOBAL DEFAULT    5 entry_irq35
+   550: 00005e64    72 FUNC    GLOBAL DEFAULT    5 entry_irq37
+   551: 00005bbc    72 FUNC    GLOBAL DEFAULT    5 entry_irq54
+   552: 00005e58     4 FUNC    GLOBAL DEFAULT    5 entry_irq40
+   553: 00001500     0 NOTYPE  GLOBAL DEFAULT    5 _RAMCODE_VMA_START
+   554: 0000609c    68 FUNC    GLOBAL DEFAULT    5 entry_irq29
+   555: 00006848    68 FUNC    GLOBAL DEFAULT    5 entry_irq7
+   556: 00005fcc    72 FUNC    GLOBAL DEFAULT    5 entry_irq32
+   557: 00000000     0 FUNC    GLOBAL DEFAULT    2 _IRESET_ENTRY
+   558: 000064cc    68 FUNC    GLOBAL DEFAULT    5 entry_irq18
+   559: 000061ac    68 FUNC    GLOBAL DEFAULT    5 entry_irq25
+
+No version information found in this file.
+Attribute Section: riscv
+File Attributes
+  Tag_RISCV_stack_align: 16-bytes
+  Tag_RISCV_arch: "rv32i2p0_m2p0_f2p0_c2p0_xv5-1p1_xdsp2p0"
