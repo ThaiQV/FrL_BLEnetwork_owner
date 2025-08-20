@@ -82,10 +82,10 @@ typedef struct {
 	u32 magic; // constant for LSB
 }__attribute__((packed)) fl_slave_profiles_t;
 
-#define ADDR_SLAVE_PROFILE_START  		(ADDR_RTC_START+RTC_SIZE)
+#define ADDR_SLAVE_PROFILE_START  		(ADDR_RTC_START + RTC_SIZE)
 #define SLAVE_PROFILE_MAGIC 			0xEDEDEDED
 #define SLAVE_PROFILE_ENTRY_SIZE        (sizeof(fl_slave_profiles_t)/sizeof(u8))
-#define SLAVE_PROFILE_MAX_ENTRIES       (SLAVEPROFILE_SIZE / SLAVE_PROFILE_ENTRY_SIZE)
+#define SLAVE_PROFILE_MAX_ENTRIES       (SLAVEPROFILE_SIZE / SLAVE_PROFILE_ENTRY_SIZE - 1)
 
 fl_slave_profiles_t fl_db_slaveprofile_init(void);
 void fl_db_slaveprofile_save(fl_slave_profiles_t entry);
