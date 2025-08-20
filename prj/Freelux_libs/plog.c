@@ -61,6 +61,7 @@ const plog_cmd_t plog_cmd[] = {
 	{ HELP, ( char *) "p help", _help },
 	{SETCMD,(char *)"p set",_Simulate},
 	{GETCMD,(char *)"p get",_Simulate},
+	{FACTORYCMD,(char *)"p rstfac",_Simulate},
 //	{TESTCMD,(const char *)"p test",_Simulate},
 //	{ATCMD,(const char *)"p atcmd",_ATCmdTest},
 	{RSTCMD,(char *)"p reset",_Simulate},

@@ -16,11 +16,6 @@
 /***                                Global Parameters                        **/
 /******************************************************************************/
 /******************************************************************************/
-/******************** RTC ********************/
-#define RTC_ORIGINAL_TIMETAMP			1752473460 // 14/07/2025-11:31:00
-#define RTC_MAGIC 						0xFAFAFAFA
-#define RTC_ENTRY_SIZE          		8       // 4 bytes timestamp + 4 bytes magic
-#define RTC_MAX_ENTRIES         		(SECTOR_FLASH_SIZE / RTC_ENTRY_SIZE)
 
 typedef struct {
 	uint32_t timestamp;
@@ -120,21 +115,21 @@ bool fl_db_nodelist_load(fl_nodelist_db_t* slavedata_arr) {
 	u8 num_slave_buf = 0;
 	//calculate position slave_data
 	unsigned long addr_slave_data = ADDR_NODELIST_DATA;
-	const u8 size_slave_data = sizeof(fl_node_data_t);
-	for (u8 var = 0; var <= NODELIST_NUMSLAVE_SIZE; ++var) {
+	const u8 size_slave_data = sizeof(fl_node_data_t)/sizeof(u8);
+	for (u8 var = 0; var < NODELIST_NUMSLAVE_SIZE; ++var) {
 		flash_read_page(ADDR_NODELIST_NUMSLAVE + var,1,&num_slave_buf);
 		if (num_slave_buf == 0xFF) {
 			LOGA(FLA,"Num_slave:%d\r\n",nodelist_db.num_slave);
-			if (nodelist_db.num_slave) {
+			if (nodelist_db.num_slave && nodelist_db.num_slave != 0xFF) {
 				LOGA(FLA,"Load NODELIST at slot(%d)-addr(%08lX)\r\n",var -1,addr_slave_data);
 				/* get data slave */
 				flash_read_page(addr_slave_data,nodelist_db.num_slave * size_slave_data,(u8*) &nodelist_db.slave);
 				*slavedata_arr = nodelist_db;
 				//printf nodelist debug
 				_nodelist_printf(nodelist_db.slave,nodelist_db.num_slave);
+				return true;
 			}
-//			*slavedata_arr = nodelist_db;
-			return true;
+			break;
 		} else {
 			addr_slave_data = addr_slave_data + nodelist_db.num_slave * size_slave_data;
 			nodelist_db.num_slave = num_slave_buf;
@@ -156,13 +151,16 @@ bool fl_db_nodelist_save(fl_nodelist_db_t *_pnodelist){
 //	nodelist_buf.slave[2].mac_u32 = 0x532FF477; //
 
 	unsigned long addr_slave_data = ADDR_NODELIST_DATA;
-	const u8 size_slave_data = sizeof(fl_node_data_t);
+	unsigned long addr_slave_data_end = 0;
+	const u8 size_slave_data = sizeof(fl_node_data_t)/sizeof(u8);
 
 	u8 num_slave_buf = 0;
 	for (u8 var = 0; var < NODELIST_NUMSLAVE_SIZE; ++var) {
 		flash_read_page(ADDR_NODELIST_NUMSLAVE + var,1,&num_slave_buf);
 		if (num_slave_buf == 0xFF) {
-			LOGA(FLA,"Save NODELIST at slot(%d)-addr(%08lX)\r\n",var,addr_slave_data);
+			addr_slave_data_end = addr_slave_data + nodelist_buf.num_slave * size_slave_data;
+			LOGA(FLA,"Save NODELIST at slot(%d)-addr(%08lX - %08lX)\r\n",var,addr_slave_data,addr_slave_data_end);
+			if(addr_slave_data_end > ADDR_NODELIST_START+NODELIST_SIZE)goto RE_STORE;
 			flash_write_page(ADDR_NODELIST_NUMSLAVE + var,1,(u8*) &nodelist_buf.num_slave);
 			flash_write_page(addr_slave_data,nodelist_buf.num_slave * size_slave_data,(u8*) &nodelist_buf.slave);
 			return true;
@@ -170,15 +168,15 @@ bool fl_db_nodelist_save(fl_nodelist_db_t *_pnodelist){
 			addr_slave_data = addr_slave_data + num_slave_buf * size_slave_data;
 		}
 	}
+	RE_STORE:
 	//fully memory -> clear and re-store
 	ERR(FLA,"NODELIST overload memory!!!\r\n");
-	flash_erase_sector(ADDR_NODELIST_NUMSLAVE);
+	flash_erase_sector(ADDR_NODELIST_START);
 	fl_db_nodelist_save(_pnodelist);
 	return false;
 }
 void fl_db_nodelist_clearAll(void){
-	flash_erase_sector(ADDR_NODELIST_NUMSLAVE);
-	delay_ms(100);
+	flash_erase_sector(ADDR_NODELIST_START);
 }
 
 /******************** MASTER PROFILE FUNCTIONs *******************/
@@ -318,6 +316,15 @@ fl_slave_profiles_t fl_db_slaveprofile_init(void){
 /***                            Functions callback                           **/
 /******************************************************************************/
 /******************************************************************************/
+void fl_db_init(void){
+	LOGA(FLA,"RTC ADDR      :0x%X-0x%X\r\n",ADDR_RTC_START,ADDR_RTC_START+RTC_SIZE);
+#ifdef MASTER_CORE
+	LOGA(FLA,"NODELIST      :0x%X-0x%X\r\n",ADDR_NODELIST_START,ADDR_NODELIST_START+NODELIST_SIZE);
+	LOGA(FLA,"MASTERPROFILE :0x%X-0x%X\r\n",ADDR_MASTER_PROFILE_START,ADDR_MASTER_PROFILE_START+MASTERPROFILE_SIZE);
+#else
+	LOGA(FLA,"SLAVEPROFILE  :0x%X-0x%X\r\n",ADDR_SLAVE_PROFILE_START,ADDR_SLAVE_PROFILE_START+SLAVEPROFILE_SIZE);
+#endif
+}
 void fl_db_all_save(void){
 	fl_rtc_set(0); // storage currently time
 }
@@ -325,6 +332,7 @@ void fl_db_all_save(void){
 void fl_db_clearAll(void){
 	flash_erase_sector(ADDR_RTC_START);
 #ifdef MASTER_CORE
+	flash_erase_sector(ADDR_NODELIST_START);
 	flash_erase_sector(ADDR_MASTER_PROFILE_START);
 #else
 	flash_erase_sector(ADDR_SLAVE_PROFILE_START);

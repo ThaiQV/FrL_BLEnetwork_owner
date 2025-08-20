@@ -12,9 +12,10 @@
 #define VENDOR_FRL_NETWORK_FL_NWK_DATABASE_H_
 
 #define SECTOR_FLASH_SIZE				0x1000 //4096
-#define ADDR_USERAREA_START				0x20040000  //
+#define ADDR_USERAREA_START				0x20040000 + SECTOR_FLASH_SIZE //
 
-#define SYSTEM_RUNTIME_SIZE				SECTOR_FLASH_SIZE
+//#define SYSTEM_RUNTIME_SIZE				SECTOR_FLASH_SIZE
+#define RTC_SIZE						SECTOR_FLASH_SIZE
 
 #define NODELIST_SIZE					SECTOR_FLASH_SIZE
 
@@ -22,7 +23,13 @@
 
 #define MASTERPROFILE_SIZE				SECTOR_FLASH_SIZE
 //////// ======================================================================
-#define ADDR_RTC_START					(ADDR_USERAREA_START+SECTOR_FLASH_SIZE)
+#define ADDR_RTC_START					(ADDR_USERAREA_START)
+
+/******************** RTC ********************/
+#define RTC_ORIGINAL_TIMETAMP			1752473460 // 14/07/2025-11:31:00
+#define RTC_MAGIC 						0xFAFAFAFA
+#define RTC_ENTRY_SIZE          		8       // 4 bytes timestamp + 4 bytes magic
+#define RTC_MAX_ENTRIES         		(RTC_SIZE / RTC_ENTRY_SIZE)
 
 #ifdef MASTER_CORE
 
@@ -46,7 +53,7 @@ typedef struct {
 	u32 magic;
 }__attribute__((packed)) fl_db_master_profile_t;
 
-#define ADDR_NODELIST_START				(ADDR_RTC_START+SYSTEM_RUNTIME_SIZE)
+#define ADDR_NODELIST_START				(ADDR_RTC_START+RTC_SIZE)
 #define ADDR_NODELIST_NUMSLAVE			ADDR_NODELIST_START
 #define NODELIST_NUMSLAVE_SIZE			0x14 //20 bytes
 #define ADDR_NODELIST_DATA				(ADDR_NODELIST_START + NODELIST_NUMSLAVE_SIZE)
@@ -75,7 +82,7 @@ typedef struct {
 	u32 magic; // constant for LSB
 }__attribute__((packed)) fl_slave_profiles_t;
 
-#define ADDR_SLAVE_PROFILE_START  		(ADDR_RTC_START+SYSTEM_RUNTIME_SIZE)
+#define ADDR_SLAVE_PROFILE_START  		(ADDR_RTC_START+RTC_SIZE)
 #define SLAVE_PROFILE_MAGIC 			0xEDEDEDED
 #define SLAVE_PROFILE_ENTRY_SIZE        (sizeof(fl_slave_profiles_t)/sizeof(u8))
 #define SLAVE_PROFILE_MAX_ENTRIES       (SLAVEPROFILE_SIZE / SLAVE_PROFILE_ENTRY_SIZE)
@@ -91,6 +98,7 @@ void fl_db_rtc_factory(void);
 void fl_db_rtc_init(void);
 void fl_db_rtc_save(u32 _timetamp);
 u32 fl_db_rtc_load(void);
+void fl_db_init(void);
 void fl_db_all_save(void);
 void fl_db_clearAll(void);
 #ifdef MASTER_CORE

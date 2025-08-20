@@ -335,25 +335,7 @@ void fl_master_StatusNodePrintf(void) {
 		P_INFO("RspTime:%d ms\r\n",max_time);
 	}
 }
-///
-//void fl_master_node_printf(void) {
-//	u8 online_cnt = 0;
-//	u32 max_time = 0;
-//	u8 var = 0;
-//	for (var = 0; var < MAX_NODES && G_NODE_LIST[var].mac_short != 0; ++var) {
-//		if (G_NODE_LIST[var].active) {
-//			//LOGA(APP,"[%d] %08X:%d ms\r\n",var,G_NODE_LIST[var].mac,G_NODE_LIST[var].timelife);
-//			online_cnt++;
-//			if (max_time < G_NODE_LIST[var].timelife) {
-//				max_time = G_NODE_LIST[var].timelife;
-//			}
-//		} else {
-//			//ERR(APP,"%s[%d] %08X:%d ms\r\n",(G_NODE_LIST[var].active) ? "Onl " : "Off",var,G_NODE_LIST[var].mac_short,G_NODE_LIST[var].timelife);
-//		}
-//	}
-//	P_INFO("Online :%d/%d\r\n",online_cnt,var);
-//	P_INFO("RspTime:%d ms\r\n",max_time);
-//}
+
 s16 fl_master_Node_find(u32 _mac_short) {
 	for (u8 var = 0; var < G_NODE_LIST.slot_inused && G_NODE_LIST.slot_inused != 0xFF; ++var) {
 		if (G_NODE_LIST.sla_info[var].mac_short.mac_u32 == _mac_short) {
@@ -571,13 +553,25 @@ void fl_nwk_master_init(void) {
  ***************************************************/
 void fl_nwk_master_nodelist_store(void) {
 	fl_nodelist_db_t nodelist;
+	/*
 	nodelist.num_slave = G_NODE_LIST.slot_inused;
 	for (u8 var = 0; var < nodelist.num_slave && nodelist.num_slave != 0xFF; ++var) {
 		nodelist.slave[var].slaveid = G_NODE_LIST.sla_info[var].slaveID.id_u8;
 		nodelist.slave[var].mac_u32 = G_NODE_LIST.sla_info[var].mac_short.mac_u32;
 	}
+	*/
+	//For testing
+	nodelist.num_slave = NODELIST_SLAVE_MAX;
+	nodelist.slave[0].slaveid = 0;
+	nodelist.slave[0].mac_u32 = 0x41232e24; //
+	for (u8 i = 1; i < nodelist.num_slave; ++i) {
+		nodelist.slave[i].slaveid = i;
+		nodelist.slave[i].mac_u32 = 0x2F2245D1; //
+	}
 	if (nodelist.num_slave && nodelist.num_slave!= 0xFF)
+	{
 		fl_db_nodelist_save(&nodelist);
+	}
 }
 /***************************************************
  * @brief 		:load all nodelist from the flash and assign to G_NODE_LIST
