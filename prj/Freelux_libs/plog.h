@@ -78,6 +78,7 @@ typedef enum {
 	HELP,
 	SETCMD,
 	GETCMD,
+	FACTORYCMD,
 	RSTCMD,
 //	ATCMD,
 //	TESTCMD,

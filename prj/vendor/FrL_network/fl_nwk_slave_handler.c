@@ -111,16 +111,15 @@ void fl_nwk_slave_init(void) {
 	memcpy(G_INFORMATION.mac_short.byte,blc_ll_get_macAddrPublic(),SIZEU8(G_INFORMATION.mac_short.byte));
 
 	//Load from db
-//	fl_slave_profiles_t my_profile = fl_db_slaveprofile_init();
-//	G_INFORMATION.slaveID.id_u8 = my_profile.slaveid;
-//	G_INFORMATION.profile = my_profile;
+	fl_slave_profiles_t my_profile = fl_db_slaveprofile_init();
+	G_INFORMATION.slaveID.id_u8 = my_profile.slaveid;
+	G_INFORMATION.profile = my_profile;
 
-	//Test join network + factory
-	G_INFORMATION.profile.run_stt.join_nwk = 1; //access to join network
-	G_INFORMATION.profile.run_stt.rst_factory  = 1 ; //has reset factory device
-//
-	G_INFORMATION.slaveID.id_u8 = 0xFF;
-	G_INFORMATION.profile.slaveid = 0xFF;
+//	//Test join network + factory
+//	G_INFORMATION.profile.run_stt.join_nwk = 1; //access to join network
+//	G_INFORMATION.profile.run_stt.rst_factory  = 1 ; //has reset factory device
+//	G_INFORMATION.slaveID.id_u8 = 0xFF;
+//	G_INFORMATION.profile.slaveid = 0xFF;
 
 	LOG_P(INF,"Freelux network SLAVE init\r\n");
 	LOGA(INF,"** MAC    :%08X\r\n",G_INFORMATION.mac_short.mac_u32);

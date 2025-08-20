@@ -331,8 +331,7 @@ void fl_adv_sendtest(void) {
  *
  ***************************************************/
 void fl_adv_init(void) {
-
-
+	fl_db_init();
 #ifdef MASTER_CORE
 	extern fl_master_config_t G_MASTER_INFO;
 	//fl_adv_sendtest();
@@ -563,6 +562,7 @@ void fl_adv_run(void) {
 //		LOGA(APP,"QUEUE GET : (%d)%d-%d\r\n",G_DATA_CONTAINER.count,G_DATA_CONTAINER.head_index,G_DATA_CONTAINER.tail_index);
 		fl_dataframe_format_t data_parsed;
 		if (fl_packet_parse(data_in_queue,&data_parsed)) {
+
 //			fl_packet_printf(data_parsed);
 #ifdef MASTER_CORE
 			fl_nwk_master_run(&data_in_queue); //process reponse from the slaves
