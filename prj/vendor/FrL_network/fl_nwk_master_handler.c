@@ -211,6 +211,48 @@ fl_pack_t fl_master_packet_assignSlaveID_build(u32 _mac_short) {
 	return packet_built;
 }
 /***************************************************
+ * @brief 		: build packet RSP 55 to rsp SlaveID
+ *
+ * @param[in] 	: none
+ *
+ * @return	  	: fl_pack_t
+ *
+ ***************************************************/
+fl_pack_t fl_master_packet_RSP_55_build(u8 slaveID) {
+	extern fl_adv_settings_t G_ADV_SETTINGS ;
+	fl_pack_t packet_built;
+
+	fl_data_frame_u packet;
+	memset(packet.bytes,0,SIZEU8(packet.bytes));
+	packet.frame.hdr = NWK_HDR_55;
+
+	fl_timetamp_withstep_t timetampStep = fl_rtc_getWithMilliStep();
+//	u32 timetamp = fl_rtc_get();
+	packet.frame.timetamp[0] = U32_BYTE0(timetampStep.timetamp);
+	packet.frame.timetamp[1] = U32_BYTE1(timetampStep.timetamp);
+	packet.frame.timetamp[2] = U32_BYTE2(timetampStep.timetamp);
+	packet.frame.timetamp[3] = U32_BYTE3(timetampStep.timetamp);
+
+	//Add new mill-step
+	packet.frame.milltamp = timetampStep.milstep;
+
+	//Create payload
+	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
+	u8 ack[2] = {'O','K'};
+	memcpy(packet.frame.payload,ack,SIZEU8(ack));
+	//assign slaveID
+	packet.frame.slaveID.id_u8 = slaveID;
+
+	packet.frame.endpoint.repeat_cnt = REPEAT_LEVEL;
+	packet.frame.endpoint.master = FL_FROM_MASTER; //non-ack
+	packet.frame.endpoint.dbg = NWK_DEBUG_STT;
+	packet.frame.endpoint.rep_mode = REPEAT_LEVEL;
+
+	packet_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
+	memcpy(packet_built.data_arr,packet.bytes,packet_built.length);
+	return packet_built;
+}
+/***************************************************
  * @brief 		: build packet get information slave
  *
  * @param[in] 	: mac slave,count slave
@@ -415,7 +457,8 @@ int fl_master_ProccesRSP_cbk(void) {
 		fl_data_frame_u packet;
 		extern u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
 		fl_packet_parse(data_in_queue,&packet.frame);
-//		LOGA(INF,"HDR_RSP ID: %02X\r\n",packet.frame.hdr);
+		LOGA(INF,"HDR_RSP ID: %02X\r\n",packet.frame.hdr);
+		P_PRINTFHEX_A(INF,packet.frame.payload,SIZEU8(packet.frame.payload),"%d:",packet.frame.slaveID.id_u8);
 		switch ((fl_hdr_nwk_type_e) packet.frame.hdr) {
 			case NWK_HDR_HEARTBEAT: {
 				/** - NON-RSP
@@ -430,6 +473,27 @@ int fl_master_ProccesRSP_cbk(void) {
 				 P_PRINTFHEX_A(INF,packet.frame.payload,4,"0x%08X:",mac_short);
 				 }
 				 **/
+			}
+			break;
+
+			case NWK_HDR_55: {
+				/*****************************************************************/
+				/* | HDR | Timetamp | Mill_time | SlaveID | payload | crc8 | Ep | */
+				/* | 1B  |   4Bs    |    1B     |    1B   |   20Bs  |  1B  | 1B | -> .master = FL_FROM_SLAVE_ACK / FL_FROM_SLAVE */
+				/*****************************************************************/
+				//Todo: parse payload response
+				u8 slave_id = packet.frame.slaveID.id_u8;
+				u8 node_indx = fl_master_SlaveID_find(slave_id);
+				if (node_indx != -1) {
+					G_NODE_LIST.sla_info[node_indx].active = true;
+					G_NODE_LIST.sla_info[node_indx].timelife = (clock_time() - G_NODE_LIST.sla_info[node_indx].timelife);
+					LOGA(INF,"55(%d)(%d ms)(%d):%s\r\n",slave_id,G_NODE_LIST.sla_info[node_indx].timelife / SYSTEM_TIMER_TICK_1MS,
+							packet.frame.endpoint.repeat_cnt,packet.frame.payload);
+					//Send assignment to slave
+					fl_adv_sendFIFO_add(fl_master_packet_RSP_55_build(slave_id));
+				} else {
+					ERR(INF,"ID not foud:%02X\r\n",slave_id);
+				}
 			}
 			break;
 			case NWK_HDR_F5_INFO: {

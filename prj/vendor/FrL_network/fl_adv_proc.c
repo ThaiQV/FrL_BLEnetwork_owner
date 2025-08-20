@@ -238,13 +238,18 @@ void fl_adv_sendFIFO_run(void) {
 		while (FL_QUEUE_GET_LOOP(&G_QUEUE_SENDING,&data_in_queue)) {
 
 			fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(data_in_queue);
-			if ( (fl_rtc_timetamp2milltampStep(timetamp_inpack) != fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME))){
+			u32 inpack = fl_rtc_timetamp2milltampStep(timetamp_inpack);
+			u32 origin_pack = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
+			if ( inpack < origin_pack){
+//				LOGA(APP,"timetamp:%d | %d \r\n",inpack,origin_pack);
+//				P_PRINTFHEX_A(APP,data_in_queue.data_arr,data_in_queue.length,"[%d]TTL(%d):",G_QUEUE_SENDING.head_index,
+//						data_in_queue.data_arr[data_in_queue.length - 1] & 0x03);
 				return;
 			}
 			//For debuging
 //			P_PRINTFHEX_A(BLE,data_in_queue.data_arr,data_in_queue.length,"[%d]TTL(%d):",G_QUEUE_SENDING.head_index,
 //					data_in_queue.data_arr[data_in_queue.length - 1] & 0x03);
-//
+
 #endif
 //			LOGA(APP,"ADV FIFO(%d):%d/%d\r\n",G_QUEUE_SENDING.count,G_QUEUE_SENDING.head_index,G_QUEUE_SENDING.tail_index);
 			F_SENDING_STATE = 1;
@@ -327,6 +332,7 @@ void fl_adv_sendtest(void) {
  ***************************************************/
 void fl_adv_init(void) {
 
+
 #ifdef MASTER_CORE
 	extern fl_master_config_t G_MASTER_INFO;
 	//fl_adv_sendtest();
@@ -337,8 +343,8 @@ void fl_adv_init(void) {
 	G_ADV_SETTINGS.nwk_chn.chn2 = &G_MASTER_INFO.nwk.chn[1];
 	G_ADV_SETTINGS.nwk_chn.chn3 = &G_MASTER_INFO.nwk.chn[2];
 
-
 #else
+	//fl_input_external_init();
 	extern fl_nodeinnetwork_t G_INFORMATION;
 	fl_nwk_slave_init();
 	fl_repeater_init();
@@ -347,7 +353,9 @@ void fl_adv_init(void) {
 	G_ADV_SETTINGS.nwk_chn.chn2 = &G_INFORMATION.profile.nwk.chn[1];
 	G_ADV_SETTINGS.nwk_chn.chn3 = &G_INFORMATION.profile.nwk.chn[2];
 #endif
-
+	// Init REQ call RSP
+	fl_queue_REQnRSP_TimeoutStart();
+	//
 	rf_set_power_level_index(MY_RF_POWER_INDEX);
 	blc_ll_setAdvCustomedChannel(*G_ADV_SETTINGS.nwk_chn.chn1,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3);
 	fl_adv_scanner_init();
@@ -464,7 +472,7 @@ u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt) {
 s8 fl_adv_IsFromMaster(fl_pack_t data_in_queue) {
 	fl_dataframe_format_t data_parsed;
 	if (fl_packet_parse(data_in_queue,&data_parsed)) {
-		if(data_parsed.endpoint.master != FL_FROM_SLAVE){
+		if(data_parsed.endpoint.master == FL_FROM_MASTER || data_parsed.endpoint.master == FL_FROM_MASTER_ACK){
 			return 1;
 		}
 		else return 0;
@@ -484,7 +492,7 @@ bool fl_adv_IsFromMe(fl_pack_t data_in_queue) {
 	extern fl_nodeinnetwork_t G_INFORMATION;
 	fl_dataframe_format_t data_parsed;
 	if (fl_packet_parse(data_in_queue,&data_parsed)) {
-		if(data_parsed.endpoint.master == FL_FROM_SLAVE && data_parsed.slaveID.id_u8 == G_INFORMATION.slaveID.id_u8
+		if((data_parsed.endpoint.master == FL_FROM_SLAVE || data_parsed.endpoint.master == FL_FROM_SLAVE_ACK) && data_parsed.slaveID.id_u8 == G_INFORMATION.slaveID.id_u8
 				&& G_INFORMATION.slaveID.id_u8 != 0xFF){
 			return true;
 		}
