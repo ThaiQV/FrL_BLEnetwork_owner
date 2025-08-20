@@ -35,8 +35,8 @@ int TEST_slave_sendREQ(void) {
 		blt_soft_timer_add(&TEST_slave_sendREQ,rand_time_send * 1000);
 	} else {
 		rand_time_send = 5000;//RAND(500,4500);
-		LOGA(APP,"TEST REQ %d ms\r\n",rand_time_send);
 		if (IsJoinedNetwork()) {
+			LOGA(APP,"TEST REQ %d ms\r\n",rand_time_send);
 			u8 test_u8[4];
 			test_pack_cnt++;
 			test_u8[0] = U32_BYTE0(test_pack_cnt);
