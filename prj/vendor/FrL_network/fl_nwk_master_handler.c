@@ -553,21 +553,19 @@ void fl_nwk_master_init(void) {
  ***************************************************/
 void fl_nwk_master_nodelist_store(void) {
 	fl_nodelist_db_t nodelist;
-	/*
 	nodelist.num_slave = G_NODE_LIST.slot_inused;
 	for (u8 var = 0; var < nodelist.num_slave && nodelist.num_slave != 0xFF; ++var) {
 		nodelist.slave[var].slaveid = G_NODE_LIST.sla_info[var].slaveID.id_u8;
 		nodelist.slave[var].mac_u32 = G_NODE_LIST.sla_info[var].mac_short.mac_u32;
 	}
-	*/
-	//For testing
-	nodelist.num_slave = NODELIST_SLAVE_MAX;
-	nodelist.slave[0].slaveid = 0;
-	nodelist.slave[0].mac_u32 = 0x41232e24; //
-	for (u8 i = 1; i < nodelist.num_slave; ++i) {
-		nodelist.slave[i].slaveid = i;
-		nodelist.slave[i].mac_u32 = 0x2F2245D1; //
-	}
+//	//For testing
+//	nodelist.num_slave = NODELIST_SLAVE_MAX;
+//	nodelist.slave[0].slaveid = 0;
+//	nodelist.slave[0].mac_u32 = 0x41232e24; //
+//	for (u8 i = 1; i < nodelist.num_slave; ++i) {
+//		nodelist.slave[i].slaveid = i;
+//		nodelist.slave[i].mac_u32 = 0x2F2245D1; //
+//	}
 	if (nodelist.num_slave && nodelist.num_slave!= 0xFF)
 	{
 		fl_db_nodelist_save(&nodelist);

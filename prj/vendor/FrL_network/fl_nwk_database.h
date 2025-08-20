@@ -29,7 +29,7 @@
 #define RTC_ORIGINAL_TIMETAMP			1752473460 // 14/07/2025-11:31:00
 #define RTC_MAGIC 						0xFAFAFAFA
 #define RTC_ENTRY_SIZE          		8       // 4 bytes timestamp + 4 bytes magic
-#define RTC_MAX_ENTRIES         		(RTC_SIZE / RTC_ENTRY_SIZE)
+#define RTC_MAX_ENTRIES         		(RTC_SIZE / RTC_ENTRY_SIZE -1)
 
 #ifdef MASTER_CORE
 
@@ -61,7 +61,7 @@ typedef struct {
 #define ADDR_MASTER_PROFILE_START 		(ADDR_NODELIST_START + NODELIST_SIZE)
 #define MASTER_PROFILE_MAGIC			0xECECECEC
 #define MASTER_PROFILE_ENTRY_SIZE		(sizeof(fl_db_master_profile_t)/sizeof(u8))
-#define MASTER_PROFILE_MAX_ENTRIES		(MASTERPROFILE_SIZE / MASTER_PROFILE_ENTRY_SIZE)
+#define MASTER_PROFILE_MAX_ENTRIES		(MASTERPROFILE_SIZE / MASTER_PROFILE_ENTRY_SIZE - 1) //for sure
 
 fl_db_master_profile_t fl_db_masterprofile_init(void);
 void fl_db_masterprofile_save(fl_db_master_profile_t entry);
