@@ -152,7 +152,6 @@ static int rx_from_uart_cb(void) //UART data send to Master,we will handler the 
 	memset(data_verify,0,sizeof(data_verify));
 	memcpy(data_verify,p+1,p[0]);
 	PLOG_Parser_Cmd(data_verify);
-
 	my_fifo_pop(&fl_rx_fifo);
 	return 0;
 }
