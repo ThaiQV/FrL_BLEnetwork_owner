@@ -48,7 +48,7 @@ typedef struct {
 	u8 timetamp[4];
 	u8 milltamp;
 	fl_slaveID_u slaveID;
-	u8 payload[20]; //modify to special parameter in the packet
+	u8 payload[22]; //modify to special parameter in the packet
 	u8 crc8;
 	union {
 		u8 ep_u8; //
@@ -61,7 +61,7 @@ typedef struct {
 	} endpoint;
 // LSB: don't change location byte
 	s8 rssi;
-}__attribute__((packed)) fl_dataframe_format_t; //Must less than 30 bytes
+}__attribute__((packed)) fl_dataframe_format_t; //Must less than 31 bytes
 
 typedef union {
 	fl_dataframe_format_t frame;
