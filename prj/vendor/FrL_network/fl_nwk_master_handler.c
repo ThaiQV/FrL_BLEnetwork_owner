@@ -44,7 +44,7 @@ u16 PERIOD_HEARTBEAT = 0 * 1000; //
 //flag debug of the network
 volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into endpoint byte (dbg :1bit)
 //volatile u8 NWK_REPEAT_MODE = 1; // slave repeat?
-volatile u8  REPEAT_LEVEL = 2;
+volatile u8  REPEAT_LEVEL = 3;
 
 /******************************************************************************/
 /******************************************************************************/

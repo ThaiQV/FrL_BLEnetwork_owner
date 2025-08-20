@@ -34,7 +34,7 @@ int TEST_slave_sendREQ(void) {
 	if (blt_soft_timer_find(&TEST_slave_sendREQ) == -1) {
 		blt_soft_timer_add(&TEST_slave_sendREQ,rand_time_send * 1000);
 	} else {
-		rand_time_send = 5000;//RAND(500,4500);
+		rand_time_send = RAND(850,4500);
 		if (IsJoinedNetwork()) {
 			LOGA(APP,"TEST REQ %d ms\r\n",rand_time_send);
 			u8 test_u8[4];
