@@ -168,11 +168,12 @@ vendor/FrL_Network/main.d vendor/FrL_Network/main.o: \
  /cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/service/hids.h \
  /cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/service/uuid.h \
  ../vendor/FrL_Network/app.h ../vendor/FrL_Network/fl_input_ext.h \
- ../common/../Freelux_libs/SPI_FLASH.h ../common/../Freelux_libs/nvm.h \
- ../common/../Freelux_libs/SPI_FLASH.h \
- ../common/../Freelux_libs/fl_ble_wifi_protocol.h \
- ../common/../Freelux_libs/storage_weekly_data.h \
- ../common/../Freelux_libs/nvm.h
+ /cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/SPI_FLASH.h \
+ /cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/nvm.h \
+ /cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/SPI_FLASH.h \
+ /cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/fl_ble_wifi_protocol.h \
+ /cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/storage_weekly_data.h \
+ /cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/nvm.h
 
 /cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/tl_common.h:
 
@@ -528,14 +529,14 @@ vendor/FrL_Network/main.d vendor/FrL_Network/main.o: \
 
 ../vendor/FrL_Network/fl_input_ext.h:
 
-../common/../Freelux_libs/SPI_FLASH.h:
+/cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/SPI_FLASH.h:
 
-../common/../Freelux_libs/nvm.h:
+/cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/nvm.h:
 
-../common/../Freelux_libs/SPI_FLASH.h:
+/cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/SPI_FLASH.h:
 
-../common/../Freelux_libs/fl_ble_wifi_protocol.h:
+/cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/fl_ble_wifi_protocol.h:
 
-../common/../Freelux_libs/storage_weekly_data.h:
+/cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/storage_weekly_data.h:
 
-../common/../Freelux_libs/nvm.h:
+/cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/nvm.h:

@@ -93,7 +93,11 @@
 /* SPI Serial Flash MEMORY MAP
  *
  *     0x00400000 |------------------|
- *                |   1.5MB Reverse  |
+ *                |    1 MB Reverse  |
+ *     0x00300000 |------------------|
+ *                |   512 KB device  |
+ *                |     broadcast    |
+ *                |     Firmware     |
  *     0x00280000 |------------------|
  *                |Device unspecified|
  *                |   data storage   |
@@ -116,6 +120,7 @@
 #define EX_FLASH_NVM_ADDRESS				0x00100000
 #define EX_FLASH_DEVICE_STORAGE_ADDRESS		0x00180000
 #define EX_FLASH_DEVICE_UNSTORAGE_ADDRESS	0x00200000
+#define EX_FLASH_BROADCAST_FW_ADDRESS		0x00280000
 
 /******************************************************************************/
 /* Variable Definition */

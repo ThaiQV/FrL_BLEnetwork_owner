@@ -168,8 +168,9 @@ Freelux_libs/fl_ble_wifi_protocol.d Freelux_libs/fl_ble_wifi_protocol.o: \
  /cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/service/device_information.h \
  /cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/service/hids.h \
  /cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/service/uuid.h \
- ../Freelux_libs/../vendor/FrL_Network/fl_input_ext.h \
- ../drivers/B91/uart.h ../Freelux_libs/os_queue.h
+ /cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/vendor/FrL_Network/fl_input_ext.h \
+ ../drivers/B91/uart.h ../vendor/Common/blt_soft_timer.h \
+ ../Freelux_libs/os_queue.h
 
 ../Freelux_libs/fl_ble_wifi_protocol.h:
 
@@ -523,8 +524,10 @@ Freelux_libs/fl_ble_wifi_protocol.d Freelux_libs/fl_ble_wifi_protocol.o: \
 
 /cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/service/uuid.h:
 
-../Freelux_libs/../vendor/FrL_Network/fl_input_ext.h:
+/cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/vendor/FrL_Network/fl_input_ext.h:
 
 ../drivers/B91/uart.h:
+
+../vendor/Common/blt_soft_timer.h:
 
 ../Freelux_libs/os_queue.h:

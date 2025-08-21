@@ -25,6 +25,9 @@ void storage_init(void)
 {
 	nvm_status_t ret;
 	uint32_t i;
+
+	// Init non-volatile memory
+	nvm_init();
 	// Load timestamp start
 	ret = nvm_record_read(STORAGE_TIMESTAMP_START,(uint8_t*)&timestamp_start,sizeof(timestamp_start));
 	if(ret == NVM_NO_RECORD)
@@ -351,3 +354,75 @@ storage_ret_t storage_get_data_unspecified(uint32_t index, uint8_t *pdata,uint32
 	}
 	return STORAGE_RET_ERROR;
 }
+
+/******************************************OTA Region******************************************/
+/*
+ *     Page 128  |------------------|
+ *               |       OTA        |
+ *               |     Firmware     |
+ *     Page 1    |------------------|
+ *               |     Firmware     |
+ *               |      Header      |
+ *     Page 0    |------------------|
+ * */
+
+/**
+* @brief: Put data into OTA region
+* @param: see below
+* -----------------------------------------------------
+* | Device type | Version | Memory address |   Data   |
+* -----------------------------------------------------
+* |    1 byte   | 1 byte  |     3 bytes    | 16 bytes |
+* -----------------------------------------------------
+* @retval: ota_ret_t
+*/
+ota_ret_t ota_fw_put(uint8_t *pdata)
+{
+	ota_device_type_t 	device_type;
+	uint8_t 			version;
+	uint32_t 			memory_addr;
+	ota_fw_header_t		header;
+
+	device_type = pdata[0];
+	version		= pdata[1];
+	memory_addr	= (uint32_t)pdata[2] + (uint32_t)(pdata[3] << 8) + (uint32_t)(pdata[4] << 16);
+
+	ota_fw_header_get(&header);
+	if((header.state == OTA_FW_STATE_EMPTY) || (header.state == OTA_FW_STATE_WRITING))
+	{
+		if((device_type == header.type) && (version == header.version))
+		{
+			memory_addr = EX_FLASH_OTA_FW_ADDRESS + memory_addr;
+			W25XXX_WR_Block((uint8_t*)&pdata[5],memory_addr,OTA_PACKET_LENGTH);
+			return OTA_RET_OK;
+		}
+	}
+	return OTA_RET_ERROR;
+}
+
+ota_ret_t ota_fw_header_set(ota_fw_header_t *header)
+{
+	nvm_status_t nvm_ret;
+
+	nvm_ret = nvm_record_write(OTA_FW_HEADER_KEY,(uint8_t*)header,sizeof(ota_fw_header_t));
+	if(nvm_ret == NVM_OK)
+	{
+		return OTA_RET_OK;
+	}
+	return OTA_RET_ERROR;
+}
+
+ota_ret_t ota_fw_header_get(ota_fw_header_t *header)
+{
+	nvm_status_t nvm_ret;
+
+	nvm_ret = nvm_record_read(OTA_FW_HEADER_KEY,(uint8_t*)header,sizeof(ota_fw_header_t));
+	if(nvm_ret == NVM_OK)
+	{
+		return OTA_RET_OK;
+	}
+	return OTA_RET_ERROR;
+}
+
+
+

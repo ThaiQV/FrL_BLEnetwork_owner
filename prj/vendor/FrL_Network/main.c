@@ -26,10 +26,10 @@
 #include "stack/ble/ble.h"
 #include "app.h"
 #include "fl_input_ext.h"
-#include "../Freelux_libs/SPI_FLASH.h"
-#include "../Freelux_libs/nvm.h"
-#include "../Freelux_libs/fl_ble_wifi_protocol.h"
-#include "../Freelux_libs/storage_weekly_data.h"
+#include "SPI_FLASH.h"
+#include "nvm.h"
+#include "fl_ble_wifi_protocol.h"
+#include "storage_weekly_data.h"
 
 #if(FREERTOS_ENABLE)
 #include <FreeRTOS.h>
@@ -191,76 +191,17 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 	{ //MCU power_on or wake_up from deepSleep mode
 		user_init_normal();
 
-//		delay_ms(3000);
 		ble_wifi_protocol_init();
-		nvm_init();
-
 		storage_init();
-//		storage_clean();
-////		nvm_record_write(1,"Hello world!",strlen("Hello world!"));
-////		nvm_record_write(2,"Good morning!",strlen("Good morning!"));
-////		nvm_record_write(3,"Good afternoon!",strlen("Good afternoon!"));
-//	    nvm_record_read(1,read_msg,strlen("Hello world!"));
-//		LOGA(DRV,"MSG: %s\n",read_msg);
-//		nvm_record_read(2,read_msg,strlen("Good morning!"));
-//		LOGA(DRV,"MSG: %s\n",read_msg);
-//		nvm_record_read(3,read_msg,strlen("Good afternoon!"));
-//		LOGA(DRV,"MSG: %s\n",read_msg);
 
 		uint8_t buff[24];
+		memset(buff,0x00,sizeof(buff));
 
-//		memset(buff,0x06,sizeof(buff));
-//		storage_put_data(1756771200 + 604800,buff,sizeof(buff));
-//		memset(buff,0x00,sizeof(buff));
-//		storage_get_data(1756771200 + 604800,buff,sizeof(buff));
-//		LOGA(DRV,"buff: %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n",buff[0],buff[1],buff[2],buff[3],buff[4],buff[5],
-//				buff[6],buff[7],buff[8],buff[9],buff[10],buff[11],
-//				buff[12],buff[13],buff[14],buff[15],buff[16],buff[17],
-//				buff[18],buff[19],buff[20],buff[21],buff[22],buff[23]);
-//
-////		memset(buff,0x02,sizeof(buff));
-////		storage_put_data(1754956860,buff,sizeof(buff));
-////		memset(buff,0x00,sizeof(buff));
-//		storage_get_data(1756771260 + 604800,buff,sizeof(buff));
-//		LOGA(DRV,"buff: %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n",buff[0],buff[1],buff[2],buff[3],buff[4],buff[5],
-//				buff[6],buff[7],buff[8],buff[9],buff[10],buff[11],
-//				buff[12],buff[13],buff[14],buff[15],buff[16],buff[17],
-//				buff[18],buff[19],buff[20],buff[21],buff[22],buff[23]);
-
-//		int i;
-//		for(i=0;i<400;i++)
-//		{
-//			memset(buff,2*i+1,sizeof(buff));
-//			storage_put_data(1757376000 + 9*604800 + 60*i,buff,sizeof(buff));
-//		}
-//
-//		for(i=0;i<400;i++)
-//		{
-//			storage_get_data(1757376000 + 9*604800 + 60*i,buff,sizeof(buff));
-//			LOGA(DRV,"buff[%d]: %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n",i,buff[0],buff[1],buff[2],buff[3],buff[4],buff[5],
-//					buff[6],buff[7],buff[8],buff[9],buff[10],buff[11],
-//					buff[12],buff[13],buff[14],buff[15],buff[16],buff[17],
-//					buff[18],buff[19],buff[20],buff[21],buff[22],buff[23]);
-//		}
-//
-//
-//		for(i=0;i<200;i++)
-//		{
-//			memset(buff,i,sizeof(buff));
-//			storage_put_data(0,buff,sizeof(buff));
-//		}
-//
-//		for(i=0;i<200;i++)
-//		{
-//			storage_get_data_unspecified(i,buff,sizeof(buff));
-//			LOGA(DRV,"buff[%d]: %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n",i,buff[0],buff[1],buff[2],buff[3],buff[4],buff[5],
-//					buff[6],buff[7],buff[8],buff[9],buff[10],buff[11],
-//					buff[12],buff[13],buff[14],buff[15],buff[16],buff[17],
-//					buff[18],buff[19],buff[20],buff[21],buff[22],buff[23]);
-//		}
-//
-//		LOGA(DRV,"End Unspecified\n");
-
+		storage_get_data(1762819200,buff,sizeof(buff));
+					LOGA(DRV,"buff[%d]: %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n",0,buff[0],buff[1],buff[2],buff[3],buff[4],buff[5],
+							buff[6],buff[7],buff[8],buff[9],buff[10],buff[11],
+							buff[12],buff[13],buff[14],buff[15],buff[16],buff[17],
+							buff[18],buff[19],buff[20],buff[21],buff[22],buff[23]);
 
 #if (FREERTOS_ENABLE)
 		extern void blc_ll_set_freertos_en(u8 en);

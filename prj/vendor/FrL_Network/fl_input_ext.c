@@ -14,7 +14,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "fl_nwk_protocol.h"
-#include "../Freelux_libs/fl_ble_wifi_protocol.h"
+#include "fl_ble_wifi_protocol.h"
 
 /******************************************************************************/
 /******************************************************************************/

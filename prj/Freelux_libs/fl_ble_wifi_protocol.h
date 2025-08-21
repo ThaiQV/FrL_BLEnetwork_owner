@@ -7,8 +7,9 @@
 #include "tl_common.h"
 #include "drivers.h"
 #include "stack/ble/ble.h"
-#include "../vendor/FrL_Network/fl_input_ext.h"
+#include "fl_input_ext.h"
 #include "uart.h"
+#include "blt_soft_timer.h"
 
 /* Parameters */
 #define UART_FIFO_SIZE					2048

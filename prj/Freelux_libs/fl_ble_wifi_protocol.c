@@ -54,12 +54,12 @@ void ble_wifi_protocol_init(void)
 */
 int ble_wifi_protocol_process(void)
 {
-	gf_command_t			cmd;
-	uint32_t 				queue_len = 0;
-	uint8_t					data_len = 0;
-	uint8_t					get_data;
+	gf_command_t	cmd;
+	uint32_t		queue_len = 0;
+	uint8_t			data_len = 0;
+	uint8_t			get_data;
 
-	queue_ret_t				retval = QUEUE_RET_OK;
+	queue_ret_t		retval = QUEUE_RET_OK;
 
 	queue_len = queue_available_data(&queue_uart);
 	if( queue_len > 0)
@@ -189,3 +189,4 @@ void gf_cmd_timestamp_response(uint8_t *pdata, uint8_t len)
 {
 	BW_LOG("Timestamp response: %d\n");
 }
+
