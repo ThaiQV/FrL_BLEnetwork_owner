@@ -15,6 +15,7 @@ typedef enum{
 	FL_FROM_MASTER = 0,
 	FL_FROM_SLAVE = 0x01,
 	FL_FROM_MASTER_ACK = 0x02,
+	FL_FROM_SLAVE_ACK = 0x03, //Max
 }fl_packet_from_e;
 
 void fl_adv_collection_channel_init(void);

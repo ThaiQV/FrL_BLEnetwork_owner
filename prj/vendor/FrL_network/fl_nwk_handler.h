@@ -11,14 +11,24 @@
 #ifndef VENDOR_FRL_NETWORK_FL_NWK_HANDLER_H_
 #define VENDOR_FRL_NETWORK_FL_NWK_HANDLER_H_
 
+#include "fl_nwk_database.h"
+
+/**
+ * @brief	callback function for rsp
+ */
+typedef void (*fl_rsp_callback_fnc)(void*);
+#define QUEUE_RSP_SLOT_MAX		10
+#define QUEUQ_REQcRSP_INTERVAL  20*1000 //ms
+
 #define RAND(min, max)				((rand() % ((max) - (min) + 1)) + (min))
 #define RAND_INT(min, max)  		((rand() % ((min) + (max) + 1)) - (min))
 #define SIZEU8(x)					(sizeof(x)/sizeof(u8))
 
 typedef enum {
 	NWK_HDR_NONE = 0,
-	NWK_HDR_55 = 0x55,
-	//
+	// slave -> req -> master -> rsp
+	NWK_HDR_55 = 0x55, //
+	// master -> req -> slave -> rsp
 	NWK_HDR_F5_INFO = 0xF5,
 	NWK_HDR_ASSIGN = 0xFC,//Use to assign SlaveID to slave
 	NWK_HDR_HEARTBEAT = 0xFD,
@@ -38,7 +48,7 @@ typedef struct {
 	u8 timetamp[4];
 	u8 milltamp;
 	fl_slaveID_u slaveID;
-	u8 payload[20]; //modify to special parameter in the packet
+	u8 payload[22]; //modify to special parameter in the packet
 	u8 crc8;
 	union {
 		u8 ep_u8; //
@@ -46,13 +56,12 @@ typedef struct {
 			u8 repeat_cnt :2;   // 2 bits
 			u8 master :2;  		// 2 bits
 			u8 dbg:1;			// 1 bit
-			u8 rep_mode:1;
-			//u8 millis_step :2;  // 1000 millisecond / 4 = 250
+			u8 rep_mode:2;		//for setting slave
 		};
 	} endpoint;
 // LSB: don't change location byte
 	s8 rssi;
-}__attribute__((packed)) fl_dataframe_format_t; //Must less than 30 bytes
+}__attribute__((packed)) fl_dataframe_format_t; //Must less than 31 bytes
 
 typedef union {
 	fl_dataframe_format_t frame;
@@ -67,14 +76,10 @@ typedef struct {
 	fl_slaveID_u slaveID;
 	u32 timelife;
 	bool active;
+#ifndef MASTER_CORE
 //todo: parameters
-	union {
-		u8 stt_u8;
-		struct {
-			u8 rst_factory :1;
-			u8 join_nwk :1;
-		};
-	} run_stt;
+	fl_slave_profiles_t profile;
+#endif
 }__attribute__((packed)) fl_nodeinnetwork_t;
 
 #ifdef MASTER_CORE
@@ -84,6 +89,14 @@ typedef struct {
 	u8 slot_inused;
 	fl_nodeinnetwork_t sla_info[MAX_NODES];
 }__attribute__((packed)) fl_slaves_list_t;
+
+typedef struct {
+	struct {
+		u8 collect_chn[3];
+		u8 chn[3];
+	} nwk;
+	u32 my_mac;
+}__attribute__((packed)) fl_master_config_t;
 
 #endif
 
@@ -102,6 +115,7 @@ inline u8 fl_crc8(u8* _pdata, u8 _len) {
 	return (u8) (crc % 256);
 }
 
+
 #ifdef MASTER_CORE
 void fl_nwk_master_init(void);
 void fl_nwk_master_run(fl_pack_t *_pack_handle);
@@ -111,13 +125,18 @@ void fl_master_nodelist_AddRefesh(fl_nodeinnetwork_t _node);
 s16 fl_master_SlaveID_find(u8 _id) ;
 void fl_nwk_master_nodelist_load(void);
 #else
+bool IsJoinedNetwork(void);
 void fl_nwk_slave_init(void);
 void fl_nwk_slave_run(fl_pack_t *_pack_handle);
 void fl_nwk_slave_process(void);
 bool fl_nwk_slave_checkHDR(u8 _hdr);
 u32 fl_adv_timetampInPack(fl_pack_t _pack);
 fl_timetamp_withstep_t fl_adv_timetampStepInPack(fl_pack_t _pack);
+bool fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len);
 #endif
+s8 fl_queueREQcRSP_add(u8 cmdid,u8 slaveid,fl_rsp_callback_fnc *_cb, u32 _timeout_ms);
+void fl_queue_REQcRSP_ScanRec(fl_pack_t _pack);
+int fl_queue_REQnRSP_TimeoutStart(void);
 void fl_adv_setting_update(void);
 int fl_adv_sendFIFO_add(fl_pack_t _pack);
 

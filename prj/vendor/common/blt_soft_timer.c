@@ -72,6 +72,7 @@ int blt_soft_timer_add(blt_timer_callback_t func, u32 interval_us) {
 	u32 now = clock_time();
 
 	if (blt_timer.currentNum >= MAX_TIMER_NUM) {  //timer full
+		ERR(DRV,"Soft-timer add ERR !!\r\n");
 		return 0;
 	} else {
 		blt_timer.timer[blt_timer.currentNum].cb = func;

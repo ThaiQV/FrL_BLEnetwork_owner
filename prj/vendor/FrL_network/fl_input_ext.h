@@ -12,6 +12,24 @@
 #define VENDOR_FRL_NETWORK_FL_INPUT_EXT_H_
 
 #pragma once
+
+#define PRESSnHOLD_DUTY				2*1000*1000 //us->s
+#define PRESSnRELEASE_DUTY			300*1000 	//us->ms
+
+typedef enum {
+	BUTT_STATE_NONE = 0xFF,
+	BUTT_STATE_PRESSnRELEASE = 0x01,
+	BUTT_STATE_PRESSnHOLD = 0x02,
+}fl_exButton_states_e;
+
+typedef enum{
+	DET_FALLING_EDGE = 0,
+	DET_RISING_EDGE,
+}fl_gpio_edge_detect_e;
+
+
+typedef void (*FncExc)(fl_exButton_states_e,void*);
+
 void fl_input_external_init(void);
 void fl_input_collection_node_handle(blt_timer_callback_t _fnc, u16 _timeout_ms);
 

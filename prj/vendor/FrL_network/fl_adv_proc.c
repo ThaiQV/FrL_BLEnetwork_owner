@@ -32,19 +32,23 @@
 extern _attribute_data_retention_ volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME;
 #endif
 _attribute_data_retention_ volatile u8 F_SENDING_STATE = 0;
-//_attribute_data_retention_ volatile u32 TICK_GET_PROCESSING_TIME = 0;
-_attribute_data_retention_ fl_adv_settings_t G_ADV_SETTINGS = {
+
+fl_adv_settings_t G_ADV_SETTINGS = {
 		.adv_interval_min = ADV_INTERVAL_20MS,
-		.adv_interval_max = ADV_INTERVAL_50MS,
+		.adv_interval_max = ADV_INTERVAL_30MS,
 		.adv_duration = SEND_TIMEOUT_MS,
 		.scan_interval = SCAN_INTERVAL_60MS,
 		.scan_window = SCAN_WINDOW_60MS,
-		.nwk_chn = {10,11,12}};
+		//.nwk_chn = {10,11,12}
+		};
+
+extern volatile u8  REPEAT_LEVEL;
+
 /*---------------- Total ADV Rec --------------------------*/
 #define IN_DATA_SIZE 		128
 fl_pack_t g_data_array[IN_DATA_SIZE];
 fl_data_container_t G_DATA_CONTAINER = { .data = g_data_array, .head_index = 0, .tail_index = 0, .mask = IN_DATA_SIZE - 1, .count = 0 };
-//_attribute_data_retention_ u32 LAST_REC_TIMEOUT = 0;
+
 /*---------------- ADV SEND QUEUE --------------------------*/
 #define QUEUE_SENDING_SIZE 		16
 fl_pack_t g_sending_array[QUEUE_SENDING_SIZE];
@@ -65,7 +69,7 @@ fl_data_container_t G_QUEUE_SENDING = { .data = g_sending_array, .head_index = 0
 /******************************************************************************/
 void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms);
 fl_pack_t fl_packet_build(u8 *payload, u8 _len);
-s8 fl_adv_IsFormMaster(fl_pack_t data_in_queue);
+s8 fl_adv_IsFromMaster(fl_pack_t data_in_queue);
 u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
 /******************************************************************************/
 /******************************************************************************/
@@ -91,7 +95,7 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 
 #ifdef MASTER_CORE
 				//skip from  master
-				if (fl_adv_IsFormMaster(incomming_data)) {
+				if (fl_adv_IsFromMaster(incomming_data)) {
 					return 0;
 				}
 #else
@@ -143,6 +147,57 @@ void fl_durationADV_timeout_proccess(u8 e, u8 *p, int n) {
 /***                      Processing functions 					             **/
 /******************************************************************************/
 /******************************************************************************/
+#ifndef MASTER_CORE
+/***************************************************
+ * @brief 		:Align QUEUE SENDING
+ *
+ * @param[in] 	:none
+ *
+ * @return	  	:none
+ *
+ ***************************************************/
+bool _align_QUEUE_SENDING(fl_pack_t _pack){
+	typedef struct {
+		fl_pack_t two_pack[2];
+		u8 origin_indx;
+		u8 loop_times;
+	}manage_sending_loop_t;
+
+	static manage_sending_loop_t man_loop={.origin_indx = 0xFF,.loop_times = 1, .two_pack = {{.length = 0},{.length =0}}};
+	//update pack_arr
+	man_loop.two_pack[0] = man_loop.two_pack[1];
+	man_loop.two_pack[1] = _pack;
+	//find orginal index
+	u32  timetamp_in_pack = fl_rtc_timetamp2milltampStep(fl_adv_timetampStepInPack(man_loop.two_pack[1]));
+	u32  timetamp_in_pre_pack = fl_rtc_timetamp2milltampStep(fl_adv_timetampStepInPack(man_loop.two_pack[0]));
+
+	if(timetamp_in_pack && timetamp_in_pre_pack){ //  parse success
+		//check master original of the previous with currently
+		if(timetamp_in_pack > timetamp_in_pre_pack && timetamp_in_pack >= fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME)){
+//			man_loop.origin_indx = idx_inQUEUE;
+			man_loop.loop_times = (man_loop.loop_times > REPEAT_LEVEL) ? 1 : man_loop.loop_times + 1;
+		}
+		//Check loop_times to skip packet with ttl < loop_times
+		fl_dataframe_format_t data_parsed;
+		man_loop.two_pack[1].length+=1;
+		u8 rslt_parser=fl_packet_parse(man_loop.two_pack[1],&data_parsed);
+//		LOGA(BLE,"LoopTimes:%d|(%d)TTL:%d\r\n",man_loop.loop_times,rslt_parser,data_parsed.endpoint.repeat_cnt);
+//		LOGA(BLE,"[0].len:%d | [1].len:%d\r\n",man_loop.two_pack[0].length,man_loop.two_pack[1].length);
+		if (rslt_parser) {
+//			LOGA(BLE,"LoopTimes:%d|(%d)TTL:%d\r\n",man_loop.loop_times,rslt_parser,data_parsed.endpoint.repeat_cnt);
+			return (data_parsed.endpoint.repeat_cnt <= man_loop.loop_times);
+		}
+	}
+	else{
+		if (_pack.length != 0) {
+			man_loop.two_pack[0] = _pack;
+			man_loop.two_pack[1] = _pack;
+		}
+	}
+	return false;
+}
+#endif
+
 /***************************************************
  * @brief 		: add data payload adv into queue fifo
  *
@@ -167,7 +222,7 @@ int fl_adv_sendFIFO_add(fl_pack_t _pack) {
 /***************************************************
  * @brief 		: run and send adv from the queue
  *
- * @param[in] 	:none
+ * @param[in] 	: none
  *
  * @return	  	:
  *
@@ -181,16 +236,20 @@ void fl_adv_sendFIFO_run(void) {
 		if (FL_QUEUE_GET(&G_QUEUE_SENDING,&data_in_queue)) {
 #else
 		while (FL_QUEUE_GET_LOOP(&G_QUEUE_SENDING,&data_in_queue)) {
-//			u32 timetamp_inpack = fl_adv_timetampInPack(data_in_queue);
-			fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(data_in_queue);
 
-			if (fl_rtc_timetamp2milltampStep(timetamp_inpack) < fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME)){
+			fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(data_in_queue);
+			u32 inpack = fl_rtc_timetamp2milltampStep(timetamp_inpack);
+			u32 origin_pack = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
+			if ( inpack < origin_pack){
+//				LOGA(APP,"timetamp:%d | %d \r\n",inpack,origin_pack);
+//				P_PRINTFHEX_A(APP,data_in_queue.data_arr,data_in_queue.length,"[%d]TTL(%d):",G_QUEUE_SENDING.head_index,
+//						data_in_queue.data_arr[data_in_queue.length - 1] & 0x03);
 				return;
 			}
 			//For debuging
 //			P_PRINTFHEX_A(BLE,data_in_queue.data_arr,data_in_queue.length,"[%d]TTL(%d):",G_QUEUE_SENDING.head_index,
 //					data_in_queue.data_arr[data_in_queue.length - 1] & 0x03);
-//
+
 #endif
 //			LOGA(APP,"ADV FIFO(%d):%d/%d\r\n",G_QUEUE_SENDING.count,G_QUEUE_SENDING.head_index,G_QUEUE_SENDING.tail_index);
 			F_SENDING_STATE = 1;
@@ -272,17 +331,33 @@ void fl_adv_sendtest(void) {
  *
  ***************************************************/
 void fl_adv_init(void) {
-	rf_set_power_level_index(MY_RF_POWER_INDEX);
-
-	blc_ll_setAdvCustomedChannel(G_ADV_SETTINGS.nwk_chn.chn1,G_ADV_SETTINGS.nwk_chn.chn2,G_ADV_SETTINGS.nwk_chn.chn3);
-
-	fl_adv_scanner_init();
+	fl_db_init();
 #ifdef MASTER_CORE
+	extern fl_master_config_t G_MASTER_INFO;
+	//fl_adv_sendtest();
+	fl_nwk_master_init();
+	fl_input_external_init();
+
+	G_ADV_SETTINGS.nwk_chn.chn1 = &G_MASTER_INFO.nwk.chn[0];
+	G_ADV_SETTINGS.nwk_chn.chn2 = &G_MASTER_INFO.nwk.chn[1];
+	G_ADV_SETTINGS.nwk_chn.chn3 = &G_MASTER_INFO.nwk.chn[2];
 
 #else
-	//TEST SEND
-//	fl_adv_sendtest();
+	//fl_input_external_init();
+	extern fl_nodeinnetwork_t G_INFORMATION;
+	fl_nwk_slave_init();
+	fl_repeater_init();
+
+	G_ADV_SETTINGS.nwk_chn.chn1 = &G_INFORMATION.profile.nwk.chn[0];
+	G_ADV_SETTINGS.nwk_chn.chn2 = &G_INFORMATION.profile.nwk.chn[1];
+	G_ADV_SETTINGS.nwk_chn.chn3 = &G_INFORMATION.profile.nwk.chn[2];
 #endif
+	// Init REQ call RSP
+	fl_queue_REQnRSP_TimeoutStart();
+	//
+	rf_set_power_level_index(MY_RF_POWER_INDEX);
+	blc_ll_setAdvCustomedChannel(*G_ADV_SETTINGS.nwk_chn.chn1,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3);
+	fl_adv_scanner_init();
 }
 /***************************************************
  * @brief 		:init collection channel (0,1,2)
@@ -312,7 +387,7 @@ void fl_adv_collection_channel_init(void){
 	bls_ll_setAdvEnable(BLC_ADV_ENABLE);  //adv enable
 	FL_QUEUE_CLEAR(&G_DATA_CONTAINER,IN_DATA_SIZE);
 
-	P_INFO("Collection Init:%d\r\n",bls_ll_setAdvEnable(BLC_ADV_ENABLE));  //adv enable
+	P_INFO("Collection Init(%d): %d| %d| %d\r\n",bls_ll_setAdvEnable(BLC_ADV_ENABLE),*G_ADV_SETTINGS.nwk_chn.chn1,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3);  //adv enable
 
 }
 /***************************************************
@@ -332,7 +407,7 @@ void fl_adv_collection_channel_deinit(void){
 	rf_set_power_level_index(MY_RF_POWER_INDEX);
 	FL_QUEUE_CLEAR(&G_QUEUE_SENDING,QUEUE_SENDING_SIZE);
 
-	blc_ll_setAdvCustomedChannel(G_ADV_SETTINGS.nwk_chn.chn1,G_ADV_SETTINGS.nwk_chn.chn2,G_ADV_SETTINGS.nwk_chn.chn3);
+	blc_ll_setAdvCustomedChannel(*G_ADV_SETTINGS.nwk_chn.chn1,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3);
 
 	blc_hci_le_setEventMask_cmd(HCI_LE_EVT_MASK_ADVERTISING_REPORT);
 	blc_hci_registerControllerEventHandler(fl_controller_event_callback);
@@ -343,7 +418,7 @@ void fl_adv_collection_channel_deinit(void){
 	bls_ll_setAdvEnable(BLC_ADV_ENABLE);  //adv enable
 	FL_QUEUE_CLEAR(&G_DATA_CONTAINER,IN_DATA_SIZE);
 
-	P_INFO("Collection Deinit:%d\r\n",bls_ll_setAdvEnable(BLC_ADV_ENABLE))
+	P_INFO("Collection Deinit(%d):%d |%d |%d\r\n",bls_ll_setAdvEnable(BLC_ADV_ENABLE),*G_ADV_SETTINGS.nwk_chn.chn1,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3)
 }
 
 void fl_adv_setting_update(void) {
@@ -367,15 +442,6 @@ void fl_adv_scanner_init(void) {
 	blc_ll_setScanEnable(1,0);
 	bls_ll_setAdvEnable(BLC_ADV_ENABLE);  //adv enable
 	FL_QUEUE_CLEAR(&G_DATA_CONTAINER,IN_DATA_SIZE);
-
-#ifdef MASTER_CORE
-	//fl_adv_sendtest();
-	fl_nwk_master_init();
-	fl_input_external_init();
-#else
-	fl_nwk_slave_init();
-	fl_repeater_init();
-#endif
 }
 /***************************************************
  * @brief 		: parse data array to data fields
@@ -402,17 +468,37 @@ u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt) {
  * @return	  	:-1 : fail, 0: SLAVE /REPEATER , 1 MASTER
  *
  ***************************************************/
-s8 fl_adv_IsFormMaster(fl_pack_t data_in_queue) {
+s8 fl_adv_IsFromMaster(fl_pack_t data_in_queue) {
 	fl_dataframe_format_t data_parsed;
 	if (fl_packet_parse(data_in_queue,&data_parsed)) {
-		if(data_parsed.endpoint.master != FL_FROM_SLAVE){
+		if(data_parsed.endpoint.master == FL_FROM_MASTER || data_parsed.endpoint.master == FL_FROM_MASTER_ACK){
 			return 1;
 		}
 		else return 0;
 	}
 	return -1;
 }
-
+#ifndef MASTER_CORE
+/***************************************************
+ * @brief 		:check packet rec From ME (only for slave)
+ *
+ * @param[in] 	:none
+ *
+ * @return	  	:
+ *
+ ***************************************************/
+bool fl_adv_IsFromMe(fl_pack_t data_in_queue) {
+	extern fl_nodeinnetwork_t G_INFORMATION;
+	fl_dataframe_format_t data_parsed;
+	if (fl_packet_parse(data_in_queue,&data_parsed)) {
+		if((data_parsed.endpoint.master == FL_FROM_SLAVE || data_parsed.endpoint.master == FL_FROM_SLAVE_ACK) && data_parsed.slaveID.id_u8 == G_INFORMATION.slaveID.id_u8
+				&& G_INFORMATION.slaveID.id_u8 != 0xFF){
+			return true;
+		}
+	}
+	return false;
+}
+#endif
 /***************************************************
  * @brief 		: build packet adv via the freelux protocol
  *
@@ -439,7 +525,7 @@ fl_pack_t fl_packet_build(u8 *payload, u8 _len) {
 	//for testing repeat level
 //	static u8 rep_level = 0;
 	packet.frame.endpoint.ep_u8 = 0;
-	packet.frame.endpoint.repeat_cnt = 0;
+	packet.frame.endpoint.repeat_cnt = REPEAT_LEVEL;
 
 	pack_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
 	memcpy(pack_built.data_arr,packet.bytes,pack_built.length);
@@ -476,17 +562,18 @@ void fl_adv_run(void) {
 //		LOGA(APP,"QUEUE GET : (%d)%d-%d\r\n",G_DATA_CONTAINER.count,G_DATA_CONTAINER.head_index,G_DATA_CONTAINER.tail_index);
 		fl_dataframe_format_t data_parsed;
 		if (fl_packet_parse(data_in_queue,&data_parsed)) {
+
 //			fl_packet_printf(data_parsed);
 #ifdef MASTER_CORE
 			fl_nwk_master_run(&data_in_queue); //process reponse from the slaves
 #else //SLAVE
-//			Todo: Handle FORM MASTER REQ
-			if (fl_adv_IsFormMaster(data_in_queue)) {
-				fl_nwk_slave_run(&data_in_queue);
-			}
 			//Todo: Repeat process
-			if (data_parsed.endpoint.repeat_cnt < REPEAT_LEVEL && data_parsed.endpoint.rep_mode != 0) {
+			if (fl_adv_IsFromMe(data_in_queue) == false && data_parsed.endpoint.repeat_cnt > 0) {
 				fl_repeat_run(&data_in_queue);
+			}
+			//Todo: Handle FORM MASTER REQ
+			if (fl_adv_IsFromMaster(data_in_queue)) {
+				fl_nwk_slave_run(&data_in_queue);
 			}
 #endif
 		} else {

@@ -34,7 +34,7 @@
 
 #include "fl_adv_proc.h"
 #include "fl_input_ext.h"
-
+#include "fl_nwk_database.h"
 #define SYNCHRONIZE_SYSTIME			5000*1000 //5s
 
 _attribute_data_retention_ own_addr_type_t app_own_address_type = OWN_ADDRESS_PUBLIC;
@@ -130,7 +130,7 @@ _attribute_no_inline_ void user_init_normal(void) {
 	//////////////////////////// BLE stack Initialization  End //////////////////////////////////
 
 	///////////////////// freelux adv initialization///////////////////
-
+	//fl_db_clearAll();//FOR CLEAN
 	////////////////// config adv scan /////////////////////
 	fl_adv_init();
 	///////////////////// stimer Management initialization///////////////////

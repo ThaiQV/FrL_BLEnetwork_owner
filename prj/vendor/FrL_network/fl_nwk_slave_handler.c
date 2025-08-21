@@ -18,6 +18,9 @@
 #include "fl_nwk_handler.h"
 #include "fl_nwk_protocol.h"
 
+//Test api
+#include "test_api.h"
+
 #ifndef MASTER_CORE
 /******************************************************************************/
 /******************************************************************************/
@@ -28,13 +31,27 @@
 _attribute_data_retention_ volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME = {.timetamp = 0,.milstep = 0};
 
 #define SYNC_ORIGIN_MASTER(x,y) 			do{	\
-															ORIGINAL_MASTER_TIME.timetamp = x;\
-															ORIGINAL_MASTER_TIME.milstep = y;\
-														}while(0) //Sync original time-master req
+												ORIGINAL_MASTER_TIME.timetamp = x;\
+												ORIGINAL_MASTER_TIME.milstep = y;\
+											}while(0) //Sync original time-master req
 
 #define JOIN_NETWORK_TIME 		30*1000 //ms
-fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = { NWK_HDR_55, NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmd
-#define NWK_HDR_SIZE (sizeof(G_NWK_HDR_LIST)/sizeof(fl_hdr_nwk_type_e))
+
+fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
+fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_55}; // register cmdid REQ
+
+#define NWK_HDR_SIZE (sizeof(G_NWK_HDR_LIST)/sizeof(G_NWK_HDR_LIST[0]))
+#define NWK_HDR_REQ_SIZE (sizeof(G_NWK_HDR_REQLIST)/sizeof(G_NWK_HDR_REQLIST[0]))
+
+static inline u8 IsREQHDR(fl_hdr_nwk_type_e cmdid) {
+	for (u8 i = 0; i < NWK_HDR_REQ_SIZE; i++) {
+		if (cmdid == G_NWK_HDR_REQLIST[i]) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
 /*---------------- Total Packet handling --------------------------*/
 
 #define PACK_HANDLE_SIZE 		32 // bcs : slave need to rec its req and repeater of the neighbors
@@ -45,8 +62,9 @@ fl_data_container_t G_HANDLE_CONTAINER = { .data = g_handle_array, .head_index =
 fl_nodeinnetwork_t G_INFORMATION;
 
 //flag debug of the network
-volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into end-point byte (dbg :1bit)
+volatile u8 NWK_DEBUG_STT = 1; // it will be assigned into end-point byte (dbg :1bit)
 volatile u8 NWK_REPEAT_MODE = 1; // slave repeat?
+volatile u8  REPEAT_LEVEL = 2;
 /******************************************************************************/
 /******************************************************************************/
 /***                           Private definitions                           **/
@@ -57,35 +75,64 @@ volatile u8 NWK_REPEAT_MODE = 1; // slave repeat?
 							else   { PLOG_Stop(ALL); } \
 						} while(0)
 
-#define IsJoinedNetwork()	(G_INFORMATION.slaveID.id_u8 != 0xFF)
 
 /******************************************************************************/
 /******************************************************************************/
 /***                       Functions declare                   		         **/
 /******************************************************************************/
 /******************************************************************************/
+
+bool IsJoinedNetwork(void)	{
+	return(G_INFORMATION.slaveID.id_u8 != 0xFF);
+}
+
+int _nwk_slave_backup(void){
+	static u32 pre_crc32 = 0;
+	u32 crc32  = fl_db_crc32((u8*)&G_INFORMATION.profile,SLAVE_PROFILE_ENTRY_SIZE);
+	if(crc32 != pre_crc32){
+		pre_crc32 = crc32;
+		fl_db_slaveprofile_save(G_INFORMATION.profile);
+		LOGA(INF,"** MAC     :%08X\r\n",G_INFORMATION.mac_short.mac_u32);
+		LOGA(INF,"** SlaveID :%d\r\n",G_INFORMATION.slaveID.id_u8);
+		LOGA(INF,"** grpID   :%d\r\n",G_INFORMATION.slaveID.grpID);
+		LOGA(INF,"** memID   :%d\r\n",G_INFORMATION.slaveID.memID);
+		LOGA(INF,"** JoinNWK :%d\r\n",G_INFORMATION.profile.run_stt.join_nwk);
+		LOGA(INF,"** RstFac  :%d\r\n",G_INFORMATION.profile.run_stt.rst_factory);
+		LOGA(INF,"** Channels:%d |%d |%d\r\n",G_INFORMATION.profile.nwk.chn[0],G_INFORMATION.profile.nwk.chn[1],G_INFORMATION.profile.nwk.chn[2])
+	}
+	return 0;
+}
+
 void fl_nwk_slave_init(void) {
 	FL_QUEUE_CLEAR(&G_HANDLE_CONTAINER,PACK_HANDLE_SIZE);
 	//Generate information
 	G_INFORMATION.active = false;
 	G_INFORMATION.timelife = 0;
-	//u8 mac_short[4];
-//	memcpy(mac_short,blc_ll_get_macAddrPublic(),SIZEU8(mac_short));
-//	G_INFORMATION.mac_short = MAKE_U32(mac_short[3],mac_short[2],mac_short[1],mac_short[0]);
 	memcpy(G_INFORMATION.mac_short.byte,blc_ll_get_macAddrPublic(),SIZEU8(G_INFORMATION.mac_short.byte));
 
-	//Test join network + factory
-	G_INFORMATION.run_stt.join_nwk = 1; //access to join network
-	G_INFORMATION.run_stt.rst_factory  = 1 ; //has reset factory device
-	G_INFORMATION.slaveID.id_u8 = 0xFF;
+	//Load from db
+	fl_slave_profiles_t my_profile = fl_db_slaveprofile_init();
+	G_INFORMATION.slaveID.id_u8 = my_profile.slaveid;
+	G_INFORMATION.profile = my_profile;
+
+//	//Test join network + factory
+//	G_INFORMATION.profile.run_stt.join_nwk = 1; //access to join network
+//	G_INFORMATION.profile.run_stt.rst_factory  = 1 ; //has reset factory device
+//	G_INFORMATION.slaveID.id_u8 = 0xFF;
+//	G_INFORMATION.profile.slaveid = 0xFF;
 
 	LOG_P(INF,"Freelux network SLAVE init\r\n");
 	LOGA(INF,"** MAC    :%08X\r\n",G_INFORMATION.mac_short.mac_u32);
 	LOGA(INF,"** SlaveID:%d\r\n",G_INFORMATION.slaveID.id_u8);
 	LOGA(INF,"** grpID  :%d\r\n",G_INFORMATION.slaveID.grpID);
 	LOGA(INF,"** memID  :%d\r\n",G_INFORMATION.slaveID.memID);
-	LOGA(INF,"** JoinNWK:%d\r\n",G_INFORMATION.run_stt.join_nwk);
-	LOGA(INF,"** RstFac :%d\r\n",G_INFORMATION.run_stt.rst_factory);
+	LOGA(INF,"** JoinNWK:%d\r\n",G_INFORMATION.profile.run_stt.join_nwk);
+	LOGA(INF,"** RstFac :%d\r\n",G_INFORMATION.profile.run_stt.rst_factory);
+
+//	blt_soft_timer_add(_nwk_slave_backup,2*1000*1000);
+
+	//test random send req
+	TEST_slave_sendREQ();
 }
 /***************************************************
  * @brief 		:synchronization status from packet
@@ -108,10 +155,82 @@ void _nwk_slave_syncFromPack(fl_dataframe_format_t *packet){
 	NWK_DEBUG_STT = packet->endpoint.dbg;
 	DEBUG_TURN(NWK_DEBUG_STT);
 	//Sync repeat mode
-	NWK_REPEAT_MODE = packet->endpoint.rep_mode;
+//	NWK_REPEAT_MODE = packet->endpoint.rep_mode;
+	//add repeat_cnt
+	REPEAT_LEVEL = packet->endpoint.rep_mode;
 	//Sync mastertime origin
 	SYNC_ORIGIN_MASTER(master_timetamp,packet->milltamp);
 	LOGA(INF,"ORIGINAL MASTER-TIME:%d\r\n",ORIGINAL_MASTER_TIME.milstep);
+}
+
+s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms) {
+	//register timeout cb
+	if (_cb != 0 && _timeout_ms*1000 >= 2*QUEUQ_REQcRSP_INTERVAL) {
+		if(fl_req_slave_packet_createNsend(_cmdid,_data,_len)){
+			fl_queueREQcRSP_add(_cmdid,G_INFORMATION.slaveID.id_u8,&_cb,_timeout_ms*1000);
+		}
+	} else {
+		ERR(API,"Cann't set timeout (%d/%d ms)!!\r\n",(u32)_cb,_timeout_ms);
+	}
+	return -1;
+}
+
+/***************************************************
+ * @brief 		: create and send packet request to master via the freelux protocol
+ *
+ * @param[in] 	: _cmdid : id cmd
+ * 				  _data : pointer to data
+ * 				  _len  : size data
+ *
+ * @return	  	: 0: fail, 1: success
+ *
+ ***************************************************/
+bool fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
+	/*****************************************************************/
+	/* | HDR | Timetamp | Mill_time | SlaveID | payload | crc8 | Ep | */
+	/* | 1B  |   4Bs    |    1B     |    1B   |   20Bs  |  1B  | 1B | -> .master = FL_FROM_SLAVE_ACK / FL_FROM_SLAVE */
+	/*****************************************************************/
+	//**todo: Need to convert _data to payload base on special command ID
+	//
+	fl_pack_t rslt = {.length = 0};
+	fl_hdr_nwk_type_e cmdid = (fl_hdr_nwk_type_e)_cmdid;
+	if(!IsREQHDR(cmdid)){return false;}
+	fl_data_frame_u req_pack;
+	switch (cmdid) {
+		case NWK_HDR_55: {
+
+			LOGA(INF,"Send 55 REQ to Master:%d/%d\r\n",ORIGINAL_MASTER_TIME.timetamp,ORIGINAL_MASTER_TIME.milstep);
+			req_pack.frame.hdr = NWK_HDR_55;
+
+			req_pack.frame.timetamp[0] = U32_BYTE0(ORIGINAL_MASTER_TIME.timetamp);
+			req_pack.frame.timetamp[1] = U32_BYTE1(ORIGINAL_MASTER_TIME.timetamp);
+			req_pack.frame.timetamp[2] = U32_BYTE2(ORIGINAL_MASTER_TIME.timetamp);
+			req_pack.frame.timetamp[3] = U32_BYTE3(ORIGINAL_MASTER_TIME.timetamp);
+
+			req_pack.frame.milltamp = ORIGINAL_MASTER_TIME.milstep;
+
+			req_pack.frame.slaveID.id_u8 = G_INFORMATION.slaveID.id_u8;
+			//Create payload
+			memset(req_pack.frame.payload,0xFF,SIZEU8(req_pack.frame.payload));
+			memcpy(req_pack.frame.payload,_data,_len);
+			//create endpoint
+			req_pack.frame.endpoint.dbg = NWK_DEBUG_STT;
+			req_pack.frame.endpoint.repeat_cnt = REPEAT_LEVEL;
+			req_pack.frame.endpoint.rep_mode = REPEAT_LEVEL;
+			//Create packet from slave
+			req_pack.frame.endpoint.master = FL_FROM_SLAVE_ACK;
+		}
+		break;
+		default:
+		break;
+	}
+	//copy to data struct
+	rslt.length = SIZEU8(req_pack.bytes) - 1; //skip rssi
+	memcpy(rslt.data_arr,req_pack.bytes,rslt.length );
+	P_PRINTFHEX_A(INF,rslt.data_arr,rslt.length,"REQ 55");
+	//Send ADV
+	fl_adv_sendFIFO_add(rslt);
+	return true;
 }
 /***************************************************
  * @brief 		: build packet response via the freelux protocol
@@ -127,20 +246,14 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 	memset(packet_built.data_arr,0,SIZEU8(packet_built.data_arr));
 
 	fl_data_frame_u packet;
-//	u32 master_timetamp; //, slave_timetamp;
 	extern u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
 	if(!fl_packet_parse(_pack,&packet.frame)){
 		ERR(INF,"Packet parse fail!!!\r\n");
 		packet_built.length = 0;
 		return packet_built;
 	}
-
 	LOGA(INF,"(%d|%x)HDR_REQ ID: %02X - ACK:%d\r\n",IsJoinedNetwork(),G_INFORMATION.slaveID.id_u8,packet.frame.hdr,packet.frame.endpoint.master);
 	switch ((fl_hdr_nwk_type_e) packet.frame.hdr) {
-		case NWK_HDR_55:
-			//todo:
-			return packet_built;
-		break;
 		case NWK_HDR_HEARTBEAT:
 			_nwk_slave_syncFromPack(&packet.frame);
 			if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
@@ -150,6 +263,8 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 				packet.frame.endpoint.dbg = NWK_DEBUG_STT;
 				//change endpoint to node source
 				packet.frame.endpoint.master = FL_FROM_SLAVE;
+				//add repeat_cnt
+				packet.frame.endpoint.repeat_cnt = REPEAT_LEVEL;
 			} else {
 				//Non-rsp
 				packet_built.length = 0;
@@ -165,9 +280,11 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 				master_timetamp = MAKE_U32(packet.frame.timetamp[3],packet.frame.timetamp[2],packet.frame.timetamp[1],packet.frame.timetamp[0]);
 				datetime_t cur_dt;
 				fl_rtc_timestamp_to_datetime(master_timetamp,&cur_dt);
+
+				fl_timetamp_withstep_t millstep = fl_rtc_getWithMilliStep();
 				u8 test_payload[SIZEU8(packet.frame.payload)];
 				memset(test_payload,0,sizeof(test_payload));
-				sprintf((char*) test_payload,"%02d:%02d:%02d-%03d",cur_dt.hour,cur_dt.minute,cur_dt.second, packet.frame.milltamp);
+				sprintf((char*) test_payload,"%02d:%02d:%02d-%03d/%03d",cur_dt.hour,cur_dt.minute,cur_dt.second,millstep.milstep, packet.frame.milltamp);
 				LOGA(APP,"(%d)SlaveID:%X | inPack:%X\r\n",memid_idx,G_INFORMATION.slaveID.id_u8,packet.frame.payload[memid_idx]);
 				packet.frame.endpoint.dbg = NWK_DEBUG_STT;
 
@@ -184,6 +301,8 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 				}
 				//change endpoint to node source
 				packet.frame.endpoint.master = FL_FROM_SLAVE;
+				//add repeat_cnt
+				packet.frame.endpoint.repeat_cnt = REPEAT_LEVEL;
 			} else {
 				//Non-rsp
 				packet_built.length = 0;
@@ -197,16 +316,11 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 				if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
 					//Process rsp
 					memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
-
 					memcpy(packet.frame.payload,G_INFORMATION.mac_short.byte,SIZEU8(G_INFORMATION.mac_short.byte));
-
-//					packet.frame.payload[0] = U32_BYTE0(G_INFORMATION.mac_short);
-//					packet.frame.payload[1] = U32_BYTE1(G_INFORMATION.mac_short);
-//					packet.frame.payload[2] = U32_BYTE2(G_INFORMATION.mac_short);
-//					packet.frame.payload[3] = U32_BYTE3(G_INFORMATION.mac_short);
-//					packet.frame.endpoint.dbg = NWK_DEBUG_STT;
 					//change endpoint to node source
 					packet.frame.endpoint.master = FL_FROM_SLAVE;
+					//add repeat_cnt
+					packet.frame.endpoint.repeat_cnt = REPEAT_LEVEL;
 				}
 			} else {
 				//Non-rsp
@@ -223,6 +337,13 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 			if (mymac_idx != -1) {
 				G_INFORMATION.slaveID.id_u8 = packet.frame.slaveID.id_u8;
 				LOGA(INF,"UPDATE SlaveID: %d(grpID:%d|memID:%d)\r\n",G_INFORMATION.slaveID.id_u8,G_INFORMATION.slaveID.grpID,G_INFORMATION.slaveID.memID);
+				G_INFORMATION.profile.slaveid = G_INFORMATION.slaveID.id_u8 ;
+				G_INFORMATION.profile.run_stt.rst_factory = 0;
+				G_INFORMATION.profile.nwk.chn[0] = packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac_short.byte)];
+				G_INFORMATION.profile.nwk.chn[1] = packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac_short.byte) + 1];
+				G_INFORMATION.profile.nwk.chn[2] = packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac_short.byte) + 2];
+				//get master's mac
+				G_INFORMATION.profile.nwk.mac_parent = MAKE_U32(packet.frame.payload[7],packet.frame.payload[8],packet.frame.payload[9],packet.frame.payload[10]);
 			}
 			//debug
 			else{
@@ -261,6 +382,9 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 int fl_slave_ProccesRSP_cbk(void) {
 	fl_pack_t data_in_queue;
 	if (FL_QUEUE_GET(&G_HANDLE_CONTAINER,&data_in_queue)) {
+		//Scan req call rsp
+		fl_queue_REQcRSP_ScanRec(data_in_queue);
+		//process rsp of the protocol
 		fl_pack_t packet_build;
 		packet_build = fl_rsp_slave_packet_build(data_in_queue);
 		if (packet_build.length > 0) {
@@ -280,21 +404,23 @@ int fl_slave_ProccesRSP_cbk(void) {
  * @return	  	:none
  *
  ***************************************************/
-int fl_nwk_joinnwk_timeout(void){
-	ERR(INF,"Join-network timeout!!!\r\n");
-	G_INFORMATION.run_stt.join_nwk = 0;
-	fl_adv_collection_channel_deinit();
-	return -1;
+int fl_nwk_joinnwk_timeout(void) {
+	ERR(INF,"Join-network timeout and re-scan!!!\r\n");
+	if (IsJoinedNetwork()) {
+		G_INFORMATION.profile.run_stt.join_nwk = 0;
+		fl_adv_collection_channel_deinit();
+		return -1;
+	} else
+		return 0;
 }
 void fl_nwk_slave_joinnwk_exc(void) {
-	if (G_INFORMATION.run_stt.join_nwk) {
+	if (G_INFORMATION.profile.run_stt.join_nwk) {
 		if (blt_soft_timer_find(&fl_nwk_joinnwk_timeout) == -1) {
 			fl_adv_collection_channel_init();
 			blt_soft_timer_add(&fl_nwk_joinnwk_timeout,JOIN_NETWORK_TIME * 1000);
 		}
 	}
 }
-
 /******************************************************************************/
 /******************************************************************************/
 /***                      Processing functions 					             **/
@@ -309,8 +435,14 @@ void fl_nwk_slave_joinnwk_exc(void) {
  *
  ***************************************************/
 bool fl_nwk_slave_checkHDR(u8 _hdr) {
+	//scan RSP HDR
 	for (int var = 0; var < SIZEU8(G_NWK_HDR_LIST); ++var) {
 		if (G_NWK_HDR_LIST[var] == _hdr)
+			return true;
+	}
+	//scan REQ HDR
+	for (int var = 0; var < SIZEU8(G_NWK_HDR_REQLIST); ++var) {
+		if (G_NWK_HDR_REQLIST[var] == _hdr)
 			return true;
 	}
 	return false;
@@ -365,6 +497,7 @@ fl_timetamp_withstep_t fl_adv_timetampStepInPack(fl_pack_t _pack) {
 void fl_nwk_slave_process(void){
 	//todo : join- network
 	fl_nwk_slave_joinnwk_exc();
+
 }
 /***************************************************
  * @brief 		:Main functions to process income packet
@@ -382,6 +515,8 @@ void fl_nwk_slave_run(fl_pack_t *_pack_handle) {
 			s8 rssi = _pack_handle->data_arr[_pack_handle->length - 1];
 			LOGA(INF,"QUEUE HANDLE ADD (len:%d|RSSI:%d): (%d)%d-%d\r\n",_pack_handle->length,rssi,G_HANDLE_CONTAINER.count,
 					G_HANDLE_CONTAINER.head_index,G_HANDLE_CONTAINER.tail_index);
+
+			//process rsp of the protocols
 			fl_slave_ProccesRSP_cbk();
 		}
 	} else {

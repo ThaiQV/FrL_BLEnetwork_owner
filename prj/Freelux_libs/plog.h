@@ -68,6 +68,7 @@ typedef enum {
 	MCU,
 	USER,
 	PERI,
+	API,
 	ALL,
 	DEFAULT,
 //	EXSS,
@@ -77,6 +78,7 @@ typedef enum {
 	HELP,
 	SETCMD,
 	GETCMD,
+	FACTORYCMD,
 	RSTCMD,
 //	ATCMD,
 //	TESTCMD,
@@ -133,6 +135,9 @@ enum {
                                             break;                  		\
                                             case PERI:             		\
                                             TERMINAL_FONT_PURPLE(); 		\
+                                            break;                  		\
+                                            case API:             		\
+											TERMINAL_FONT_L_CYAN(); 		\
                                             break;                  		\
                                             default:TERMINAL_FONT_DRFAULT();\
                                             break;	\

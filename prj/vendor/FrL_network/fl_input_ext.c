@@ -20,8 +20,19 @@
 /***                                Global Parameters                        **/
 /******************************************************************************/
 /******************************************************************************/
+#define FL_IO_SCAN_INTERVAL	30 //ms
 #define FL_IO_READ(x)		gpio_read(x)
 #define FL_IO_WRITE(x,y)	gpio_write(x,y)
+
+typedef struct {
+	gpio_pin_e pin;
+	bool cur_stt;
+	u32 debounce_time;
+	fl_exButton_states_e status;
+	fl_gpio_edge_detect_e mode;
+	FncExc exc;
+}fl_exIO_t;
+
 typedef struct {
 	struct {
 		gpio_pin_e signal;
@@ -29,6 +40,7 @@ typedef struct {
 	struct {
 		gpio_pin_e collect;
 	} sw;
+
 #ifdef MASTER_CORE
 	struct {
 		uart_num_e uart_num;
@@ -38,10 +50,20 @@ typedef struct {
 		dma_chn_e dma_tx_chn;
 		dma_chn_e dma_rx_chn;
 	} serial;
+#else
+	struct {
+		fl_exIO_t calling;
+		fl_exIO_t count_up;
+	} butts;
 #endif
+
 }__attribute__((packed)) fl_input_external_t;
 
-volatile fl_input_external_t G_INPUT_EXT;
+fl_input_external_t G_INPUT_EXT;
+
+fl_exIO_t *G_IN_POLLING[10];
+
+#define  IN_POLLING_SIZE		(sizeof(G_IN_POLLING)/sizeof(G_IN_POLLING[0]))
 
 #ifdef MASTER_CORE
 
@@ -73,7 +95,29 @@ fl_uart_data_t FL_TXDATA; //T_txdata_buf
 /***                           Private definitions                           **/
 /******************************************************************************/
 /******************************************************************************/
-
+void InitPOLLING(void) {
+	for (u8 i = 0; i < IN_POLLING_SIZE; i++) {
+		G_IN_POLLING[i]->exc =0;
+	}
+}
+s8 RegisterPOLLING(fl_exIO_t *_io) {
+	u8 i = 0;
+	for (i = 0; i < IN_POLLING_SIZE ; i++) {
+		//LOGA(USER,"(%d/%d)%d | %d \r\n",i,IN_POLLING_SIZE,*G_IN_POLLING[i]->exc,*_io->exc);
+		if ((u32)G_IN_POLLING[i]->exc == (u32)_io->exc) {
+			break;
+		}
+		if(G_IN_POLLING[i]->exc == 0){
+			G_IN_POLLING[i] = _io;
+			G_IN_POLLING[i]->cur_stt = FL_IO_READ(_io->pin);
+			G_IN_POLLING[i]->debounce_time = 0;
+			G_IN_POLLING[i]->status = BUTT_STATE_NONE;
+			return i;
+		}
+	}
+	ERR(USER,"Register POLLING Err!!!\r\n");
+	return -1;
+}
 /******************************************************************************/
 /******************************************************************************/
 /***                       Functions declare                   		         **/
@@ -235,6 +279,68 @@ void fl_input_collection_node_handle(blt_timer_callback_t _fnc, u16 _timeout_ms)
 		previous_stt = state;
 	}
 }
+
+#ifndef MASTER_CORE
+
+void _button1_excute(fl_exButton_states_e _state, void *_data) {
+	u32 *time_tick = (u32*)_data;
+	LOGA(USER,"BUTT 1 %s (%d ms)\r\n",_state==BUTT_STATE_PRESSnHOLD?"Press & hold":"Press & Release",
+			(clock_time()-*time_tick)/SYSTEM_TIMER_TICK_1MS);
+}
+void _button2_excute(fl_exButton_states_e _state, void *_data) {
+	u32 *time_tick = (u32*)_data;
+	LOGA(USER,"BUTT 2 %s (%d ms)\r\n",_state==BUTT_STATE_PRESSnHOLD?"Press & hold":"Press & Release",
+			(clock_time()-*time_tick)/SYSTEM_TIMER_TICK_1MS);
+}
+#endif
+/***************************************************
+ * @brief 		: polling scan input states (buttons, switch,...)
+ *
+ * @param[in] 	:none
+ *
+ * @return	  	:none
+ *
+ ***************************************************/
+int _scan_external_input(void){
+	s8 indx = 0;
+	int detect_edge  = 0;
+	bool debounce_check = false;
+	for (indx = 0; indx < IN_POLLING_SIZE && G_IN_POLLING[indx]->exc != 0; ++indx) {
+		detect_edge = (int)(G_IN_POLLING[indx]->cur_stt-FL_IO_READ(G_IN_POLLING[indx]->pin));
+		debounce_check = clock_time_exceed(G_IN_POLLING[indx]->debounce_time,PRESSnRELEASE_DUTY);
+		if(debounce_check){
+			if(detect_edge > 0 && G_IN_POLLING[indx]->mode == DET_FALLING_EDGE && FL_IO_READ(G_IN_POLLING[indx]->pin) == 1){// ----\____/
+				G_IN_POLLING[indx]->status = BUTT_STATE_PRESSnRELEASE;
+				G_IN_POLLING[indx]->exc(G_IN_POLLING[indx]->status,(void*)&G_IN_POLLING[indx]->debounce_time);
+			}
+			else if(detect_edge < 0&& G_IN_POLLING[indx]->mode == DET_RISING_EDGE && FL_IO_READ(G_IN_POLLING[indx]->pin) == 0){/* ____/-----\ */
+				G_IN_POLLING[indx]->status = BUTT_STATE_PRESSnRELEASE;
+				G_IN_POLLING[indx]->exc(G_IN_POLLING[indx]->status,(void*)&G_IN_POLLING[indx]->debounce_time);
+			}
+			else {//hold
+				if(clock_time_exceed(G_IN_POLLING[indx]->debounce_time,PRESSnHOLD_DUTY)){
+					if(G_IN_POLLING[indx]->mode == DET_FALLING_EDGE && FL_IO_READ(G_IN_POLLING[indx]->pin) == 0){
+						G_IN_POLLING[indx]->status = BUTT_STATE_PRESSnHOLD;
+						G_IN_POLLING[indx]->exc(G_IN_POLLING[indx]->status,(void*)&G_IN_POLLING[indx]->debounce_time);
+						//update debouce for next test
+						G_IN_POLLING[indx]->debounce_time = clock_time();
+					} else if (G_IN_POLLING[indx]->mode == DET_RISING_EDGE && FL_IO_READ(G_IN_POLLING[indx]->pin) == 1) {
+						G_IN_POLLING[indx]->status = BUTT_STATE_PRESSnHOLD;
+						G_IN_POLLING[indx]->exc(G_IN_POLLING[indx]->status,(void*) &G_IN_POLLING[indx]->debounce_time);
+						//update debouce for next test
+						G_IN_POLLING[indx]->debounce_time = clock_time();
+					}
+				}
+			}
+		}
+		G_IN_POLLING[indx]->cur_stt = FL_IO_READ(G_IN_POLLING[indx]->pin);
+		if(detect_edge != 0){
+			G_IN_POLLING[indx]->debounce_time = clock_time();
+		}
+	}
+	return 0;
+}
+
 /******************************************************************************/
 /******************************************************************************/
 /***                      Processing functions 					             **/
@@ -242,16 +348,49 @@ void fl_input_collection_node_handle(blt_timer_callback_t _fnc, u16 _timeout_ms)
 /******************************************************************************/
 void fl_input_external_init(void) {
 
-	G_INPUT_EXT.sw.collect = GPIO_PB1;
-	gpio_function_en(G_INPUT_EXT.sw.collect);
-	gpio_set_output(G_INPUT_EXT.sw.collect,0); 		//disable output
-	gpio_set_input(G_INPUT_EXT.sw.collect,1); 		//enable input
-	gpio_set_up_down_res(G_INPUT_EXT.sw.collect,GPIO_PIN_PULLUP_10K);
+	//init POLLING Container
+	InitPOLLING();
 
-	G_INPUT_EXT.led.signal = GPIO_PB4;
-	gpio_function_en(G_INPUT_EXT.led.signal);
-	gpio_set_output(G_INPUT_EXT.led.signal,1);
-	gpio_set_input(G_INPUT_EXT.led.signal,0);
-	gpio_set_up_down_res(G_INPUT_EXT.led.signal,GPIO_PIN_PULLUP_10K);
+//	G_INPUT_EXT.sw.collect = GPIO_PB1;
+//	gpio_function_en(G_INPUT_EXT.sw.collect);
+//	gpio_set_output(G_INPUT_EXT.sw.collect,0); 		//disable output
+//	gpio_set_input(G_INPUT_EXT.sw.collect,1); 		//enable input
+//	gpio_set_up_down_res(G_INPUT_EXT.sw.collect,GPIO_PIN_PULLUP_10K);
+//
+//	G_INPUT_EXT.led.signal = GPIO_PB4;
+//	gpio_function_en(G_INPUT_EXT.led.signal);
+//	gpio_set_output(G_INPUT_EXT.led.signal,1);
+//	gpio_set_input(G_INPUT_EXT.led.signal,0);
+//	gpio_set_up_down_res(G_INPUT_EXT.led.signal,GPIO_PIN_PULLUP_10K);
 
+#ifndef MASTER_CORE
+	G_INPUT_EXT.butts.calling.pin = GPIO_PE0;
+	gpio_function_en(G_INPUT_EXT.butts.calling.pin);
+	gpio_set_output(G_INPUT_EXT.butts.calling.pin,0); 		//disable output
+	gpio_set_input(G_INPUT_EXT.butts.calling.pin,1); 		//enable input
+	gpio_set_up_down_res(G_INPUT_EXT.butts.calling.pin,GPIO_PIN_PULLUP_10K);
+	//register function callback
+	G_INPUT_EXT.butts.calling.exc = &_button1_excute;
+	G_INPUT_EXT.butts.calling.status = BUTT_STATE_NONE;
+	G_INPUT_EXT.butts.calling.mode = DET_FALLING_EDGE;
+	//Register polling callback
+	s8 regis = RegisterPOLLING(&G_INPUT_EXT.butts.calling);
+	LOGA(USER,"Button(%d)Calling Register :%d\r\n",FL_IO_READ(G_INPUT_EXT.butts.calling.pin),regis);
+
+	G_INPUT_EXT.butts.count_up.pin = GPIO_PE2;
+	gpio_function_en(G_INPUT_EXT.butts.count_up.pin);
+	gpio_set_output(G_INPUT_EXT.butts.count_up.pin,0); 		//disable output
+	gpio_set_input(G_INPUT_EXT.butts.count_up.pin,1); 		//enable input
+	gpio_set_up_down_res(G_INPUT_EXT.butts.count_up.pin,GPIO_PIN_PULLUP_10K);
+	//register function callback
+	G_INPUT_EXT.butts.count_up.exc = &_button2_excute;
+	G_INPUT_EXT.butts.count_up.status = BUTT_STATE_NONE;
+	G_INPUT_EXT.butts.count_up.mode = DET_RISING_EDGE;
+	//Register polling callback
+	regis = RegisterPOLLING(&G_INPUT_EXT.butts.count_up);
+	LOGA(USER,"Button(%d)Couter Register :%d\r\n",FL_IO_READ(G_INPUT_EXT.butts.count_up.pin),regis);
+
+#endif
+	/* --- Polling read input --- */
+	blt_soft_timer_add(_scan_external_input,FL_IO_SCAN_INTERVAL*1000); //ms
 }

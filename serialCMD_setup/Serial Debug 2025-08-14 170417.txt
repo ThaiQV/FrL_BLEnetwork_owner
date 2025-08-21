@@ -1,0 +1,2289 @@
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(16):install on
+[LOG][fl_nwk_protocol.c] CMD_INSTALLMODE(330):Master installMode: ON
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_collection_run(565):Install mode : On
+[LOG][fl_nwk_database.c] fl_db_nodelist_load(127):Num_slave:89
+[LOG][fl_nwk_database.c] fl_db_nodelist_load(129):Load NODELIST at slot(1)-addr(200421D1)
+[LOG][fl_nwk_database.c] _nodelist_printf(112):******** NODELIST ********
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[0]Mac:0x674BC777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[1]Mac:0x7586DF77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[2]Mac:0xB5E6F777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[3]Mac:0x4F9F8777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[4]Mac:0x7DB4BC77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[5]Mac:0x857EC877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[6]Mac:0x50DA0777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[7]Mac:0x47B35877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[8]Mac:0xC9BB3277
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[9]Mac:0x600D7577
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[10]Mac:0xA90BF077
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[11]Mac:0x742FE377
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[12]Mac:0xA205DE77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[13]Mac:0x8B092977
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[14]Mac:0xE6D66D77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[15]Mac:0xF860B877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[16]Mac:0x6881CA77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[17]Mac:0x1077E177
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[18]Mac:0x4CB17577
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[19]Mac:0x9B279177
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[20]Mac:0xAC843477
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[21]Mac:0x9E461677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[22]Mac:0xAE201877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[23]Mac:0xCC79D77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[24]Mac:0x24974277
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[25]Mac:0x474E6F77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[26]Mac:0x121F7E77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[27]Mac:0xA5C45677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[28]Mac:0xB49E7377
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[29]Mac:0xF0F48D77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[30]Mac:0xAED4F777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[31]Mac:0xFF398AD1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[32]Mac:0x3D2B5D1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[33]Mac:0x6A84BFD1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[34]Mac:0x2F2245D1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[35]Mac:0xC643B3D1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[36]Mac:0x4F11CBD1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[37]Mac:0x532FF477
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[38]Mac:0x626CC877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[39]Mac:0x5A6CA377
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[40]Mac:0x5286CD1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[41]Mac:0xC0F34177
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[42]Mac:0x54C5B677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[43]Mac:0xD78BD077
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[44]Mac:0xC67B4677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[45]Mac:0xE1F92E77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[46]Mac:0x346553D1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[47]Mac:0xD1B48177
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[48]Mac:0x7099FE77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[49]Mac:0xE288C877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[50]Mac:0xEC46B677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[51]Mac:0x6274A777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[52]Mac:0x6D110177
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[53]Mac:0x683DD877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[54]Mac:0xB829B077
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[55]Mac:0x88C48D77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[56]Mac:0x2A006577
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[57]Mac:0x213F6477
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[58]Mac:0xBBAC9977
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[59]Mac:0x5954A77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[60]Mac:0x3DDDFC77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[61]Mac:0xD452CB77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[62]Mac:0xD9796277
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[63]Mac:0xD6B0A077
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[64]Mac:0xA8E09877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[65]Mac:0x376D9977
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[66]Mac:0x2AA19C77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[67]Mac:0x4BED2F77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[68]Mac:0x4C290777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[69]Mac:0xFB110677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[70]Mac:0xAC330D77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[71]Mac:0x1E04FD77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[72]Mac:0xFCBBF277
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[73]Mac:0x774EA677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[74]Mac:0xADC2FF77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[75]Mac:0x719CFC77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[76]Mac:0x1BFFA077
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[77]Mac:0xECB34177
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[78]Mac:0x707BE577
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[79]Mac:0x416BCA77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[80]Mac:0x1397BC77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[81]Mac:0xCEA05977
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[82]Mac:0xB5857B77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[83]Mac:0xAF1F6F77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[84]Mac:0xA238DF77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[85]Mac:0xFE973877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[86]Mac:0x3FC42677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[87]Mac:0x306EA77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[88]Mac:0x6755A977
+[LOG][fl_nwk_database.c] _nodelist_printf(116):******** END *************
+Collection Init(0): 7| 8| 9
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:42:22
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:42:23
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:42:24
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:42:25
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:42:27
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:42:27
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 D4 33 9C 68 18 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(76 ms)(2):06:42:28-132/024
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(216 ms)(2):06:42:28-142/024
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:42:28
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(241 ms)(2):06:42:28-137/024
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(254 ms)(2):06:42:28-142/024
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(294 ms)(2):06:42:28-151/024
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(329 ms)(2):06:42:28-150/024
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:42:29
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:42:30
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 D7 33 9C 68 95 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(90 ms)(2):06:42:31-254/149
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(106 ms)(2):06:42:31-000/149
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(119 ms)(2):06:42:31-251/149
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(133 ms)(2):06:42:31-253/149
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(146 ms)(2):06:42:31-255/149
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(162 ms)(2):06:42:31-255/149
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:42:31
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:42:32
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:42:33
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:42:34
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 DB 33 9C 68 61 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(91 ms)(2):06:42:35-199/097
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:42:35
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:42:36
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:42:37
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 DD 33 9C 68 B0 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(118 ms)(2):06:42:37-023/176
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:42:37
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:42:39
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:42:40
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 E1 33 9C 68 70 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:42:41
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 E2 33 9C 68 28 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:42:42
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 E2 33 9C 68 AF FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:42:42
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 E2 33 9C 68 E0 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 E3 33 9C 68 10 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 E3 33 9C 68 41 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 E3 33 9C 68 66 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 E3 33 9C 68 8E FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:42:43
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:42:45
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:42:46
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:42:47
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:42:47
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(16):install off
+[LOG][fl_nwk_protocol.c] CMD_INSTALLMODE(330):Master installMode: OFF
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_collection_run(573):Install mode : Off
+Collection Deinit(0):7 |8 |9
+[LOG][fl_nwk_database.c] fl_db_nodelist_save(165):Save NODELIST at slot(2)-addr(2004238E)
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(5050 ms)(1):06:42:31-008/149
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(5077 ms)(0):06:42:31-007/149
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 EC 33 9C 68 89 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:42:52
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(100 ms)(2):06:42:52-238/137
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(120 ms)(2):06:42:52-242/137
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(132 ms)(2):06:42:52-239/137
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(146 ms)(2):06:42:52-238/137
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(161 ms)(2):06:42:52-238/137
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(175 ms)(2):06:42:52-240/137
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(187 ms)(1):06:42:52-237/137
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(203 ms)(2):06:42:52-238/137
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(323 ms)(2):06:42:52-244/137
+Online :9/9
+LongestTime:323 ms
+RspTime:279 ms
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:42:57
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:43:02
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:43:07
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):slalist
+[LOG][fl_nwk_master_handler.c] fl_master_nodelist_AddRefesh(73):NODE LIST: 89(grpID:11,memID:0)
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:43:12
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):slalist
+[LOG][fl_nwk_master_handler.c] fl_master_nodelist_AddRefesh(73):NODE LIST: 89(grpID:11,memID:0)
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:43:17
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 89
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(10):50 51 52 53 54 55 56 57 58 59 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 05 34 9C 68 C2 FF 50 51 52 53 54 55 56 57 58 59 FF FF FF FF FF FF FF FF FF FF 43 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(82 ms)(2):06:43:17-026/194
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(96 ms)(2):06:43:17-023/194
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(111 ms)(2):06:43:17-025/194
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(125 ms)(2):06:43:17-030/194
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(141 ms)(2):06:43:17-028/194
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(154 ms)(2):06:43:17-027/194
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(167 ms)(2):06:43:17-037/194
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(194 ms)(2):06:43:17-026/194
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 89
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(10):50 51 52 53 54 55 56 57 58 59 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 09 34 9C 68 CB FF 50 51 52 53 54 55 56 57 58 59 FF FF FF FF FF FF FF FF FF FF 43 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(83 ms)(2):06:43:21-037/203
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(97 ms)(2):06:43:21-033/203
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(113 ms)(2):06:43:21-032/203
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(127 ms)(2):06:43:21-033/203
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(142 ms)(2):06:43:21-034/203
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(156 ms)(2):06:43:21-047/203
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(171 ms)(2):06:43:21-033/203
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(183 ms)(2):06:43:21-035/203
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(595 ms)(2):06:43:21-047/203
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:43:22
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 89
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(10):50 51 52 53 54 55 56 57 58 59 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 0C 34 9C 68 DB FF 50 51 52 53 54 55 56 57 58 59 FF FF FF FF FF FF FF FF FF FF 43 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(99 ms)(2):06:43:24-069/219
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(113 ms)(2):06:43:24-054/219
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(127 ms)(2):06:43:24-050/219
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(143 ms)(2):06:43:24-056/219
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(158 ms)(2):06:43:24-054/219
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(171 ms)(2):06:43:24-058/219
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(405 ms)(2):06:43:24-069/219
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(431 ms)(2):06:43:24-066/219
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(446 ms)(2):06:43:24-068/219
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 89
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(10):50 51 52 53 54 55 56 57 58 59 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 0E 34 9C 68 BD FF 50 51 52 53 54 55 56 57 58 59 FF FF FF FF FF FF FF FF FF FF 43 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(78 ms)(2):06:43:26-018/189
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(93 ms)(2):06:43:26-018/189
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(109 ms)(2):06:43:26-016/189
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(122 ms)(2):06:43:26-020/189
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(138 ms)(2):06:43:26-022/189
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(151 ms)(2):06:43:26-014/189
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(166 ms)(2):06:43:26-033/189
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(497 ms)(1):06:43:26-018/189
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:43:27
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 89
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(10):50 51 52 53 54 55 56 57 58 59 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 10 34 9C 68 90 FF 50 51 52 53 54 55 56 57 58 59 FF FF FF FF FF FF FF FF FF FF 43 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(83 ms)(2):06:43:28-230/144
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(103 ms)(2):06:43:28-245/144
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(120 ms)(2):06:43:28-231/144
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(132 ms)(2):06:43:28-225/144
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(146 ms)(2):06:43:28-228/144
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(167 ms)(2):06:43:28-229/144
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(341 ms)(2):06:43:28-245/144
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(405 ms)(2):06:43:28-241/144
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(728 ms)(2):06:43:28-250/144
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:43:32
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:43:37
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 89
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(1):59 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 1A 34 9C 68 1C FF 59 FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 46 4A 
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:43:42
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:43:47
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 23 34 9C 68 A3 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(118 ms)(2):06:43:47-252/163
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(132 ms)(2):06:43:47-251/163
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(144 ms)(2):06:43:47-017/163
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(160 ms)(2):06:43:47-000/163
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(173 ms)(2):06:43:47-249/163
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(186 ms)(2):06:43:47-250/163
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(199 ms)(2):06:43:47-246/163
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(423 ms)(2):06:43:47-010/163
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(505 ms)(2):06:43:47-008/163
+Online :9/9
+LongestTime:505 ms
+RspTime:460 ms
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:43:52
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 89
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(10):50 51 52 53 54 55 56 57 58 59 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 2B 34 9C 68 E1 FF 50 51 52 53 54 55 56 57 58 59 FF FF FF FF FF FF FF FF FF FF 43 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(82 ms)(2):06:43:55-068/225
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(192 ms)(2):06:43:55-050/225
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(260 ms)(2):06:43:55-053/225
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(575 ms)(2):06:43:55-058/225
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(592 ms)(2):06:43:55-056/225
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(949 ms)(2):06:43:55-056/225
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(971 ms)(2):06:43:55-056/225
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(1142 ms)(2):06:43:55-048/225
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:43:57
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:44:02
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 89
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(10):50 51 52 53 54 55 56 57 58 59 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 36 34 9C 68 27 FF 50 51 52 53 54 55 56 57 58 59 FF FF FF FF FF FF FF FF FF FF 43 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(78 ms)(2):06:44:06-137/039
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(91 ms)(2):06:44:06-110/039
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(107 ms)(2):06:44:06-114/039
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(131 ms)(2):06:44:06-112/039
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(305 ms)(2):06:44:06-117/039
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(319 ms)(2):06:44:06-119/039
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(334 ms)(2):06:44:06-118/039
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(1099 ms)(2):06:44:06-112/039
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:44:07
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:44:12
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(16):install on
+[LOG][fl_nwk_protocol.c] CMD_INSTALLMODE(330):Master installMode: ON
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_collection_run(565):Install mode : On
+[LOG][fl_nwk_database.c] fl_db_nodelist_load(127):Num_slave:89
+[LOG][fl_nwk_database.c] fl_db_nodelist_load(129):Load NODELIST at slot(2)-addr(2004238E)
+[LOG][fl_nwk_database.c] _nodelist_printf(112):******** NODELIST ********
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[0]Mac:0x674BC777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[1]Mac:0x7586DF77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[2]Mac:0xB5E6F777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[3]Mac:0x4F9F8777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[4]Mac:0x7DB4BC77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[5]Mac:0x857EC877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[6]Mac:0x50DA0777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[7]Mac:0x47B35877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[8]Mac:0xC9BB3277
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[9]Mac:0x600D7577
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[10]Mac:0xA90BF077
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[11]Mac:0x742FE377
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[12]Mac:0xA205DE77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[13]Mac:0x8B092977
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[14]Mac:0xE6D66D77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[15]Mac:0xF860B877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[16]Mac:0x6881CA77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[17]Mac:0x1077E177
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[18]Mac:0x4CB17577
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[19]Mac:0x9B279177
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[20]Mac:0xAC843477
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[21]Mac:0x9E461677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[22]Mac:0xAE201877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[23]Mac:0xCC79D77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[24]Mac:0x24974277
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[25]Mac:0x474E6F77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[26]Mac:0x121F7E77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[27]Mac:0xA5C45677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[28]Mac:0xB49E7377
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[29]Mac:0xF0F48D77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[30]Mac:0xAED4F777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[31]Mac:0xFF398AD1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[32]Mac:0x3D2B5D1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[33]Mac:0x6A84BFD1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[34]Mac:0x2F2245D1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[35]Mac:0xC643B3D1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[36]Mac:0x4F11CBD1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[37]Mac:0x532FF477
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[38]Mac:0x626CC877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[39]Mac:0x5A6CA377
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[40]Mac:0x5286CD1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[41]Mac:0xC0F34177
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[42]Mac:0x54C5B677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[43]Mac:0xD78BD077
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[44]Mac:0xC67B4677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[45]Mac:0xE1F92E77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[46]Mac:0x346553D1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[47]Mac:0xD1B48177
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[48]Mac:0x7099FE77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[49]Mac:0xE288C877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[50]Mac:0xEC46B677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[51]Mac:0x6274A777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[52]Mac:0x6D110177
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[53]Mac:0x683DD877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[54]Mac:0xB829B077
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[55]Mac:0x88C48D77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[56]Mac:0x2A006577
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[57]Mac:0x213F6477
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[58]Mac:0xBBAC9977
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[59]Mac:0x5954A77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[60]Mac:0x3DDDFC77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[61]Mac:0xD452CB77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[62]Mac:0xD9796277
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[63]Mac:0xD6B0A077
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[64]Mac:0xA8E09877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[65]Mac:0x376D9977
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[66]Mac:0x2AA19C77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[67]Mac:0x4BED2F77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[68]Mac:0x4C290777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[69]Mac:0xFB110677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[70]Mac:0xAC330D77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[71]Mac:0x1E04FD77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[72]Mac:0xFCBBF277
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[73]Mac:0x774EA677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[74]Mac:0xADC2FF77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[75]Mac:0x719CFC77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[76]Mac:0x1BFFA077
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[77]Mac:0xECB34177
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[78]Mac:0x707BE577
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[79]Mac:0x416BCA77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[80]Mac:0x1397BC77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[81]Mac:0xCEA05977
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[82]Mac:0xB5857B77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[83]Mac:0xAF1F6F77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[84]Mac:0xA238DF77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[85]Mac:0xFE973877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[86]Mac:0x3FC42677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[87]Mac:0x306EA77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[88]Mac:0x6755A977
+[LOG][fl_nwk_database.c] _nodelist_printf(116):******** END *************
+Collection Init(0): 7| 8| 9
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:15
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:16
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:44:17
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:17
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:18
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:20
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:21
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:22
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:44:22
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:23
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:24
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:26
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:27
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:44:27
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:28
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:29
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:30
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:32
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:44:32
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:33
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:34
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:35
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:36
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:44:37
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:38
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:39
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:40
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:41
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:44:42
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:42
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:44
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:45
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:46
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:44:47
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:47
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:48
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:50
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:51
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:52
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:44:52
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:53
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:54
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:56
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 89
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(10):50 51 52 53 54 55 56 57 58 59 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 68 34 9C 68 8E FF 50 51 52 53 54 55 56 57 58 59 FF FF FF FF FF FF FF FF FF FF 43 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(79 ms)(2):06:44:56-240/142
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(93 ms)(2):06:44:56-237/142
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(108 ms)(2):06:44:56-238/142
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(121 ms)(2):06:44:56-237/142
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(134 ms)(2):06:44:56-238/142
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(150 ms)(2):06:44:56-238/142
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(163 ms)(2):06:44:56-236/142
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(176 ms)(2):06:44:56-237/142
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(592 ms)(2):06:44:56-253/142
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:57
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:44:57
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:58
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:44:59
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:45:00
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 89
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(10):50 51 52 53 54 55 56 57 58 59 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 6D 34 9C 68 A3 FF 50 51 52 53 54 55 56 57 58 59 FF FF FF FF FF FF FF FF FF FF 43 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(81 ms)(2):06:45:01-002/163
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(95 ms)(2):06:45:01-003/163
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(110 ms)(2):06:45:01-000/163
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(124 ms)(2):06:45:01-001/163
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(136 ms)(2):06:45:01-002/163
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(150 ms)(2):06:45:01-002/163
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(166 ms)(2):06:45:01-004/163
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(179 ms)(2):06:45:01-003/163
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:45:02
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:45:02
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:45:03
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 89
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(10):50 51 52 53 54 55 56 57 58 59 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 70 34 9C 68 23 FF 50 51 52 53 54 55 56 57 58 59 FF FF FF FF FF FF FF FF FF FF 43 4A 
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:45:04
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 89
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(10):50 51 52 53 54 55 56 57 58 59 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 71 34 9C 68 8B FF 50 51 52 53 54 55 56 57 58 59 FF FF FF FF FF FF FF FF FF FF 43 4A 
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 89
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(10):50 51 52 53 54 55 56 57 58 59 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 71 34 9C 68 B2 FF 50 51 52 53 54 55 56 57 58 59 FF FF FF FF FF FF FF FF FF FF 43 4A 
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:45:05
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 89
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(10):50 51 52 53 54 55 56 57 58 59 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 71 34 9C 68 D8 FF 50 51 52 53 54 55 56 57 58 59 FF FF FF FF FF FF FF FF FF FF 43 4A 
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:45:06
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:45:07
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:45:08
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:45:09
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:45:10
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(16):install off
+[LOG][fl_nwk_protocol.c] CMD_INSTALLMODE(330):Master installMode: OFF
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_collection_run(573):Install mode : Off
+Collection Deinit(0):7 |8 |9
+[LOG][fl_nwk_database.c] fl_db_nodelist_save(165):Save NODELIST at slot(3)-addr(2004254B)
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(5495 ms)(0):06:45:01-012/163
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:45:12
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 79
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(10):50 51 52 53 54 55 56 57 58 4F 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 7C 34 9C 68 66 FF 50 51 52 53 54 55 56 57 58 4F FF FF FF FF FF FF FF FF FF FF 39 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(123 ms)(2):06:45:16-205/102
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(136 ms)(2):06:45:16-205/102
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(149 ms)(2):06:45:16-206/102
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(165 ms)(2):06:45:16-193/102
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(178 ms)(2):06:45:16-208/102
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(191 ms)(2):06:45:16-205/102
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(203 ms)(2):06:45:16-206/102
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(219 ms)(2):06:45:16-203/102
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(577 ms)(2):06:45:16-220/102
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:45:17
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 79
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(10):50 51 52 53 54 55 56 57 58 4F 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 7F 34 9C 68 7D FF 50 51 52 53 54 55 56 57 58 4F FF FF FF FF FF FF FF FF FF FF 39 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(100 ms)(2):06:45:19-216/125
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(116 ms)(2):06:45:19-216/125
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(130 ms)(2):06:45:19-218/125
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(144 ms)(1):06:45:19-214/125
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(159 ms)(2):06:45:19-217/125
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(173 ms)(2):06:45:19-217/125
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(397 ms)(2):06:45:19-229/125
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(414 ms)(2):06:45:19-228/125
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 79
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(10):50 51 52 53 54 55 56 57 58 4F 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 81 34 9C 68 7C FF 50 51 52 53 54 55 56 57 58 4F FF FF FF FF FF FF FF FF FF FF 39 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(76 ms)(2):06:45:21-212/124
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(91 ms)(2):06:45:21-214/124
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(104 ms)(2):06:45:21-215/124
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(120 ms)(2):06:45:21-217/124
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(133 ms)(2):06:45:21-213/124
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(146 ms)(2):06:45:21-214/124
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(161 ms)(2):06:45:21-215/124
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(191 ms)(2):06:45:21-215/124
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(584 ms)(2):06:45:21-226/124
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:45:22
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 85 34 9C 68 BB FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(80 ms)(2):06:45:25-019/187
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(95 ms)(2):06:45:25-020/187
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(109 ms)(2):06:45:25-021/187
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(127 ms)(2):06:45:25-023/187
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(139 ms)(2):06:45:25-019/187
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(153 ms)(2):06:45:25-019/187
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(543 ms)(2):06:45:25-032/187
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(670 ms)(2):06:45:25-036/187
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(1076 ms)(1):06:45:25-035/187
+Online :9/9
+LongestTime:1076 ms
+RspTime:1033 ms
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:45:27
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:45:32
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:45:37
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:45:42
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:45:47
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:45:52
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:45:57
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:46:02
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:46:07
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:46:12
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:46:17
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:46:22
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:46:27
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:46:32
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:46:37
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:46:42
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:46:47
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:46:52
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:46:57
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:47:02
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:47:07
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 ED 34 9C 68 ED FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(77 ms)(2):06:47:09-056/237
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(91 ms)(2):06:47:09-051/237
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(107 ms)(2):06:47:09-048/237
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(121 ms)(2):06:47:09-052/237
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(135 ms)(2):06:47:09-048/237
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(358 ms)(2):06:47:09-059/237
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(613 ms)(2):06:47:09-050/237
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(641 ms)(2):06:47:09-071/237
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 EF 34 9C 68 3F FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(81 ms)(2):06:47:11-138/063
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(95 ms)(2):06:47:11-131/063
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(113 ms)(2):06:47:11-131/063
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(547 ms)(2):06:47:11-128/063
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(613 ms)(2):06:47:11-129/063
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(876 ms)(2):06:47:11-133/063
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(1030 ms)(2):06:47:11-133/063
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(1094 ms)(2):06:47:11-134/063
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:47:12
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 F0 34 9C 68 94 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(88 ms)(2):06:47:12-223/148
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(127 ms)(2):06:47:12-227/148
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(194 ms)(2):06:47:12-227/148
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(219 ms)(2):06:47:12-222/148
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(235 ms)(1):06:47:12-227/148
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(441 ms)(2):06:47:12-232/148
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(922 ms)(2):06:47:12-224/148
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 F1 34 9C 68 E3 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(187 ms)(2):06:47:13-064/227
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(200 ms)(2):06:47:13-067/227
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(214 ms)(2):06:47:13-069/227
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(230 ms)(1):06:47:13-067/227
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(244 ms)(2):06:47:13-074/227
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(278 ms)(2):06:47:13-066/227
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(321 ms)(2):06:47:13-078/227
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 F3 34 9C 68 36 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(82 ms)(2):06:47:15-118/054
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(96 ms)(2):06:47:15-123/054
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(108 ms)(2):06:47:15-119/054
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(124 ms)(2):06:47:15-121/054
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(156 ms)(2):06:47:15-132/054
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(877 ms)(2):06:47:15-122/054
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(900 ms)(2):06:47:15-123/054
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 F4 34 9C 68 89 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(126 ms)(2):06:47:16-215/137
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(143 ms)(2):06:47:16-221/137
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(156 ms)(2):06:47:16-204/137
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(173 ms)(2):06:47:16-211/137
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(256 ms)(2):06:47:16-223/137
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(297 ms)(2):06:47:16-225/137
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(327 ms)(2):06:47:16-224/137
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(374 ms)(2):06:47:16-220/137
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:47:17
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 F5 34 9C 68 DA FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(192 ms)(2):06:47:17-056/218
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(207 ms)(2):06:47:17-058/218
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(221 ms)(2):06:47:17-055/218
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(237 ms)(2):06:47:17-065/218
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(326 ms)(2):06:47:17-069/218
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(876 ms)(2):06:47:17-060/218
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(1139 ms)(2):06:47:17-057/218
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(1360 ms)(2):06:47:17-072/218
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:47:22
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:47:27
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 02 35 9C 68 5A FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(117 ms)(2):06:47:30-163/090
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(133 ms)(2):06:47:30-166/090
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(146 ms)(2):06:47:30-156/090
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(247 ms)(2):06:47:30-171/090
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(260 ms)(2):06:47:30-166/090
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(387 ms)(1):06:47:30-152/090
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(888 ms)(2):06:47:30-168/090
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(1050 ms)(2):06:47:30-164/090
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:47:32
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 04 35 9C 68 AC FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(80 ms)(2):06:47:32-235/172
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(94 ms)(2):06:47:32-236/172
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(107 ms)(2):06:47:32-239/172
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(124 ms)(2):06:47:32-236/172
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(185 ms)(2):06:47:32-237/172
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(274 ms)(2):06:47:32-247/172
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(302 ms)(2):06:47:32-251/172
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(366 ms)(2):06:47:32-001/172
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 06 35 9C 68 FD FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(77 ms)(2):06:47:34-062/253
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(91 ms)(2):06:47:34-069/253
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(104 ms)(2):06:47:34-061/253
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(121 ms)(2):06:47:34-063/253
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(249 ms)(2):06:47:34-068/253
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(313 ms)(2):06:47:34-068/253
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(499 ms)(2):06:47:34-074/253
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 09 35 9C 68 52 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(117 ms)(2):06:47:37-152/082
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(131 ms)(2):06:47:37-162/082
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(147 ms)(2):06:47:37-151/082
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:47:37
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(264 ms)(2):06:47:37-163/082
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(285 ms)(2):06:47:37-172/082
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(739 ms)(2):06:47:37-154/082
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(987 ms)(2):06:47:37-157/082
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(1067 ms)(2):06:47:37-154/082
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 0B 35 9C 68 A4 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(88 ms)(2):06:47:39-226/164
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(109 ms)(2):06:47:39-227/164
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(122 ms)(2):06:47:39-224/164
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(137 ms)(2):06:47:39-235/164
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(153 ms)(2):06:47:39-224/164
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(167 ms)(2):06:47:39-235/164
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(953 ms)(2):06:47:39-228/164
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 0E 35 9C 68 0F FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(87 ms)(2):06:47:42-078/015
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(102 ms)(2):06:47:42-077/015
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(115 ms)(2):06:47:42-086/015
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(132 ms)(2):06:47:42-075/015
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:47:42
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(559 ms)(2):06:47:42-080/015
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(573 ms)(2):06:47:42-098/015
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(597 ms)(2):06:47:42-081/015
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 0F 35 9C 68 C7 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(75 ms)(2):06:47:43-006/199
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(89 ms)(2):06:47:43-004/199
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(109 ms)(2):06:47:43-006/199
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(122 ms)(2):06:47:43-014/199
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(446 ms)(2):06:47:43-018/199
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(575 ms)(2):06:47:43-024/199
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(618 ms)(2):06:47:43-020/199
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(1188 ms)(2):06:47:43-024/199
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 12 35 9C 68 1C FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(130 ms)(2):06:47:46-095/028
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(146 ms)(2):06:47:46-099/028
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(160 ms)(2):06:47:46-096/028
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(479 ms)(2):06:47:46-102/028
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(796 ms)(2):06:47:46-109/028
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(929 ms)(2):06:47:46-107/028
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(1090 ms)(2):06:47:46-099/028
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:47:47
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 14 35 9C 68 A5 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(82 ms)(2):06:47:48-230/165
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(96 ms)(2):06:47:48-225/165
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(109 ms)(2):06:47:48-224/165
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(126 ms)(2):06:47:48-227/165
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(140 ms)(2):06:47:48-227/165
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(154 ms)(2):06:47:48-223/165
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(170 ms)(2):06:47:48-228/165
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(1184 ms)(2):06:47:48-241/165
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 16 35 9C 68 38 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(116 ms)(2):06:47:50-121/056
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(133 ms)(2):06:47:50-118/056
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(146 ms)(2):06:47:50-114/056
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(160 ms)(2):06:47:50-116/056
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(176 ms)(2):06:47:50-118/056
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(189 ms)(2):06:47:50-115/056
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(202 ms)(2):06:47:50-126/056
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(413 ms)(2):06:47:50-136/056
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(986 ms)(2):06:47:50-134/056
+Online :9/9
+LongestTime:986 ms
+RspTime:948 ms
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:47:52
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 1B 35 9C 68 9C FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(82 ms)(2):06:47:55-215/156
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(97 ms)(2):06:47:55-217/156
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(111 ms)(2):06:47:55-216/156
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(128 ms)(2):06:47:55-224/156
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(143 ms)(2):06:47:55-218/156
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(377 ms)(2):06:47:55-227/156
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(408 ms)(2):06:47:55-228/156
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(474 ms)(1):06:47:55-219/156
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:47:57
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 1E 35 9C 68 62 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 4A 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(83 ms)(2):06:47:58-155/098
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(97 ms)(2):06:47:58-158/098
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(110 ms)(2):06:47:58-160/098
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(126 ms)(2):06:47:58-158/098
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(138 ms)(2):06:47:58-166/098
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(154 ms)(2):06:47:58-154/098
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(721 ms)(2):06:47:58-158/098
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(926 ms)(2):06:47:58-162/098
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(1129 ms)(2):06:47:58-175/098
+Online :9/9
+LongestTime:1129 ms
+RspTime:1085 ms
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:48:02
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(16):repeat 3
+[LOG][fl_nwk_protocol.c] CMD_REPEAT(376):Repeat Mode: 3
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:48:07
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 2A 35 9C 68 E7 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(125 ms)(3):06:48:10-029/231
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(139 ms)(3):06:48:10-037/231
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(153 ms)(3):06:48:10-031/231
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(168 ms)(3):06:48:10-033/231
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(182 ms)(3):06:48:10-051/231
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(194 ms)(3):06:48:10-034/231
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(210 ms)(3):06:48:10-030/231
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:48:12
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 2E 35 9C 68 45 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(80 ms)(3):06:48:14-134/069
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(93 ms)(3):06:48:14-128/069
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(108 ms)(3):06:48:14-121/069
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(125 ms)(3):06:48:14-124/069
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(138 ms)(3):06:48:14-126/069
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(152 ms)(3):06:48:14-126/069
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(166 ms)(3):06:48:14-122/069
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:48:17
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:48:22
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:48:27
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:48:32
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(16):install on
+[LOG][fl_nwk_protocol.c] CMD_INSTALLMODE(330):Master installMode: ON
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_collection_run(565):Install mode : On
+[LOG][fl_nwk_database.c] fl_db_nodelist_load(127):Num_slave:89
+[LOG][fl_nwk_database.c] fl_db_nodelist_load(129):Load NODELIST at slot(3)-addr(2004254B)
+[LOG][fl_nwk_database.c] _nodelist_printf(112):******** NODELIST ********
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[0]Mac:0x674BC777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[1]Mac:0x7586DF77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[2]Mac:0xB5E6F777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[3]Mac:0x4F9F8777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[4]Mac:0x7DB4BC77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[5]Mac:0x857EC877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[6]Mac:0x50DA0777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[7]Mac:0x47B35877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[8]Mac:0xC9BB3277
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[9]Mac:0x600D7577
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[10]Mac:0xA90BF077
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[11]Mac:0x742FE377
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[12]Mac:0xA205DE77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[13]Mac:0x8B092977
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[14]Mac:0xE6D66D77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[15]Mac:0xF860B877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[16]Mac:0x6881CA77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[17]Mac:0x1077E177
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[18]Mac:0x4CB17577
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[19]Mac:0x9B279177
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[20]Mac:0xAC843477
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[21]Mac:0x9E461677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[22]Mac:0xAE201877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[23]Mac:0xCC79D77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[24]Mac:0x24974277
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[25]Mac:0x474E6F77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[26]Mac:0x121F7E77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[27]Mac:0xA5C45677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[28]Mac:0xB49E7377
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[29]Mac:0xF0F48D77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[30]Mac:0xAED4F777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[31]Mac:0xFF398AD1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[32]Mac:0x3D2B5D1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[33]Mac:0x6A84BFD1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[34]Mac:0x2F2245D1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[35]Mac:0xC643B3D1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[36]Mac:0x4F11CBD1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[37]Mac:0x532FF477
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[38]Mac:0x626CC877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[39]Mac:0x5A6CA377
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[40]Mac:0x5286CD1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[41]Mac:0xC0F34177
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[42]Mac:0x54C5B677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[43]Mac:0xD78BD077
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[44]Mac:0xC67B4677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[45]Mac:0xE1F92E77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[46]Mac:0x346553D1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[47]Mac:0xD1B48177
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[48]Mac:0x7099FE77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[49]Mac:0xE288C877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[50]Mac:0xEC46B677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[51]Mac:0x6274A777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[52]Mac:0x6D110177
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[53]Mac:0x683DD877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[54]Mac:0xB829B077
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[55]Mac:0x88C48D77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[56]Mac:0x2A006577
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[57]Mac:0x213F6477
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[58]Mac:0xBBAC9977
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[59]Mac:0x5954A77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[60]Mac:0x3DDDFC77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[61]Mac:0xD452CB77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[62]Mac:0xD9796277
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[63]Mac:0xD6B0A077
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[64]Mac:0xA8E09877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[65]Mac:0x376D9977
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[66]Mac:0x2AA19C77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[67]Mac:0x4BED2F77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[68]Mac:0x4C290777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[69]Mac:0xFB110677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[70]Mac:0xAC330D77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[71]Mac:0x1E04FD77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[72]Mac:0xFCBBF277
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[73]Mac:0x774EA677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[74]Mac:0xADC2FF77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[75]Mac:0x719CFC77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[76]Mac:0x1BFFA077
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[77]Mac:0xECB34177
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[78]Mac:0x707BE577
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[79]Mac:0x416BCA77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[80]Mac:0x1397BC77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[81]Mac:0xCEA05977
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[82]Mac:0xB5857B77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[83]Mac:0xAF1F6F77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[84]Mac:0xA238DF77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[85]Mac:0xFE973877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[86]Mac:0x3FC42677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[87]Mac:0x306EA77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[88]Mac:0x6755A977
+[LOG][fl_nwk_database.c] _nodelist_printf(116):******** END *************
+Collection Init(0): 7| 8| 9
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:48:37
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:48:38
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:48:39
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:48:40
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:48:41
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:48:42
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:48:42
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:48:44
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:48:45
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 4E 35 9C 68 1B FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(79 ms)(3):06:48:46-214/027
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(93 ms)(3):06:48:46-214/027
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(106 ms)(3):06:48:46-213/027
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(121 ms)(3):06:48:46-214/027
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(134 ms)(3):06:48:46-214/027
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(147 ms)(3):06:48:46-213/027
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(160 ms)(3):06:48:46-213/027
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:48:46
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:48:47
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:48:47
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 50 35 9C 68 14 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(81 ms)(3):06:48:48-208/020
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(107 ms)(3):06:48:48-207/020
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(121 ms)(3):06:48:48-207/020
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(134 ms)(3):06:48:48-208/020
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(147 ms)(3):06:48:48-207/020
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(162 ms)(3):06:48:48-207/020
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(175 ms)(3):06:48:48-206/020
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(188 ms)(3):06:48:48-207/020
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:48:48
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 51 35 9C 68 C6 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(96 ms)(3):06:48:49-129/198
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(117 ms)(3):06:48:49-129/198
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(129 ms)(3):06:48:49-129/198
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(146 ms)(3):06:48:49-129/198
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(159 ms)(3):06:48:49-129/198
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(171 ms)(3):06:48:49-129/198
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(188 ms)(3):06:48:49-130/198
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(200 ms)(3):06:48:49-129/198
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(213 ms)(3):06:48:49-128/198
+Online :9/9
+LongestTime:213 ms
+RspTime:176 ms
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:48:50
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:48:51
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 54 35 9C 68 16 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(78 ms)(3):06:48:52-209/022
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(91 ms)(3):06:48:52-209/022
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(104 ms)(3):06:48:52-208/022
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(121 ms)(3):06:48:52-208/022
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(134 ms)(3):06:48:52-209/022
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(147 ms)(3):06:48:52-208/022
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(163 ms)(3):06:48:52-209/022
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(176 ms)(3):06:48:52-210/022
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(189 ms)(3):06:48:52-209/022
+Online :9/9
+LongestTime:189 ms
+RspTime:145 ms
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:48:52
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:48:52
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 55 35 9C 68 5B FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(79 ms)(3):06:48:53-022/091
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(92 ms)(3):06:48:53-023/091
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(108 ms)(3):06:48:53-022/091
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(122 ms)(3):06:48:53-022/091
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(135 ms)(3):06:48:53-021/091
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(148 ms)(3):06:48:53-022/091
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(164 ms)(3):06:48:53-022/091
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(177 ms)(3):06:48:53-022/091
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:48:53
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:48:54
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:48:56
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 89
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(1):59 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 58 35 9C 68 7C FF 59 FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 46 6B 
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:48:57
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:48:57
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 89
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(1):59 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 5A 35 9C 68 40 FF 59 FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 46 6B 
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:48:58
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 89
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(1):59 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 5A 35 9C 68 EF FF 59 FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 46 6B 
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 89
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(1):59 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 5B 35 9C 68 1C FF 59 FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 46 6B 
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 89
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(1):59 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 5B 35 9C 68 4D FF 59 FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 46 6B 
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 89
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(1):59 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 5B 35 9C 68 75 FF 59 FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 46 6B 
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:48:59
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:49:00
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:49:02
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:49:02
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:49:03
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:49:04
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:49:05
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:49:06
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:49:07
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:49:08
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:49:09
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:49:10
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:49:11
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:49:12
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:49:12
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:49:14
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:49:15
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:49:16
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:49:17
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:49:17
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:49:18
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:49:20
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:49:21
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:49:22
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:49:22
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:49:23
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:49:24
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:49:26
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:49:27
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:49:27
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(16):install off
+[LOG][fl_nwk_protocol.c] CMD_INSTALLMODE(330):Master installMode: OFF
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_collection_run(573):Install mode : Off
+Collection Deinit(0):7 |8 |9
+[LOG][fl_nwk_database.c] fl_db_nodelist_save(165):Save NODELIST at slot(4)-addr(20042708)
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 79 35 9C 68 F0 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(122 ms)(3):06:49:29-183/240
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(136 ms)(3):06:49:29-184/240
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(149 ms)(3):06:49:29-185/240
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(165 ms)(3):06:49:29-186/240
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(178 ms)(3):06:49:29-183/240
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(191 ms)(3):06:49:29-184/240
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(204 ms)(3):06:49:29-181/240
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(219 ms)(3):06:49:29-182/240
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(816 ms)(3):06:49:29-205/240
+Online :9/9
+LongestTime:816 ms
+RspTime:772 ms
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:49:32
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 7F 35 9C 68 3C FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(79 ms)(3):06:49:35-251/060
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(172 ms)(3):06:49:35-001/060
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(190 ms)(3):06:49:35-253/060
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(204 ms)(3):06:49:35-000/060
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(217 ms)(3):06:49:35-000/060
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(230 ms)(3):06:49:35-003/060
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(246 ms)(3):06:49:35-000/060
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(353 ms)(3):06:49:35-006/060
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:49:37
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 82 35 9C 68 C8 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(116 ms)(3):06:49:38-142/200
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(133 ms)(3):06:49:38-137/200
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(146 ms)(3):06:49:38-141/200
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(162 ms)(3):06:49:38-138/200
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(175 ms)(3):06:49:38-143/200
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(189 ms)(3):06:49:38-140/200
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(342 ms)(3):06:49:38-149/200
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(357 ms)(3):06:49:38-149/200
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 85 35 9C 68 4D FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(84 ms)(3):06:49:41-008/077
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(99 ms)(3):06:49:41-014/077
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(113 ms)(3):06:49:41-011/077
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(129 ms)(3):06:49:41-010/077
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(142 ms)(3):06:49:41-012/077
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(156 ms)(3):06:49:41-010/077
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(170 ms)(3):06:49:41-009/077
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(185 ms)(3):06:49:41-007/077
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:49:42
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 87 35 9C 68 89 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(127 ms)(3):06:49:43-081/137
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(141 ms)(3):06:49:43-079/137
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(155 ms)(3):06:49:43-081/137
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(171 ms)(3):06:49:43-081/137
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(185 ms)(3):06:49:43-083/137
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(198 ms)(3):06:49:43-082/137
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(429 ms)(3):06:49:43-098/137
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(463 ms)(3):06:49:43-101/137
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 8A 35 9C 68 2F FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(88 ms)(3):06:49:46-237/047
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(105 ms)(3):06:49:46-236/047
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(119 ms)(3):06:49:46-238/047
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(134 ms)(3):06:49:46-236/047
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(148 ms)(3):06:49:46-233/047
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(178 ms)(3):06:49:46-234/047
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(302 ms)(2):06:49:46-237/047
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(443 ms)(3):06:49:46-249/047
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(505 ms)(3):06:49:46-245/047
+Online :9/9
+LongestTime:505 ms
+RspTime:461 ms
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:49:47
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:49:52
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:49:57
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:50:02
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:50:07
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:50:12
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 A5 35 9C 68 D9 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(98 ms)(3):06:50:13-147/217
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(118 ms)(3):06:50:13-156/217
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(133 ms)(3):06:50:13-152/217
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(146 ms)(3):06:50:13-151/217
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(162 ms)(3):06:50:13-156/217
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 A7 35 9C 68 E7 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(77 ms)(3):06:50:15-166/231
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(91 ms)(3):06:50:15-171/231
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(120 ms)(3):06:50:15-165/231
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(139 ms)(3):06:50:15-162/231
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(169 ms)(3):06:50:15-166/231
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(183 ms)(3):06:50:15-167/231
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(291 ms)(3):06:50:15-175/231
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(778 ms)(2):06:50:15-171/231
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:50:17
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:50:22
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 83
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(1):53 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 B0 35 9C 68 DD FF 53 FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 40 6B 
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 83
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(1):53 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 B1 35 9C 68 7B FF 53 FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 40 6B 
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 83
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(1):53 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 B2 35 9C 68 02 FF 53 FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 40 6B 
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:50:27
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:50:32
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:50:37
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:50:42
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 C3 35 9C 68 22 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(88 ms)(3):06:50:43-220/034
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(104 ms)(3):06:50:43-226/034
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(117 ms)(3):06:50:43-220/034
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(132 ms)(3):06:50:43-231/034
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(146 ms)(3):06:50:43-225/034
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(160 ms)(3):06:50:43-225/034
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(176 ms)(3):06:50:43-228/034
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(555 ms)(3):06:50:43-241/034
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:50:47
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:50:52
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:50:57
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 83
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(1):53 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 D5 35 9C 68 0C FF 53 FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 40 6B 
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:51:02
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:51:07
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:51:12
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:51:17
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:51:22
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:51:27
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:51:32
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:51:37
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(16):install on
+[LOG][fl_nwk_protocol.c] CMD_INSTALLMODE(330):Master installMode: ON
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_collection_run(565):Install mode : On
+[LOG][fl_nwk_database.c] fl_db_nodelist_load(127):Num_slave:89
+[LOG][fl_nwk_database.c] fl_db_nodelist_load(129):Load NODELIST at slot(4)-addr(20042708)
+[LOG][fl_nwk_database.c] _nodelist_printf(112):******** NODELIST ********
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[0]Mac:0x674BC777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[1]Mac:0x7586DF77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[2]Mac:0xB5E6F777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[3]Mac:0x4F9F8777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[4]Mac:0x7DB4BC77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[5]Mac:0x857EC877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[6]Mac:0x50DA0777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[7]Mac:0x47B35877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[8]Mac:0xC9BB3277
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[9]Mac:0x600D7577
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[10]Mac:0xA90BF077
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[11]Mac:0x742FE377
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[12]Mac:0xA205DE77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[13]Mac:0x8B092977
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[14]Mac:0xE6D66D77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[15]Mac:0xF860B877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[16]Mac:0x6881CA77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[17]Mac:0x1077E177
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[18]Mac:0x4CB17577
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[19]Mac:0x9B279177
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[20]Mac:0xAC843477
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[21]Mac:0x9E461677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[22]Mac:0xAE201877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[23]Mac:0xCC79D77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[24]Mac:0x24974277
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[25]Mac:0x474E6F77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[26]Mac:0x121F7E77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[27]Mac:0xA5C45677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[28]Mac:0xB49E7377
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[29]Mac:0xF0F48D77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[30]Mac:0xAED4F777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[31]Mac:0xFF398AD1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[32]Mac:0x3D2B5D1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[33]Mac:0x6A84BFD1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[34]Mac:0x2F2245D1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[35]Mac:0xC643B3D1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[36]Mac:0x4F11CBD1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[37]Mac:0x532FF477
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[38]Mac:0x626CC877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[39]Mac:0x5A6CA377
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[40]Mac:0x5286CD1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[41]Mac:0xC0F34177
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[42]Mac:0x54C5B677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[43]Mac:0xD78BD077
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[44]Mac:0xC67B4677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[45]Mac:0xE1F92E77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[46]Mac:0x346553D1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[47]Mac:0xD1B48177
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[48]Mac:0x7099FE77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[49]Mac:0xE288C877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[50]Mac:0xEC46B677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[51]Mac:0x6274A777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[52]Mac:0x6D110177
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[53]Mac:0x683DD877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[54]Mac:0xB829B077
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[55]Mac:0x88C48D77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[56]Mac:0x2A006577
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[57]Mac:0x213F6477
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[58]Mac:0xBBAC9977
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[59]Mac:0x5954A77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[60]Mac:0x3DDDFC77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[61]Mac:0xD452CB77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[62]Mac:0xD9796277
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[63]Mac:0xD6B0A077
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[64]Mac:0xA8E09877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[65]Mac:0x376D9977
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[66]Mac:0x2AA19C77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[67]Mac:0x4BED2F77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[68]Mac:0x4C290777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[69]Mac:0xFB110677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[70]Mac:0xAC330D77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[71]Mac:0x1E04FD77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[72]Mac:0xFCBBF277
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[73]Mac:0x774EA677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[74]Mac:0xADC2FF77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[75]Mac:0x719CFC77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[76]Mac:0x1BFFA077
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[77]Mac:0xECB34177
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[78]Mac:0x707BE577
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[79]Mac:0x416BCA77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[80]Mac:0x1397BC77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[81]Mac:0xCEA05977
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[82]Mac:0xB5857B77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[83]Mac:0xAF1F6F77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[84]Mac:0xA238DF77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[85]Mac:0xFE973877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[86]Mac:0x3FC42677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[87]Mac:0x306EA77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[88]Mac:0x6755A977
+[LOG][fl_nwk_database.c] _nodelist_printf(116):******** END *************
+Collection Init(0): 7| 8| 9
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:51:40
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:51:41
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:51:42
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:51:42
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:51:43
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:51:44
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:51:46
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:51:47
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:51:47
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:51:48
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:51:49
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:51:50
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:51:52
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:51:52
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:51:53
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:51:54
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:51:55
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:51:56
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:51:57
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:51:58
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:51:59
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:52:00
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:52:01
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:52:02
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:52:02
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:52:04
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:52:05
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:52:06
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:52:07
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:52:07
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:52:08
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:52:10
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:52:11
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:52:12
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:52:12
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:52:13
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:52:14
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:52:16
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:52:17
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:52:17
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 21 36 9C 68 82 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:52:18
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:52:19
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(16):install off
+[LOG][fl_nwk_protocol.c] CMD_INSTALLMODE(330):Master installMode: OFF
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_collection_run(573):Install mode : Off
+Collection Deinit(0):7 |8 |9
+[LOG][fl_nwk_database.c] fl_db_nodelist_save(165):Save NODELIST at slot(5)-addr(200428C5)
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 26 36 9C 68 2D FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(90 ms)(3):06:52:22-085/045
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(103 ms)(3):06:52:22-088/045
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(120 ms)(3):06:52:22-084/045
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(133 ms)(3):06:52:22-085/045
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(146 ms)(3):06:52:22-086/045
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:52:22
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(180 ms)(3):06:52:22-084/045
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(193 ms)(3):06:52:22-087/045
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(561 ms)(3):06:52:22-094/045
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(762 ms)(2):06:52:22-086/045
+Online :9/9
+LongestTime:762 ms
+RspTime:718 ms
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 27 36 9C 68 D1 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(86 ms)(3):06:52:23-245/209
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(100 ms)(3):06:52:23-250/209
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(117 ms)(3):06:52:23-251/209
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(130 ms)(3):06:52:23-249/209
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(144 ms)(3):06:52:23-250/209
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(157 ms)(3):06:52:23-248/209
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(172 ms)(3):06:52:23-248/209
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(623 ms)(3):06:52:23-017/209
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(714 ms)(3):06:52:23-018/209
+Online :9/9
+LongestTime:714 ms
+RspTime:670 ms
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 2A 36 9C 68 2F FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(171 ms)(3):06:52:26-111/047
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(186 ms)(3):06:52:26-113/047
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(200 ms)(3):06:52:26-111/047
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(215 ms)(3):06:52:26-113/047
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(228 ms)(3):06:52:26-110/047
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(244 ms)(3):06:52:26-112/047
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:52:27
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(1255 ms)(3):06:52:26-121/047
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 2D 36 9C 68 BC FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(115 ms)(3):06:52:29-240/188
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(130 ms)(3):06:52:29-236/188
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(145 ms)(3):06:52:29-238/188
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(159 ms)(3):06:52:29-236/188
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(172 ms)(3):06:52:29-238/188
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(185 ms)(3):06:52:29-238/188
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(201 ms)(3):06:52:29-233/188
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(215 ms)(3):06:52:29-236/188
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(715 ms)(3):06:52:29-255/188
+Online :9/9
+LongestTime:715 ms
+RspTime:675 ms
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 2F 36 9C 68 28 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(84 ms)(3):06:52:31-082/040
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(98 ms)(3):06:52:31-079/040
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(114 ms)(3):06:52:31-080/040
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(129 ms)(3):06:52:31-083/040
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(142 ms)(3):06:52:31-081/040
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(154 ms)(3):06:52:31-076/040
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(172 ms)(3):06:52:31-082/040
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(697 ms)(3):06:52:31-104/040
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:52:32
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 32 36 9C 68 0B FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(120 ms)(3):06:52:34-063/011
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(134 ms)(3):06:52:34-063/011
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(170 ms)(3):06:52:34-063/011
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(184 ms)(3):06:52:34-060/011
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(200 ms)(3):06:52:34-060/011
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(213 ms)(3):06:52:34-061/011
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(238 ms)(3):06:52:34-071/011
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(396 ms)(3):06:52:34-067/011
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 34 36 9C 68 98 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(106 ms)(3):06:52:36-195/152
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(119 ms)(3):06:52:36-191/152
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(134 ms)(3):06:52:36-195/152
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(150 ms)(3):06:52:36-192/152
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(163 ms)(3):06:52:36-193/152
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(176 ms)(3):06:52:36-193/152
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(192 ms)(3):06:52:36-189/152
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(205 ms)(3):06:52:36-196/152
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(274 ms)(3):06:52:36-200/152
+Online :9/9
+LongestTime:274 ms
+RspTime:230 ms
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:52:37
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 36 36 9C 68 71 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(105 ms)(3):06:52:38-159/113
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(121 ms)(3):06:52:38-164/113
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(137 ms)(3):06:52:38-160/113
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(150 ms)(3):06:52:38-161/113
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(164 ms)(3):06:52:38-162/113
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(179 ms)(3):06:52:38-161/113
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(192 ms)(3):06:52:38-163/113
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(401 ms)(2):06:52:38-156/113
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(1330 ms)(2):06:52:38-174/113
+Online :9/9
+LongestTime:1330 ms
+RspTime:1286 ms
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 39 36 9C 68 20 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(123 ms)(3):06:52:41-083/032
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(137 ms)(3):06:52:41-082/032
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(154 ms)(3):06:52:41-084/032
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(167 ms)(3):06:52:41-083/032
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(182 ms)(3):06:52:41-086/032
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(197 ms)(3):06:52:41-081/032
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(210 ms)(3):06:52:41-082/032
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(223 ms)(3):06:52:41-077/032
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(583 ms)(3):06:52:41-093/032
+Online :9/9
+LongestTime:583 ms
+RspTime:539 ms
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:52:42
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(16):debug off
+[LOG][fl_nwk_protocol.c] CMD_DEBUG(340):Master Netrwork Debug: OFF
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:52:47
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 41 36 9C 68 72 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(82 ms)(3):06:52:49-157/114
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(98 ms)(3):06:52:49-150/114
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(112 ms)(3):06:52:49-155/114
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(126 ms)(3):06:52:49-158/114
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(141 ms)(3):06:52:49-156/114
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(155 ms)(3):06:52:49-160/114
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(170 ms)(3):06:52:49-154/114
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(183 ms)(3):06:52:49-158/114
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(401 ms)(3):06:52:49-163/114
+Online :9/9
+LongestTime:401 ms
+RspTime:357 ms
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 42 36 9C 68 E5 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(82 ms)(3):06:52:50-013/229
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(96 ms)(3):06:52:50-019/229
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(109 ms)(3):06:52:50-009/229
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(124 ms)(3):06:52:50-017/229
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(138 ms)(3):06:52:50-017/229
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(152 ms)(3):06:52:50-013/229
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(167 ms)(2):06:52:50-014/229
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(181 ms)(3):06:52:50-016/229
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:52:52
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 45 36 9C 68 7E FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(78 ms)(3):06:52:53-171/126
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(92 ms)(3):06:52:53-163/126
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(104 ms)(3):06:52:53-173/126
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(121 ms)(3):06:52:53-171/126
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(135 ms)(3):06:52:53-167/126
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(151 ms)(3):06:52:53-170/126
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(165 ms)(3):06:52:53-168/126
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(178 ms)(3):06:52:53-168/126
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(390 ms)(3):06:52:53-179/126
+Online :9/9
+LongestTime:390 ms
+RspTime:346 ms
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 46 36 9C 68 BB FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(78 ms)(3):06:52:54-234/187
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(92 ms)(3):06:52:54-232/187
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(107 ms)(3):06:52:54-232/187
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(123 ms)(3):06:52:54-224/187
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(138 ms)(3):06:52:54-230/187
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(153 ms)(3):06:52:54-229/187
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(166 ms)(3):06:52:54-227/187
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(596 ms)(3):06:52:54-231/187
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:52:57
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 4A 36 9C 68 49 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(85 ms)(3):06:52:58-115/073
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(98 ms)(3):06:52:58-120/073
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(111 ms)(3):06:52:58-118/073
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(127 ms)(3):06:52:58-117/073
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(140 ms)(3):06:52:58-118/073
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(154 ms)(3):06:52:58-109/073
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(170 ms)(3):06:52:58-113/073
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(182 ms)(3):06:52:58-116/073
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 4C 36 9C 68 98 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(81 ms)(3):06:53:00-198/152
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(96 ms)(3):06:53:00-197/152
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(112 ms)(3):06:53:00-197/152
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(126 ms)(3):06:53:00-194/152
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(139 ms)(3):06:53:00-193/152
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(152 ms)(3):06:53:00-195/152
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(1105 ms)(3):06:53:00-204/152
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:53:02
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 51 36 9C 68 CB FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(85 ms)(3):06:53:05-244/203
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(98 ms)(3):06:53:05-249/203
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(112 ms)(3):06:53:05-247/203
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(128 ms)(3):06:53:05-251/203
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(141 ms)(3):06:53:05-239/203
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:53:07
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 53 36 9C 68 98 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(77 ms)(3):06:53:07-197/152
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(102 ms)(3):06:53:07-193/152
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(118 ms)(3):06:53:07-194/152
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(132 ms)(3):06:53:07-188/152
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(146 ms)(3):06:53:07-194/152
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(161 ms)(3):06:53:07-199/152
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(174 ms)(3):06:53:07-198/152
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(187 ms)(3):06:53:07-198/152
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(200 ms)(3):06:53:07-195/152
+Online :9/9
+LongestTime:200 ms
+RspTime:163 ms
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 56 36 9C 68 18 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(92 ms)(3):06:53:10-066/024
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(105 ms)(3):06:53:10-072/024
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(121 ms)(3):06:53:10-067/024
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(134 ms)(3):06:53:10-068/024
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(147 ms)(3):06:53:10-060/024
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(217 ms)(2):06:53:10-070/024
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(1186 ms)(3):06:53:10-082/024
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 58 36 9C 68 2F FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(78 ms)(3):06:53:12-093/047
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(92 ms)(3):06:53:12-096/047
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(108 ms)(3):06:53:12-089/047
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(121 ms)(3):06:53:12-092/047
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:53:12
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(154 ms)(3):06:53:12-090/047
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(169 ms)(3):06:53:12-083/047
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(182 ms)(3):06:53:12-093/047
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(196 ms)(3):06:53:12-088/047
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:53:17
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 5E 36 9C 68 AE FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(90 ms)(3):06:53:18-216/174
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(104 ms)(3):06:53:18-210/174
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(139 ms)(3):06:53:18-224/174
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(168 ms)(3):06:53:18-218/174
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(228 ms)(3):06:53:18-222/174
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 5F 36 9C 68 2D FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(80 ms)(3):06:53:19-091/045
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(119 ms)(3):06:53:19-092/045
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(137 ms)(3):06:53:19-092/045
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(162 ms)(3):06:53:19-081/045
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(176 ms)(3):06:53:19-089/045
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(191 ms)(3):06:53:19-093/045
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(204 ms)(3):06:53:19-101/045
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(218 ms)(3):06:53:19-094/045
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(238 ms)(3):06:53:19-094/045
+Online :9/9
+LongestTime:238 ms
+RspTime:200 ms
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 61 36 9C 68 96 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(84 ms)(3):06:53:21-197/150
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(97 ms)(3):06:53:21-192/150
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(113 ms)(3):06:53:21-186/150
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(130 ms)(3):06:53:21-193/150
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(143 ms)(3):06:53:21-197/150
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(334 ms)(2):06:53:21-194/150
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:53:22
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(1173 ms)(3):06:53:21-221/150
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:53:27
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:53:32
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 6E 36 9C 68 1A FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(87 ms)(3):06:53:34-074/026
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(100 ms)(3):06:53:34-076/026
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(116 ms)(3):06:53:34-075/026
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(129 ms)(3):06:53:34-072/026
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(144 ms)(3):06:53:34-069/026
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(157 ms)(3):06:53:34-062/026
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(383 ms)(3):06:53:34-082/026
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(608 ms)(3):06:53:34-090/026
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 70 36 9C 68 F6 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(85 ms)(3):06:53:36-040/246
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(108 ms)(3):06:53:36-036/246
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(171 ms)(3):06:53:36-044/246
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(241 ms)(3):06:53:36-057/246
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(274 ms)(3):06:53:36-051/246
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(292 ms)(3):06:53:36-052/246
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(305 ms)(3):06:53:36-054/246
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(321 ms)(3):06:53:36-059/246
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:53:37
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 75 36 9C 68 02 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(78 ms)(3):06:53:41-052/002
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(92 ms)(3):06:53:41-048/002
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(106 ms)(3):06:53:41-045/002
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(123 ms)(3):06:53:41-051/002
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(136 ms)(3):06:53:41-052/002
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(150 ms)(3):06:53:41-054/002
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(163 ms)(3):06:53:41-047/002
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(599 ms)(3):06:53:41-061/002
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:53:42
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 78 36 9C 68 4B FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(154 ms)(3):06:53:44-143/075
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(180 ms)(3):06:53:44-144/075
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(193 ms)(3):06:53:44-140/075
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(210 ms)(3):06:53:44-137/075
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(224 ms)(3):06:53:44-138/075
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(245 ms)(3):06:53:44-130/075
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(260 ms)(3):06:53:44-144/075
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:53:47
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 7D 36 9C 68 B7 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(77 ms)(3):06:53:49-236/183
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(105 ms)(3):06:53:49-233/183
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(137 ms)(3):06:53:49-233/183
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(152 ms)(3):06:53:49-232/183
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(166 ms)(3):06:53:49-229/183
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(181 ms)(3):06:53:49-230/183
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(194 ms)(3):06:53:49-226/183
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(207 ms)(3):06:53:49-238/183
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(431 ms)(2):06:53:49-228/183
+Online :9/9
+LongestTime:431 ms
+RspTime:390 ms
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:53:52
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:53:57
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:54:02
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:54:07
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:54:12
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:54:17
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:54:22
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:54:27
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:54:32
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:54:37
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:54:42
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:54:47
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:54:52
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:54:57
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:55:02
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:55:07
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:55:12
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:55:17
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:55:22
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:55:27
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(16):install on
+[LOG][fl_nwk_protocol.c] CMD_INSTALLMODE(330):Master installMode: ON
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_collection_run(565):Install mode : On
+[LOG][fl_nwk_database.c] fl_db_nodelist_load(127):Num_slave:89
+[LOG][fl_nwk_database.c] fl_db_nodelist_load(129):Load NODELIST at slot(5)-addr(200428C5)
+[LOG][fl_nwk_database.c] _nodelist_printf(112):******** NODELIST ********
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[0]Mac:0x674BC777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[1]Mac:0x7586DF77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[2]Mac:0xB5E6F777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[3]Mac:0x4F9F8777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[4]Mac:0x7DB4BC77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[5]Mac:0x857EC877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[6]Mac:0x50DA0777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[7]Mac:0x47B35877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[8]Mac:0xC9BB3277
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[9]Mac:0x600D7577
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[10]Mac:0xA90BF077
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[11]Mac:0x742FE377
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[12]Mac:0xA205DE77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[13]Mac:0x8B092977
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[14]Mac:0xE6D66D77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[15]Mac:0xF860B877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[16]Mac:0x6881CA77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[17]Mac:0x1077E177
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[18]Mac:0x4CB17577
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[19]Mac:0x9B279177
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[20]Mac:0xAC843477
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[21]Mac:0x9E461677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[22]Mac:0xAE201877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[23]Mac:0xCC79D77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[24]Mac:0x24974277
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[25]Mac:0x474E6F77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[26]Mac:0x121F7E77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[27]Mac:0xA5C45677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[28]Mac:0xB49E7377
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[29]Mac:0xF0F48D77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[30]Mac:0xAED4F777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[31]Mac:0xFF398AD1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[32]Mac:0x3D2B5D1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[33]Mac:0x6A84BFD1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[34]Mac:0x2F2245D1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[35]Mac:0xC643B3D1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[36]Mac:0x4F11CBD1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[37]Mac:0x532FF477
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[38]Mac:0x626CC877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[39]Mac:0x5A6CA377
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[40]Mac:0x5286CD1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[41]Mac:0xC0F34177
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[42]Mac:0x54C5B677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[43]Mac:0xD78BD077
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[44]Mac:0xC67B4677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[45]Mac:0xE1F92E77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[46]Mac:0x346553D1
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[47]Mac:0xD1B48177
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[48]Mac:0x7099FE77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[49]Mac:0xE288C877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[50]Mac:0xEC46B677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[51]Mac:0x6274A777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[52]Mac:0x6D110177
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[53]Mac:0x683DD877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[54]Mac:0xB829B077
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[55]Mac:0x88C48D77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[56]Mac:0x2A006577
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[57]Mac:0x213F6477
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[58]Mac:0xBBAC9977
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[59]Mac:0x5954A77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[60]Mac:0x3DDDFC77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[61]Mac:0xD452CB77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[62]Mac:0xD9796277
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[63]Mac:0xD6B0A077
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[64]Mac:0xA8E09877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[65]Mac:0x376D9977
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[66]Mac:0x2AA19C77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[67]Mac:0x4BED2F77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[68]Mac:0x4C290777
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[69]Mac:0xFB110677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[70]Mac:0xAC330D77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[71]Mac:0x1E04FD77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[72]Mac:0xFCBBF277
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[73]Mac:0x774EA677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[74]Mac:0xADC2FF77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[75]Mac:0x719CFC77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[76]Mac:0x1BFFA077
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[77]Mac:0xECB34177
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[78]Mac:0x707BE577
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[79]Mac:0x416BCA77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[80]Mac:0x1397BC77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[81]Mac:0xCEA05977
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[82]Mac:0xB5857B77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[83]Mac:0xAF1F6F77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[84]Mac:0xA238DF77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[85]Mac:0xFE973877
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[86]Mac:0x3FC42677
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[87]Mac:0x306EA77
+[LOG][fl_nwk_database.c] _nodelist_printf(114):[88]Mac:0x6755A977
+[LOG][fl_nwk_database.c] _nodelist_printf(116):******** END *************
+Collection Init(0): 7| 8| 9
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:55:29
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:55:30
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:55:31
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:55:32
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:55:32
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:55:33
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:55:35
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:55:36
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:55:37
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:55:37
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:55:38
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(16):debug oN
+[LOG][fl_nwk_protocol.c] CMD_DEBUG(340):Master Netrwork Debug: OFF
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:55:39
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:55:41
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:55:42
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:55:42
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:55:43
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:55:44
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:55:45
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:55:47
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:55:47
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:55:48
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:55:49
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:55:50
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:55:51
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:55:52
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:55:53
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:55:54
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:55:55
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:55:56
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:55:57
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:55:57
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:55:59
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:00
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:01
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:56:02
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:02
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:03
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:05
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:06
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:56:07
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:07
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:08
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:09
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:11
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:56:12
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:12
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:13
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:14
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:15
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:17
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:56:17
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:18
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:19
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:20
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:21
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:56:22
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:23
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:24
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:25
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(16):debug on
+[LOG][fl_nwk_protocol.c] CMD_DEBUG(340):Master Netrwork Debug: ON
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:26
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:56:27
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:27
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:29
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:30
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:31
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:56:32
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:32
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:33
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:35
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(16):debug off
+[LOG][fl_nwk_protocol.c] CMD_DEBUG(340):Master Netrwork Debug: OFF
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:36
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:56:37
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:37
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:38
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:39
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:41
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:56:42
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:42
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:43
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:44
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:45
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:47
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:56:47
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:48
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:49
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:50
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:51
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:56:52
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:53
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:54
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:55
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:56
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:56:57
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:57
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:56:59
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:57:00
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:57:01
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:57:02
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:57:02
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:57:03
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:57:05
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:57:06
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:57:07
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:57:07
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:57:08
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:57:09
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:57:11
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:57:12
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:57:12
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:57:13
+[LOG][fl_nwk_master_handler.c] fl_send_collection_req(351):CollectREQ:2025/08/13-06:57:14
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(16):install off
+[LOG][fl_nwk_protocol.c] CMD_INSTALLMODE(330):Master installMode: OFF
+[LOG][fl_nwk_master_handler.c] fl_nwk_master_collection_run(573):Install mode : Off
+Collection Deinit(0):7 |8 |9
+[LOG][fl_nwk_database.c] fl_db_nodelist_save(165):Save NODELIST at slot(6)-addr(20042A82)
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:57:17
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 4D 37 9C 68 86 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(134 ms)(3):06:57:17-047/134
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(149 ms)(3):06:57:17-048/134
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(164 ms)(3):06:57:17-049/134
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(177 ms)(3):06:57:17-048/134
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(190 ms)(3):06:57:17-046/134
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(206 ms)(3):06:57:17-048/134
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(218 ms)(3):06:57:17-045/134
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(233 ms)(3):06:57:17-047/134
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(246 ms)(3):06:57:17-047/134
+Online :9/9
+LongestTime:246 ms
+RspTime:202 ms
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 4E 37 9C 68 EE FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(79 ms)(3):06:57:18-139/238
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(93 ms)(3):06:57:18-139/238
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(107 ms)(3):06:57:18-135/238
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(122 ms)(3):06:57:18-139/238
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(135 ms)(3):06:57:18-138/238
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(150 ms)(3):06:57:18-138/238
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(164 ms)(3):06:57:18-137/238
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(178 ms)(3):06:57:18-136/238
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 51 37 9C 68 7A FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(146 ms)(3):06:57:21-032/122
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(161 ms)(3):06:57:21-033/122
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(175 ms)(3):06:57:21-033/122
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(189 ms)(3):06:57:21-029/122
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(205 ms)(2):06:57:21-032/122
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(218 ms)(3):06:57:21-030/122
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(231 ms)(3):06:57:21-032/122
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(290 ms)(3):06:57:21-037/122
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(602 ms)(2):06:57:21-033/122
+Online :9/9
+LongestTime:602 ms
+RspTime:564 ms
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:57:22
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 53 37 9C 68 2E FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(129 ms)(3):06:57:23-215/046
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(143 ms)(3):06:57:23-215/046
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(159 ms)(3):06:57:23-215/046
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(176 ms)(3):06:57:23-214/046
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(194 ms)(3):06:57:23-212/046
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(207 ms)(3):06:57:23-216/046
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(221 ms)(3):06:57:23-211/046
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(398 ms)(3):06:57:23-226/046
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(874 ms)(3):06:57:23-234/046
+Online :9/9
+LongestTime:874 ms
+RspTime:835 ms
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 54 37 9C 68 F2 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(119 ms)(3):06:57:24-150/242
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(137 ms)(3):06:57:24-150/242
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(150 ms)(3):06:57:24-147/242
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(166 ms)(3):06:57:24-149/242
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(181 ms)(3):06:57:24-150/242
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(194 ms)(3):06:57:24-146/242
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(210 ms)(3):06:57:24-151/242
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(222 ms)(3):06:57:24-149/242
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(235 ms)(3):06:57:24-150/242
+Online :9/9
+LongestTime:235 ms
+RspTime:191 ms
+[LOG][fl_nwk_protocol.c] _Passing_CmdLine(507):CMD(17):info 80 81 82 83 84 85 86 87 88 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(480):num(9):50 51 52 53 54 55 56 57 58 
+[LOG][fl_nwk_protocol.c] CMD_GETINFOSLAVE(482):Info Pack(29):F5 56 37 9C 68 A6 FF 50 51 52 53 54 55 56 57 58 FF FF FF FF FF FF FF FF FF FF FF E9 6B 
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(87)(84 ms)(3):06:57:26-064/166
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(85)(111 ms)(3):06:57:26-068/166
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(80)(128 ms)(3):06:57:26-068/166
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(86)(141 ms)(3):06:57:26-068/166
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(83)(154 ms)(3):06:57:26-069/166
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(81)(170 ms)(3):06:57:26-068/166
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(82)(184 ms)(3):06:57:26-067/166
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(88)(196 ms)(3):06:57:26-067/166
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:57:27
+[LOG][fl_nwk_master_handler.c] fl_master_ProccesRSP_cbk(448):INFO(84)(807 ms)(2):06:57:26-073/166
+Online :9/9
+LongestTime:807 ms
+RspTime:767 ms
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:57:32
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:57:37
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:57:42
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:57:47
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:57:52
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:57:57
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:58:02
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:58:07
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:58:12
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:58:17
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:58:22
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:58:27
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:58:32
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:58:37
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:58:42
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:58:47
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:58:52
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:58:57
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:59:02
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:59:07
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:59:12
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:59:17
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:59:22
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:59:27
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:59:32
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:59:37
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:59:42
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:59:47
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:59:52
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 06:59:57
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:00:02
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:00:07
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:00:12
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:00:17
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:00:22
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:00:27
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:00:32
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:00:37
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:00:42
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:00:47
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:00:52
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:00:57
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:01:02
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:01:07
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:01:12
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:01:17
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:01:22
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:01:27
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:01:32
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:01:37
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:01:42
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:01:47
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:01:52
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:01:57
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:02:02
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:02:07
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:02:12
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:02:16
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:02:21
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:02:26
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:02:31
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:02:36
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:02:41
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:02:46
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:02:51
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:02:56
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:03:01
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:03:06
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:03:11
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:03:16
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:03:21
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:03:26
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:03:31
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:03:36
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:03:41
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:03:46
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:03:51
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:03:56
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:04:01
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:04:06
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:04:11
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:04:16
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:04:21
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:04:26
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:04:31
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:04:36
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:04:41
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:04:46
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:04:51
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:04:56
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:05:01
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:05:06
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:05:11
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:05:16
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:05:21
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:05:26
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:05:31
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:05:36
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:05:41
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:05:46
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:05:51
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:05:56
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:06:01
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:06:06
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:06:11
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:06:16
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:06:21
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:06:26
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:06:31
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:06:36
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:06:41
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:06:46
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:06:51
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:06:56
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:07:01
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:07:06
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:07:11
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:07:16
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:07:21
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:07:26
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:07:31
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:07:36
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:07:41
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:07:46
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:07:51
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:07:56
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:08:01
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:08:06
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:08:11
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:08:16
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:08:21
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:08:26
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:08:31
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:08:36
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:08:41
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:08:46
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:08:51
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:08:56
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:09:01
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:09:06
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:09:11
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:09:16
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:09:21
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:09:26
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:09:31
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:09:36
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:09:41
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:09:46
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:09:51
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:09:56
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:10:01
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:10:06
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:10:11
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:10:16
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:10:21
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:10:26
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:10:31
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:10:36
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:10:41
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:10:46
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:10:51
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:10:56
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:11:01
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:11:06
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:11:11
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:11:16
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:11:21
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:11:26
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:11:31
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:11:36
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:11:41
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:11:46
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:11:51
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:11:56
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:12:01
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:12:06
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:12:11
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:12:16
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:12:21
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:12:26
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:12:31
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:12:36
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:12:41
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:12:46
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:12:51
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:12:56
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:13:01
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:13:06
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:13:11
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:13:16
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:13:21
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:13:26
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:13:31
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:13:36
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:13:41
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:13:46
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:13:51
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:13:56
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:14:01
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:14:06
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:14:11
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:14:16
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:14:21
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:14:26
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:14:31
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:14:36
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:14:41
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:14:46
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:14:51
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:14:56
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:15:01
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:15:06
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:15:11
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:15:16
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:15:21
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:15:26
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:15:31
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:15:36
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:15:41
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:15:46
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:15:51
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:15:56
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:16:01
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:16:06
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:16:11
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:16:16
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:16:21
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:16:26
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:16:31
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:16:36
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:16:41
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:16:46
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:16:51
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:16:56
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:17:01
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:17:06
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:17:11
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:17:16
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:17:21
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:17:26
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:17:31
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:17:36
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:17:41
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:17:46
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:17:51
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:17:56
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:18:01
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:18:06
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:18:11
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:18:16
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:18:21
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:18:26
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:18:31
+[LOG][app.c] app_system_time_sync(55):SYSTIME:2025/08/13 - 07:18:36
