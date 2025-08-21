@@ -11,32 +11,40 @@
 #include "tl_common.h"
 #include "fl_nwk_api.h"
 
-void _rsp_callback(void *_data){
-	u8 *data =  (u8*)_data;
-	LOGA(API,"Data:%d\r\n",*data);
+void _rsp_callback(void *_data,void* _data2){
+	fl_rsp_container_t *data =  (fl_rsp_container_t*)_data;
+	LOGA(API,"Timeout:%d\r\n",data->timeout);
+	LOGA(API,"cmdID  :%0X\r\n",data->rsp_check.hdr_cmdid);
+	LOGA(API,"SlaveID:%0X\r\n",data->rsp_check.slaveID);
+	//rsp data
+
+	if(data->timeout >= 0){
+		fl_pack_t *packet = (fl_pack_t *)_data2;
+		P_PRINTFHEX_A(API,packet->data_arr,packet->length,"RSP: ");
+	}
 }
-void _rsp_callback1(void *_data){
-	_rsp_callback(_data);
-}
-void _rsp_callback2(void *_data){
-	_rsp_callback(_data);
-}
-void _rsp_callback3(void *_data){
-	_rsp_callback(_data);
-}
-void _rsp_callback4(void *_data){
-	_rsp_callback(_data);
-}
+//void _rsp_callback1(void *_data){
+//	_rsp_callback(_data);
+//}
+//void _rsp_callback2(void *_data){
+//	_rsp_callback(_data);
+//}
+//void _rsp_callback3(void *_data){
+//	_rsp_callback(_data);
+//}
+//void _rsp_callback4(void *_data){
+//	_rsp_callback(_data);
+//}
 
 int TEST_slave_sendREQ(void) {
-	u32 rand_time_send = 0;
+	u32 rand_time_send = 5000;
 	static u32 test_pack_cnt = 0;
 	if (blt_soft_timer_find(&TEST_slave_sendREQ) == -1) {
 		blt_soft_timer_add(&TEST_slave_sendREQ,rand_time_send * 1000);
 	} else {
-		rand_time_send = 5000;//RAND(500,4500);
-		LOGA(APP,"TEST REQ %d ms\r\n",rand_time_send);
-		if (IsJoinedNetwork()) {
+		rand_time_send = RAND(500,4500);
+		if (IsJoinedNetwork() && IsOnline()) {
+			LOGA(APP,"TEST REQ %d ms\r\n",rand_time_send);
 			u8 test_u8[4];
 			test_pack_cnt++;
 			test_u8[0] = U32_BYTE0(test_pack_cnt);

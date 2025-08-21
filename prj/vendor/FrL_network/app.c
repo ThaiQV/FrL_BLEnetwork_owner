@@ -128,14 +128,13 @@ _attribute_no_inline_ void user_init_normal(void) {
 	bls_pm_setSuspendMask(SUSPEND_DISABLE);
 
 	//////////////////////////// BLE stack Initialization  End //////////////////////////////////
-
+	///////////////////// stimer Management initialization///////////////////
+	//blc_ll_initPowerManagement_module();
+	blt_soft_timer_init();
 	///////////////////// freelux adv initialization///////////////////
 	//fl_db_clearAll();//FOR CLEAN
 	////////////////// config adv scan /////////////////////
 	fl_adv_init();
-	///////////////////// stimer Management initialization///////////////////
-	//blc_ll_initPowerManagement_module();
-	blt_soft_timer_init();
 	///////////////////// TIME SYSTEM initialization///////////////////
 	fl_rtc_init();
 

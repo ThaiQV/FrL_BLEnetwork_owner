@@ -10,6 +10,8 @@
 
 #include "tl_common.h"
 #include "fl_nwk_handler.h"
+#include "fl_nwk_protocol.h"
+
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -28,15 +30,6 @@
  * @return	  	:-1: fail otherwise success
  *
  ***************************************************/
-
-typedef struct {
-	fl_rsp_callback_fnc rsp_cb;
-	s32 timeout;
-	struct {
-		u8 hdr_cmdid;
-		u8 slaveID;
-	} rsp_check;
-}__attribute__((packed)) fl_rsp_container_t;
 
 fl_rsp_container_t G_QUEUE_REQ_CALL_RSP[QUEUE_RSP_SLOT_MAX];
 
@@ -112,6 +105,7 @@ s8 fl_queueREQcRSP_add(u8 cmdid,u8 slaveid,fl_rsp_callback_fnc *_cb, u32 _timeou
 
 int fl_queue_REQnRSP_TimeoutStart(void){
 	if(blt_soft_timer_find(&fl_queue_REQnRSP_TimeoutStart)==-1){
+		LOGA(INF,"REQcRSP initialization (%d ms)!!\r\n",QUEUQ_REQcRSP_INTERVAL);
 		blt_soft_timer_add(&fl_queue_REQnRSP_TimeoutStart,QUEUQ_REQcRSP_INTERVAL);
 		fl_queueREQcRSP_clear(G_QUEUE_REQ_CALL_RSP);
 	}else{
@@ -119,10 +113,10 @@ int fl_queue_REQnRSP_TimeoutStart(void){
 		for(u8 i =0;i < avai_slot;i++){
 			//check timeout
 			if(G_QUEUE_REQ_CALL_RSP[i].timeout > 0 && G_QUEUE_REQ_CALL_RSP[i].rsp_cb != 0){
-				G_QUEUE_REQ_CALL_RSP[i].timeout -= QUEUQ_REQcRSP_INTERVAL;
+				G_QUEUE_REQ_CALL_RSP[i].timeout -= (s32)QUEUQ_REQcRSP_INTERVAL;
 				if(G_QUEUE_REQ_CALL_RSP[i].timeout <= 0){
 					LOGA(API,"%d/%d TIMEOUT!!! \r\n", G_QUEUE_REQ_CALL_RSP[i].rsp_check.hdr_cmdid ,G_QUEUE_REQ_CALL_RSP[i].rsp_check.slaveID);
-					G_QUEUE_REQ_CALL_RSP[i].rsp_cb((void*)&G_QUEUE_REQ_CALL_RSP[i].rsp_cb); //timeout
+					G_QUEUE_REQ_CALL_RSP[i].rsp_cb((void*)&G_QUEUE_REQ_CALL_RSP[i],0); //timeout
 					//clear event
 					_queue_REQcRSP_clear(&G_QUEUE_REQ_CALL_RSP[i]);
 				}
@@ -139,20 +133,36 @@ int fl_queue_REQnRSP_TimeoutStart(void){
  * @return	  	:pack
  *
  ***************************************************/
-void fl_queue_REQcRSP_ScanRec(fl_pack_t _pack) {
+#ifdef MASTER_CORE
+void fl_queue_REQcRSP_ScanRec(fl_pack_t _pack)
+{
+#else
+void fl_queue_REQcRSP_ScanRec(fl_pack_t _pack,void *_id)
+{
+	fl_nodeinnetwork_t *_myID = (fl_nodeinnetwork_t*)_id;
+#endif
 	extern u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
 	fl_data_frame_u packet;
 	if (!fl_packet_parse(_pack,&packet.frame)) {
 		ERR(API,"Packet parse fail!!!\r\n");
 		return;
 	}else{
+#ifndef MASTER_CORE
+		if(_myID->slaveID.id_u8 != packet.frame.slaveID.id_u8 || _myID->slaveID.id_u8==0xFF){//not me
+			return;
+		}
+		//Synchronize debug log
+		NWK_DEBUG_STT = packet.frame.endpoint.dbg;
+		DEBUG_TURN(NWK_DEBUG_STT);
+		_myID->active = true;
+#endif
 		u8 avai_slot = fl_queueREQcRSP_sort();
 		for(u8 i =0;i < avai_slot;i++){
 			if (G_QUEUE_REQ_CALL_RSP[i].rsp_check.hdr_cmdid != 0 && G_QUEUE_REQ_CALL_RSP[i].rsp_check.slaveID != 0xFF) {
 				if (G_QUEUE_REQ_CALL_RSP[i].rsp_check.hdr_cmdid == packet.frame.hdr
 					&& G_QUEUE_REQ_CALL_RSP[i].rsp_check.slaveID == packet.frame.slaveID.id_u8) {
 					LOGA(API,"Master RSP:%d/%d\r\n",packet.frame.hdr,packet.frame.slaveID.id_u8);
-					G_QUEUE_REQ_CALL_RSP[i].rsp_cb((void*)packet.frame.payload); //timeout
+					G_QUEUE_REQ_CALL_RSP[i].rsp_cb((void*)&G_QUEUE_REQ_CALL_RSP[i],(void*)&_pack); //timeout
 					//clear event
 					_queue_REQcRSP_clear(&G_QUEUE_REQ_CALL_RSP[i]);
 				}

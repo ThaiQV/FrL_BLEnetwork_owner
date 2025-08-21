@@ -65,22 +65,22 @@ void fl_db_rtc_save(u32 _timetamp) {
 	check.magic = 0;
 	for (u16 i = 0; i < RTC_MAX_ENTRIES; i++) {
 		check.magic = 0;
-		flash_read_page(ADDR_RTC_START + i * RTC_ENTRY_SIZE,RTC_ENTRY_SIZE,(uint8_t*) &check);
+		flash_dread(ADDR_RTC_START + i * RTC_ENTRY_SIZE,RTC_ENTRY_SIZE,(uint8_t*) &check);
 //		LOGA(FLA,"RTC DB(0x%X):0x%X\r\n",ADDR_RTC_START + i * RTC_ENTRY_SIZE,check.magic);
 		if (check.magic != RTC_MAGIC) {
-			flash_write_page(ADDR_RTC_START + i * RTC_ENTRY_SIZE,RTC_ENTRY_SIZE,(uint8_t*) &entry);
+			flash_page_program(ADDR_RTC_START + i * RTC_ENTRY_SIZE,RTC_ENTRY_SIZE,(uint8_t*) &entry);
 //			LOGA(FLA,"RTC backup(0x%X):%ld\r\n",ADDR_RTC_START + i * RTC_ENTRY_SIZE,entry.timestamp);
 			return;
 		}
 	}
 	flash_erase_sector(ADDR_RTC_START);
-	flash_write_page(ADDR_RTC_START,RTC_ENTRY_SIZE,(uint8_t*) &entry);
+	flash_page_program(ADDR_RTC_START,RTC_ENTRY_SIZE,(uint8_t*) &entry);
 }
 
 u32 fl_db_rtc_load(void) {
 	fl_rtc_entry_t entry;
 	for (s16 i = RTC_MAX_ENTRIES - 1; i >= 0; i--) {
-		flash_read_page(ADDR_RTC_START + i * RTC_ENTRY_SIZE,RTC_ENTRY_SIZE,(uint8_t*) &entry);
+		flash_dread(ADDR_RTC_START + i * RTC_ENTRY_SIZE,RTC_ENTRY_SIZE,(uint8_t*) &entry);
 //		LOGA(FLA,"RTC DB(0x%X):0x%X\r\n",ADDR_RTC_START + i * RTC_ENTRY_SIZE,entry.magic);
 		if (entry.magic == RTC_MAGIC) {
 //			LOGA(FLA,"RTC load(0x%X):%ld\r\n",ADDR_RTC_START + i * RTC_ENTRY_SIZE,entry.timestamp);
@@ -117,13 +117,13 @@ bool fl_db_nodelist_load(fl_nodelist_db_t* slavedata_arr) {
 	unsigned long addr_slave_data = ADDR_NODELIST_DATA;
 	const u8 size_slave_data = sizeof(fl_node_data_t)/sizeof(u8);
 	for (u8 var = 0; var < NODELIST_NUMSLAVE_SIZE; ++var) {
-		flash_read_page(ADDR_NODELIST_NUMSLAVE + var,1,&num_slave_buf);
+		flash_dread(ADDR_NODELIST_NUMSLAVE + var,1,&num_slave_buf);
 		if (num_slave_buf == 0xFF) {
 			LOGA(FLA,"Num_slave:%d\r\n",nodelist_db.num_slave);
 			if (nodelist_db.num_slave && nodelist_db.num_slave != 0xFF) {
 				LOGA(FLA,"Load NODELIST at slot(%d)-addr(%08lX)\r\n",var -1,addr_slave_data);
 				/* get data slave */
-				flash_read_page(addr_slave_data,nodelist_db.num_slave * size_slave_data,(u8*) &nodelist_db.slave);
+				flash_dread(addr_slave_data,nodelist_db.num_slave * size_slave_data,(u8*) &nodelist_db.slave);
 				*slavedata_arr = nodelist_db;
 				//printf nodelist debug
 				_nodelist_printf(nodelist_db.slave,nodelist_db.num_slave);
@@ -156,13 +156,13 @@ bool fl_db_nodelist_save(fl_nodelist_db_t *_pnodelist){
 
 	u8 num_slave_buf = 0;
 	for (u8 var = 0; var < NODELIST_NUMSLAVE_SIZE; ++var) {
-		flash_read_page(ADDR_NODELIST_NUMSLAVE + var,1,&num_slave_buf);
+		flash_dread(ADDR_NODELIST_NUMSLAVE + var,1,&num_slave_buf);
 		if (num_slave_buf == 0xFF) {
 			addr_slave_data_end = addr_slave_data + nodelist_buf.num_slave * size_slave_data;
 			LOGA(FLA,"Save NODELIST at slot(%d)-addr(%08lX - %08lX)\r\n",var,addr_slave_data,addr_slave_data_end);
 			if(addr_slave_data_end > ADDR_NODELIST_START+NODELIST_SIZE)goto RE_STORE;
-			flash_write_page(ADDR_NODELIST_NUMSLAVE + var,1,(u8*) &nodelist_buf.num_slave);
-			flash_write_page(addr_slave_data,nodelist_buf.num_slave * size_slave_data,(u8*) &nodelist_buf.slave);
+			flash_page_program(ADDR_NODELIST_NUMSLAVE + var,1,(u8*) &nodelist_buf.num_slave);
+			flash_page_program(addr_slave_data,nodelist_buf.num_slave * size_slave_data,(u8*) &nodelist_buf.slave);
 			return true;
 		} else {
 			addr_slave_data = addr_slave_data + num_slave_buf * size_slave_data;
@@ -191,7 +191,7 @@ void fl_db_nodelist_clearAll(void){
 fl_db_master_profile_t fl_db_masterprofile_load(void) {
 	fl_db_master_profile_t entry = { .magic = 0xFFFFFFFF};
 	for (s16 i = MASTER_PROFILE_MAX_ENTRIES - 1; i >= 0; i--) {
-		flash_read_page(ADDR_MASTER_PROFILE_START + i * MASTER_PROFILE_ENTRY_SIZE,MASTER_PROFILE_ENTRY_SIZE,(uint8_t*) &entry);
+		flash_dread(ADDR_MASTER_PROFILE_START + i * MASTER_PROFILE_ENTRY_SIZE,MASTER_PROFILE_ENTRY_SIZE,(uint8_t*) &entry);
 		if (entry.magic == MASTER_PROFILE_MAGIC) {
 			LOGA(FLA,"MASTER PROFILE Load(0x%X):%d|%d|%d\r\n",ADDR_MASTER_PROFILE_START + i * MASTER_PROFILE_ENTRY_SIZE,
 					entry.nwk.chn[0],entry.nwk.chn[1],entry.nwk.chn[2]);
@@ -213,16 +213,16 @@ void fl_db_masterprofile_save(fl_db_master_profile_t entry) {
 	fl_db_master_profile_t check;
 	for (u16 i = 0; i < MASTER_PROFILE_MAX_ENTRIES; i++) {
 		check.magic = 0;
-		flash_read_page(ADDR_MASTER_PROFILE_START + i * MASTER_PROFILE_ENTRY_SIZE,MASTER_PROFILE_ENTRY_SIZE,(uint8_t*) &check);
+		flash_dread(ADDR_MASTER_PROFILE_START + i * MASTER_PROFILE_ENTRY_SIZE,MASTER_PROFILE_ENTRY_SIZE,(uint8_t*) &check);
 		if (check.magic != MASTER_PROFILE_MAGIC) {
-			flash_write_page(ADDR_MASTER_PROFILE_START + i * MASTER_PROFILE_ENTRY_SIZE,MASTER_PROFILE_ENTRY_SIZE,(uint8_t*) &entry);
+			flash_page_program(ADDR_MASTER_PROFILE_START + i * MASTER_PROFILE_ENTRY_SIZE,MASTER_PROFILE_ENTRY_SIZE,(uint8_t*) &entry);
 			LOGA(FLA,"MASTER PROFILE Stored(0x%X):%d|%d|%d\r\n",ADDR_MASTER_PROFILE_START + i * MASTER_PROFILE_ENTRY_SIZE,
 					entry.nwk.chn[0],entry.nwk.chn[1],entry.nwk.chn[2]);
 			return;
 		}
 	}
 	flash_erase_sector(ADDR_MASTER_PROFILE_START);
-	flash_write_page(ADDR_MASTER_PROFILE_START,MASTER_PROFILE_ENTRY_SIZE,(uint8_t*) &entry);
+	flash_page_program(ADDR_MASTER_PROFILE_START,MASTER_PROFILE_ENTRY_SIZE,(uint8_t*) &entry);
 }
 fl_db_master_profile_t fl_db_masterprofile_init(void) {
 	fl_db_master_profile_t profile = { .magic = 0xFFFFFFFF};
@@ -234,7 +234,7 @@ fl_db_master_profile_t fl_db_masterprofile_init(void) {
 		profile = fl_db_masterprofile_load();
 	}
 	//for debugging
-	LOGA(FLA,"Magic: 0x%X\r\n",profile.magic);
+//	LOGA(FLA,"Magic: 0x%X\r\n",profile.magic);
 	LOGA(FLA,"NWK channel:%d |%d |%d \r\n",profile.nwk.chn[0],profile.nwk.chn[1],profile.nwk.chn[2]);
 	return profile;
 }
@@ -253,7 +253,7 @@ fl_db_master_profile_t fl_db_masterprofile_init(void) {
 fl_slave_profiles_t fl_db_slaveprofile_load(void) {
 	fl_slave_profiles_t entry = {.slaveid = 0xFF};
 	for (s16 i = SLAVE_PROFILE_MAX_ENTRIES - 1; i >= 0; i--) {
-		flash_read_page(ADDR_SLAVE_PROFILE_START + i * SLAVE_PROFILE_ENTRY_SIZE,SLAVE_PROFILE_ENTRY_SIZE,(uint8_t*) &entry);
+		flash_dread(ADDR_SLAVE_PROFILE_START + i * SLAVE_PROFILE_ENTRY_SIZE,SLAVE_PROFILE_ENTRY_SIZE,(uint8_t*) &entry);
 		if (entry.magic == SLAVE_PROFILE_MAGIC) {
 			LOGA(FLA,"SLAVE PROFILE Load(0x%X):%d\r\n",ADDR_SLAVE_PROFILE_START + i * SLAVE_PROFILE_ENTRY_SIZE,entry.slaveid);
 			return entry;
@@ -274,15 +274,15 @@ void fl_db_slaveprofile_save(fl_slave_profiles_t entry) {
 	fl_slave_profiles_t check;
 	for (u16 i = 0; i < SLAVE_PROFILE_MAX_ENTRIES; i++) {
 		check.magic = 0;
-		flash_read_page(ADDR_SLAVE_PROFILE_START + i * SLAVE_PROFILE_ENTRY_SIZE,SLAVE_PROFILE_ENTRY_SIZE,(uint8_t*) &check);
+		flash_dread(ADDR_SLAVE_PROFILE_START + i * SLAVE_PROFILE_ENTRY_SIZE,SLAVE_PROFILE_ENTRY_SIZE,(uint8_t*) &check);
 		if (check.magic != SLAVE_PROFILE_MAGIC) {
-			flash_write_page(ADDR_SLAVE_PROFILE_START + i * SLAVE_PROFILE_ENTRY_SIZE,SLAVE_PROFILE_ENTRY_SIZE,(uint8_t*) &entry);
+			flash_page_program(ADDR_SLAVE_PROFILE_START + i * SLAVE_PROFILE_ENTRY_SIZE,SLAVE_PROFILE_ENTRY_SIZE,(uint8_t*) &entry);
 			LOGA(FLA,"SLAVE PROFILE Stored(0x%X):%d\r\n",ADDR_SLAVE_PROFILE_START + i * SLAVE_PROFILE_ENTRY_SIZE,entry.slaveid);
 			return;
 		}
 	}
 	flash_erase_sector(ADDR_SLAVE_PROFILE_START);
-	flash_write_page(ADDR_SLAVE_PROFILE_START,SLAVE_PROFILE_ENTRY_SIZE,(uint8_t*) &entry);
+	flash_page_program(ADDR_SLAVE_PROFILE_START,SLAVE_PROFILE_ENTRY_SIZE,(uint8_t*) &entry);
 }
 /***************************************************
  * @brief 		: initialization slave profile database
@@ -302,7 +302,7 @@ fl_slave_profiles_t fl_db_slaveprofile_init(void){
 		profile = fl_db_slaveprofile_load();
 	}
 	//for debugging
-	LOGA(FLA,"Magic: 0x%X\r\n",profile.magic);
+//	LOGA(FLA,"Magic: 0x%X\r\n",profile.magic);
 	LOGA(FLA,"SlaveID:%d\r\n",profile.slaveid);
 	LOGA(FLA,"NWK channel:%d |%d |%d \r\n",profile.nwk.chn[0],profile.nwk.chn[1],profile.nwk.chn[2]);
 	LOGA(FLA,"NWK Parent(%d):0x%X\r\n",profile.run_stt.join_nwk,profile.nwk.mac_parent);
@@ -317,6 +317,23 @@ fl_slave_profiles_t fl_db_slaveprofile_init(void){
 /******************************************************************************/
 /******************************************************************************/
 void fl_db_init(void){
+
+	//First load firmware to device
+	//check flash -> clear all -> first init
+	u8 initialized_db[QUANTITY_FIELD_STORED_DB];
+	memset(initialized_db,0xFF,QUANTITY_FIELD_STORED_DB);
+	flash_dread(ADDR_DATABASE_INITIALIZATION,QUANTITY_FIELD_STORED_DB,(uint8_t*) &initialized_db);
+	for(u8 i = 0;i<QUANTITY_FIELD_STORED_DB;i++){
+		if(initialized_db[i]==0xFF){
+			ERR(FLA,"Factory all DB....\r\n");
+			flash_erase_sector(ADDR_USERAREA_END-SECTOR_FLASH_SIZE);
+			fl_db_clearAll();
+			memset(initialized_db,0x55,QUANTITY_FIELD_STORED_DB);
+			flash_page_program(ADDR_DATABASE_INITIALIZATION,QUANTITY_FIELD_STORED_DB,(uint8_t*) &initialized_db);
+			break;
+		}
+	}
+
 	LOGA(FLA,"RTC ADDR      :0x%X-0x%X\r\n",ADDR_RTC_START,ADDR_RTC_START+RTC_SIZE);
 #ifdef MASTER_CORE
 	LOGA(FLA,"NODELIST      :0x%X-0x%X\r\n",ADDR_NODELIST_START,ADDR_NODELIST_START+NODELIST_SIZE);

@@ -16,7 +16,7 @@
 /**
  * @brief	callback function for rsp
  */
-typedef void (*fl_rsp_callback_fnc)(void*);
+typedef void (*fl_rsp_callback_fnc)(void*,void*);
 #define QUEUE_RSP_SLOT_MAX		10
 #define QUEUQ_REQcRSP_INTERVAL  20*1000 //ms
 
@@ -27,10 +27,12 @@ typedef void (*fl_rsp_callback_fnc)(void*);
 typedef enum {
 	NWK_HDR_NONE = 0,
 	// slave -> req -> master -> rsp
+	NWK_HDR_RECONNECT = 0x11,
+	/*Frl protocols*/
 	NWK_HDR_55 = 0x55, //
 	// master -> req -> slave -> rsp
 	NWK_HDR_F5_INFO = 0xF5,
-	NWK_HDR_ASSIGN = 0xFC,//Use to assign SlaveID to slave
+	NWK_HDR_ASSIGN = 0xFC,	//Use to assign SlaveID to slave
 	NWK_HDR_HEARTBEAT = 0xFD,
 	NWK_HDR_COLLECT = 0xFE, //Use to collect slave (master and slaves)
 }__attribute__((packed)) fl_hdr_nwk_type_e;
@@ -41,7 +43,7 @@ typedef union {
 		u8 memID :3; //3 bits : 0-8 => total 8*32 = 256 slaves
 		u8 grpID :5; //5bits : 0-32
 	};
-}fl_slaveID_u;
+} fl_slaveID_u;
 
 typedef struct {
 	u8 hdr;
@@ -55,8 +57,8 @@ typedef struct {
 		struct {
 			u8 repeat_cnt :2;   // 2 bits
 			u8 master :2;  		// 2 bits
-			u8 dbg:1;			// 1 bit
-			u8 rep_mode:2;		//for setting slave
+			u8 dbg :1;			// 1 bit
+			u8 rep_mode :2;		//for setting slave
 		};
 	} endpoint;
 // LSB: don't change location byte
@@ -82,8 +84,16 @@ typedef struct {
 #endif
 }__attribute__((packed)) fl_nodeinnetwork_t;
 
-#ifdef MASTER_CORE
+typedef struct {
+	fl_rsp_callback_fnc rsp_cb;
+	s32 timeout;
+	struct {
+		u8 hdr_cmdid;
+		u8 slaveID;
+	} rsp_check;
+}__attribute__((packed)) fl_rsp_container_t;
 
+#ifdef MASTER_CORE
 #define MAX_NODES 	200
 typedef struct {
 	u8 slot_inused;
@@ -94,10 +104,9 @@ typedef struct {
 	struct {
 		u8 collect_chn[3];
 		u8 chn[3];
-	} nwk;
+	}nwk;
 	u32 my_mac;
 }__attribute__((packed)) fl_master_config_t;
-
 #endif
 
 /*******************************************************************************
@@ -115,6 +124,10 @@ inline u8 fl_crc8(u8* _pdata, u8 _len) {
 	return (u8) (crc % 256);
 }
 
+#define DEBUG_TURN(x) do { \
+							if (x) { PLOG_Start(ALL); } \
+							else   { PLOG_Stop(ALL); } \
+						} while(0)
 
 #ifdef MASTER_CORE
 void fl_nwk_master_init(void);
@@ -122,20 +135,25 @@ void fl_nwk_master_run(fl_pack_t *_pack_handle);
 void fl_nwk_master_process(void);
 fl_pack_t fl_master_packet_GetInfo_build(u8 *_slave_mac_arr, u8 _slave_num);
 void fl_master_nodelist_AddRefesh(fl_nodeinnetwork_t _node);
-s16 fl_master_SlaveID_find(u8 _id) ;
+s16 fl_master_SlaveID_find(u8 _id);
 void fl_nwk_master_nodelist_load(void);
+void fl_queue_REQcRSP_ScanRec(fl_pack_t _pack);
 #else
+extern volatile u8 NWK_DEBUG_STT; // it will be assigned into end-point byte (dbg :1bit);
 bool IsJoinedNetwork(void);
+bool IsOnline(void);
 void fl_nwk_slave_init(void);
 void fl_nwk_slave_run(fl_pack_t *_pack_handle);
 void fl_nwk_slave_process(void);
 bool fl_nwk_slave_checkHDR(u8 _hdr);
 u32 fl_adv_timetampInPack(fl_pack_t _pack);
 fl_timetamp_withstep_t fl_adv_timetampStepInPack(fl_pack_t _pack);
-bool fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len);
+bool fl_req_slave_packet_createNsend(u8 _cmdid, u8* _data, u8 _len);
+void fl_queue_REQcRSP_ScanRec(fl_pack_t _pack,void *_id);
+int fl_nwk_slave_reconnect(void);
 #endif
-s8 fl_queueREQcRSP_add(u8 cmdid,u8 slaveid,fl_rsp_callback_fnc *_cb, u32 _timeout_ms);
-void fl_queue_REQcRSP_ScanRec(fl_pack_t _pack);
+s8 fl_queueREQcRSP_add(u8 cmdid, u8 slaveid, fl_rsp_callback_fnc *_cb, u32 _timeout_ms);
+
 int fl_queue_REQnRSP_TimeoutStart(void);
 void fl_adv_setting_update(void);
 int fl_adv_sendFIFO_add(fl_pack_t _pack);
