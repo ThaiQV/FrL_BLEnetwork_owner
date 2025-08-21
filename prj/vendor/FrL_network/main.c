@@ -26,6 +26,10 @@
 #include "stack/ble/ble.h"
 #include "app.h"
 #include "fl_input_ext.h"
+#include "../Freelux_libs/SPI_FLASH.h"
+#include "../Freelux_libs/nvm.h"
+#include "../Freelux_libs/fl_ble_wifi_protocol.h"
+#include "../Freelux_libs/storage_weekly_data.h"
 
 #if(FREERTOS_ENABLE)
 #include <FreeRTOS.h>
@@ -179,6 +183,10 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 		user_init_deepRetn();
 	} else { //MCU power_on or wake_up from deepSleep mode
 		user_init_normal();
+
+		ble_wifi_protocol_init();
+		nvm_init();
+		storage_init();
 #if (FREERTOS_ENABLE)
 		extern void blc_ll_set_freertos_en(u8 en);
 		blc_ll_set_freertos_en(1);
