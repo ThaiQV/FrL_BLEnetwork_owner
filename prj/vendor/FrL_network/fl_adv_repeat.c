@@ -81,7 +81,6 @@ int fl_repeat_send_cbk(void) {
 		packet_built = fl_repeat_packet_build(data_in_queue);
 		//P_PRINTFHEX_A(ZIG_GP,pack_arr,SIZEU8(pack_arr),"%s:","RepeatPack");
 //		LOGA(ZIG_GP,"Repeat lvl: %d\r\n",packet_built.data_arr[packet_built.length - 1] & 0x03);
-
 		fl_adv_sendFIFO_add(packet_built);
 	}
 	return 0;
