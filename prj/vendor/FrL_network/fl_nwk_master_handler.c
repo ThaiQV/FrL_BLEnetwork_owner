@@ -415,7 +415,7 @@ int _nwk_master_backup(void){
 		profile.nwk.chn[1] = G_MASTER_INFO.nwk.chn[1];
 		profile.nwk.chn[2] = G_MASTER_INFO.nwk.chn[2];
 		fl_db_masterprofile_save(profile);
-		LOGA(INF,"** Channels:%d |%d |%d\r\n",profile.nwk.chn[0],profile.nwk.chn[1],profile.nwk.chn[2])
+		LOGA(INF,"Channels:%d |%d |%d\r\n",profile.nwk.chn[0],profile.nwk.chn[1],profile.nwk.chn[2])
 	}
 	return 0;
 }

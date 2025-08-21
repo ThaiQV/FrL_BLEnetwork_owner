@@ -13,6 +13,17 @@
 
 #define SECTOR_FLASH_SIZE				0x1000 //4096
 #define ADDR_USERAREA_START				0x20040000 + SECTOR_FLASH_SIZE //
+#define ADDR_USERAREA_END				0x200FFFFF //END FLASH
+
+//////// ======================================================================
+
+#ifdef MASTER_CORE
+#define QUANTITY_FIELD_STORED_DB			3 //RTC + NODELIST(master) + MASTER PROFILE
+#else
+#define QUANTITY_FIELD_STORED_DB			2 //RTC + SLAVE PROFILE
+#endif
+#define ADDR_DATABASE_INITIALIZATION	(ADDR_USERAREA_END - QUANTITY_FIELD_STORED_DB)	//initialization db
+//////// ======================================================================
 
 //#define SYSTEM_RUNTIME_SIZE				SECTOR_FLASH_SIZE
 #define RTC_SIZE						SECTOR_FLASH_SIZE

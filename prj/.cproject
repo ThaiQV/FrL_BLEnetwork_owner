@@ -492,7 +492,7 @@
 							<option id="nds32le-elf-mculib-v5f.managedbuild.option.toolchain.RSE_TARGET.1604154198" name="RSE_TARGET" superClass="nds32le-elf-mculib-v5f.managedbuild.option.toolchain.RSE_TARGET" value="rse://LOCALHOST/~target/ADP-AE350-D25F-EAGLE-0106" valueType="string"/>
 							<option id="nds32le-elf-mculib-v5f.managedbuild.option.toolchain.RSE_CONNECT.1396275034" name="RSE_CONNECT" superClass="nds32le-elf-mculib-v5f.managedbuild.option.toolchain.RSE_CONNECT" value="ICE" valueType="string"/>
 							<targetPlatform archList="all" binaryParser="com.andestech.ide.cdt.managedbuilder.core.CROSS_GNU_ELF" id="target.nds.platform.base.v5.2138482648" name="Debug Platform" osList="all" superClass="target.nds.platform.base.v5"/>
-							<builder buildPath="${workspace_loc:/Eagle_Driver_Demo}/Base_Test_DEMO" id="target.nds.builder.base.v5.840086981" keepEnvironmentInBuildfile="false" name="Andes Make Builder" parallelBuildOn="true" parallelizationNumber="8" superClass="target.nds.builder.base.v5"/>
+							<builder buildPath="${workspace_loc:/Eagle_Driver_Demo}/Base_Test_DEMO" enableAutoBuild="true" id="target.nds.builder.base.v5.840086981" keepEnvironmentInBuildfile="false" name="Andes Make Builder" parallelBuildOn="true" parallelizationNumber="8" superClass="target.nds.builder.base.v5"/>
 							<tool id="tool.nds32le-elf-mculib-v5f.archiver.base.1922736655" name="Andes Archiver" superClass="tool.nds32le-elf-mculib-v5f.archiver.base"/>
 							<tool id="tool.nds32le-elf-mculib-v5f.cpp.compiler.base.135212260" name="Andes C++ Compiler" superClass="tool.nds32le-elf-mculib-v5f.cpp.compiler.base">
 								<option id="nds.cpp.compiler.option.debugging.level.1080121833" name="Debug Level" superClass="nds.cpp.compiler.option.debugging.level" value="nds.cpp.compiler.debugging.level.max" valueType="enumerated"/>
@@ -642,6 +642,9 @@
 		<configuration configurationName="9518_Flash_Demo">
 			<resource resourceType="PROJECT" workspacePath="/FrL_BLEnetwork_owner"/>
 		</configuration>
+		<configuration configurationName="FrL_Network">
+			<resource resourceType="PROJECT" workspacePath="/FrL_BLEnetwork_owner"/>
+		</configuration>
 		<configuration configurationName="9518_UART_DEMO"/>
 		<configuration configurationName="9518_RF_DEMO"/>
 		<configuration configurationName="9518_USB_Speaker_DEMO">
@@ -690,6 +693,9 @@
 		</configuration>
 		<configuration configurationName="B91_module"/>
 		<configuration configurationName="IIC_DEMO"/>
+		<configuration configurationName="FrL_Network_Master">
+			<resource resourceType="PROJECT" workspacePath="/FrL_BLEnetwork_owner"/>
+		</configuration>
 		<configuration configurationName="9518_TIMER_DEMO">
 			<resource resourceType="PROJECT" workspacePath="/FrL_BLEnetwork_owner"/>
 		</configuration>

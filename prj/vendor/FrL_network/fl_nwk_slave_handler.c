@@ -16,7 +16,7 @@
 #include "fl_adv_repeat.h"
 #include "fl_adv_proc.h"
 #include "fl_nwk_handler.h"
-#include "fl_nwk_protocol.h"
+//#include "fl_nwk_protocol.h"
 
 //Test api
 #include "test_api.h"
@@ -35,10 +35,11 @@ _attribute_data_retention_ volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME 
 												ORIGINAL_MASTER_TIME.milstep = y;\
 											}while(0) //Sync original time-master req
 
-#define JOIN_NETWORK_TIME 		30*1000 //ms
+#define JOIN_NETWORK_TIME 			30*1000 	//ms
+#define RECHECKING_NETWOK_TIME 		1*60*1000 	//ms - 2mins
 
 fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
-fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_55}; // register cmdid REQ
+fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_55,NWK_HDR_RECONNECT}; // register cmdid REQ
 
 #define NWK_HDR_SIZE (sizeof(G_NWK_HDR_LIST)/sizeof(G_NWK_HDR_LIST[0]))
 #define NWK_HDR_REQ_SIZE (sizeof(G_NWK_HDR_REQLIST)/sizeof(G_NWK_HDR_REQLIST[0]))
@@ -69,10 +70,10 @@ fl_pack_t g_handle_array[PACK_HANDLE_SIZE];
 fl_data_container_t G_HANDLE_CONTAINER = { .data = g_handle_array, .head_index = 0, .tail_index = 0, .mask = PACK_HANDLE_SIZE - 1, .count = 0 };
 
 //My information
-fl_nodeinnetwork_t G_INFORMATION;
+fl_nodeinnetwork_t G_INFORMATION ={.active = true};
 
 //flag debug of the network
-volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into end-point byte (dbg :1bit)
+volatile u8 NWK_DEBUG_STT = 1; // it will be assigned into end-point byte (dbg :1bit)
 //volatile u8 NWK_REPEAT_MODE = 1; // slave repeat?
 volatile u8  REPEAT_LEVEL = 3;
 /******************************************************************************/
@@ -80,11 +81,6 @@ volatile u8  REPEAT_LEVEL = 3;
 /***                           Private definitions                           **/
 /******************************************************************************/
 /******************************************************************************/
-#define DEBUG_TURN(x) do { \
-							if (x) { PLOG_Start(ALL); } \
-							else   { PLOG_Stop(ALL); } \
-						} while(0)
-
 
 /******************************************************************************/
 /******************************************************************************/
@@ -94,6 +90,9 @@ volatile u8  REPEAT_LEVEL = 3;
 
 bool IsJoinedNetwork(void)	{
 	return(G_INFORMATION.slaveID.id_u8 != 0xFF);
+}
+bool IsOnline(void){
+	return G_INFORMATION.active;
 }
 
 int _nwk_slave_backup(void){
@@ -114,6 +113,8 @@ int _nwk_slave_backup(void){
 }
 
 void fl_nwk_slave_init(void) {
+	DEBUG_TURN(NWK_DEBUG_STT);
+
 	FL_QUEUE_CLEAR(&G_HANDLE_CONTAINER,PACK_HANDLE_SIZE);
 	//Generate information
 	G_INFORMATION.active = false;
@@ -126,10 +127,12 @@ void fl_nwk_slave_init(void) {
 	G_INFORMATION.profile = my_profile;
 
 //	//Test join network + factory
-//	G_INFORMATION.profile.run_stt.join_nwk = 1; //access to join network
-//	G_INFORMATION.profile.run_stt.rst_factory  = 1 ; //has reset factory device
-//	G_INFORMATION.slaveID.id_u8 = 0xFF;
-//	G_INFORMATION.profile.slaveid = 0xFF;
+	if (G_INFORMATION.slaveID.id_u8 == 0xFF && G_INFORMATION.profile.slaveid==G_INFORMATION.slaveID.id_u8) {
+		G_INFORMATION.profile.run_stt.join_nwk = 1; //access to join network
+		G_INFORMATION.profile.run_stt.rst_factory = 1; //has reset factory device
+	}
+	fl_timetamp_withstep_t cur_timetamp = fl_rtc_getWithMilliStep();
+	SYNC_ORIGIN_MASTER(cur_timetamp.timetamp,cur_timetamp.milstep);
 
 	LOG_P(INF,"Freelux network SLAVE init\r\n");
 	LOGA(INF,"** MAC    :%08X\r\n",G_INFORMATION.mac_short.mac_u32);
@@ -139,6 +142,7 @@ void fl_nwk_slave_init(void) {
 	LOGA(INF,"** JoinNWK:%d\r\n",G_INFORMATION.profile.run_stt.join_nwk);
 	LOGA(INF,"** RstFac :%d\r\n",G_INFORMATION.profile.run_stt.rst_factory);
 
+
 	//test
 	if(G_INFORMATION.slaveID.id_u8 == G_INFORMATION.profile.slaveid && G_INFORMATION.slaveID.id_u8 == 0xFF){
 		ERR(APP,"Turn on install mode\r\n");
@@ -147,6 +151,9 @@ void fl_nwk_slave_init(void) {
 	}
 
 	blt_soft_timer_add(_nwk_slave_backup,2*1000*1000);
+
+	//Interval checking network
+	fl_nwk_slave_reconnect();
 
 	//test random send req
 	TEST_slave_sendREQ();
@@ -178,6 +185,11 @@ void _nwk_slave_syncFromPack(fl_dataframe_format_t *packet){
 	//Sync mastertime origin
 	SYNC_ORIGIN_MASTER(master_timetamp,packet->milltamp);
 	LOGA(INF,"ORIGINAL MASTER-TIME:%d\r\n",ORIGINAL_MASTER_TIME.milstep);
+	//Sync network status
+	//if(packet->slaveID.id_u8 == G_INFORMATION.slaveID.id_u8)
+	{
+		G_INFORMATION.active=true;
+	}
 }
 
 s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms) {
@@ -186,7 +198,10 @@ s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 
 		if(fl_req_slave_packet_createNsend(_cmdid,_data,_len)){
 			fl_queueREQcRSP_add(_cmdid,G_INFORMATION.slaveID.id_u8,&_cb,_timeout_ms*1000);
 		}
-	} else {
+	} else if(_cb == 0 && _timeout_ms ==0){
+		return (fl_req_slave_packet_createNsend(_cmdid,_data,_len) == 0?-1:0); // none rsp
+	}
+	else {
 		ERR(API,"Cann't set timeout (%d/%d ms)!!\r\n",(u32)_cb,_timeout_ms);
 	}
 	return -1;
@@ -211,7 +226,10 @@ bool fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 	//
 	fl_pack_t rslt = {.length = 0};
 	fl_hdr_nwk_type_e cmdid = (fl_hdr_nwk_type_e)_cmdid;
-	if(!IsREQHDR(cmdid)){return false;}
+	if(!IsREQHDR(cmdid)){
+		ERR(API,"REQ CMD ID has been registered!!\r\n");
+		return false;
+	}
 	fl_data_frame_u req_pack;
 	switch (cmdid) {
 		case NWK_HDR_55: {
@@ -222,6 +240,7 @@ bool fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 //			req_pack.frame.timetamp[1] = U32_BYTE1(ORIGINAL_MASTER_TIME.timetamp);
 //			req_pack.frame.timetamp[2] = U32_BYTE2(ORIGINAL_MASTER_TIME.timetamp);
 //			req_pack.frame.timetamp[3] = U32_BYTE3(ORIGINAL_MASTER_TIME.timetamp);
+
 //			req_pack.frame.milltamp = ORIGINAL_MASTER_TIME.milstep;
 
 			fl_timetamp_withstep_t field_timetamp = GenerateTimetampField();
@@ -244,13 +263,40 @@ bool fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 			req_pack.frame.endpoint.master = FL_FROM_SLAVE_ACK;
 		}
 		break;
+		case NWK_HDR_RECONNECT: {
+
+			//LOGA(INF,"Send 55 REQ to Master:%d/%d\r\n",ORIGINAL_MASTER_TIME.timetamp,ORIGINAL_MASTER_TIME.milstep);
+			req_pack.frame.hdr = NWK_HDR_RECONNECT;
+
+			fl_timetamp_withstep_t field_timetamp = GenerateTimetampField();
+
+			req_pack.frame.timetamp[0] = U32_BYTE0(field_timetamp.timetamp);
+			req_pack.frame.timetamp[1] = U32_BYTE1(field_timetamp.timetamp);
+			req_pack.frame.timetamp[2] = U32_BYTE2(field_timetamp.timetamp);
+			req_pack.frame.timetamp[3] = U32_BYTE3(field_timetamp.timetamp);
+			req_pack.frame.milltamp = field_timetamp.milstep;
+
+			req_pack.frame.slaveID.id_u8 = G_INFORMATION.slaveID.id_u8;
+			//Create payload
+			memset(req_pack.frame.payload,0xFF,SIZEU8(req_pack.frame.payload));
+			memcpy(req_pack.frame.payload,_data,_len);
+			//create endpoint
+			req_pack.frame.endpoint.dbg = NWK_DEBUG_STT;
+			req_pack.frame.endpoint.repeat_cnt = REPEAT_LEVEL;
+			req_pack.frame.endpoint.rep_mode = REPEAT_LEVEL;
+			//Create packet from slave
+			req_pack.frame.endpoint.master = FL_FROM_SLAVE;
+		}
+		break;
 		default:
 		break;
 	}
 	//copy to data struct
 	rslt.length = SIZEU8(req_pack.bytes) - 1; //skip rssi
 	memcpy(rslt.data_arr,req_pack.bytes,rslt.length );
-	P_PRINTFHEX_A(INF,rslt.data_arr,rslt.length,"REQ 55: ");
+
+	P_PRINTFHEX_A(INF,rslt.data_arr,rslt.length,"REQ %X ",_cmdid);
+
 	//Send ADV
 	fl_adv_sendFIFO_add(rslt);
 	return true;
@@ -406,7 +452,7 @@ int fl_slave_ProccesRSP_cbk(void) {
 	fl_pack_t data_in_queue;
 	if (FL_QUEUE_GET(&G_HANDLE_CONTAINER,&data_in_queue)) {
 		//Scan req call rsp
-		fl_queue_REQcRSP_ScanRec(data_in_queue);
+		fl_queue_REQcRSP_ScanRec(data_in_queue,&G_INFORMATION);
 		//process rsp of the protocol
 		fl_pack_t packet_build;
 		packet_build = fl_rsp_slave_packet_build(data_in_queue);
@@ -444,6 +490,26 @@ void fl_nwk_slave_joinnwk_exc(void) {
 		}
 	}
 }
+/***************************************************
+ * @brief 		:Reconnect process - inform to master that re-online (reboot,change anything configurations,...)
+ *
+ * @param[in] 	:none
+ *
+ * @return	  	:none
+ *
+ ***************************************************/
+int fl_nwk_slave_reconnect(void){
+	//create timer interval for checking online
+	if(blt_soft_timer_find(&fl_nwk_slave_reconnect)==-1){
+		blt_soft_timer_add(&fl_nwk_slave_reconnect,RECHECKING_NETWOK_TIME*1000);
+	}
+	if(IsJoinedNetwork() && G_INFORMATION.active == false){
+		LOGA(INF,"Reconnect network (%d s)!!!\r\n",RECHECKING_NETWOK_TIME/1000);
+		fl_api_slave_req(NWK_HDR_RECONNECT,G_INFORMATION.mac_short.byte,SIZEU8(G_INFORMATION.mac_short.byte),0,0);
+	}
+	return 0;
+}
+
 /******************************************************************************/
 /******************************************************************************/
 /***                      Processing functions 					             **/
