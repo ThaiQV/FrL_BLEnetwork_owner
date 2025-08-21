@@ -1,0 +1,19 @@
+# Ignore build output folders
+FrL_Network/
+FrL_Network_Master/
+B91_ble_sample/
+B91_module/
+output/
+
+# Ignore temporary files
+*.log
+*.tmp
+*.bak
+
+# Ignore IDE-specific files (optional)
+.settings/
+*.launch
+*.swp
+*.swo
+*.swn
+*.DS_Store

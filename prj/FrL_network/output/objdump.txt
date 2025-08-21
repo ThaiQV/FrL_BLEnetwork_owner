@@ -14497,7 +14497,7 @@ Disassembly of section .text:
 2000c0ac:	00150593          	addi	a1,a0,1
 2000c0b0:	2000f637          	lui	a2,0x2000f
 2000c0b4:	20010537          	lui	a0,0x20010
-2000c0b8:	05f00693          	li	a3,95
+2000c0b8:	05e00693          	li	a3,94
 2000c0bc:	d9860613          	addi	a2,a2,-616 # 2000ed98 <__FUNCTION__.10062>
 2000c0c0:	b1c50513          	addi	a0,a0,-1252 # 2000fb1c <gen_method_sc+0x708>
 2000c0c4:	5c9010ef          	jal	ra,2000de8c <printf>
@@ -15325,7 +15325,7 @@ Disassembly of section .text:
 2000cc88:	00150593          	addi	a1,a0,1
 2000cc8c:	2000f637          	lui	a2,0x2000f
 2000cc90:	2000f537          	lui	a0,0x2000f
-2000cc94:	06e00693          	li	a3,110
+2000cc94:	06d00693          	li	a3,109
 2000cc98:	dac60613          	addi	a2,a2,-596 # 2000edac <__FUNCTION__.10066.lto_priv.61>
 2000cc9c:	4e850513          	addi	a0,a0,1256 # 2000f4e8 <gen_method_sc+0xd4>
 2000cca0:	1ec010ef          	jal	ra,2000de8c <printf>
@@ -16349,7 +16349,7 @@ Disassembly of section .text:
 2000db90:	00150593          	addi	a1,a0,1
 2000db94:	2000f637          	lui	a2,0x2000f
 2000db98:	2000f537          	lui	a0,0x2000f
-2000db9c:	06600693          	li	a3,102
+2000db9c:	06500693          	li	a3,101
 2000dba0:	dac60613          	addi	a2,a2,-596 # 2000edac <__FUNCTION__.10066.lto_priv.61>
 2000dba4:	48850513          	addi	a0,a0,1160 # 2000f488 <gen_method_sc+0x74>
 2000dba8:	2e4000ef          	jal	ra,2000de8c <printf>
