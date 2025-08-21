@@ -533,6 +533,7 @@
 								</option>
 								<option id="nds.c.compiler.option.include.paths.1385723824" name="Include paths (-I)" superClass="nds.c.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/vendor/FrL_network}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/3rd-party/freertos-V5/portable/GCC/RISC-V}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/3rd-party/freertos-V5/include}&quot;"/>
 									<listOptionValue builtIn="false" value="../drivers/B91"/>

@@ -224,6 +224,9 @@ void fl_input_serial_rec(void) {
 		u8* p = fl_rx_fifo.p + (fl_rx_fifo.wptr & (fl_rx_fifo.num - 1)) * fl_rx_fifo.size;
 		uart_receive_dma(G_INPUT_EXT.serial.uart_num,(unsigned char *) p,(unsigned int) fl_rx_fifo.size);
 	}
+
+	//	u8* p = my_fifo_get(&fl_rx_fifo);
+	//	ble_wifi_protocol_put_queue(&p[1],*p);
 }
 
 void fl_input_serial_init(uart_num_e uart_num, uart_tx_pin_e tx_pin, uart_rx_pin_e rx_pin, u32 baudrate) {
