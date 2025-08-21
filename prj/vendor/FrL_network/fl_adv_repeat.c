@@ -55,7 +55,7 @@ fl_pack_t fl_repeat_packet_build(fl_pack_t _pack) {
 	pack_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
 	memcpy(pack_built.data_arr,packet.bytes,pack_built.length);
 
-	LOGA(ZIG_GP,"%s:%d,TTL: %d\r\n",(packet.frame.endpoint.master == FL_FROM_SLAVE)?"SlaveID":"Master",packet.frame.slaveID.id_u8,packet.frame.endpoint.repeat_cnt);
+	LOGA(ZIG_GP,"%s :%d,TTL: %d\r\n",(packet.frame.endpoint.master == FL_FROM_SLAVE)?"SlaveID":"Master",packet.frame.slaveID.id_u8,packet.frame.endpoint.repeat_cnt);
 
 	return pack_built;
 }
