@@ -400,6 +400,16 @@ void fl_input_external_init(void) {
 	//Register polling callback
 	s8 regis = RegisterPOLLING(GPIO_IN);
 	LOGA(PERI,"Button(%d)Calling Register :%d\r\n",GPIO_IN.pin_read(GPIO_IN.pin),regis);
+
+	extern u8 TEST_Buttons_RST(fl_exButton_states_e _state, void *_data);
+	GPIO_IN.exc = &TEST_Buttons_RST;
+	GPIO_IN.status = BUTT_STATE_NONE;
+	GPIO_IN.mode = DET_LOW;
+	GPIO_IN.pin_read = (FucRead) &TCA95xx_read1;
+	GPIO_IN.pin = (gpio_pin_e) TCA_P10;
+	//Register polling callback
+	regis = RegisterPOLLING(GPIO_IN);
+	LOGA(PERI,"Button(%d)Reset Register :%d\r\n",GPIO_IN.pin_read(GPIO_IN.pin),regis);
 #endif
 
 

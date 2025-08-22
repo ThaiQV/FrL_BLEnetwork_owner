@@ -93,11 +93,24 @@ u8 TEST_Buttons(fl_exButton_states_e _state, void *_data) {
 	test_u8[2] = U32_BYTE2(test_pack_cnt);
 	test_u8[3] = U32_BYTE3(test_pack_cnt);
 	fl_api_slave_req(NWK_HDR_55,test_u8,SIZEU8(test_u8),&_rsp_callback,800);
-	LOGA(PERI,"BUTT 1 %s (%d ms):%d\r\n",_state==BUTT_STATE_PRESSnHOLD?"Press & hold":"Press & Release",
+	LOGA(PERI,"BUTT Calling %s (%d ms):%d\r\n",_state==BUTT_STATE_PRESSnHOLD?"Press & hold":"Press & Release",
 			(clock_time()-*time_tick)/SYSTEM_TIMER_TICK_1MS,test_pack_cnt);
 	//Must to clear status if done
 	return BUTT_STATE_NONE;
 	//else return _state;
 }
-
+u8 TEST_Buttons_RST(fl_exButton_states_e _state, void *_data) {
+	u32 *time_tick = (u32*)_data;
+	LOGA(USER,"BUTT RST %s (%d ms)\r\n",_state==BUTT_STATE_PRESSnHOLD?"Press & hold":"Press & Release",
+			(clock_time()-*time_tick)/SYSTEM_TIMER_TICK_1MS);
+	if(_state == BUTT_STATE_PRESSnHOLD){
+		ERR(USER,"Factory!!!!!\r\n");
+		fl_db_clearAll();
+		delay_ms(1000);
+		sys_reboot();
+	}
+	//Must to clear status if done
+	return BUTT_STATE_NONE;
+	//else return _state;
+}
 #endif

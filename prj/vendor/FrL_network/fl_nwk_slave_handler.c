@@ -422,7 +422,6 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 			//Non-rsp
 			packet_built.length = 0;
 			return packet_built;
-
 		}
 		break;
 		default:
