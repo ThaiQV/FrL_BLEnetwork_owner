@@ -12,6 +12,7 @@
 #define VENDOR_FRL_NETWORK_FL_NWK_API_H_
 
 #include "fl_nwk_handler.h"
+#include "fl_input_ext.h"
 
 s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms);
 

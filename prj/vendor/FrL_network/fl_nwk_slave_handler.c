@@ -156,7 +156,7 @@ void fl_nwk_slave_init(void) {
 	fl_nwk_slave_reconnect();
 
 	//test random send req
-	TEST_slave_sendREQ();
+//	TEST_slave_sendREQ();
 }
 /***************************************************
  * @brief 		:synchronization status from packet
