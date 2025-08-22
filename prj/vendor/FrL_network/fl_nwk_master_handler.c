@@ -470,7 +470,7 @@ int fl_master_ProccesRSP_cbk(void) {
 					G_NODE_LIST.sla_info[node_indx].active = true;
 					G_NODE_LIST.sla_info[node_indx].timelife = (clock_time() - G_NODE_LIST.sla_info[node_indx].timelife);
 					u32 cnt_inpack = MAKE_U32(packet.frame.payload[3],packet.frame.payload[2],packet.frame.payload[1],packet.frame.payload[0]);
-					LOGA(INF,"55(%d)%0x02X(%d):%d\r\n",slave_id,G_NODE_LIST.sla_info[node_indx].mac_short.mac_u32,
+					LOGA(INF,"55(%d)0x%02X(%d):%d\r\n",slave_id,G_NODE_LIST.sla_info[node_indx].mac_short.mac_u32,
 							packet.frame.endpoint.repeat_cnt,cnt_inpack);
 					//Send assignment to slave
 					fl_adv_sendFIFO_add(fl_master_packet_RSP_55_build(slave_id));
