@@ -15,6 +15,9 @@
 #include <stdio.h>
 #include "fl_nwk_protocol.h"
 
+//Lib
+#include "Peri_libs/TCA9555.h"
+
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -34,13 +37,6 @@ typedef struct {
 }fl_exIO_t;
 
 typedef struct {
-	struct {
-		gpio_pin_e signal;
-	} led;
-	struct {
-		gpio_pin_e collect;
-	} sw;
-
 #ifdef MASTER_CORE
 	struct {
 		uart_num_e uart_num;
@@ -51,6 +47,13 @@ typedef struct {
 		dma_chn_e dma_rx_chn;
 	} serial;
 #else
+	struct{
+		u8 id;
+		gpio_pin_e irq_pin; //irq - not use
+		i2c_sda_pin_e sda;
+		i2c_scl_pin_e scl;
+	}exIO;
+	//
 	struct {
 		fl_exIO_t calling;
 		fl_exIO_t count_up;
@@ -256,29 +259,6 @@ void fl_input_serial_init(uart_num_e uart_num, uart_tx_pin_e tx_pin, uart_rx_pin
 /******************************************************************************/
 /******************************************************************************/
 
-/***************************************************
- * @brief 		:Read input status
- *
- * @param[in] 	:none
- *
- * @return	  	:
- ***************************************************/
-void fl_input_collection_node_handle(blt_timer_callback_t _fnc, u16 _timeout_ms) {
-	static u8 previous_stt = 0;
-	u8 state = FL_IO_READ(G_INPUT_EXT.sw.collect);
-	if (previous_stt != state)
-		delay_ms(100);
-	state = FL_IO_READ(G_INPUT_EXT.sw.collect);
-	if (previous_stt != state) {
-		LOGA(USER,"Collection mode:%d\r\n",state);
-		FL_IO_WRITE(G_INPUT_EXT.sw.collect,state);
-		if (state)
-			blt_soft_timer_add(_fnc,_timeout_ms * 1000); //
-		else
-			blt_soft_timer_delete(_fnc);
-		previous_stt = state;
-	}
-}
 
 #ifndef MASTER_CORE
 
@@ -340,7 +320,42 @@ int _scan_external_input(void){
 	}
 	return 0;
 }
+/***************************************************
+ * @brief 		:initialization the External GPIO via I2C protocol
+ *
+ * @param[in] 	:sda+ scl: i2c protocol pin
+ *
+ * @return	  	:none
+ *
+ ***************************************************/
+void fl_ExIO_init(i2c_sda_pin_e _sda, i2c_scl_pin_e _scl,gpio_pin_e _irq_pin ) {
 
+#define I2C_CLOCK						(4*100000)//n*100K
+#define I2C_CLOCK_SOURCE				(sys_clk.pclk * 1000 * 1000)
+
+	G_INPUT_EXT.exIO.id = 0x20;
+	G_INPUT_EXT.exIO.sda = _sda;
+	G_INPUT_EXT.exIO.scl = _scl;
+	G_INPUT_EXT.exIO.irq_pin =_irq_pin;
+
+//    gpio_set_func(G_INPUT_EXT.exIO.irq_pin, AS_GPIO);
+//    gpio_set_input(G_INPUT_EXT.exIO.irq_pin, 1);
+//    gpio_set_output(G_INPUT_EXT.exIO.irq_pin, 0);
+//	gpio_irq_en(G_INPUT_EXT.exIO.irq_pin);
+//	gpio_set_irq(G_INPUT_EXT.exIO.irq_pin, INTR_FALLING_EDGE);
+//
+//	gpio_set_irq_mask(GPIO_IRQ_MASK_GPIO);
+//	plic_interrupt_enable(IRQ25_GPIO);
+
+	//I2c init
+	u8 divClock = (u8) ( I2C_CLOCK_SOURCE / (I2C_CLOCK));
+	i2c_master_init();
+	i2c_set_master_clk(divClock);
+	i2c_set_pin(G_INPUT_EXT.exIO.sda,G_INPUT_EXT.exIO.scl);
+	//init TCA chip
+	u8 rslt = TCA95xx_begin(G_INPUT_EXT.exIO.id,0x00FF);
+	LOGA(PERI,"TCA95xxx init 0x%02X(%d): v %s\r\n",TCA95xx_getAddress(),rslt,TCA9555_LIB_VERSION);
+}
 /******************************************************************************/
 /******************************************************************************/
 /***                      Processing functions 					             **/
@@ -348,8 +363,14 @@ int _scan_external_input(void){
 /******************************************************************************/
 void fl_input_external_init(void) {
 
+	fl_ExIO_init(I2C_GPIO_SDA_E2,I2C_GPIO_SCL_E0,GPIO_PD0);
+
+	while (1) {
+		LOGA(PERI,"%0X\r\n",TCA95xx_read8(1));
+		delay_ms(500);
+	}
 	//init POLLING Container
-	InitPOLLING();
+//	InitPOLLING();
 
 //	G_INPUT_EXT.sw.collect = GPIO_PB1;
 //	gpio_function_en(G_INPUT_EXT.sw.collect);
@@ -364,33 +385,33 @@ void fl_input_external_init(void) {
 //	gpio_set_up_down_res(G_INPUT_EXT.led.signal,GPIO_PIN_PULLUP_10K);
 
 #ifndef MASTER_CORE
-	G_INPUT_EXT.butts.calling.pin = GPIO_PE0;
-	gpio_function_en(G_INPUT_EXT.butts.calling.pin);
-	gpio_set_output(G_INPUT_EXT.butts.calling.pin,0); 		//disable output
-	gpio_set_input(G_INPUT_EXT.butts.calling.pin,1); 		//enable input
-	gpio_set_up_down_res(G_INPUT_EXT.butts.calling.pin,GPIO_PIN_PULLUP_10K);
-	//register function callback
-	G_INPUT_EXT.butts.calling.exc = &_button1_excute;
-	G_INPUT_EXT.butts.calling.status = BUTT_STATE_NONE;
-	G_INPUT_EXT.butts.calling.mode = DET_FALLING_EDGE;
-	//Register polling callback
-	s8 regis = RegisterPOLLING(&G_INPUT_EXT.butts.calling);
-	LOGA(USER,"Button(%d)Calling Register :%d\r\n",FL_IO_READ(G_INPUT_EXT.butts.calling.pin),regis);
-
-	G_INPUT_EXT.butts.count_up.pin = GPIO_PE2;
-	gpio_function_en(G_INPUT_EXT.butts.count_up.pin);
-	gpio_set_output(G_INPUT_EXT.butts.count_up.pin,0); 		//disable output
-	gpio_set_input(G_INPUT_EXT.butts.count_up.pin,1); 		//enable input
-	gpio_set_up_down_res(G_INPUT_EXT.butts.count_up.pin,GPIO_PIN_PULLUP_10K);
-	//register function callback
-	G_INPUT_EXT.butts.count_up.exc = &_button2_excute;
-	G_INPUT_EXT.butts.count_up.status = BUTT_STATE_NONE;
-	G_INPUT_EXT.butts.count_up.mode = DET_RISING_EDGE;
-	//Register polling callback
-	regis = RegisterPOLLING(&G_INPUT_EXT.butts.count_up);
-	LOGA(USER,"Button(%d)Couter Register :%d\r\n",FL_IO_READ(G_INPUT_EXT.butts.count_up.pin),regis);
+//	G_INPUT_EXT.butts.calling.pin = GPIO_PE0;
+//	gpio_function_en(G_INPUT_EXT.butts.calling.pin);
+//	gpio_set_output(G_INPUT_EXT.butts.calling.pin,0); 		//disable output
+//	gpio_set_input(G_INPUT_EXT.butts.calling.pin,1); 		//enable input
+//	gpio_set_up_down_res(G_INPUT_EXT.butts.calling.pin,GPIO_PIN_PULLUP_10K);
+//	//register function callback
+//	G_INPUT_EXT.butts.calling.exc = &_button1_excute;
+//	G_INPUT_EXT.butts.calling.status = BUTT_STATE_NONE;
+//	G_INPUT_EXT.butts.calling.mode = DET_FALLING_EDGE;
+//	//Register polling callback
+//	s8 regis = RegisterPOLLING(&G_INPUT_EXT.butts.calling);
+//	LOGA(USER,"Button(%d)Calling Register :%d\r\n",FL_IO_READ(G_INPUT_EXT.butts.calling.pin),regis);
+//
+//	G_INPUT_EXT.butts.count_up.pin = GPIO_PE2;
+//	gpio_function_en(G_INPUT_EXT.butts.count_up.pin);
+//	gpio_set_output(G_INPUT_EXT.butts.count_up.pin,0); 		//disable output
+//	gpio_set_input(G_INPUT_EXT.butts.count_up.pin,1); 		//enable input
+//	gpio_set_up_down_res(G_INPUT_EXT.butts.count_up.pin,GPIO_PIN_PULLUP_10K);
+//	//register function callback
+//	G_INPUT_EXT.butts.count_up.exc = &_button2_excute;
+//	G_INPUT_EXT.butts.count_up.status = BUTT_STATE_NONE;
+//	G_INPUT_EXT.butts.count_up.mode = DET_RISING_EDGE;
+//	//Register polling callback
+//	regis = RegisterPOLLING(&G_INPUT_EXT.butts.count_up);
+//	LOGA(USER,"Button(%d)Couter Register :%d\r\n",FL_IO_READ(G_INPUT_EXT.butts.count_up.pin),regis);
 
 #endif
 	/* --- Polling read input --- */
-	blt_soft_timer_add(_scan_external_input,FL_IO_SCAN_INTERVAL*1000); //ms
+//	blt_soft_timer_add(_scan_external_input,FL_IO_SCAN_INTERVAL*1000); //ms
 }

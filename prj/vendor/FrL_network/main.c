@@ -76,6 +76,16 @@ void rf_irq_handler(void) {
 	DBG_CHN14_LOW;
 }
 /**
+ * @brief		GPIO interrupt handler.
+ * @param[in]	none
+ * @return      none
+ */
+_attribute_ram_code_ void gpio_irq_handler(void){
+	LOG_P(APP,"GPIO irq....\r\n");
+	gpio_clr_irq_mask(GPIO_IRQ_MASK_GPIO);
+	gpio_clr_irq_status(FLD_GPIO_IRQ_CLR);
+}
+/**
  * @brief		BLE SDK UART0 interrupt handler.
  * @param[in]	none
  * @return      none
