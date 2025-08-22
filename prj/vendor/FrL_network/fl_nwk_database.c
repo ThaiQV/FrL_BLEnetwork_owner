@@ -302,7 +302,6 @@ fl_slave_profiles_t fl_db_slaveprofile_init(void){
 		profile = fl_db_slaveprofile_load();
 	}
 	//for debugging
-//	LOGA(FLA,"Magic: 0x%X\r\n",profile.magic);
 	LOGA(FLA,"SlaveID:%d\r\n",profile.slaveid);
 	LOGA(FLA,"NWK channel:%d |%d |%d \r\n",profile.nwk.chn[0],profile.nwk.chn[1],profile.nwk.chn[2]);
 	LOGA(FLA,"NWK Parent(%d):0x%X\r\n",profile.run_stt.join_nwk,profile.nwk.mac_parent);

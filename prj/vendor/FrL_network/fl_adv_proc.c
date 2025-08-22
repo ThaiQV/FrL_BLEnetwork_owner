@@ -343,7 +343,7 @@ void fl_adv_init(void) {
 	G_ADV_SETTINGS.nwk_chn.chn3 = &G_MASTER_INFO.nwk.chn[2];
 
 #else
-	//fl_input_external_init();
+	fl_input_external_init();
 	extern fl_nodeinnetwork_t G_INFORMATION;
 	fl_nwk_slave_init();
 	fl_repeater_init();

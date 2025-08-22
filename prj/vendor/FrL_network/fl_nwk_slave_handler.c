@@ -53,6 +53,16 @@ static inline u8 IsREQHDR(fl_hdr_nwk_type_e cmdid) {
 	return 0;
 }
 
+static inline fl_timetamp_withstep_t GenerateTimetampField(void){
+	fl_timetamp_withstep_t cur_timetamp = fl_rtc_getWithMilliStep();
+	u32 mill_sys = fl_rtc_timetamp2milltampStep(cur_timetamp);
+	u32 origin_master = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
+	if(mill_sys < origin_master){
+		cur_timetamp = ORIGINAL_MASTER_TIME;
+	}
+	return cur_timetamp;
+}
+
 /*---------------- Total Packet handling --------------------------*/
 
 #define PACK_HANDLE_SIZE 		32 // bcs : slave need to rec its req and repeater of the neighbors
@@ -71,15 +81,6 @@ volatile u8  REPEAT_LEVEL = 3;
 /***                           Private definitions                           **/
 /******************************************************************************/
 /******************************************************************************/
-static inline fl_timetamp_withstep_t GenerateTimetampField(void){
-	fl_timetamp_withstep_t cur_timetamp = fl_rtc_getWithMilliStep();
-	u32 mill_sys = fl_rtc_timetamp2milltampStep(cur_timetamp);
-	u32 origin_master = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
-	if(mill_sys < origin_master){
-		cur_timetamp = ORIGINAL_MASTER_TIME;
-	}
-	return cur_timetamp;
-}
 
 /******************************************************************************/
 /******************************************************************************/
@@ -141,12 +142,21 @@ void fl_nwk_slave_init(void) {
 	LOGA(INF,"** JoinNWK:%d\r\n",G_INFORMATION.profile.run_stt.join_nwk);
 	LOGA(INF,"** RstFac :%d\r\n",G_INFORMATION.profile.run_stt.rst_factory);
 
+
+	//test
+	if(G_INFORMATION.slaveID.id_u8 == G_INFORMATION.profile.slaveid && G_INFORMATION.slaveID.id_u8 == 0xFF){
+		ERR(APP,"Turn on install mode\r\n");
+		G_INFORMATION.profile.run_stt.join_nwk = 1;
+		G_INFORMATION.profile.run_stt.rst_factory  = 1 ; //has reset factory device
+	}
+
 	blt_soft_timer_add(_nwk_slave_backup,2*1000*1000);
+
 	//Interval checking network
 	fl_nwk_slave_reconnect();
 
 	//test random send req
-	TEST_slave_sendREQ();
+//	TEST_slave_sendREQ();
 }
 /***************************************************
  * @brief 		:synchronization status from packet
@@ -223,7 +233,6 @@ bool fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 	fl_data_frame_u req_pack;
 	switch (cmdid) {
 		case NWK_HDR_55: {
-
 			LOGA(INF,"Send 55 REQ to Master:%d/%d\r\n",ORIGINAL_MASTER_TIME.timetamp,ORIGINAL_MASTER_TIME.milstep);
 			req_pack.frame.hdr = NWK_HDR_55;
 
@@ -231,7 +240,7 @@ bool fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 //			req_pack.frame.timetamp[1] = U32_BYTE1(ORIGINAL_MASTER_TIME.timetamp);
 //			req_pack.frame.timetamp[2] = U32_BYTE2(ORIGINAL_MASTER_TIME.timetamp);
 //			req_pack.frame.timetamp[3] = U32_BYTE3(ORIGINAL_MASTER_TIME.timetamp);
-//
+
 //			req_pack.frame.milltamp = ORIGINAL_MASTER_TIME.milstep;
 
 			fl_timetamp_withstep_t field_timetamp = GenerateTimetampField();
@@ -285,7 +294,9 @@ bool fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 	//copy to data struct
 	rslt.length = SIZEU8(req_pack.bytes) - 1; //skip rssi
 	memcpy(rslt.data_arr,req_pack.bytes,rslt.length );
+
 	P_PRINTFHEX_A(INF,rslt.data_arr,rslt.length,"REQ %X ",_cmdid);
+
 	//Send ADV
 	fl_adv_sendFIFO_add(rslt);
 	return true;
@@ -411,7 +422,6 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 			//Non-rsp
 			packet_built.length = 0;
 			return packet_built;
-
 		}
 		break;
 		default:
