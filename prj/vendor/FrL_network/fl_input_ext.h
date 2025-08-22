@@ -13,9 +13,6 @@
 
 #pragma once
 
-#define PRESSnHOLD_DUTY				2*1000*1000 //us->s
-#define PRESSnRELEASE_DUTY			300*1000 	//us->ms
-
 typedef enum {
 	BUTT_STATE_NONE = 0xFF,
 	BUTT_STATE_PRESSnRELEASE = 0x01,
@@ -23,12 +20,16 @@ typedef enum {
 }fl_exButton_states_e;
 
 typedef enum{
-	DET_FALLING_EDGE = 0,
-	DET_RISING_EDGE,
-}fl_gpio_edge_detect_e;
+//	DET_FALLING_EDGE = 0,
+//	DET_RISING_EDGE,
+	DET_LOW,
+	DET_HIGH,
+}fl_gpio_mode_detect_e;
 
+#define LED_NETWORK(x)			gpio_set_level(G_INPUT_EXT.led.network,(x==0)?0:1); //
+#define LED_MANETA(x)			gpio_set_level(G_INPUT_EXT.led.maneta,(x==0)?0:1); //
 
-typedef void (*FncExc)(fl_exButton_states_e,void*);
+typedef u8 (*FncExc)(fl_exButton_states_e,void*);
 
 void fl_input_external_init(void);
 void fl_input_collection_node_handle(blt_timer_callback_t _fnc, u16 _timeout_ms);

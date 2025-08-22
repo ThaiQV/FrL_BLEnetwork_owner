@@ -415,7 +415,7 @@ int _nwk_master_backup(void){
 		profile.nwk.chn[1] = G_MASTER_INFO.nwk.chn[1];
 		profile.nwk.chn[2] = G_MASTER_INFO.nwk.chn[2];
 		fl_db_masterprofile_save(profile);
-		LOGA(INF,"** Channels:%d |%d |%d\r\n",profile.nwk.chn[0],profile.nwk.chn[1],profile.nwk.chn[2])
+		LOGA(INF,"Channels:%d |%d |%d\r\n",profile.nwk.chn[0],profile.nwk.chn[1],profile.nwk.chn[2])
 	}
 	return 0;
 }
@@ -439,8 +439,8 @@ int fl_master_ProccesRSP_cbk(void) {
 		fl_data_frame_u packet;
 		extern u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
 		fl_packet_parse(data_in_queue,&packet.frame);
-		LOGA(INF,"HDR_RSP ID: %02X\r\n",packet.frame.hdr);
-		P_PRINTFHEX_A(INF,packet.frame.payload,SIZEU8(packet.frame.payload),"%d:",packet.frame.slaveID.id_u8);
+//		LOGA(INF,"HDR_RSP ID: %02X\r\n",packet.frame.hdr);
+//		P_PRINTFHEX_A(INF,packet.frame.payload,SIZEU8(packet.frame.payload),"%d:",packet.frame.slaveID.id_u8);
 		switch ((fl_hdr_nwk_type_e) packet.frame.hdr) {
 			case NWK_HDR_HEARTBEAT: {
 				/** - NON-RSP
@@ -469,8 +469,9 @@ int fl_master_ProccesRSP_cbk(void) {
 				if (node_indx != -1) {
 					G_NODE_LIST.sla_info[node_indx].active = true;
 					G_NODE_LIST.sla_info[node_indx].timelife = (clock_time() - G_NODE_LIST.sla_info[node_indx].timelife);
-					LOGA(INF,"55(%d)(%d ms)(%d):%s\r\n",slave_id,G_NODE_LIST.sla_info[node_indx].timelife / SYSTEM_TIMER_TICK_1MS,
-							packet.frame.endpoint.repeat_cnt,packet.frame.payload);
+					u32 cnt_inpack = MAKE_U32(packet.frame.payload[3],packet.frame.payload[2],packet.frame.payload[1],packet.frame.payload[0]);
+					LOGA(INF,"55(%d)0x%02X(%d):%d\r\n",slave_id,G_NODE_LIST.sla_info[node_indx].mac_short.mac_u32,
+							packet.frame.endpoint.repeat_cnt,cnt_inpack);
 					//Send assignment to slave
 					fl_adv_sendFIFO_add(fl_master_packet_RSP_55_build(slave_id));
 				} else {

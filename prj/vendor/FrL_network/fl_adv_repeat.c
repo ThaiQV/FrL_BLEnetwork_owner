@@ -55,7 +55,7 @@ fl_pack_t fl_repeat_packet_build(fl_pack_t _pack) {
 	pack_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
 	memcpy(pack_built.data_arr,packet.bytes,pack_built.length);
 
-	LOGA(ZIG_GP,"%s:%d,TTL: %d\r\n",(packet.frame.endpoint.master == FL_FROM_SLAVE)?"SlaveID":"Master",packet.frame.slaveID.id_u8,packet.frame.endpoint.repeat_cnt);
+	LOGA(ZIG_GP,"%s :%d,TTL: %d\r\n",(packet.frame.endpoint.master == FL_FROM_SLAVE)?"SlaveID":"Master",packet.frame.slaveID.id_u8,packet.frame.endpoint.repeat_cnt);
 
 	return pack_built;
 }
@@ -81,7 +81,6 @@ int fl_repeat_send_cbk(void) {
 		packet_built = fl_repeat_packet_build(data_in_queue);
 		//P_PRINTFHEX_A(ZIG_GP,pack_arr,SIZEU8(pack_arr),"%s:","RepeatPack");
 //		LOGA(ZIG_GP,"Repeat lvl: %d\r\n",packet_built.data_arr[packet_built.length - 1] & 0x03);
-
 		fl_adv_sendFIFO_add(packet_built);
 	}
 	return 0;
@@ -97,7 +96,7 @@ void fl_repeater_init(void) {
 }
 void fl_repeat_run(fl_pack_t *_pack_repeat) {
 	//LOGA(ZIG_GP,"REPEAT(%d)-> run\r\n",_pack_repeat->length - 1);
-	if (FL_QUEUE_FIND(&G_REPEAT_CONTAINER,_pack_repeat,_pack_repeat->length - 1/*skip rssi */) == -1) { //+ repeat_cnt
+	if (FL_QUEUE_FIND(&G_REPEAT_CONTAINER,_pack_repeat,_pack_repeat->length - 1/*skip rssi*/) == -1) { // + repeat_cnt
 		if (FL_QUEUE_ADD(&G_REPEAT_CONTAINER,_pack_repeat) < 0) {
 			ERR(ZIG_GP,"Err <QUEUE ADD> - G_REPEAT_CONTAINER!!\r\n");
 		} else {
