@@ -10,6 +10,7 @@
 
 #include "tl_common.h"
 #include "fl_input_ext.h"
+#include "fl_nwk_handler.h"
 #ifdef MASTER_CORE
 /******************************************************************************/
 /******************************************************************************/
@@ -53,7 +54,16 @@ typedef struct {
 		RspFunc Rspfnc;
 	} rsp;
 }__attribute__((packed)) fl_wifiprotocol_proc_t;
-
+//** Format data CMD from WIFI **//
+typedef struct {
+	u8 mac[6];
+	u8 timetamp_begin[4];
+	u8 timetamp_end[4];
+} fl_wf_report_frame_t;
+typedef union {
+	fl_wf_report_frame_t frame;
+	u8 bytes[SIZEU8(fl_wf_report_frame_t)];
+}__attribute__((packed)) fl_wf_report_u;
 
 /******************************************************************************/
 /******************************************************************************/
@@ -73,8 +83,20 @@ void REPORT_REQUEST(u8* _pdata,RspFunc rspfnc ){
 	LOGA(MCU,"cmdID:0x%02X\r\n",data->cmd);
 	LOGA(MCU,"CRC8:0x%02X\r\n",data->crc8);
 	P_PRINTFHEX_A(MCU,data->data,data->len_data,"Data:");
-	if(rspfnc != 0){
-		rspfnc(_pdata);
+	if(fl_crc8(data->data,data->len_data) != data->crc8){
+		ERR(MCU,"ERR >> CRC8:0x%02X\r\n",data->crc8);
+	}
+	if (rspfnc != 0) {
+		fl_wf_report_u report_fmt;
+		memcpy(report_fmt.bytes,data->data,data->len_data);
+		if (IS_MAC_INVALID(report_fmt.frame.mac,0xFF)) {
+			LOG_P(MCU,"Send all nodelist!!!\r\n");
+			//todo : create array data of the all nodelist
+
+		} else {
+			//todo: send history of the special nodes
+		}
+		rspfnc(report_fmt.bytes);
 	}
 }
 

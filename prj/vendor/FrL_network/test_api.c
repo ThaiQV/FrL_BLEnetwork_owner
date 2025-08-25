@@ -10,7 +10,7 @@
 
 #include "tl_common.h"
 #include "fl_nwk_api.h"
-#include "TBS_dev_config.h"
+#include "../TBS_dev/TBS_dev_config.h"
 
 void _rsp_callback(void *_data,void* _data2){
 	fl_rsp_container_t *data =  (fl_rsp_container_t*)_data;

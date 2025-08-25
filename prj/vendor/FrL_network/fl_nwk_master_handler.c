@@ -36,7 +36,7 @@ fl_data_container_t G_HANDLE_MASTER_CONTAINER = {
 		.data = g_handle_master_array, .head_index = 0, .tail_index = 0, .mask = PACK_HANDLE_MASTER_SIZE - 1, .count = 0 };
 
 fl_slaves_list_t G_NODE_LIST = { .slot_inused = 0xFF };
-fl_master_config_t G_MASTER_INFO ={.nwk ={.chn = {10,11,12},.collect_chn ={0,1,2}}};
+fl_master_config_t G_MASTER_INFO = { .nwk = { .chn = { 10, 11, 12 }, .collect_chn = { 0, 1, 2 } } };
 
 volatile u8 MASTER_INSTALL_STATE = 0;
 //Period of the heartbeat
@@ -44,7 +44,7 @@ u16 PERIOD_HEARTBEAT = 0 * 1000; //
 //flag debug of the network
 volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into endpoint byte (dbg :1bit)
 //volatile u8 NWK_REPEAT_MODE = 1; // slave repeat?
-volatile u8  REPEAT_LEVEL = 3;
+volatile u8 REPEAT_LEVEL = 3;
 
 /******************************************************************************/
 /******************************************************************************/
@@ -58,12 +58,15 @@ void fl_nwk_master_nodelist_load(void);
 void fl_nwk_master_nodelist_store(void);
 
 void _master_nodelist_printf(fl_slaves_list_t *_node, u8 _size) {
-	LOG_P(FLA,"******** NODELIST ********\r\n");
-	for (u8 var = 0; var < _size; ++var) {
-		LOGA(FLA,"[%d]Mac:0x%02X%02X%02X%02X%02X%02X\r\n",_node->sla_info[var].slaveID.id_u8,_node->sla_info[var].mac[0],_node->sla_info[var].mac[1],
-				_node->sla_info[var].mac[2],_node->sla_info[var].mac[3],_node->sla_info[var].mac[4],_node->sla_info[var].mac[5]);
+	if (_size < 0xFF && _size > 0) {
+		LOG_P(FLA,"******** NODELIST ********\r\n");
+		for (u8 var = 0; var < _size; ++var) {
+			LOGA(FLA,"[%d]Mac:0x%02X%02X%02X%02X%02X%02X\r\n",_node->sla_info[var].slaveID.id_u8,_node->sla_info[var].mac[0],
+					_node->sla_info[var].mac[1],_node->sla_info[var].mac[2],_node->sla_info[var].mac[3],_node->sla_info[var].mac[4],
+					_node->sla_info[var].mac[5]);
+		}
+		LOG_P(FLA,"******** END *************\r\n");
 	}
-	LOG_P(FLA,"******** END *************\r\n");
 }
 
 void fl_master_nodelist_AddRefesh(fl_nodeinnetwork_t _node) {
@@ -179,7 +182,7 @@ fl_pack_t fl_master_packet_collect_build(void) {
  *
  ***************************************************/
 fl_pack_t fl_master_packet_assignSlaveID_build(u8* _mac) {
-	extern fl_adv_settings_t G_ADV_SETTINGS ;
+	extern fl_adv_settings_t G_ADV_SETTINGS;
 	fl_pack_t packet_built;
 
 	fl_data_frame_u packet;
@@ -228,7 +231,7 @@ fl_pack_t fl_master_packet_assignSlaveID_build(u8* _mac) {
  *
  ***************************************************/
 fl_pack_t fl_master_packet_RSP_55_build(u8 slaveID) {
-	extern fl_adv_settings_t G_ADV_SETTINGS ;
+	extern fl_adv_settings_t G_ADV_SETTINGS;
 	fl_pack_t packet_built;
 
 	fl_data_frame_u packet;
@@ -247,7 +250,7 @@ fl_pack_t fl_master_packet_RSP_55_build(u8 slaveID) {
 
 	//Create payload
 	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
-	u8 ack[2] = {'O','K'};
+	u8 ack[2] = { 'O', 'K' };
 	memcpy(packet.frame.payload,ack,SIZEU8(ack));
 	//assign slaveID
 	packet.frame.slaveID.id_u8 = slaveID;
@@ -414,10 +417,10 @@ int fl_send_heartbeat(void) {
  * @return	  	:none
  *
  ***************************************************/
-int _nwk_master_backup(void){
+int _nwk_master_backup(void) {
 	static u32 pre_crc32 = 0;
-	u32 crc32  = fl_db_crc32((u8*)&G_MASTER_INFO,sizeof(fl_master_config_t)/sizeof(u8));
-	if(crc32 != pre_crc32){
+	u32 crc32 = fl_db_crc32((u8*) &G_MASTER_INFO,sizeof(fl_master_config_t) / sizeof(u8));
+	if (crc32 != pre_crc32) {
 		pre_crc32 = crc32;
 		fl_db_master_profile_t profile;
 		profile.nwk.chn[0] = G_MASTER_INFO.nwk.chn[0];
@@ -479,10 +482,9 @@ int fl_master_ProccesRSP_cbk(void) {
 					G_NODE_LIST.sla_info[node_indx].active = true;
 					G_NODE_LIST.sla_info[node_indx].timelife = (clock_time() - G_NODE_LIST.sla_info[node_indx].timelife);
 					u32 cnt_inpack = MAKE_U32(packet.frame.payload[3],packet.frame.payload[2],packet.frame.payload[1],packet.frame.payload[0]);
-					LOGA(INF,"CMD_55(%d)0x%02X%02X%02X%02X%02X%02X(%d):%d\r\n",slave_id,
-							G_NODE_LIST.sla_info[node_indx].mac[0],G_NODE_LIST.sla_info[node_indx].mac[1],G_NODE_LIST.sla_info[node_indx].mac[2],
-							G_NODE_LIST.sla_info[node_indx].mac[3],G_NODE_LIST.sla_info[node_indx].mac[4],G_NODE_LIST.sla_info[node_indx].mac[5],
-							packet.frame.endpoint.repeat_cnt,cnt_inpack);
+					LOGA(INF,"CMD_55(%d)0x%02X%02X%02X%02X%02X%02X(%d):%d\r\n",slave_id,G_NODE_LIST.sla_info[node_indx].mac[0],
+							G_NODE_LIST.sla_info[node_indx].mac[1],G_NODE_LIST.sla_info[node_indx].mac[2],G_NODE_LIST.sla_info[node_indx].mac[3],
+							G_NODE_LIST.sla_info[node_indx].mac[4],G_NODE_LIST.sla_info[node_indx].mac[5],packet.frame.endpoint.repeat_cnt,cnt_inpack);
 					//Send assignment to slave
 					fl_adv_sendFIFO_add(fl_master_packet_RSP_55_build(slave_id));
 				} else {
@@ -501,9 +503,14 @@ int fl_master_ProccesRSP_cbk(void) {
 					node_indx = fl_master_SlaveID_find(slave_id);
 					if (node_indx != -1) {
 						G_NODE_LIST.sla_info[node_indx].active = true;
-						G_NODE_LIST.sla_info[node_indx].timelife = (clock_time() - G_NODE_LIST.sla_info[node_indx].timelife) ;
-						LOGA(INF,"INFO(%d)(%d ms)(%d):%s\r\n",slave_id,G_NODE_LIST.sla_info[node_indx].timelife/ SYSTEM_TIMER_TICK_1MS,
-								packet.frame.endpoint.repeat_cnt,packet.frame.payload);
+						G_NODE_LIST.sla_info[node_indx].timelife = (clock_time() - G_NODE_LIST.sla_info[node_indx].timelife);
+						memcpy(G_NODE_LIST.sla_info[node_indx].data,packet.frame.payload,SIZEU8(G_NODE_LIST.sla_info[node_indx].data));
+						P_PRINTFHEX_A(INF,G_NODE_LIST.sla_info[node_indx].data,SIZEU8(G_NODE_LIST.sla_info[node_indx].data),
+								"INFO(%d)Devtype(%d)(%d ms)(%d):",slave_id,G_NODE_LIST.sla_info[node_indx].data[0],
+								G_NODE_LIST.sla_info[node_indx].timelife / SYSTEM_TIMER_TICK_1MS,packet.frame.endpoint.repeat_cnt);
+//						LOGA(INF,"INFO(%d)(%d ms)(%d):%s\r\n",slave_id,G_NODE_LIST.sla_info[node_indx].timelife/ SYSTEM_TIMER_TICK_1MS,
+//								packet.frame.endpoint.repeat_cnt,packet.frame.payload);
+
 					} else {
 						ERR(INF,"ID not foud:%02X\r\n",slave_id);
 					}
@@ -519,7 +526,7 @@ int fl_master_ProccesRSP_cbk(void) {
 				u8 mac[6];
 				MAC_ZERO_CLEAR(mac,0);
 				memcpy(mac,&packet.frame.payload[0],sizeof(mac));
-				if(IS_MAC_INVALID(mac,0) || IS_MAC_INVALID(mac,0xFF)){
+				if (IS_MAC_INVALID(mac,0) || IS_MAC_INVALID(mac,0xFF)) {
 					break;
 				}
 				s16 node_indx = fl_master_Node_find(mac);
@@ -529,9 +536,8 @@ int fl_master_ProccesRSP_cbk(void) {
 					new_slave.timelife = clock_time();
 //					new_slave.mac_short.mac_u32 = mac_short;
 					memcpy(new_slave.mac,mac,sizeof(mac));
-					P_PRINTFHEX_A(INF,packet.frame.payload,sizeof(mac),"0x%02X%02X%02X%02X%02X%02X\r\n(%d):",
-							new_slave.mac[0],new_slave.mac[1],new_slave.mac[2],new_slave.mac[3],new_slave.mac[4],new_slave.mac[5],
-							packet.frame.endpoint.repeat_cnt);
+					P_PRINTFHEX_A(INF,packet.frame.payload,sizeof(mac),"0x%02X%02X%02X%02X%02X%02X\r\n(%d):",new_slave.mac[0],new_slave.mac[1],
+							new_slave.mac[2],new_slave.mac[3],new_slave.mac[4],new_slave.mac[5],packet.frame.endpoint.repeat_cnt);
 					//assign SlaveID (grpID + memID) to the slave
 					fl_master_nodelist_AddRefesh(new_slave);
 				}
@@ -564,7 +570,7 @@ void fl_nwk_master_init(void) {
 	G_MASTER_INFO.nwk.chn[1] = master_profile.nwk.chn[1];
 	G_MASTER_INFO.nwk.chn[2] = master_profile.nwk.chn[2];
 
-	blt_soft_timer_add(_nwk_master_backup,2*1000*1000);
+	blt_soft_timer_add(_nwk_master_backup,2 * 1000 * 1000);
 }
 /***************************************************
  * @brief 		: init nodelist
@@ -574,12 +580,12 @@ void fl_nwk_master_init(void) {
  * @return	  	:none
  *
  ***************************************************/
-void fl_nwk_master_nodelist_init(void){
+void fl_nwk_master_nodelist_init(void) {
 	G_NODE_LIST.slot_inused = 0xFF;
-	for(u8 i=0;i<MAX_NODES;i++){
+	for (u8 i = 0; i < MAX_NODES; i++) {
 		G_NODE_LIST.sla_info[i].active = false;
 		G_NODE_LIST.sla_info[i].slaveID.id_u8 = 0xFF;
-		G_NODE_LIST.sla_info[i].timelife =0;
+		G_NODE_LIST.sla_info[i].timelife = 0;
 		MAC_ZERO_CLEAR(G_NODE_LIST.sla_info[i].mac,0);
 	}
 }
@@ -607,8 +613,7 @@ void fl_nwk_master_nodelist_store(void) {
 //		nodelist.slave[i].slaveid = i;
 //		nodelist.slave[i].mac_u32 = 0x2F2245D1; //
 //	}
-	if (nodelist.num_slave && nodelist.num_slave!= 0xFF)
-	{
+	if (nodelist.num_slave && nodelist.num_slave != 0xFF) {
 		fl_db_nodelist_save(&nodelist);
 	}
 }
@@ -621,7 +626,7 @@ void fl_nwk_master_nodelist_store(void) {
  *
  ***************************************************/
 void fl_nwk_master_nodelist_load(void) {
-	fl_nodelist_db_t nodelist = { .num_slave = 0xFF};
+	fl_nodelist_db_t nodelist = { .num_slave = 0xFF };
 	if (fl_db_nodelist_load(&nodelist) && nodelist.num_slave != 0xFF) {
 		G_NODE_LIST.slot_inused = nodelist.num_slave;
 		for (u8 var = 0; var < nodelist.num_slave; ++var) {

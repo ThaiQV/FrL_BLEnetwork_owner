@@ -17,11 +17,14 @@
 #include "fl_adv_proc.h"
 #include "fl_nwk_handler.h"
 //#include "fl_nwk_protocol.h"
-
+#include "../TBS_dev/TBS_dev_config.h"
 //Test api
 #include "test_api.h"
 
 #ifndef MASTER_CORE
+#ifdef COUNTER_DEVICE
+extern fl_device_counter_t G_COUNTER_DEV ;
+#endif
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -352,18 +355,21 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 				datetime_t cur_dt;
 				fl_rtc_timestamp_to_datetime(master_timetamp,&cur_dt);
 
-				fl_timetamp_withstep_t millstep = fl_rtc_getWithMilliStep();
-				u8 test_payload[SIZEU8(packet.frame.payload)];
-				memset(test_payload,0,sizeof(test_payload));
-				sprintf((char*) test_payload,"%02d:%02d:%02d-%03d/%03d",cur_dt.hour,cur_dt.minute,cur_dt.second,millstep.milstep, packet.frame.milltamp);
+//				fl_timetamp_withstep_t millstep = fl_rtc_getWithMilliStep();
+//				u8 test_payload[SIZEU8(packet.frame.payload)];
+//				memset(test_payload,0,sizeof(test_payload));
+//				sprintf((char*) test_payload,"%02d:%02d:%02d-%03d/%03d",cur_dt.hour,cur_dt.minute,cur_dt.second,millstep.milstep, packet.frame.milltamp);
+#ifdef COUNTER_DEVICE
+				u8 _payload[SIZEU8(packet.frame.payload)];
+				memset(_payload,0xFF,SIZEU8(_payload));
+				memcpy(_payload,G_COUNTER_DEV.bytes,SIZEU8(G_COUNTER_DEV.bytes));
+#endif
 				LOGA(APP,"(%d)SlaveID:%X | inPack:%X\r\n",memid_idx,G_INFORMATION.slaveID.id_u8,packet.frame.payload[memid_idx]);
 				packet.frame.endpoint.dbg = NWK_DEBUG_STT;
-
 				if (memid_idx != -1) {
 					packet.frame.slaveID.id_u8 = G_INFORMATION.slaveID.id_u8;
 					memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
-					//TEST payload
-					memcpy(&packet.frame.payload,test_payload,SIZEU8(test_payload));
+					memcpy(&packet.frame.payload,_payload,SIZEU8(_payload));
 					//CRC
 					packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
 				} else {

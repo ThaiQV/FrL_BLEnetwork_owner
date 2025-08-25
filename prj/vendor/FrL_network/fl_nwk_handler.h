@@ -75,6 +75,20 @@ typedef union {
 	u8 bytes[SIZEU8(fl_dataframe_format_t)];
 }__attribute__((packed)) fl_data_frame_u;
 
+typedef union{
+	struct{
+		u8 type;
+		u8 bt_call;
+		u8 bt_endcall;
+		u8 bt_rst;
+		u32 pass_product;
+		u32 err_product;
+		//reserve
+		//u8 rsv[11];
+	}data;
+	u8 bytes[12];
+}__attribute__((packed)) fl_device_counter_t;
+
 typedef struct {
 	u8 mac[6];
 	fl_slaveID_u slaveID;
@@ -84,6 +98,8 @@ typedef struct {
 //todo: parameters
 	fl_slave_profiles_t profile;
 #endif
+	//data of dev
+	u8 data[21];
 }__attribute__((packed)) fl_nodeinnetwork_t;
 
 typedef struct {
