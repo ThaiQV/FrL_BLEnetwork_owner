@@ -101,7 +101,8 @@ int _nwk_slave_backup(void){
 	if(crc32 != pre_crc32){
 		pre_crc32 = crc32;
 		fl_db_slaveprofile_save(G_INFORMATION.profile);
-		LOGA(INF,"** MAC     :%08X\r\n",G_INFORMATION.mac_short.mac_u32);
+		LOGA(INF,"** MAC     :%02X%02X%02X%02X%02X%02X\r\n",G_INFORMATION.mac[0],G_INFORMATION.mac[1],G_INFORMATION.mac[2],
+				G_INFORMATION.mac[3],G_INFORMATION.mac[4],G_INFORMATION.mac[5]);
 		LOGA(INF,"** SlaveID :%d\r\n",G_INFORMATION.slaveID.id_u8);
 		LOGA(INF,"** grpID   :%d\r\n",G_INFORMATION.slaveID.grpID);
 		LOGA(INF,"** memID   :%d\r\n",G_INFORMATION.slaveID.memID);
@@ -119,7 +120,7 @@ void fl_nwk_slave_init(void) {
 	//Generate information
 	G_INFORMATION.active = false;
 	G_INFORMATION.timelife = 0;
-	memcpy(G_INFORMATION.mac_short.byte,blc_ll_get_macAddrPublic(),SIZEU8(G_INFORMATION.mac_short.byte));
+	memcpy(G_INFORMATION.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_INFORMATION.mac));
 
 	//Load from db
 	fl_slave_profiles_t my_profile = fl_db_slaveprofile_init();
@@ -135,7 +136,8 @@ void fl_nwk_slave_init(void) {
 	SYNC_ORIGIN_MASTER(cur_timetamp.timetamp,cur_timetamp.milstep);
 
 	LOG_P(INF,"Freelux network SLAVE init\r\n");
-	LOGA(INF,"** MAC    :%08X\r\n",G_INFORMATION.mac_short.mac_u32);
+	LOGA(INF,"** MAC     :%02X%02X%02X%02X%02X%02X\r\n",G_INFORMATION.mac[0],G_INFORMATION.mac[1],G_INFORMATION.mac[2],
+			G_INFORMATION.mac[3],G_INFORMATION.mac[4],G_INFORMATION.mac[5]);
 	LOGA(INF,"** SlaveID:%d\r\n",G_INFORMATION.slaveID.id_u8);
 	LOGA(INF,"** grpID  :%d\r\n",G_INFORMATION.slaveID.grpID);
 	LOGA(INF,"** memID  :%d\r\n",G_INFORMATION.slaveID.memID);
@@ -385,7 +387,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 				if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
 					//Process rsp
 					memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
-					memcpy(packet.frame.payload,G_INFORMATION.mac_short.byte,SIZEU8(G_INFORMATION.mac_short.byte));
+					memcpy(packet.frame.payload,G_INFORMATION.mac,SIZEU8(G_INFORMATION.mac));
 					//change endpoint to node source
 					packet.frame.endpoint.master = FL_FROM_SLAVE;
 					//add repeat_cnt
@@ -402,21 +404,21 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 		{
 			_nwk_slave_syncFromPack(&packet.frame);
 			//Process rsp
-			s8 mymac_idx = plog_IndexOf(packet.frame.payload,G_INFORMATION.mac_short.byte,SIZEU8(G_INFORMATION.mac_short.byte),sizeof(packet.frame.payload));
+			s8 mymac_idx = plog_IndexOf(packet.frame.payload,G_INFORMATION.mac,SIZEU8(G_INFORMATION.mac),sizeof(packet.frame.payload));
 			if (mymac_idx != -1) {
 				G_INFORMATION.slaveID.id_u8 = packet.frame.slaveID.id_u8;
 				LOGA(INF,"UPDATE SlaveID: %d(grpID:%d|memID:%d)\r\n",G_INFORMATION.slaveID.id_u8,G_INFORMATION.slaveID.grpID,G_INFORMATION.slaveID.memID);
 				G_INFORMATION.profile.slaveid = G_INFORMATION.slaveID.id_u8 ;
 				G_INFORMATION.profile.run_stt.rst_factory = 0;
-				G_INFORMATION.profile.nwk.chn[0] = packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac_short.byte)];
-				G_INFORMATION.profile.nwk.chn[1] = packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac_short.byte) + 1];
-				G_INFORMATION.profile.nwk.chn[2] = packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac_short.byte) + 2];
+				G_INFORMATION.profile.nwk.chn[0] = packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac)];
+				G_INFORMATION.profile.nwk.chn[1] = packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac) + 1];
+				G_INFORMATION.profile.nwk.chn[2] = packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac) + 2];
 				//get master's mac
 				G_INFORMATION.profile.nwk.mac_parent = MAKE_U32(packet.frame.payload[7],packet.frame.payload[8],packet.frame.payload[9],packet.frame.payload[10]);
 			}
 			//debug
 			else{
-				P_PRINTFHEX_A(INF,G_INFORMATION.mac_short.byte,4,"Mac:");
+				P_PRINTFHEX_A(INF,G_INFORMATION.mac,SIZEU8(G_INFORMATION.mac),"Mac:");
 				P_PRINTFHEX_A(INF,packet.frame.payload,19,"PACK");
 			}
 			//Non-rsp
@@ -504,7 +506,7 @@ int fl_nwk_slave_reconnect(void){
 	}
 	if(IsJoinedNetwork() && G_INFORMATION.active == false){
 		LOGA(INF,"Reconnect network (%d s)!!!\r\n",RECHECKING_NETWOK_TIME/1000);
-		fl_api_slave_req(NWK_HDR_RECONNECT,G_INFORMATION.mac_short.byte,SIZEU8(G_INFORMATION.mac_short.byte),0,0);
+		fl_api_slave_req(NWK_HDR_RECONNECT,G_INFORMATION.mac,SIZEU8(G_INFORMATION.mac),0,0);
 	}
 	return 0;
 }

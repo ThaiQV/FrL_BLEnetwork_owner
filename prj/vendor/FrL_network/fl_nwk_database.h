@@ -18,7 +18,7 @@
 //////// ======================================================================
 
 #ifdef MASTER_CORE
-#define QUANTITY_FIELD_STORED_DB			3 //RTC + NODELIST(master) + MASTER PROFILE
+#define QUANTITY_FIELD_STORED_DB		3 //RTC + NODELIST(master) + MASTER PROFILE
 #else
 #define QUANTITY_FIELD_STORED_DB			2 //RTC + SLAVE PROFILE
 #endif
@@ -48,7 +48,7 @@
 #define NODELIST_SLAVE_MAX				200
 typedef struct {
 	uint8_t slaveid;
-	uint32_t mac_u32;
+	uint8_t mac[6];
 }__attribute__((packed)) fl_node_data_t;
 typedef struct {
 	u8 num_slave;

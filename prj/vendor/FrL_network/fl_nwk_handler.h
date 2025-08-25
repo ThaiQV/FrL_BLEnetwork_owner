@@ -24,6 +24,11 @@ typedef void (*fl_rsp_callback_fnc)(void*,void*);
 #define RAND_INT(min, max)  		((rand() % ((min) + (max) + 1)) - (min))
 #define SIZEU8(x)					(sizeof(x)/sizeof(u8))
 
+#define MAC_ZERO_CLEAR(mac,x)		(memset(mac,x,sizeof(mac)/sizeof(mac[0])))
+#define IS_MAC_INVALID(mac,x) 		(((mac[0] == x) && (mac[1] == x) && (mac[2] == x) && (mac[3] == x) && (mac[4] == x) && (mac[5] == x)))
+#define MAC_MATCH(mac1, mac2) 		(memcmp(mac1, mac2, 6) == 0)
+#define MAC_COPY(mac,data)			(memcpy(mac,data,6))
+
 typedef enum {
 	NWK_HDR_NONE = 0,
 	// slave -> req -> master -> rsp
@@ -71,10 +76,7 @@ typedef union {
 }__attribute__((packed)) fl_data_frame_u;
 
 typedef struct {
-	union {
-		u32 mac_u32;
-		u8 byte[4];
-	} mac_short;
+	u8 mac[6];
 	fl_slaveID_u slaveID;
 	u32 timelife;
 	bool active;

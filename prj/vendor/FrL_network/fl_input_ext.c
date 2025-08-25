@@ -14,9 +14,8 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "fl_nwk_protocol.h"
-
+#include "fl_ble_wifi.h"
 //Lib
-
 #include "TBS_dev_config.h"
 #include "Peri_libs/TCA9555.h"
 
@@ -163,6 +162,8 @@ static int rx_from_uart_cb(void) //UART data send to Master,we will handler the 
 		return 0;
 	}
 	u8* p = my_fifo_get(&fl_rx_fifo);
+	//Add WIFI <-> BLE process cmd
+	fl_ble_wifi_proc(p);
 //	fl_serial_send(p,(unsigned int) p[0]+1);
 	u8 data_verify[UART_DATA_LEN];
 	memset(data_verify,0,sizeof(data_verify));
@@ -180,12 +181,12 @@ static int tx_to_uart_cb(void) {
 	u8 *p = my_fifo_get(&fl_tx_fifo);
 	if (p && !FLAG_uart_dma_send) {
 		FL_TXDATA.len = (unsigned int) p[0];
-		memcpy(&FL_TXDATA.data,p,FL_TXDATA.len);
-		LOGA(DRV,"lenData:%d\r\n",FL_TXDATA.len);
-		P_PRINTFHEX_A(DRV,FL_TXDATA.data,FL_TXDATA.len,"%s(%d):","Tx",FL_TXDATA.len);
+		memcpy(&FL_TXDATA.data,&p[1],FL_TXDATA.len);
 		if (uart_send_dma(G_INPUT_EXT.serial.uart_num,(u8 *) (&FL_TXDATA.data),FL_TXDATA.len)) {
 			my_fifo_pop(&fl_tx_fifo);
 			FLAG_uart_dma_send = 1;
+			LOGA(DRV,"lenData:%d\r\n",FL_TXDATA.len);
+			P_PRINTFHEX_A(DRV,FL_TXDATA.data,FL_TXDATA.len,"%s(%d):","Tx",FL_TXDATA.len);
 		}
 	}
 	return 0;
@@ -199,10 +200,13 @@ static int tx_to_uart_cb(void) {
  */
 int fl_serial_send(u8* _data, u8 _len) {
 	u8 *p = my_fifo_wptr(&fl_tx_fifo);
-	if (!p) {
+	if (!p || _len >= UART_DATA_LEN) {
 		return -1;
 	}
-	memcpy(p,_data,_len);
+//	u8 data_verify[UART_DATA_LEN];
+//	memset(data_verify,0,sizeof(data_verify));
+	p[0] = _len;
+	memcpy(&p[1],_data,_len);
 	my_fifo_next(&fl_tx_fifo);
 	return 0;
 }

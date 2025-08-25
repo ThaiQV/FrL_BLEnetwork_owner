@@ -12,5 +12,5 @@
 #define VENDOR_FRL_NETWORK_FL_BLE_WIFI_H_
 
 
-
+void fl_ble_wifi_proc(u8* _pdata) ;
 #endif /* VENDOR_FRL_NETWORK_FL_BLE_WIFI_H_ */
