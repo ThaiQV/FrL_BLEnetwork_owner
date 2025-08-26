@@ -8,19 +8,34 @@
  *License: Revised BSD License, see LICENSE.TXT file include in the project
  **************************************************************************/
 
-
-#include "TBS_dev_config.h"
+#include "stack/ble/ble.h"
 #include "tl_common.h"
+#include "TBS_dev_config.h"
 #include "../FrL_Network/fl_nwk_handler.h"
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
 /******************************************************************************/
 /******************************************************************************/
+void tbs_counter_printf(void* _p){
+	tbs_device_counter_t *data = (tbs_device_counter_t*)_p;
+	LOGA(INF,"MAC:0x%02X%02X%02X%02X%02X%02X\r\n",data->data.mac[0],data->data.mac[1],data->data.mac[2],
+			data->data.mac[3],data->data.mac[4],data->data.mac[5]);
+	LOGA(INF,"Timetamp:%d\r\n",data->data.timetamp);
+	LOGA(INF,"Type:%d\r\n",data->data.type);
+	LOGA(INF,"BT_Call:%d\r\n",data->data.bt_call);
+	LOGA(INF,"BT_EndCall:%d\r\n",data->data.bt_endcall);
+	LOGA(INF,"BT_Rst:%d\r\n",data->data.bt_rst);
+	LOGA(INF,"BT_Pass:%d\r\n",data->data.pass_product);
+	LOGA(INF,"BT_Err:%d\r\n",data->data.err_product);
+	P_PRINTFHEX_A(INF,data->bytes,SIZEU8(data->bytes),"Raw:");
+}
+
+
 #ifdef COUNTER_DEVICE
-fl_device_counter_t G_COUNTER_DEV = { .data = {
+tbs_device_counter_t G_COUNTER_DEV = { .data = {
 												.timetamp = 0,
-												.type = 0,
+												.type = TBS_COUNTER,
 												.bt_call = 0,
 												.bt_endcall = 0,
 												.bt_rst = 0,
@@ -76,14 +91,30 @@ void test_powermeter(void) {
 /***                           Private definitions                           **/
 /******************************************************************************/
 /******************************************************************************/
+#ifdef COUNTER_DEVICE
+void TBS_Counter_init(void){
+	memcpy(G_COUNTER_DEV.data.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_COUNTER_DEV.data.mac));
+	G_COUNTER_DEV.data.type = TBS_COUNTER;
+	G_COUNTER_DEV.data.timetamp = fl_rtc_get();
+	//todo:Init Butt,lcd,7segs,.....
 
+}
+void TBS_Counter_Run(void){
+	G_COUNTER_DEV.data.timetamp = fl_rtc_get();
+	//For testing : randon valid of fields
+	G_COUNTER_DEV.data.bt_call = RAND(0,1);
+	G_COUNTER_DEV.data.bt_endcall = G_COUNTER_DEV.data.bt_call?0:1;
+	G_COUNTER_DEV.data.bt_rst = RAND(0,1);
+	G_COUNTER_DEV.data.pass_product = RAND(1,1020);
+	G_COUNTER_DEV.data.err_product = RAND(1,500);
+}
+#endif
 
 /******************************************************************************/
 /******************************************************************************/
 /***                       Functions declare                   		         **/
 /******************************************************************************/
 /******************************************************************************/
-
 
 
 /******************************************************************************/
@@ -99,4 +130,13 @@ void test_powermeter(void) {
 /***                      Processing functions 					             **/
 /******************************************************************************/
 /******************************************************************************/
-
+void TBS_Device_Init(void){
+#ifdef COUNTER_DEVICE
+	TBS_Counter_init();
+#endif
+}
+void TBS_Device_Run(void){
+#ifdef COUNTER_DEVICE
+	TBS_Counter_Run();
+#endif
+}

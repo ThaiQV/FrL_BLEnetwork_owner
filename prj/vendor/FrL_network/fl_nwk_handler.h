@@ -192,9 +192,12 @@ typedef struct {
 #ifndef MASTER_CORE
 //todo: parameters
 	fl_slave_profiles_t profile;
-#endif
+	//pointer data of device
+	u8 *data;
+#else
 	//data of dev
 	u8 data[35];
+#endif
 }__attribute__((packed)) fl_nodeinnetwork_t;
 
 typedef struct {
