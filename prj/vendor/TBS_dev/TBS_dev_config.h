@@ -18,7 +18,6 @@ typedef enum{
 #define tbs_device_gettype(x)			(x[sizeof(u32)+6]) //mac[6] + timetamp (u32)
 #ifndef MASTER_CORE
 #define COUNTER_DEVICE
-
 #endif
 
 #endif /* VENDOR_FRL_NETWORK_TBS_DEV_CONFIG_H_ */

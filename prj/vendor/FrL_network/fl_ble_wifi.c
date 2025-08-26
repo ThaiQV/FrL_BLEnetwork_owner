@@ -139,17 +139,19 @@ void REPORT_RESPONSE(u8* _pdata){
 		LOG_P(MCU,"Send all nodelist!!!\r\n");
 		//todo : create array data of the all nodelist
 
-		/* COUNTER DEVICE
-		 * |Call butt|End call butt|Reset button|Pass product|Error product|Reserve| (sum 22 bytes)
-		 * |   1B	 |      1B     |     1B     |    4Bs     |     4Bs     |  11Bs |
-		 * */
 		u8 payload[BLE_WIFI_MAXLEN];
-		memset(payload,0xFF,SIZEU8(payload));
+
 		fl_datawifi2ble_t wfdata;
 		for (u8 var = 0; var < G_NODE_LIST.slot_inused; ++var) {
+			memset(payload,0xFF,SIZEU8(payload));
 			LOGA(MCU,"Devtype:%d\r\n",G_NODE_LIST.sla_info[var].dev_type);
+			//for COUTER DEVICEs
+			/* COUNTER DEVICE
+			 * |Call butt|End call butt|Reset button|Pass product|Error product|Reserve| (sum 22 bytes)
+			 * |   1B	 |      1B     |     1B     |    4Bs     |     4Bs     |  11Bs |
+			 * */
 			if (G_NODE_LIST.sla_info[var].dev_type == TBS_COUNTER) {
-				fl_device_counter_t *counter_data = (fl_device_counter_t*) G_NODE_LIST.sla_info[var].data;
+				tbs_device_counter_t *counter_data = (tbs_device_counter_t*) G_NODE_LIST.sla_info[var].data;
 				memcpy(counter_data->data.mac,G_NODE_LIST.sla_info[var].mac,6);
 				wfdata.cmd = G_WIFI_CON[_wf_CMD_find(data->cmd)].rsp.cmd;
 				wfdata.len_data = SIZEU8(counter_data->bytes);
@@ -160,13 +162,39 @@ void REPORT_RESPONSE(u8* _pdata){
 				P_PRINTFHEX_A(MCU,counter_data->bytes,sizeof(counter_data->bytes),"Couter struct(%d):",len_payload);
 				fl_ble_send_wifi(payload,len_payload);
 			}
+	//For POWER-METER DEVICEs
+	/*
+	 * | Frequency | Voltage | Current 1 | Current 2 | Current 3 | Power 1 | Power 2 | Power 3 | Energy 1 | Energy 2 | Energy 3 | Reserve | (sum 176 bits)
+	 * |   7 bits  |  9 bits |  10 bits  |  10 bits  |  10 bits  | 14 bits | 14 bits | 14 bits | 24 bits  | 24 bits  | 24 bits  | 16 bits |
+	 */
+			else {
+				if (G_NODE_LIST.sla_info[var].dev_type == TBS_POWERMETER) {
+//					tbs_device_powermeter_t meter = {
+//							.mac = { 0xDE, 0xAD, 0xBE, 0xEF, 0x00, 0x01 }, .timestamp = 12345678, .frequency = 100, .voltage = 300, .current1 = 512,
+//							.current2 = 513, .current3 = 514, .power1 = 1000, .power2 = 1001, .power3 = 1002, .energy1 = 123456, .energy2 = 654321,
+//							.energy3 = 111111,
+//							};
+//					u8 buffer[POWER_METER_SIZE];
+//					memset(buffer,0,POWER_METER_SIZE);
+					tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) G_NODE_LIST.sla_info[var].data;
+					memcpy(pwmeter_data->mac,G_NODE_LIST.sla_info[var].mac,6);
+					//pack_powermeter_data(pwmeter_data,buffer);
+					wfdata.cmd = G_WIFI_CON[_wf_CMD_find(data->cmd)].rsp.cmd;
+					wfdata.len_data = POWER_METER_PACK_SIZE-SIZEU8(pwmeter_data->mac) - SIZEU8(pwmeter_data->timestamp);
+					//memcpy(wfdata.data,(u8*)&pwmeter_data,wfdata.len_data);
+					pack_powermeter_data(pwmeter_data,wfdata.data);
+					wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
+					u8 len_payload = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
+					memcpy(payload,(u8*) &wfdata,len_payload);
+					P_PRINTFHEX_A(MCU,payload,len_payload,"PW Meter struct(%d):",len_payload);
+					fl_ble_send_wifi(payload,len_payload);
+				}
+			}
 		}
 	} else {
 		//todo: send history of the special nodes
 	}
-
 }
-
 
 /******************************************************************************/
 /******************************************************************************/

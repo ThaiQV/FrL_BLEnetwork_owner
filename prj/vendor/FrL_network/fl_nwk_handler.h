@@ -16,7 +16,7 @@
 /**
  * @brief	callback function for rsp
  */
-typedef void (*fl_rsp_callback_fnc)(void*,void*);
+typedef void (*fl_rsp_callback_fnc)(void*, void*);
 #define QUEUE_RSP_SLOT_MAX		10
 #define QUEUQ_REQcRSP_INTERVAL  20*1000 //ms
 
@@ -75,6 +75,10 @@ typedef union {
 	u8 bytes[SIZEU8(fl_dataframe_format_t)];
 }__attribute__((packed)) fl_data_frame_u;
 
+/* COUNTER DEVICE
+ * |Call butt|End call butt|Reset button|Pass product|Error product|Reserve| (sum 22 bytes)
+ * |   1B	 |      1B     |     1B     |    4Bs     |     4Bs     |  11Bs |
+ * */
 typedef union {
 	struct {
 		u8 mac[6];
@@ -89,8 +93,95 @@ typedef union {
 	//u8 rsv[11];
 	} data;
 	u8 bytes[22];
-}__attribute__((packed)) fl_device_counter_t;
+}__attribute__((packed)) tbs_device_counter_t;
+//For POWER-METER DEVICEs
+/*
+ * | Frequency | Voltage | Current 1 | Current 2 | Current 3 | Power 1 | Power 2 | Power 3 | Energy 1 | Energy 2 | Energy 3 | Reserve | (sum 176 bits)
+ * |   7 bits  |  9 bits |  10 bits  |  10 bits  |  10 bits  | 14 bits | 14 bits | 14 bits | 24 bits  | 24 bits  | 24 bits  | 16 bits |
+ */
+typedef struct {
+	u8 mac[6];         // MAC address (48 bits)
+	u32 timestamp;     // Timestamp (32 bits)
+	// Measurement fields (bit-level precision noted)
+	u8 frequency;     	// 7 bits
+	u16 voltage;       // 9 bits
+	u16 current1;      // 10 bits
+	u16 current2;      // 10 bits
+	u16 current3;      // 10 bits
+	u16 power1;        // 14 bits
+	u16 power2;        // 14 bits
+	u16 power3;        // 14 bits
+	u32 energy1;       // 24 bits
+	u32 energy2;       // 24 bits
+	u32 energy3;       // 24 bits
+	//u16 reserve;     // 16 bits
+}__attribute__((packed)) tbs_device_powermeter_t;
 
+#define POWER_METER_SIZE		(SIZEU8(tbs_device_powermeter_t))
+#define POWER_METER_PACK_SIZE	32
+
+static inline void pack_powermeter_data(tbs_device_powermeter_t *src, u8 *dst) {
+	u32 bitpos = 0;
+	memset(dst,0,POWER_METER_PACK_SIZE); // clear buffer
+
+	// Copy MAC and timestamp (byte-aligned)
+	memcpy(&dst[0],src->mac,6);
+	memcpy(&dst[6],&src->timestamp,4);
+	bitpos = 10 * 8;
+
+#define WRITE_BITS(val, bits) do { \
+        for (int i = 0; i < (bits); ++i) { \
+            u32 byte_index = (bitpos + i) / 8; \
+            u32 bit_index  = (bitpos + i) % 8; \
+            dst[byte_index] |= ((val >> i) & 1) << bit_index; \
+        } \
+        bitpos += (bits); \
+    } while (0)
+
+	WRITE_BITS(src->frequency,7);
+	WRITE_BITS(src->voltage,9);
+	WRITE_BITS(src->current1,10);
+	WRITE_BITS(src->current2,10);
+	WRITE_BITS(src->current3,10);
+	WRITE_BITS(src->power1,14);
+	WRITE_BITS(src->power2,14);
+	WRITE_BITS(src->power3,14);
+	WRITE_BITS(src->energy1,24);
+	WRITE_BITS(src->energy2,24);
+	WRITE_BITS(src->energy3,24);
+	//WRITE_BITS(src->reserve,16);
+#undef WRITE_BITS
+}
+static inline void unpack_powermeter_data(tbs_device_powermeter_t *dst, u8 *src) {
+	u32 bitpos = 0;
+	memcpy(dst->mac,&src[0],6);
+	memcpy(&dst->timestamp,&src[6],4);
+	bitpos = 10 * 8;
+
+#define READ_BITS(var, bits) do { \
+        var = 0; \
+        for (int i = 0; i < (bits); ++i) { \
+            u32 byte_index = (bitpos + i) / 8; \
+            u32 bit_index  = (bitpos + i) % 8; \
+            var |= ((src[byte_index] >> bit_index) & 1) << i; \
+        } \
+        bitpos += (bits); \
+    } while (0)
+
+	READ_BITS(dst->frequency,7);
+	READ_BITS(dst->voltage,9);
+	READ_BITS(dst->current1,10);
+	READ_BITS(dst->current2,10);
+	READ_BITS(dst->current3,10);
+	READ_BITS(dst->power1,14);
+	READ_BITS(dst->power2,14);
+	READ_BITS(dst->power3,14);
+	READ_BITS(dst->energy1,24);
+	READ_BITS(dst->energy2,24);
+	READ_BITS(dst->energy3,24);
+	//READ_BITS(dst->reserve,16);
+#undef READ_BITS
+}
 
 typedef struct {
 	u8 mac[6];
@@ -103,7 +194,7 @@ typedef struct {
 	fl_slave_profiles_t profile;
 #endif
 	//data of dev
-	u8 data[22];
+	u8 data[35];
 }__attribute__((packed)) fl_nodeinnetwork_t;
 
 typedef struct {
@@ -126,7 +217,7 @@ typedef struct {
 	struct {
 		u8 collect_chn[3];
 		u8 chn[3];
-	}nwk;
+	} nwk;
 	u32 my_mac;
 }__attribute__((packed)) fl_master_config_t;
 #endif

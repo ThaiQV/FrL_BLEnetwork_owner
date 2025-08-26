@@ -631,8 +631,8 @@ void fl_nwk_master_nodelist_load(void) {
 			G_NODE_LIST.sla_info[var].slaveID.id_u8 = nodelist.slave[var].slaveid;
 			//G_NODE_LIST.sla_info[var].mac_short.mac_u32 = nodelist.slave[var].mac_u32;
 			memcpy(G_NODE_LIST.sla_info[var].mac,nodelist.slave[var].mac,6);
-			//test counter dev_type
-			G_NODE_LIST.sla_info[var].dev_type=TBS_COUNTER;
+			//test counter dev_type /power meter
+			G_NODE_LIST.sla_info[var].dev_type=TBS_POWERMETER;//TBS_COUNTER;
 		}
 	}
 }
