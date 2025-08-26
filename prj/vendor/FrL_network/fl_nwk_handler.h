@@ -12,7 +12,7 @@
 #define VENDOR_FRL_NETWORK_FL_NWK_HANDLER_H_
 
 #include "fl_nwk_database.h"
-
+#include "../TBS_dev/TBS_dev_config.h"
 /**
  * @brief	callback function for rsp
  */
@@ -75,31 +75,35 @@ typedef union {
 	u8 bytes[SIZEU8(fl_dataframe_format_t)];
 }__attribute__((packed)) fl_data_frame_u;
 
-typedef union{
-	struct{
+typedef union {
+	struct {
+		u8 mac[6];
+		u32 timetamp;
 		u8 type;
 		u8 bt_call;
 		u8 bt_endcall;
 		u8 bt_rst;
 		u32 pass_product;
 		u32 err_product;
-		//reserve
-		//u8 rsv[11];
-	}data;
-	u8 bytes[12];
+	//reserve
+	//u8 rsv[11];
+	} data;
+	u8 bytes[22];
 }__attribute__((packed)) fl_device_counter_t;
+
 
 typedef struct {
 	u8 mac[6];
 	fl_slaveID_u slaveID;
 	u32 timelife;
 	bool active;
+	tbs_dev_type_e dev_type;
 #ifndef MASTER_CORE
 //todo: parameters
 	fl_slave_profiles_t profile;
 #endif
 	//data of dev
-	u8 data[21];
+	u8 data[22];
 }__attribute__((packed)) fl_nodeinnetwork_t;
 
 typedef struct {

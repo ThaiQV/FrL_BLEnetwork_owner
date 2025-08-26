@@ -78,13 +78,6 @@ fl_exIO_t G_IN_POLLING[10];
 
 #ifdef MASTER_CORE
 
-#define FL_RXFIFO_SIZE		72
-#define FL_RXFIFO_NUM		2
-#define FL_TXFIFO_SIZE		25
-#define FL_TXFIFO_NUM		256
-
-#define UART_DATA_LEN    	(FL_TXFIFO_SIZE - 2)   // data max 252
-
 typedef struct {
 unsigned int len; // data max 252
 unsigned char data[UART_DATA_LEN];
