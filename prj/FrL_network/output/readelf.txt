@@ -10,7 +10,7 @@ ELF Header:
   Version:                           0x1
   Entry point address:               0x20000000
   Start of program headers:          52 (bytes into file)
-  Start of section headers:          375924 (bytes into file)
+  Start of section headers:          376016 (bytes into file)
   Flags:                             0x3, RVC, single-float ABI
   Size of this header:               52 (bytes)
   Size of program headers:           32 (bytes)
@@ -38,14 +38,14 @@ Section Headers:
   [14] .debug_loc        PROGBITS        00000000 02e677 00c56b 00      0   0  1
   [15] .debug_aranges    PROGBITS        00000000 03abe8 000770 00      0   0  8
   [16] .debug_ranges     PROGBITS        00000000 03b358 003d00 00      0   0  8
-  [17] .debug_line       PROGBITS        00000000 03f058 00c45c 00      0   0  1
-  [18] .debug_str        PROGBITS        00000000 04b4b4 0099c7 01  MS  0   0  1
-  [19] .comment          PROGBITS        00000000 054e7b 000037 01  MS  0   0  1
-  [20] .riscv.attributes RISCV_ATTRIBUTE 00000000 054eb2 00003b 00      0   0  1
-  [21] .debug_frame      PROGBITS        00000000 054ef0 0021a0 00      0   0  4
-  [22] .symtab           SYMTAB          00000000 057090 002520 10     23 452  4
-  [23] .strtab           STRTAB          00000000 0595b0 0025c1 00      0   0  1
-  [24] .shstrtab         STRTAB          00000000 05bb71 000103 00      0   0  1
+  [17] .debug_line       PROGBITS        00000000 03f058 00c4b8 00      0   0  1
+  [18] .debug_str        PROGBITS        00000000 04b510 0099c7 01  MS  0   0  1
+  [19] .comment          PROGBITS        00000000 054ed7 000037 01  MS  0   0  1
+  [20] .riscv.attributes RISCV_ATTRIBUTE 00000000 054f0e 00003b 00      0   0  1
+  [21] .debug_frame      PROGBITS        00000000 054f4c 0021a0 00      0   0  4
+  [22] .symtab           SYMTAB          00000000 0570ec 002520 10     23 452  4
+  [23] .strtab           STRTAB          00000000 05960c 0025c1 00      0   0  1
+  [24] .shstrtab         STRTAB          00000000 05bbcd 000103 00      0   0  1
 Key to Flags:
   W (write), A (alloc), X (execute), M (merge), S (strings), I (info),
   L (link order), O (extra OS processing required), G (group), T (TLS),
@@ -62,7 +62,7 @@ Program Headers:
   LOAD           0x003300 0x00001300 0x20001408 0x05102 0x05102 R E 0x1000
   LOAD           0x008510 0x20006510 0x20006510 0x0b228 0x0b228 R E 0x1000
   LOAD           0x014000 0x00080000 0x20011738 0x00096 0x01b28 RW  0x1000
-  RISCV_ATTRIBUT 0x054eb2 0x00000000 0x00000000 0x0003b 0x00000 R   0x1
+  RISCV_ATTRIBUT 0x054f0e 0x00000000 0x00000000 0x0003b 0x00000 R   0x1
 
  Section to Segment mapping:
   Segment Sections...
@@ -144,16 +144,16 @@ Symbol table '.symtab' contains 594 entries:
     59: 200065e0    48 FUNC    LOCAL  DEFAULT    6 blt_ll_unknown_rsp.constp
     60: 00001358    16 FUNC    LOCAL  DEFAULT    5 smemset.constprop.15
     61: 20006614   108 FUNC    LOCAL  DEFAULT    6 blc_gatt_requestServiceAc
-    62: 20006684    20 FUNC    LOCAL  DEFAULT    6 blc_gap_send_event
-    63: 2000669c   138 FUNC    LOCAL  DEFAULT    6 att_Find_end_group
-    64: 20006728   158 FUNC    LOCAL  DEFAULT    6 l2cap_att_search
-    65: 00001368    24 FUNC    LOCAL  DEFAULT    5 smemcpy
-    66: 00001380   444 FUNC    LOCAL  DEFAULT    5 aes_ccmAuthTran.constprop
-    67: 0000153c   436 FUNC    LOCAL  DEFAULT    5 aes_ccmBaseTran.isra.0.co
-    68: 000016f0   212 FUNC    LOCAL  DEFAULT    5 aes_ll_ccm_decryption.con
-    69: 200067c8   118 FUNC    LOCAL  DEFAULT    6 aes_ll_encryption
-    70: 20006840   230 FUNC    LOCAL  DEFAULT    6 blt_smp_alg_c1.constprop.
-    71: 20006928    82 FUNC    LOCAL  DEFAULT    6 blc_smp_procParingEnd
+    62: 00001368    24 FUNC    LOCAL  DEFAULT    5 smemcpy
+    63: 00001380   444 FUNC    LOCAL  DEFAULT    5 aes_ccmAuthTran.constprop
+    64: 0000153c   436 FUNC    LOCAL  DEFAULT    5 aes_ccmBaseTran.isra.0.co
+    65: 000016f0   212 FUNC    LOCAL  DEFAULT    5 aes_ll_ccm_decryption.con
+    66: 20006684   118 FUNC    LOCAL  DEFAULT    6 aes_ll_encryption
+    67: 200066fc   230 FUNC    LOCAL  DEFAULT    6 blt_smp_alg_c1.constprop.
+    68: 200067e4    20 FUNC    LOCAL  DEFAULT    6 blc_gap_send_event
+    69: 200067fc    82 FUNC    LOCAL  DEFAULT    6 blc_smp_procParingEnd
+    70: 20006850   138 FUNC    LOCAL  DEFAULT    6 att_Find_end_group
+    71: 200068dc   158 FUNC    LOCAL  DEFAULT    6 l2cap_att_search
     72: 2000697c    20 FUNC    LOCAL  DEFAULT    6 blc_hci_send_event
     73: 20006994   328 FUNC    LOCAL  DEFAULT    6 blt_leg_scan_mainloop_tas
     74: 20006adc   128 FUNC    LOCAL  DEFAULT    6 blc_ll_addScanningInAdvSt
@@ -310,16 +310,16 @@ Symbol table '.symtab' contains 594 entries:
    225: 00000194     4 OBJECT  LOCAL  DEFAULT    4 ll_push_tx_fifo_handler
    226: 00000198   112 OBJECT  LOCAL  DEFAULT    4 tbl_bondDevice
    227: 00000208    40 OBJECT  LOCAL  DEFAULT    4 blc_cyrpt_para
-   228: 00000230     4 OBJECT  LOCAL  DEFAULT    4 blc_gap_event_handler
-   229: 00000234     4 OBJECT  LOCAL  DEFAULT    4 gAttributes
-   230: 00000238    72 OBJECT  LOCAL  DEFAULT    4 smp_param_own
-   231: 00000280    80 OBJECT  LOCAL  DEFAULT    4 smp_param_peer
-   232: 000002d0    24 OBJECT  LOCAL  DEFAULT    4 blc_smpMng
-   233: 000002e8    44 OBJECT  LOCAL  DEFAULT    4 bltParam
-   234: 00000314     1 OBJECT  LOCAL  DEFAULT    4 smp_DistributeKeyInit
-   235: 00000318     1 OBJECT  LOCAL  DEFAULT    4 smp_DistributeKeyResp
-   236: 0000031c     4 OBJECT  LOCAL  DEFAULT    4 smp_phase_record
-   237: 00000320     4 OBJECT  LOCAL  DEFAULT    4 gap_eventMask
+   228: 00000230    72 OBJECT  LOCAL  DEFAULT    4 smp_param_own
+   229: 00000278    80 OBJECT  LOCAL  DEFAULT    4 smp_param_peer
+   230: 000002c8     4 OBJECT  LOCAL  DEFAULT    4 blc_gap_event_handler
+   231: 000002cc    24 OBJECT  LOCAL  DEFAULT    4 blc_smpMng
+   232: 000002e4    44 OBJECT  LOCAL  DEFAULT    4 bltParam
+   233: 00000310     1 OBJECT  LOCAL  DEFAULT    4 smp_DistributeKeyInit
+   234: 00000314     1 OBJECT  LOCAL  DEFAULT    4 smp_DistributeKeyResp
+   235: 00000318     4 OBJECT  LOCAL  DEFAULT    4 smp_phase_record
+   236: 0000031c     4 OBJECT  LOCAL  DEFAULT    4 gap_eventMask
+   237: 00000320     4 OBJECT  LOCAL  DEFAULT    4 gAttributes
    238: 00000324     4 OBJECT  LOCAL  DEFAULT    4 blc_hci_event_handler
    239: 00000328     8 OBJECT  LOCAL  DEFAULT    4 scan_priRxFifo
    240: 00000330     4 OBJECT  LOCAL  DEFAULT    4 hci_le_eventMask
