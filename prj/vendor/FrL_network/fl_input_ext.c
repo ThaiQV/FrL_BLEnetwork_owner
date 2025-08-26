@@ -391,25 +391,77 @@ void fl_input_external_init(void) {
 	fl_ExIO_init(I2C_GPIO_SDA_E2,I2C_GPIO_SCL_E0,GPIO_PD0);
 //	//	//register function callback
 	fl_exIO_t GPIO_IN;
-	extern u8 TEST_Buttons(fl_exButton_states_e _state, void *_data);
-	GPIO_IN.exc = &TEST_Buttons;
-	GPIO_IN.status = BUTT_STATE_NONE;
-	GPIO_IN.mode = DET_LOW;
-	GPIO_IN.pin_read = (FucRead)&TCA95xx_read1;
-	GPIO_IN.pin = (gpio_pin_e)TCA_P16;
-	//Register polling callback
-	s8 regis = RegisterPOLLING(GPIO_IN);
-	LOGA(PERI,"Button(%d)Calling Register :%d\r\n",GPIO_IN.pin_read(GPIO_IN.pin),regis);
 
-	extern u8 TEST_Buttons_RST(fl_exButton_states_e _state, void *_data);
-	GPIO_IN.exc = &TEST_Buttons_RST;
+	extern u8 Button_RESET(fl_exButton_states_e _state, void *_data);
+	GPIO_IN.exc = &Button_RESET;
 	GPIO_IN.status = BUTT_STATE_NONE;
 	GPIO_IN.mode = DET_LOW;
 	GPIO_IN.pin_read = (FucRead) &TCA95xx_read1;
 	GPIO_IN.pin = (gpio_pin_e) TCA_P10;
 	//Register polling callback
+	s8 regis = RegisterPOLLING(GPIO_IN);
+	LOGA(PERI,"Button(%d)Reset Register :%d\r\n",GPIO_IN.pin_read(GPIO_IN.pin),regis);
+
+	extern u8 Button_CALL(fl_exButton_states_e _state, void *_data);
+	GPIO_IN.exc = &Button_CALL;
+	GPIO_IN.status = BUTT_STATE_NONE;
+	GPIO_IN.mode = DET_LOW;
+	GPIO_IN.pin_read = (FucRead) &TCA95xx_read1;
+	GPIO_IN.pin = (gpio_pin_e) TCA_P11;
+	//Register polling callback
 	regis = RegisterPOLLING(GPIO_IN);
 	LOGA(PERI,"Button(%d)Reset Register :%d\r\n",GPIO_IN.pin_read(GPIO_IN.pin),regis);
+
+	extern u8 Button_ENDCALL(fl_exButton_states_e _state, void *_data);
+	GPIO_IN.exc = &Button_ENDCALL;
+	GPIO_IN.status = BUTT_STATE_NONE;
+	GPIO_IN.mode = DET_LOW;
+	GPIO_IN.pin_read = (FucRead) &TCA95xx_read1;
+	GPIO_IN.pin = (gpio_pin_e) TCA_P12;
+	//Register polling callback
+	regis = RegisterPOLLING(GPIO_IN);
+	LOGA(PERI,"Button(%d)Reset Register :%d\r\n",GPIO_IN.pin_read(GPIO_IN.pin),regis);
+
+	extern u8 Button_ERROR_UP(fl_exButton_states_e _state, void *_data);
+	GPIO_IN.exc = &Button_ERROR_UP;
+	GPIO_IN.status = BUTT_STATE_NONE;
+	GPIO_IN.mode = DET_LOW;
+	GPIO_IN.pin_read = (FucRead) &TCA95xx_read1;
+	GPIO_IN.pin = (gpio_pin_e) TCA_P13;
+	//Register polling callback
+	regis = RegisterPOLLING(GPIO_IN);
+	LOGA(PERI,"Button(%d)Reset Register :%d\r\n",GPIO_IN.pin_read(GPIO_IN.pin),regis);
+
+	extern u8 Button_ERROR_DOWN(fl_exButton_states_e _state, void *_data);
+	GPIO_IN.exc = &Button_ERROR_DOWN;
+	GPIO_IN.status = BUTT_STATE_NONE;
+	GPIO_IN.mode = DET_LOW;
+	GPIO_IN.pin_read = (FucRead) &TCA95xx_read1;
+	GPIO_IN.pin = (gpio_pin_e) TCA_P14;
+	//Register polling callback
+	regis = RegisterPOLLING(GPIO_IN);
+	LOGA(PERI,"Button(%d)Reset Register :%d\r\n",GPIO_IN.pin_read(GPIO_IN.pin),regis);
+
+	extern u8 Button_QTY_DOWN(fl_exButton_states_e _state, void *_data);
+	GPIO_IN.exc = &Button_QTY_DOWN;
+	GPIO_IN.status = BUTT_STATE_NONE;
+	GPIO_IN.mode = DET_LOW;
+	GPIO_IN.pin_read = (FucRead) &TCA95xx_read1;
+	GPIO_IN.pin = (gpio_pin_e) TCA_P15;
+	//Register polling callback
+	regis = RegisterPOLLING(GPIO_IN);
+	LOGA(PERI,"Button(%d)Reset Register :%d\r\n",GPIO_IN.pin_read(GPIO_IN.pin),regis);
+
+	extern u8 Button_QTY_UP(fl_exButton_states_e _state, void *_data);
+	GPIO_IN.exc = &Button_QTY_UP;
+	GPIO_IN.status = BUTT_STATE_NONE;
+	GPIO_IN.mode = DET_LOW;
+	GPIO_IN.pin_read = (FucRead) &TCA95xx_read1;
+	GPIO_IN.pin = (gpio_pin_e) TCA_P16;
+	//Register polling callback
+	regis = RegisterPOLLING(GPIO_IN);
+	LOGA(PERI,"Button(%d)Reset Register :%d\r\n",GPIO_IN.pin_read(GPIO_IN.pin),regis);
+
 #endif
 
 

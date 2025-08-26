@@ -113,4 +113,60 @@ u8 TEST_Buttons_RST(fl_exButton_states_e _state, void *_data) {
 	return BUTT_STATE_NONE;
 	//else return _state;
 }
+
+u8 Button_RESET(fl_exButton_states_e _state, void *_data) {
+	u32 *time_tick = (u32*)_data;
+	LOGA(USER,"BUTT RST %s (%d ms)\r\n",_state==BUTT_STATE_PRESSnHOLD?"Press & hold":"Press & Release",
+			(clock_time()-*time_tick)/SYSTEM_TIMER_TICK_1MS);
+
+	return BUTT_STATE_NONE;
+}
+
+u8 Button_CALL(fl_exButton_states_e _state, void *_data) {
+	u32 *time_tick = (u32*)_data;
+	LOGA(USER,"BUTT CALL %s (%d ms)\r\n",_state==BUTT_STATE_PRESSnHOLD?"Press & hold":"Press & Release",
+			(clock_time()-*time_tick)/SYSTEM_TIMER_TICK_1MS);
+
+	return BUTT_STATE_NONE;
+}
+
+u8 Button_ENDCALL(fl_exButton_states_e _state, void *_data) {
+	u32 *time_tick = (u32*)_data;
+	LOGA(USER,"BUTT ENDCALL %s (%d ms)\r\n",_state==BUTT_STATE_PRESSnHOLD?"Press & hold":"Press & Release",
+			(clock_time()-*time_tick)/SYSTEM_TIMER_TICK_1MS);
+
+	return BUTT_STATE_NONE;
+}
+
+u8 Button_ERROR_UP(fl_exButton_states_e _state, void *_data) {
+	u32 *time_tick = (u32*)_data;
+	LOGA(USER,"BUTT ERROR_UP %s (%d ms)\r\n",_state==BUTT_STATE_PRESSnHOLD?"Press & hold":"Press & Release",
+			(clock_time()-*time_tick)/SYSTEM_TIMER_TICK_1MS);
+
+	return BUTT_STATE_NONE;
+}
+
+u8 Button_ERROR_DOWN(fl_exButton_states_e _state, void *_data) {
+	u32 *time_tick = (u32*)_data;
+	LOGA(USER,"BUTT ERROR_DOWN %s (%d ms)\r\n",_state==BUTT_STATE_PRESSnHOLD?"Press & hold":"Press & Release",
+			(clock_time()-*time_tick)/SYSTEM_TIMER_TICK_1MS);
+
+	return BUTT_STATE_NONE;
+}
+
+u8 Button_QTY_DOWN(fl_exButton_states_e _state, void *_data) {
+	u32 *time_tick = (u32*)_data;
+	LOGA(USER,"BUTT QTY_DOWN %s (%d ms)\r\n",_state==BUTT_STATE_PRESSnHOLD?"Press & hold":"Press & Release",
+			(clock_time()-*time_tick)/SYSTEM_TIMER_TICK_1MS);
+
+	return BUTT_STATE_NONE;
+}
+
+u8 Button_QTY_UP(fl_exButton_states_e _state, void *_data) {
+	u32 *time_tick = (u32*)_data;
+	LOGA(USER,"BUTT QTY_UP %s (%d ms)\r\n",_state==BUTT_STATE_PRESSnHOLD?"Press & hold":"Press & Release",
+			(clock_time()-*time_tick)/SYSTEM_TIMER_TICK_1MS);
+
+	return BUTT_STATE_NONE;
+}
 #endif
