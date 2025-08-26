@@ -15,20 +15,18 @@
 
 #include "fl_adv_repeat.h"
 #include "fl_adv_proc.h"
-#include "fl_nwk_handler.h"
 //#include "fl_nwk_protocol.h"
-
+#include "fl_nwk_handler.h"
 //Test api
 #include "test_api.h"
-
-#ifndef MASTER_CORE
+#include "../TBS_dev/TBS_dev_config.h"
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
 /******************************************************************************/
 /******************************************************************************/
 /*---------------- Synchronization Master RTC --------------------------*/
-_attribute_data_retention_ volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME = {.timetamp = 0,.milstep = 0};
+volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME = {.timetamp = 0,.milstep = 0};
 
 #define SYNC_ORIGIN_MASTER(x,y) 			do{	\
 												ORIGINAL_MASTER_TIME.timetamp = x;\
@@ -70,8 +68,11 @@ fl_pack_t g_handle_array[PACK_HANDLE_SIZE];
 fl_data_container_t G_HANDLE_CONTAINER = { .data = g_handle_array, .head_index = 0, .tail_index = 0, .mask = PACK_HANDLE_SIZE - 1, .count = 0 };
 
 //My information
-fl_nodeinnetwork_t G_INFORMATION ={.active = true};
-
+fl_nodeinnetwork_t G_INFORMATION ;
+#ifndef MASTER_CORE
+#ifdef COUNTER_DEVICE
+extern tbs_device_counter_t G_COUNTER_DEV ;
+#endif
 //flag debug of the network
 volatile u8 NWK_DEBUG_STT = 1; // it will be assigned into end-point byte (dbg :1bit)
 //volatile u8 NWK_REPEAT_MODE = 1; // slave repeat?
@@ -101,7 +102,8 @@ int _nwk_slave_backup(void){
 	if(crc32 != pre_crc32){
 		pre_crc32 = crc32;
 		fl_db_slaveprofile_save(G_INFORMATION.profile);
-		LOGA(INF,"** MAC     :%08X\r\n",G_INFORMATION.mac_short.mac_u32);
+		LOGA(INF,"** MAC     :%02X%02X%02X%02X%02X%02X\r\n",G_INFORMATION.mac[0],G_INFORMATION.mac[1],G_INFORMATION.mac[2],
+				G_INFORMATION.mac[3],G_INFORMATION.mac[4],G_INFORMATION.mac[5]);
 		LOGA(INF,"** SlaveID :%d\r\n",G_INFORMATION.slaveID.id_u8);
 		LOGA(INF,"** grpID   :%d\r\n",G_INFORMATION.slaveID.grpID);
 		LOGA(INF,"** memID   :%d\r\n",G_INFORMATION.slaveID.memID);
@@ -119,7 +121,7 @@ void fl_nwk_slave_init(void) {
 	//Generate information
 	G_INFORMATION.active = false;
 	G_INFORMATION.timelife = 0;
-	memcpy(G_INFORMATION.mac_short.byte,blc_ll_get_macAddrPublic(),SIZEU8(G_INFORMATION.mac_short.byte));
+	memcpy(G_INFORMATION.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_INFORMATION.mac));
 
 	//Load from db
 	fl_slave_profiles_t my_profile = fl_db_slaveprofile_init();
@@ -134,14 +136,25 @@ void fl_nwk_slave_init(void) {
 	fl_timetamp_withstep_t cur_timetamp = fl_rtc_getWithMilliStep();
 	SYNC_ORIGIN_MASTER(cur_timetamp.timetamp,cur_timetamp.milstep);
 
+#ifdef COUNTER_DEVICE
+	G_INFORMATION.dev_type = TBS_COUNTER;
+	G_INFORMATION.data =(u8*)&G_COUNTER_DEV;
+#endif
+#ifdef POWER_METER_DEVICE
+	G_INFORMATION.dev_type = TBS_POWERMETER;
+#endif
+	//todo: TBS Device initialization
+	TBS_Device_Init();
+
 	LOG_P(INF,"Freelux network SLAVE init\r\n");
-	LOGA(INF,"** MAC    :%08X\r\n",G_INFORMATION.mac_short.mac_u32);
+	LOGA(INF,"** MAC     :%02X%02X%02X%02X%02X%02X\r\n",G_INFORMATION.mac[0],G_INFORMATION.mac[1],G_INFORMATION.mac[2],
+			G_INFORMATION.mac[3],G_INFORMATION.mac[4],G_INFORMATION.mac[5]);
+	LOGA(INF,"** DevType:%d\r\n",G_INFORMATION.dev_type);
 	LOGA(INF,"** SlaveID:%d\r\n",G_INFORMATION.slaveID.id_u8);
 	LOGA(INF,"** grpID  :%d\r\n",G_INFORMATION.slaveID.grpID);
 	LOGA(INF,"** memID  :%d\r\n",G_INFORMATION.slaveID.memID);
 	LOGA(INF,"** JoinNWK:%d\r\n",G_INFORMATION.profile.run_stt.join_nwk);
 	LOGA(INF,"** RstFac :%d\r\n",G_INFORMATION.profile.run_stt.rst_factory);
-
 
 	//test
 	if(G_INFORMATION.slaveID.id_u8 == G_INFORMATION.profile.slaveid && G_INFORMATION.slaveID.id_u8 == 0xFF){
@@ -350,18 +363,25 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 				datetime_t cur_dt;
 				fl_rtc_timestamp_to_datetime(master_timetamp,&cur_dt);
 
-				fl_timetamp_withstep_t millstep = fl_rtc_getWithMilliStep();
-				u8 test_payload[SIZEU8(packet.frame.payload)];
-				memset(test_payload,0,sizeof(test_payload));
-				sprintf((char*) test_payload,"%02d:%02d:%02d-%03d/%03d",cur_dt.hour,cur_dt.minute,cur_dt.second,millstep.milstep, packet.frame.milltamp);
+//				fl_timetamp_withstep_t millstep = fl_rtc_getWithMilliStep();
+//				u8 test_payload[SIZEU8(packet.frame.payload)];
+//				memset(test_payload,0,sizeof(test_payload));
+//				sprintf((char*) test_payload,"%02d:%02d:%02d-%03d/%03d",cur_dt.hour,cur_dt.minute,cur_dt.second,millstep.milstep, packet.frame.milltamp);
+				u8 _payload[SIZEU8(packet.frame.payload)];
+				memset(_payload,0xFF,SIZEU8(_payload));
+				//u8 len_payload=0;
 				LOGA(APP,"(%d)SlaveID:%X | inPack:%X\r\n",memid_idx,G_INFORMATION.slaveID.id_u8,packet.frame.payload[memid_idx]);
 				packet.frame.endpoint.dbg = NWK_DEBUG_STT;
-
 				if (memid_idx != -1) {
+#ifdef COUNTER_DEVICE
+					//len_payload = SIZEU8(G_COUNTER_DEV.bytes) - SIZEU8(G_COUNTER_DEV.data.mac) - SIZEU8(G_COUNTER_DEV.data.timetamp);
+					tbs_device_counter_t *counter_data = (tbs_device_counter_t*)G_INFORMATION.data;
+					memcpy(_payload,counter_data->bytes,SIZEU8(counter_data->bytes));
+					tbs_counter_printf((void*)_payload);
+#endif
 					packet.frame.slaveID.id_u8 = G_INFORMATION.slaveID.id_u8;
 					memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
-					//TEST payload
-					memcpy(&packet.frame.payload,test_payload,SIZEU8(test_payload));
+					memcpy(&packet.frame.payload,_payload,SIZEU8(packet.frame.payload));
 					//CRC
 					packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
 				} else {
@@ -385,7 +405,8 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 				if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
 					//Process rsp
 					memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
-					memcpy(packet.frame.payload,G_INFORMATION.mac_short.byte,SIZEU8(G_INFORMATION.mac_short.byte));
+					memcpy(packet.frame.payload,G_INFORMATION.mac,SIZEU8(G_INFORMATION.mac));
+					packet.frame.payload[SIZEU8(G_INFORMATION.mac)] = G_INFORMATION.dev_type;
 					//change endpoint to node source
 					packet.frame.endpoint.master = FL_FROM_SLAVE;
 					//add repeat_cnt
@@ -402,21 +423,21 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 		{
 			_nwk_slave_syncFromPack(&packet.frame);
 			//Process rsp
-			s8 mymac_idx = plog_IndexOf(packet.frame.payload,G_INFORMATION.mac_short.byte,SIZEU8(G_INFORMATION.mac_short.byte),sizeof(packet.frame.payload));
+			s8 mymac_idx = plog_IndexOf(packet.frame.payload,G_INFORMATION.mac,SIZEU8(G_INFORMATION.mac),sizeof(packet.frame.payload));
 			if (mymac_idx != -1) {
 				G_INFORMATION.slaveID.id_u8 = packet.frame.slaveID.id_u8;
 				LOGA(INF,"UPDATE SlaveID: %d(grpID:%d|memID:%d)\r\n",G_INFORMATION.slaveID.id_u8,G_INFORMATION.slaveID.grpID,G_INFORMATION.slaveID.memID);
 				G_INFORMATION.profile.slaveid = G_INFORMATION.slaveID.id_u8 ;
 				G_INFORMATION.profile.run_stt.rst_factory = 0;
-				G_INFORMATION.profile.nwk.chn[0] = packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac_short.byte)];
-				G_INFORMATION.profile.nwk.chn[1] = packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac_short.byte) + 1];
-				G_INFORMATION.profile.nwk.chn[2] = packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac_short.byte) + 2];
+				G_INFORMATION.profile.nwk.chn[0] = packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac)];
+				G_INFORMATION.profile.nwk.chn[1] = packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac) + 1];
+				G_INFORMATION.profile.nwk.chn[2] = packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac) + 2];
 				//get master's mac
 				G_INFORMATION.profile.nwk.mac_parent = MAKE_U32(packet.frame.payload[7],packet.frame.payload[8],packet.frame.payload[9],packet.frame.payload[10]);
 			}
 			//debug
 			else{
-				P_PRINTFHEX_A(INF,G_INFORMATION.mac_short.byte,4,"Mac:");
+				P_PRINTFHEX_A(INF,G_INFORMATION.mac,SIZEU8(G_INFORMATION.mac),"Mac:");
 				P_PRINTFHEX_A(INF,packet.frame.payload,19,"PACK");
 			}
 			//Non-rsp
@@ -504,7 +525,7 @@ int fl_nwk_slave_reconnect(void){
 	}
 	if(IsJoinedNetwork() && G_INFORMATION.active == false){
 		LOGA(INF,"Reconnect network (%d s)!!!\r\n",RECHECKING_NETWOK_TIME/1000);
-		fl_api_slave_req(NWK_HDR_RECONNECT,G_INFORMATION.mac_short.byte,SIZEU8(G_INFORMATION.mac_short.byte),0,0);
+		fl_api_slave_req(NWK_HDR_RECONNECT,G_INFORMATION.mac,SIZEU8(G_INFORMATION.mac),0,0);
 	}
 	return 0;
 }
@@ -585,6 +606,8 @@ fl_timetamp_withstep_t fl_adv_timetampStepInPack(fl_pack_t _pack) {
 void fl_nwk_slave_process(void){
 	//todo : join- network
 	fl_nwk_slave_joinnwk_exc();
+	//todo TBS_device process
+	TBS_Device_Run();
 
 }
 /***************************************************

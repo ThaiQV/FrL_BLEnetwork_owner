@@ -10,7 +10,7 @@
 
 #include "tl_common.h"
 #include "fl_nwk_api.h"
-#include "TBS_dev_config.h"
+#include "../TBS_dev/TBS_dev_config.h"
 
 void _rsp_callback(void *_data,void* _data2){
 	fl_rsp_container_t *data =  (fl_rsp_container_t*)_data;
@@ -92,9 +92,11 @@ u8 TEST_Buttons(fl_exButton_states_e _state, void *_data) {
 	test_u8[1] = U32_BYTE1(test_pack_cnt);
 	test_u8[2] = U32_BYTE2(test_pack_cnt);
 	test_u8[3] = U32_BYTE3(test_pack_cnt);
-	fl_api_slave_req(NWK_HDR_55,test_u8,SIZEU8(test_u8),&_rsp_callback,800);
-	LOGA(PERI,"BUTT Calling %s (%d ms):%d\r\n",_state==BUTT_STATE_PRESSnHOLD?"Press & hold":"Press & Release",
-			(clock_time()-*time_tick)/SYSTEM_TIMER_TICK_1MS,test_pack_cnt);
+	if (IsJoinedNetwork() && IsOnline()){
+		fl_api_slave_req(NWK_HDR_55,test_u8,SIZEU8(test_u8),&_rsp_callback,800);
+		LOGA(PERI,"BUTT Calling %s (%d ms):%d\r\n",_state == BUTT_STATE_PRESSnHOLD ? "Press & hold" : "Press & Release",
+				(clock_time()-*time_tick)/SYSTEM_TIMER_TICK_1MS,test_pack_cnt);
+	}
 	//Must to clear status if done
 	return BUTT_STATE_NONE;
 	//else return _state;

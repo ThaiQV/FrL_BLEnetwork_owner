@@ -106,7 +106,8 @@ void fl_db_rtc_factory(void){
 void _nodelist_printf(fl_node_data_t *_node, u8 _size){
 	LOG_P(FLA,"******** NODELIST ********\r\n");
 	for (u8 var = 0; var < _size; ++var) {
-		LOGA(FLA,"[%d]Mac:0x%lX\r\n",_node[var].slaveid,_node[var].mac_u32);
+		LOGA(FLA,"[%d]Mac:0x%02X%02X%02X%02X%02X%02X\r\n",_node[var].slaveid,
+				_node[var].mac[0],_node[var].mac[1],_node[var].mac[2],_node[var].mac[3],_node[var].mac[4],_node[var].mac[5]);
 	}
 	LOG_P(FLA,"******** END *************\r\n");
 }

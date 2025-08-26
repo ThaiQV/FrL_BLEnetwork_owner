@@ -214,8 +214,9 @@ int _getInfo_autorun(void) {
 		G_SLA_INFO_RSP.rslt.num_off = G_SLA_INFO_RSP.total_slaves - G_SLA_INFO_RSP.rslt.num_onl;
 		P_INFO("**Offline:%d/%d\r\n",G_SLA_INFO_RSP.rslt.num_off,G_SLA_INFO_RSP.total_slaves);
 		for (idx_get = 0; idx_get < G_SLA_INFO_RSP.rslt.num_off; ++idx_get) {
-			P_INFO("[%d]Mac:0x%08X\r\n",G_SLA_INFO_RSP.rslt.offline[idx_get]->slaveID.id_u8,
-					G_SLA_INFO_RSP.rslt.offline[idx_get]->mac_short.mac_u32);
+			P_INFO("[%d]Mac:0x%02X%02X%02X%02X%02X%02X\r\n",G_SLA_INFO_RSP.rslt.offline[idx_get]->slaveID.id_u8,
+					G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[0],G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[1],G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[2],
+					G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[3],G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[4],G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[5]);
 		}
 // ======= RETRY
 		if(G_SLA_INFO_RSP.num_retry < G_SLA_INFO_RSP.settings.num_retry){
@@ -233,7 +234,10 @@ int _getInfo_autorun(void) {
 		}
 		ERR(DRV,"**Offline:%d/%d\r\n",G_SLA_INFO_RSP.rslt.num_off,G_SLA_INFO_RSP.total_slaves);
 		for (idx_get = 0; idx_get < G_SLA_INFO_RSP.rslt.num_off; ++idx_get) {
-			ERR(DRV,"[%d]Mac:0x%08X\r\n",G_SLA_INFO_RSP.rslt.offline[idx_get]->slaveID.id_u8,G_SLA_INFO_RSP.rslt.offline[idx_get]->mac_short.mac_u32);
+			ERR(DRV,"[%d]Mac:0x%02X%02X%02X%02X%02X%02X\r\n",G_SLA_INFO_RSP.rslt.offline[idx_get]->slaveID.id_u8,
+					G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[0],G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[1],
+					G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[2],G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[3],
+					G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[4],G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[5]);
 		}
 	}
 	//PLOG_Stop(INF);
@@ -435,8 +439,12 @@ void CMD_CHANNELCONFIG(u8* _data) {
 }
 /********************* Functions GET CMD ********************/
 void CMD_GETSLALIST(u8* _data) {
-	fl_nodeinnetwork_t _node = { .mac_short = 0 };
+	fl_nodeinnetwork_t _node;
+	MAC_ZERO_CLEAR(_node.mac,0);
 	fl_master_nodelist_AddRefesh(_node);
+	extern fl_slaves_list_t G_NODE_LIST;
+	void _master_nodelist_printf(fl_slaves_list_t *_node, u8 _size);
+	_master_nodelist_printf(&G_NODE_LIST,G_NODE_LIST.slot_inused);
 }
 void CMD_GETADVSETTING(u8* _data) {
 	extern fl_adv_settings_t G_ADV_SETTINGS;
