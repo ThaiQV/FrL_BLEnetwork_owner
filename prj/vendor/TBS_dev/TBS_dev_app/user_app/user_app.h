@@ -12,10 +12,20 @@
 //#include "lcd_app/lcd_app.h"
 //#include "led_7_seg_app/led_7_seg_app.h"
 
+//typedef struct {
+//	led7seg_shared_data_t 	*led7seg;
+//	lcd_shared_data_t		*lcd;
+//} app_share_data_t;
+
 typedef struct {
-	lcd_shared_data_t lcd_data;
-	led7seg_shared_data_t led7seg_data;
-} app_share_data_t;
+	uint32_t timetamp;
+	uint8_t bt_call;
+	uint8_t bt_endcall;
+	uint8_t bt_rst;
+	uint32_t pass_product;
+	uint32_t err_product;
+}app_share_data_t;
+
 
 void user_app_init(void);
 void user_app_loop(void);
