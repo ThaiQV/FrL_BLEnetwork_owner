@@ -240,6 +240,8 @@ void GETLIST_RESPONSE(u8* _pdata) {
 		payload_len+=SIZEU8(G_NODE_LIST.sla_info[var].mac);
 		wfdata.data[payload_len] =  G_NODE_LIST.sla_info[var].dev_type;
 		payload_len++;
+		wfdata.data[payload_len] =  G_NODE_LIST.sla_info[var].active;
+		payload_len++;
 		wfdata.len_data = payload_len;
 		wfdata.crc8 = fl_crc8(wfdata.data,payload_len);
 		payload_len += SIZEU8(wfdata.cmd)+SIZEU8(wfdata.crc8)+SIZEU8(wfdata.len_data);
@@ -287,7 +289,7 @@ void TIMETAMP_REQUEST(u8* _pdata, RspFunc rspfnc) {
 		fl_rtc_timestamp_to_datetime(timetamp_wifi_set,&cur_dt);
 		LOGA(MCU,"TIME SET:%02d/%02d/%02d - %02d:%02d:%02d\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second);
 		fl_rtc_set(timetamp_wifi_set);
-		rspfnc(_pdata);
+		//rspfnc(_pdata);
 	}
 
 }
