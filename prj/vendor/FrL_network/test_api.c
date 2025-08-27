@@ -109,7 +109,7 @@ u8 TEST_Buttons_RST(fl_exButton_states_e _state, void *_data) {
 		ERR(USER,"Factory!!!!!\r\n");
 		fl_db_clearAll();
 		delay_ms(1000);
-		sys_reboot();
+//		sys_reboot();
 	}
 	//Must to clear status if done
 	return BUTT_STATE_NONE;

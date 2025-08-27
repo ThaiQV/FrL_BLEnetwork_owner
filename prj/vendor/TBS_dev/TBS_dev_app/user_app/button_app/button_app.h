@@ -4,9 +4,10 @@
  *      Author: hoang
  */
 
-#ifndef VENDOR_USER_USER_APP_BUTTON_APP_BUTTON_APP_H_
-#define VENDOR_USER_USER_APP_BUTTON_APP_BUTTON_APP_H_
+#ifndef BUTTON_APP_H_
+#define BUTTON_APP_H_
 
-
+void user_button_app_init(void);
+void user_button_app_task(void);
 
 #endif /* VENDOR_USER_USER_APP_BUTTON_APP_BUTTON_APP_H_ */

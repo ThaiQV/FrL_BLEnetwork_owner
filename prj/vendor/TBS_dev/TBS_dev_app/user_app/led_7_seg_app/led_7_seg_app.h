@@ -22,6 +22,8 @@ typedef struct {
 	uint16_t value_err;
 	bool print_err;
 	bool enabled;           ///< Display enabled
+	bool led_nwk_on;
+	bool led_call_on;
 } led7seg_shared_data_t;
 
 void user_led_7_seg_app_init(void);
