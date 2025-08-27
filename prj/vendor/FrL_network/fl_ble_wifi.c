@@ -38,12 +38,14 @@ typedef struct {
 typedef enum {
 	/* For UART communication */
 	GF_CMD_PING = 0,
-	GF_CMD_REPORT_REQUEST,
-	GF_CMD_REPORT_RESPONSE,
-	GF_CMD_GET_LIST_REQUEST,
-	GF_CMD_GET_LIST_RESPONSE,
-	GF_CMD_TIMESTAMP_REQUEST,
-	GF_CMD_TIMESTAMP_RESPONSE,
+	GF_CMD_REPORT_REQUEST = 0x01,
+	GF_CMD_REPORT_RESPONSE = 0x02,
+	GF_CMD_GET_LIST_REQUEST = 0x03,
+	GF_CMD_GET_LIST_RESPONSE = 0x04,
+	GF_CMD_PAIRING_REQUEST = 0x05,
+	GF_CMD_PAIRING_RESPONSE = 0x05,
+	GF_CMD_TIMESTAMP_REQUEST = 0x08,
+	GF_CMD_TIMESTAMP_RESPONSE = 0x08,
 }__attribute__((packed)) fl_wifi_cmd_e;
 
 typedef void (*RspFunc)(u8*);
@@ -79,6 +81,9 @@ void REPORT_REQUEST(u8* _pdata, RspFunc rspfnc);
 void REPORT_RESPONSE(u8* _pdata);
 void GETLIST_REQUEST(u8* _pdata, RspFunc rspfnc);
 void GETLIST_RESPONSE(u8* _pdata);
+void PAIRING_REQUEST(u8* _pdata, RspFunc rspfnc);
+void PAIRING_RESPONSE(u8* _pdata){};
+
 void TIMETAMP_REQUEST(u8* _pdata, RspFunc rspfnc);
 void TIMETAMP_RESPONSE(u8* _pdata);
 
@@ -86,6 +91,7 @@ fl_wifiprotocol_proc_t G_WIFI_CON[] = {
 			{ { GF_CMD_PING, PING_REQ }, { GF_CMD_PING, PING_RSP } }, //ping
 			{ { GF_CMD_REPORT_REQUEST, REPORT_REQUEST }, { GF_CMD_REPORT_RESPONSE, REPORT_RESPONSE } },
 			{ { GF_CMD_GET_LIST_REQUEST, GETLIST_REQUEST },{GF_CMD_GET_LIST_RESPONSE, GETLIST_RESPONSE } },
+			{ { GF_CMD_PAIRING_REQUEST, PAIRING_REQUEST }, {GF_CMD_PAIRING_RESPONSE, PAIRING_RESPONSE } },
 			{ { GF_CMD_TIMESTAMP_REQUEST, TIMETAMP_REQUEST }, {GF_CMD_TIMESTAMP_RESPONSE, TIMETAMP_RESPONSE } },
 			};
 
@@ -245,11 +251,55 @@ void GETLIST_RESPONSE(u8* _pdata) {
 	}
 	return;
 }
+void PAIRING_REQUEST(u8* _pdata, RspFunc rspfnc) {
+	fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[1];
+	LOGA(MCU,"LEN:0x%02X\r\n",data->len_data);
+	LOGA(MCU,"cmdID:0x%02X\r\n",data->cmd);
+	LOGA(MCU,"CRC8:0x%02X\r\n",data->crc8);
+	P_PRINTFHEX_A(MCU,data->data,data->len_data,"Data:");
+	u8 crc8_cal = fl_crc8(data->data,data->len_data);
+	if (crc8_cal != data->crc8) {
+		ERR(MCU,"ERR >> CRC8:0x%02X | 0x%02X\r\n",data->crc8,crc8_cal);
+		return;
+	}
+	extern volatile u8 MASTER_INSTALL_STATE;
+	MASTER_INSTALL_STATE = (data->data[0]==0x01)?true:false;
+	LOGA(MCU,"WiFi -> Collection mode:%d\r\n",MASTER_INSTALL_STATE);
+	if (rspfnc != 0) {
+		rspfnc(_pdata);
+	}
+}
+
 void TIMETAMP_REQUEST(u8* _pdata, RspFunc rspfnc) {
+	fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[1];
+	LOGA(MCU,"LEN:0x%02X\r\n",data->len_data);
+	LOGA(MCU,"cmdID:0x%02X\r\n",data->cmd);
+	LOGA(MCU,"CRC8:0x%02X\r\n",data->crc8);
+	P_PRINTFHEX_A(MCU,data->data,data->len_data,"Data:");
+	u8 crc8_cal = fl_crc8(data->data,data->len_data);
+	if (crc8_cal != data->crc8) {
+		ERR(MCU,"ERR >> CRC8:0x%02X | 0x%02X\r\n",data->crc8,crc8_cal);
+		return;
+	}
+	if (rspfnc != 0) {
+		u32 timetamp_wifi_set = MAKE_U32(data->data[3],data->data[2],data->data[1],data->data[0]);
+		datetime_t cur_dt;
+		fl_rtc_timestamp_to_datetime(timetamp_wifi_set,&cur_dt);
+		LOGA(MCU,"TIME SET:%02d/%02d/%02d - %02d:%02d:%02d\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second);
+		fl_rtc_set(timetamp_wifi_set);
+		rspfnc(_pdata);
+	}
 
 }
 void TIMETAMP_RESPONSE(u8* _pdata) {
-
+	fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[1];
+	fl_datawifi2ble_t wfdata;
+	wfdata.cmd = G_WIFI_CON[_wf_CMD_find(data->cmd)].rsp.cmd;
+	memset(wfdata.data,0,SIZEU8(wfdata.data));
+	wfdata.len_data = 0;
+	wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
+	u8 payload_len = wfdata.len_data + SIZEU8(wfdata.cmd)+SIZEU8(wfdata.crc8)+SIZEU8(wfdata.len_data);
+	fl_ble_send_wifi((u8*)&wfdata,payload_len);
 }
 /******************************************************************************/
 /******************************************************************************/
