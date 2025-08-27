@@ -252,6 +252,7 @@ void fl_nwk_master_process(void);
 fl_pack_t fl_master_packet_GetInfo_build(u8 *_slave_mac_arr, u8 _slave_num);
 void fl_master_nodelist_AddRefesh(fl_nodeinnetwork_t _node);
 s16 fl_master_SlaveID_find(u8 _id);
+u8 fl_master_SlaveID_get(u8* _mac);
 void fl_nwk_master_nodelist_load(void);
 void fl_queue_REQcRSP_ScanRec(fl_pack_t _pack);
 #else

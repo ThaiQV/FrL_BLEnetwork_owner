@@ -129,7 +129,8 @@ void fl_nwk_slave_init(void) {
 	G_INFORMATION.profile = my_profile;
 
 //	//Test join network + factory
-	if (G_INFORMATION.slaveID.id_u8 == 0xFF && G_INFORMATION.profile.slaveid==G_INFORMATION.slaveID.id_u8) {
+	if (G_INFORMATION.slaveID.id_u8 == 0xFF && G_INFORMATION.profile.slaveid==G_INFORMATION.slaveID.id_u8)
+	{
 		G_INFORMATION.profile.run_stt.join_nwk = 1; //access to join network
 		G_INFORMATION.profile.run_stt.rst_factory = 1; //has reset factory device
 	}
