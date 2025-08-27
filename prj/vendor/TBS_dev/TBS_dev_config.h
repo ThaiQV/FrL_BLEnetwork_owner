@@ -17,7 +17,7 @@ typedef enum{
 }tbs_dev_type_e;
 #define tbs_device_gettype(x)			(x[sizeof(u32)+6]) //mac[6] + timetamp (u32)
 #ifndef MASTER_CORE
-#define COUNTER_DEVICE
+//#define COUNTER_DEVICE
 #ifndef COUNTER_DEVICE
 #define POWER_METER_DEVICE
 #endif

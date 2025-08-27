@@ -102,34 +102,46 @@ typedef union {
 typedef struct {
 	u8 mac[6];         // MAC address (48 bits)
 	u32 timestamp;     // Timestamp (32 bits)
+	u8 type;			//device type
 	// Measurement fields (bit-level precision noted)
-	u8 frequency;     	// 7 bits
-	u16 voltage;       // 9 bits
-	u16 current1;      // 10 bits
-	u16 current2;      // 10 bits
-	u16 current3;      // 10 bits
-	u16 power1;        // 14 bits
-	u16 power2;        // 14 bits
-	u16 power3;        // 14 bits
-	u32 energy1;       // 24 bits
-	u32 energy2;       // 24 bits
-	u32 energy3;       // 24 bits
+	struct {
+		u8 frequency;     	// 7 bits
+		u16 voltage;       // 9 bits
+		u16 current1;      // 10 bits
+		u16 current2;      // 10 bits
+		u16 current3;      // 10 bits
+		u16 power1;        // 14 bits
+		u16 power2;        // 14 bits
+		u16 power3;        // 14 bits
+		u32 energy1;       // 24 bits
+		u32 energy2;       // 24 bits
+		u32 energy3;       // 24 bits
 	//u16 reserve;     // 16 bits
+	} data;
 }__attribute__((packed)) tbs_device_powermeter_t;
 
-#define POWER_METER_SIZE		(SIZEU8(tbs_device_powermeter_t))
-#define POWER_METER_PACK_SIZE	32
+#define POWER_METER_STRUCT_BYTESIZE			(SIZEU8(tbs_device_powermeter_t))
+#define POWER_METER_BITSIZE					34
+static inline void pack_powermeter_data(const tbs_device_powermeter_t *src, u8 *dst) {
+    u32 bitpos = 0;
+    u32 byte_idx = 0;
+    memset(dst, 0, POWER_METER_BITSIZE);
 
-static inline void pack_powermeter_data(tbs_device_powermeter_t *src, u8 *dst) {
-	u32 bitpos = 0;
-	memset(dst,0,POWER_METER_PACK_SIZE); // clear buffer
+    // Copy MAC (6 bytes)
+    memcpy(&dst[byte_idx], src->mac, sizeof(src->mac));
+    byte_idx += sizeof(src->mac);
 
-	// Copy MAC and timestamp (byte-aligned)
-	memcpy(&dst[0],src->mac,6);
-	memcpy(&dst[6],&src->timestamp,4);
-	bitpos = 10 * 8;
+    // Copy timestamp (4 bytes)
+    memcpy(&dst[byte_idx], &src->timestamp, sizeof(src->timestamp));
+    byte_idx += sizeof(src->timestamp);
 
-#define WRITE_BITS(val, bits) do { \
+    // Copy type (1 byte)
+    dst[byte_idx++] = src->type;
+
+    // Start bit-level packing after 11 bytes
+    bitpos = byte_idx * 8;
+
+    #define WRITE_BITS(val, bits) do { \
         for (int i = 0; i < (bits); ++i) { \
             u32 byte_index = (bitpos + i) / 8; \
             u32 bit_index  = (bitpos + i) % 8; \
@@ -138,27 +150,39 @@ static inline void pack_powermeter_data(tbs_device_powermeter_t *src, u8 *dst) {
         bitpos += (bits); \
     } while (0)
 
-	WRITE_BITS(src->frequency,7);
-	WRITE_BITS(src->voltage,9);
-	WRITE_BITS(src->current1,10);
-	WRITE_BITS(src->current2,10);
-	WRITE_BITS(src->current3,10);
-	WRITE_BITS(src->power1,14);
-	WRITE_BITS(src->power2,14);
-	WRITE_BITS(src->power3,14);
-	WRITE_BITS(src->energy1,24);
-	WRITE_BITS(src->energy2,24);
-	WRITE_BITS(src->energy3,24);
-	//WRITE_BITS(src->reserve,16);
-#undef WRITE_BITS
-}
-static inline void unpack_powermeter_data(tbs_device_powermeter_t *dst, u8 *src) {
-	u32 bitpos = 0;
-	memcpy(dst->mac,&src[0],6);
-	memcpy(&dst->timestamp,&src[6],4);
-	bitpos = 10 * 8;
+    WRITE_BITS(src->data.frequency, 7);
+    WRITE_BITS(src->data.voltage, 9);
+    WRITE_BITS(src->data.current1, 10);
+    WRITE_BITS(src->data.current2, 10);
+    WRITE_BITS(src->data.current3, 10);
+    WRITE_BITS(src->data.power1, 14);
+    WRITE_BITS(src->data.power2, 14);
+    WRITE_BITS(src->data.power3, 14);
+    WRITE_BITS(src->data.energy1, 24);
+    WRITE_BITS(src->data.energy2, 24);
+    WRITE_BITS(src->data.energy3, 24);
 
-#define READ_BITS(var, bits) do { \
+    #undef WRITE_BITS
+}
+static inline void unpack_powermeter_data(tbs_device_powermeter_t *dst, const u8 *src) {
+    u32 bitpos = 0;
+    u32 byte_idx = 0;
+
+    // Read MAC (6 bytes)
+    memcpy(dst->mac, &src[byte_idx], sizeof(dst->mac));
+    byte_idx += sizeof(dst->mac);
+
+    // Read timestamp (4 bytes)
+    memcpy(&dst->timestamp, &src[byte_idx], sizeof(dst->timestamp));
+    byte_idx += sizeof(dst->timestamp);
+
+    // Read type (1 byte)
+    dst->type = src[byte_idx++];
+
+    // Start bit-level unpacking after 11 bytes
+    bitpos = byte_idx * 8;
+
+    #define READ_BITS(var, bits) do { \
         var = 0; \
         for (int i = 0; i < (bits); ++i) { \
             u32 byte_index = (bitpos + i) / 8; \
@@ -168,19 +192,19 @@ static inline void unpack_powermeter_data(tbs_device_powermeter_t *dst, u8 *src)
         bitpos += (bits); \
     } while (0)
 
-	READ_BITS(dst->frequency,7);
-	READ_BITS(dst->voltage,9);
-	READ_BITS(dst->current1,10);
-	READ_BITS(dst->current2,10);
-	READ_BITS(dst->current3,10);
-	READ_BITS(dst->power1,14);
-	READ_BITS(dst->power2,14);
-	READ_BITS(dst->power3,14);
-	READ_BITS(dst->energy1,24);
-	READ_BITS(dst->energy2,24);
-	READ_BITS(dst->energy3,24);
-	//READ_BITS(dst->reserve,16);
-#undef READ_BITS
+    READ_BITS(dst->data.frequency, 7);
+    READ_BITS(dst->data.voltage, 9);
+    READ_BITS(dst->data.current1, 10);
+    READ_BITS(dst->data.current2, 10);
+    READ_BITS(dst->data.current3, 10);
+    READ_BITS(dst->data.power1, 14);
+    READ_BITS(dst->data.power2, 14);
+    READ_BITS(dst->data.power3, 14);
+    READ_BITS(dst->data.energy1, 24);
+    READ_BITS(dst->data.energy2, 24);
+    READ_BITS(dst->data.energy3, 24);
+
+    #undef READ_BITS
 }
 
 typedef struct {

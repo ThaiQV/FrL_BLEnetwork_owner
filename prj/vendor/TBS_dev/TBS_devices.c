@@ -31,7 +31,6 @@ void tbs_counter_printf(void* _p){
 	P_PRINTFHEX_A(INF,data->bytes,SIZEU8(data->bytes),"Raw:");
 }
 
-
 #ifdef COUNTER_DEVICE
 tbs_device_counter_t G_COUNTER_DEV = { .data = {
 												.timetamp = 0,
@@ -44,22 +43,26 @@ tbs_device_counter_t G_COUNTER_DEV = { .data = {
 												}
 									};
 #endif
-#ifdef POWER_METER
-tbs_device_powermeter_t meter = {
+#ifdef POWER_METER_DEVICE
+
+tbs_device_powermeter_t G_POWER_METER = {
 				        .mac = {0xDE, 0xAD, 0xBE, 0xEF, 0x00, 0x01},
 				        .timestamp = 12345678,
-				        .frequency = 100,
-				        .voltage = 300,
-				        .current1 = 512,
-				        .current2 = 513,
-				        .current3 = 514,
-				        .power1 = 1000,
-				        .power2 = 1001,
-				        .power3 = 1002,
-				        .energy1 = 123456,
-				        .energy2 = 654321,
-				        .energy3 = 111111,
-//				        .reserve = 0xABCD
+						.type = TBS_POWERMETER,
+				        .data= {
+				        		.frequency = 100,
+								.voltage = 300,
+								.current1 = 512,
+								.current2 = 513,
+								.current3 = 514,
+								.power1 = 1000,
+								.power2 = 1001,
+								.power3 = 1002,
+								.energy1 = 123456,
+								.energy2 = 654321,
+								.energy3 = 111111,
+		//				        .reserve = 0xABCD
+						}
 				    };
 void test_powermeter(void) {
 	u8 buffer[POWER_METER_SIZE];
@@ -109,7 +112,23 @@ void TBS_Counter_Run(void){
 	G_COUNTER_DEV.data.err_product = RAND(1,500);
 }
 #endif
-
+#ifdef POWER_METER_DEVICE
+void TBS_PowerMeter_init(void){
+	memcpy(G_POWER_METER.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_POWER_METER.mac));
+	G_POWER_METER. = TBS_POWERMETER;
+	G_POWER_METER.timetamp = fl_rtc_get();
+	//todo:Init Butt,lcd,7segs,.....
+}
+void TBS_PowerMeter_Run(void){
+	G_COUNTER_DEV.data.timetamp = fl_rtc_get();
+	//For testing : randon valid of fields
+	G_COUNTER_DEV.data.bt_call = RAND(0,1);
+	G_COUNTER_DEV.data.bt_endcall = G_COUNTER_DEV.data.bt_call?0:1;
+	G_COUNTER_DEV.data.bt_rst = RAND(0,1);
+	G_COUNTER_DEV.data.pass_product = RAND(1,1020);
+	G_COUNTER_DEV.data.err_product = RAND(1,500);
+}
+#endif
 /******************************************************************************/
 /******************************************************************************/
 /***                       Functions declare                   		         **/
@@ -134,9 +153,15 @@ void TBS_Device_Init(void){
 #ifdef COUNTER_DEVICE
 	TBS_Counter_init();
 #endif
+#ifdef POWER_METER_DEVICE
+	TBS_PowerMeter_init();
+#endif
 }
 void TBS_Device_Run(void){
 #ifdef COUNTER_DEVICE
 	TBS_Counter_Run();
+#endif
+#ifdef POWER_METER_DEVICE
+	TBS_PowerMeter_Run();
 #endif
 }
