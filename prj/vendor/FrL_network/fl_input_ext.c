@@ -208,7 +208,7 @@ int fl_serial_send(u8* _data, u8 _len) {
 void fl_input_serial_rec(void) {
 	u8* w = fl_rx_fifo.p + (fl_rx_fifo.wptr & (fl_rx_fifo.num - 1)) * fl_rx_fifo.size;
 	u32 data_len = uart_get_dma_rev_data_len(G_INPUT_EXT.serial.uart_num,G_INPUT_EXT.serial.dma_rx_chn);
-	LOGA(DRV,"DMA Len:%d\r\n",data_len);
+//	LOGA(DRV,"DMA Len:%d\r\n",data_len);
 	fl_serial_AddLenIn1st(w,(u8) data_len);
 	uart_clr_irq_status(G_INPUT_EXT.serial.uart_num,UART_CLR_RX);
 	if (w[0] != 0) {
@@ -407,28 +407,28 @@ void fl_input_external_init(void) {
 //init POLLING Container
 	InitPOLLING();
 #ifdef COUNTER_DEVICE
-	fl_ExIO_init(I2C_GPIO_SDA_E2,I2C_GPIO_SCL_E0,GPIO_PD0);
-//	//	//register function callback
-	fl_exIO_t GPIO_IN;
-	extern u8 TEST_Buttons(fl_exButton_states_e _state, void *_data);
-	GPIO_IN.exc = &TEST_Buttons;
-	GPIO_IN.status = BUTT_STATE_NONE;
-	GPIO_IN.mode = DET_LOW;
-	GPIO_IN.pin_read = (FucRead) &TCA95xx_read1;
-	GPIO_IN.pin = (gpio_pin_e) TCA_P16;
-//Register polling callback
-	s8 regis = RegisterPOLLING(GPIO_IN);
-	LOGA(PERI,"Button(%d)Calling Register :%d\r\n",GPIO_IN.pin_read(GPIO_IN.pin),regis);
-
-	extern u8 TEST_Buttons_RST(fl_exButton_states_e _state, void *_data);
-	GPIO_IN.exc = &TEST_Buttons_RST;
-	GPIO_IN.status = BUTT_STATE_NONE;
-	GPIO_IN.mode = DET_LOW;
-	GPIO_IN.pin_read = (FucRead) &TCA95xx_read1;
-	GPIO_IN.pin = (gpio_pin_e) TCA_P10;
-//Register polling callback
-	regis = RegisterPOLLING(GPIO_IN);
-	LOGA(PERI,"Button(%d)Reset Register :%d\r\n",GPIO_IN.pin_read(GPIO_IN.pin),regis);
+//	fl_ExIO_init(I2C_GPIO_SDA_E2,I2C_GPIO_SCL_E0,GPIO_PD0);
+////	//	//register function callback
+//	fl_exIO_t GPIO_IN;
+//	extern u8 TEST_Buttons(fl_exButton_states_e _state, void *_data);
+//	GPIO_IN.exc = &TEST_Buttons;
+//	GPIO_IN.status = BUTT_STATE_NONE;
+//	GPIO_IN.mode = DET_LOW;
+//	GPIO_IN.pin_read = (FucRead) &TCA95xx_read1;
+//	GPIO_IN.pin = (gpio_pin_e) TCA_P16;
+////Register polling callback
+//	s8 regis = RegisterPOLLING(GPIO_IN);
+//	LOGA(PERI,"Button(%d)Calling Register :%d\r\n",GPIO_IN.pin_read(GPIO_IN.pin),regis);
+//
+//	extern u8 TEST_Buttons_RST(fl_exButton_states_e _state, void *_data);
+//	GPIO_IN.exc = &TEST_Buttons_RST;
+//	GPIO_IN.status = BUTT_STATE_NONE;
+//	GPIO_IN.mode = DET_LOW;
+//	GPIO_IN.pin_read = (FucRead) &TCA95xx_read1;
+//	GPIO_IN.pin = (gpio_pin_e) TCA_P10;
+////Register polling callback
+//	regis = RegisterPOLLING(GPIO_IN);
+//	LOGA(PERI,"Button(%d)Reset Register :%d\r\n",GPIO_IN.pin_read(GPIO_IN.pin),regis);
 #endif
 //test board testing-> not counter boarrd
 #ifndef MASTER_CORE
