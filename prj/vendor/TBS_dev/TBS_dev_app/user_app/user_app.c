@@ -9,7 +9,7 @@
 #include "led_7_seg_app/led_7_seg_app.h"
 #include "tca9555_app/tca9555_app.h"
 #include "lcd_app/lcd_app.h"
-#include "fl_nwk_handler.h"
+#include "vendor/FrL_network/fl_nwk_handler.h"
 
 #define TIME_DELAY_REBOOT		5000//ms
 
