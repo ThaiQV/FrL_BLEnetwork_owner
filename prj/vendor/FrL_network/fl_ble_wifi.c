@@ -83,7 +83,6 @@ void GETLIST_REQUEST(u8* _pdata, RspFunc rspfnc);
 void GETLIST_RESPONSE(u8* _pdata);
 void PAIRING_REQUEST(u8* _pdata, RspFunc rspfnc);
 void PAIRING_RESPONSE(u8* _pdata){};
-
 void TIMETAMP_REQUEST(u8* _pdata, RspFunc rspfnc);
 void TIMETAMP_RESPONSE(u8* _pdata);
 
@@ -164,18 +163,21 @@ static void _getnsend_data_report(u8 var, u8 rspcmd) {
 	 */
 	else {
 		if (G_NODE_LIST.sla_info[var].dev_type == TBS_POWERMETER) {
-
-			tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) G_NODE_LIST.sla_info[var].data;
-			memcpy(pwmeter_data->mac,G_NODE_LIST.sla_info[var].mac,6);
-			//pack_powermeter_data(pwmeter_data,buffer);
+//			tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) G_NODE_LIST.sla_info[var].data;
+//			memcpy(pwmeter_data->mac,G_NODE_LIST.sla_info[var].mac,6);
 			wfdata.cmd = rspcmd;
-			wfdata.len_data = POWER_METER_BITSIZE - SIZEU8(pwmeter_data->mac) - SIZEU8(pwmeter_data->timetamp) - SIZEU8(pwmeter_data->type);
-			//memcpy(wfdata.data,(u8*)&pwmeter_data,wfdata.len_data);
-			tbs_pack_powermeter_data(pwmeter_data,wfdata.data);
+			wfdata.len_data = POWER_METER_BITSIZE;
+			memcpy(wfdata.data,G_NODE_LIST.sla_info[var].data,wfdata.len_data);
+			//tbs_pack_powermeter_data(pwmeter_data,wfdata.data);
 			wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
 			u8 len_payload = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
 			memcpy(payload,(u8*) &wfdata,len_payload);
+			//For testing parsing
+			tbs_device_powermeter_t received;
+			tbs_unpack_powermeter_data(&received, wfdata.data);
+			tbs_power_meter_printf((void*)&received);
 			P_PRINTFHEX_A(MCU,payload,len_payload,"PW Meter struct(%d):",len_payload);
+			/*Send to WIFI*/
 			fl_ble_send_wifi(payload,len_payload);
 		}
 	}
@@ -200,8 +202,13 @@ void REPORT_RESPONSE(u8* _pdata) {
 	} else {
 		//todo: send data of the special nodes
 		u8 slave_idx = fl_master_SlaveID_get(report_fmt.frame.mac);
-		if (slave_idx != 0xFF) {
+		if (slave_idx != 0xFF && report_fmt.frame.timetamp_begin == report_fmt.frame.timetamp_end && report_fmt.frame.timetamp_begin == 0) {
 			_getnsend_data_report(slave_idx,G_WIFI_CON[_wf_CMD_find(data->cmd)].rsp.cmd);
+		}
+		//todo: get history from the flash
+		else
+		{
+
 		}
 	}
 }
