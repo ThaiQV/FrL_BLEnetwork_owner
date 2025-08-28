@@ -209,8 +209,8 @@ void REPORT_RESPONSE(u8* _pdata) {
 		//todo: get history from the flash
 		else
 		{
-			P_PRINTFHEX_A(MCU,report_fmt.frame.mac,6,"MAC:");
-			P_PRINTFHEX_A(MCU,G_NODE_LIST.sla_info[1].mac,6,"MAC2:");
+//			P_PRINTFHEX_A(MCU,report_fmt.frame.mac,6,"MAC:");
+//			P_PRINTFHEX_A(MCU,G_NODE_LIST.sla_info[1].mac,6,"MAC2:");
 		}
 	}
 }
