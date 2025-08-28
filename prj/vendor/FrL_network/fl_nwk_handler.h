@@ -34,7 +34,7 @@ typedef enum {
 	// slave -> req -> master -> rsp
 	NWK_HDR_RECONNECT = 0x11,
 	/*Frl protocols*/
-	NWK_HDR_55 = 0x55, //
+	NWK_HDR_55 = 0x55, // REQ from slave
 	// master -> req -> slave -> rsp
 	NWK_HDR_F5_INFO = 0xF5, //get data information real-time
 	NWK_HDR_ASSIGN = 0xFC,	//Use to assign SlaveID to slave

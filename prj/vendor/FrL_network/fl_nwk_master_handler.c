@@ -21,6 +21,7 @@
 #include "fl_adv_repeat.h"
 #include "fl_nwk_database.h"
 #include "fl_nwk_protocol.h"
+#include "fl_ble_wifi.h"
 
 #ifdef MASTER_CORE
 /******************************************************************************/
@@ -468,7 +469,6 @@ int fl_master_ProccesRSP_cbk(void) {
 				 **/
 			}
 			break;
-
 			case NWK_HDR_55: {
 				/*****************************************************************/
 				/* | HDR | Timetamp | Mill_time | SlaveID | payload | crc8 | Ep | */
@@ -484,8 +484,10 @@ int fl_master_ProccesRSP_cbk(void) {
 					LOGA(INF,"CMD_55(%d)0x%02X%02X%02X%02X%02X%02X(%d):%d\r\n",slave_id,G_NODE_LIST.sla_info[node_indx].mac[0],
 							G_NODE_LIST.sla_info[node_indx].mac[1],G_NODE_LIST.sla_info[node_indx].mac[2],G_NODE_LIST.sla_info[node_indx].mac[3],
 							G_NODE_LIST.sla_info[node_indx].mac[4],G_NODE_LIST.sla_info[node_indx].mac[5],packet.frame.endpoint.repeat_cnt,cnt_inpack);
-					//Send assignment to slave
+					//Send rsp to slave
 					fl_adv_sendFIFO_add(fl_master_packet_RSP_55_build(slave_id));
+					//send to WIFI
+					fl_ble2wifi_EVENT_SEND(G_NODE_LIST.sla_info[node_indx].mac);
 				} else {
 					ERR(INF,"ID not foud:%02X\r\n",slave_id);
 				}
