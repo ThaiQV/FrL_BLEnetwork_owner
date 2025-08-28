@@ -30,6 +30,7 @@ app_share_data_t app_data = {
 		.bt_endcall = 0,
 		.bt_rst = 0,
 		.timetamp = 0,
+		.is_call = 0,
 };
 
 /**
@@ -40,7 +41,7 @@ static void user_app_data_sys(void);
 
 void user_app_init(void)
 {
-	printf("user_app_init start\n");
+	ULOGA("user_app_init start\n");
 
 	gpio_function_en(GPIO_PC0);
 	gpio_set_output(GPIO_PC0, 1); 			//enable output
@@ -97,7 +98,7 @@ static void user_app_data_sys(void)
 
 	if(led7seg_data.value_err != app_data.err_product)
 	{
-		led7seg_data.value_err == app_data.err_product;
+		led7seg_data.value_err = app_data.err_product;
 		sprintf(line2, "err  %4d", (int)app_data.err_product);
 		memcpy(lcd_data.display.line2, line2, 16);
 		G_COUNTER_DEV.data.err_product = app_data.err_product;
@@ -105,18 +106,27 @@ static void user_app_data_sys(void)
 
 	if(app_data.bt_call)
 	{
-		G_COUNTER_DEV.data.bt_call = 1;
-		fl_api_slave_req(NWK_HDR_55, G_COUNTER_DEV.bytes, SIZEU8(G_COUNTER_DEV), NULL, 0);
-		led7seg_data.led_call_on = 1;
+		if(!(app_data.is_call))
+		{
+			G_COUNTER_DEV.data.bt_call = 1;
+			fl_api_slave_req(NWK_HDR_55, G_COUNTER_DEV.bytes, SIZEU8(G_COUNTER_DEV), NULL, 0);
+			G_COUNTER_DEV.data.bt_call = 0;
+			led7seg_data.led_call_on = 1;
+			app_data.is_call = 1;
+		}
 		app_data.bt_call = 0;
 	}
 
 	if(app_data.bt_endcall)
 	{
-		G_COUNTER_DEV.data.bt_endcall = 1;
-		G_COUNTER_DEV.data.bt_call = 0;
-		fl_api_slave_req(NWK_HDR_55, G_COUNTER_DEV.bytes, SIZEU8(G_COUNTER_DEV), NULL, 0);
-		led7seg_data.led_call_on = 0;
+		if(app_data.is_call)
+		{
+			G_COUNTER_DEV.data.bt_endcall = 1;
+			fl_api_slave_req(NWK_HDR_55, G_COUNTER_DEV.bytes, SIZEU8(G_COUNTER_DEV), NULL, 0);
+			G_COUNTER_DEV.data.bt_endcall = 0;
+			led7seg_data.led_call_on = 0;
+			app_data.is_call = 0;
+		}
 		app_data.bt_endcall = 0;
 	}
 
@@ -124,6 +134,7 @@ static void user_app_data_sys(void)
 	{
 		G_COUNTER_DEV.data.bt_rst = 1;
 		fl_api_slave_req(NWK_HDR_55, G_COUNTER_DEV.bytes, SIZEU8(G_COUNTER_DEV), NULL, 0);
+		G_COUNTER_DEV.data.bt_rst = 0;
 		reboot = 1;
 		reboot_TimeTick_ms = get_system_time_ms() + TIME_DELAY_REBOOT;
 		app_data.bt_rst = 0;
@@ -153,7 +164,7 @@ static void user_app_data_sys(void)
 
 void user_app_run(void)
 {
-	printf("user_app_run start\n");
+	ULOGA("user_app_run start\n");
 
 	gpio_function_en(GPIO_PA5);
 	gpio_set_output(GPIO_PA5, 1); 			//enable output

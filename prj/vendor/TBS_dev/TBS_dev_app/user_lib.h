@@ -8,6 +8,15 @@
 #define APPS_USER_USER_LIB_H_
 
 #include "tl_common.h"
+
+
+
+
+
+#define ULOGA(...)	LOGA(MCU,##__VA_ARGS__)
+
+
+
 #include "driver/lcd/lcd16x2.h"
 #include "driver/led_7_seg/led_7_seg.h"
 #include "driver/tca9555/tca9555.h"
@@ -20,7 +29,8 @@
 
 #endif /* APPS_USER_USER_LIB_H_ */
 
-inline uint32_t get_system_time_ms(void)
+
+inline unsigned long get_system_time_ms(void)
 {
-	return reg_system_tick/SYSTEM_TIMER_TICK_1MS;
+	return reg_system_tick;
 }

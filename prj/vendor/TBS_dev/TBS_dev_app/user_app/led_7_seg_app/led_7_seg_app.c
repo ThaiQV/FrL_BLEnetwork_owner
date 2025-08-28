@@ -85,17 +85,18 @@ void user_led_7_seg_app_init(void)
 	gpio_set_input(GPIO_PA6, 0);			//disable input
 	gpio_set_up_down_res(GPIO_PA6, GPIO_PIN_PULLUP_10K);
 	gpio_set_level(GPIO_PA6, 0);
+
 }
 
 void user_led_7_seg_app_task(void)
 {
-    static unsigned int buttonTimeTick = 0;
-    if(buttonTimeTick <= get_system_time_ms()){
-        buttonTimeTick = get_system_time_ms() + TIME_LED7SEG_TASK_MS ; //10ms
-    }
-    else{
-        return ;
-    }
+    static unsigned long led7segTimeTick = 0;
+	if(get_system_time_ms() - led7segTimeTick > TIME_BUTTON_TASK_MS){
+		led7segTimeTick = get_system_time_ms()  ; //10ms
+	}
+	else{
+		return ;
+	}
 
     if(!led7seg_data.enabled)
     {
@@ -115,6 +116,5 @@ void user_led_7_seg_app_task(void)
     gpio_set_level(GPIO_PA5, !(led7seg_data.led_call_on));
     gpio_set_level(GPIO_PA6, !(led7seg_data.led_nwk_on));
 
-
 }
-/*********************************************************************/
+

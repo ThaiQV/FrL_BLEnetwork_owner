@@ -4,11 +4,13 @@
  * @author Nghia Hoang
  * @date 2025
  */
+#include "../../user_lib.h"
 
 #include "button.h"
 #include <string.h>
 #include <stdio.h>
 
+#define DB_LOG_BT(...)	ULOGA(__VA_ARGS__)
 // =============================================================================
 // GLOBAL VARIABLES
 // =============================================================================
@@ -41,7 +43,7 @@ bool button_manager_init(const button_hal_t *hal) {
     g_button_manager.hal = *hal;
     g_button_manager.initialized = true;
     g_button_manager.hal.button_pin_init_all();
-    printf("[BTN_MGR] Initialized with HAL\n");
+    DB_LOG_BT("[BTN_MGR] Initialized with HAL\n");
     return true;
 }
 
@@ -49,24 +51,24 @@ void button_manager_deinit(void) {
     g_button_manager.initialized = false;
     g_button_manager.button_count = 0;
     memset(&g_button_manager.buttons, 0, sizeof(g_button_manager.buttons));
-    printf("[BTN_MGR] Deinitialized\n");
+    DB_LOG_BT("[BTN_MGR] Deinitialized\n");
 }
 
 uint8_t button_add(uint8_t gpio_pin, bool active_low) {
     if (!g_button_manager.initialized) {
-        printf("[BTN] Error: Manager not initialized\n");
+        DB_LOG_BT("[BTN] Error: Manager not initialized\n");
         return 0xFF;
     }
 
     if (g_button_manager.button_count >= MAX_BUTTONS) {
-        printf("[BTN] Error: Maximum buttons reached (%d)\n", MAX_BUTTONS);
+        DB_LOG_BT("[BTN] Error: Maximum buttons reached (%d)\n", MAX_BUTTONS);
         return 0xFF;
     }
 
     // Check for duplicate pin
     for (uint8_t i = 0; i < g_button_manager.button_count; i++) {
         if (g_button_manager.buttons[i].gpio_pin == gpio_pin) {
-            printf("[BTN] Error: GPIO pin %d already used\n", gpio_pin);
+            DB_LOG_BT("[BTN] Error: GPIO pin %d already used\n", gpio_pin);
             return 0xFF;
         }
     }
@@ -76,7 +78,7 @@ uint8_t button_add(uint8_t gpio_pin, bool active_low) {
 
     // Initialize hardware
     if (!g_button_manager.hal.button_pin_init(gpio_pin, active_low)) {
-        printf("[BTN] Error: Failed to initialize GPIO pin %d\n", gpio_pin);
+        DB_LOG_BT("[BTN] Error: Failed to initialize GPIO pin %d\n", gpio_pin);
         return 0xFF;
     }
 
@@ -108,7 +110,7 @@ uint8_t button_add(uint8_t gpio_pin, bool active_low) {
 
     g_button_manager.button_count++;
 
-    printf("[BTN] Added button %d on GPIO %d (active_%s)\n",
+    DB_LOG_BT("[BTN] Added button %d on GPIO %d (active_%s)\n",
            button_id, gpio_pin, active_low ? "low" : "high");
 
     return button_id;
@@ -126,7 +128,7 @@ bool button_remove(uint8_t button_id) {
     btn->initialized = false;
     memset(btn, 0, sizeof(button_config_t));
 
-    printf("[BTN] Removed button %d\n", button_id);
+    DB_LOG_BT("[BTN] Removed button %d\n", button_id);
     return true;
 }
 
@@ -190,7 +192,7 @@ bool button_add_hold_level(uint8_t button_id,
     button_config_t *btn = &g_button_manager.buttons[button_id];
 
     if (btn->hold_level_count >= MAX_HOLD_LEVELS) {
-        printf("[BTN] Error: Maximum hold levels reached for button %d\n", button_id);
+        DB_LOG_BT("[BTN] Error: Maximum hold levels reached for button %d\n", button_id);
         return false;
     }
 
@@ -200,7 +202,7 @@ bool button_add_hold_level(uint8_t button_id,
     btn->hold_levels[level].enabled = true;
     btn->hold_level_count++;
 
-    printf("[BTN] Added hold level %d for button %d: %d ms\n",
+    DB_LOG_BT("[BTN] Added hold level %d for button %d: %d ms\n",
            level, button_id, hold_time_ms);
 
     return true;
@@ -225,7 +227,7 @@ bool button_remove_hold_level(uint8_t button_id, uint8_t level_index) {
     btn->hold_level_count--;
     memset(&btn->hold_levels[btn->hold_level_count], 0, sizeof(button_hold_level_t));
 
-    printf("[BTN] Removed hold level %d from button %d\n", level_index, button_id);
+    DB_LOG_BT("[BTN] Removed hold level %d from button %d\n", level_index, button_id);
     return true;
 }
 
@@ -252,21 +254,21 @@ bool button_add_multiclick_level(uint8_t button_id,
     }
 
     if (click_count == 0 || click_count > MAX_MULTI_CLICK) {
-        printf("[BTN] Error: Invalid click count %d for button %d\n", click_count, button_id);
+        DB_LOG_BT("[BTN] Error: Invalid click count %d for button %d\n", click_count, button_id);
         return false;
     }
 
     button_config_t *btn = &g_button_manager.buttons[button_id];
 
     if (btn->multiclick_level_count >= MAX_MULTI_CLICK) {
-        printf("[BTN] Error: Maximum multi-click levels reached for button %d\n", button_id);
+        DB_LOG_BT("[BTN] Error: Maximum multi-click levels reached for button %d\n", button_id);
         return false;
     }
 
     // Check for duplicate click count
     for (uint8_t i = 0; i < btn->multiclick_level_count; i++) {
         if (btn->multiclick_levels[i].click_count == click_count) {
-            printf("[BTN] Error: Click count %d already configured for button %d\n",
+            DB_LOG_BT("[BTN] Error: Click count %d already configured for button %d\n",
                    click_count, button_id);
             return false;
         }
@@ -281,7 +283,7 @@ bool button_add_multiclick_level(uint8_t button_id,
     // Sort levels by click count for efficient processing
     button_sort_multiclick_levels(button_id);
 
-    printf("[BTN] Added multi-click level for button %d: %d clicks\n",
+    DB_LOG_BT("[BTN] Added multi-click level for button %d: %d clicks\n",
            button_id, click_count);
 
     return true;
@@ -308,7 +310,7 @@ bool button_remove_multiclick_level(uint8_t button_id, uint8_t level_index) {
     btn->multiclick_level_count--;
     memset(&btn->multiclick_levels[btn->multiclick_level_count], 0, sizeof(button_multiclick_t));
 
-    printf("[BTN] Removed multi-click level (%d clicks) from button %d\n",
+    DB_LOG_BT("[BTN] Removed multi-click level (%d clicks) from button %d\n",
            removed_clicks, button_id);
     return true;
 }
@@ -453,17 +455,17 @@ void button_get_stats(uint8_t *total_buttons, uint8_t *active_buttons) {
 
 static bool button_validate_id(uint8_t button_id) {
     if (!g_button_manager.initialized) {
-        printf("[BTN] Error: Manager not initialized\n");
+        DB_LOG_BT("[BTN] Error: Manager not initialized\n");
         return false;
     }
 
     if (button_id >= g_button_manager.button_count) {
-        printf("[BTN] Error: Invalid button ID %d\n", button_id);
+        DB_LOG_BT("[BTN] Error: Invalid button ID %d\n", button_id);
         return false;
     }
 
     if (!g_button_manager.buttons[button_id].initialized) {
-        printf("[BTN] Error: Button %d not initialized\n", button_id);
+        DB_LOG_BT("[BTN] Error: Button %d not initialized\n", button_id);
         return false;
     }
 
@@ -634,46 +636,46 @@ static void button_trigger_event(uint8_t button_id, button_event_t event, uint32
             if (btn->on_press) {
                 btn->on_press(button_id);
             }
-            printf("[BTN%d] PRESS\n", button_id);
+            DB_LOG_BT("[BTN%d] PRESS\n", button_id);
             break;
 
         case BUTTON_EVENT_RELEASE:
             if (btn->on_release) {
                 btn->on_release(button_id);
             }
-            printf("[BTN%d] RELEASE (%dms)\n", button_id, data);
+            DB_LOG_BT("[BTN%d] RELEASE (%dms)\n", button_id, data);
             break;
 
         case BUTTON_EVENT_CLICK:
             if (btn->on_click) {
                 btn->on_click(button_id);
             }
-            printf("[BTN%d] CLICK (%dms)\n", button_id, data);
+            DB_LOG_BT("[BTN%d] CLICK (%dms)\n", button_id, data);
             break;
 
         case BUTTON_EVENT_MULTI_CLICK:
             if (btn->on_multiclick) {
                 btn->on_multiclick(button_id, btn->click_count);
             }
-            printf("[BTN%d] MULTI_CLICK (%d clicks)\n", button_id, data);
+            DB_LOG_BT("[BTN%d] MULTI_CLICK (%d clicks)\n", button_id, data);
             break;
 
         case BUTTON_EVENT_HOLD_START:
             if (btn->on_hold_start) {
                 btn->on_hold_start(button_id);
             }
-            printf("[BTN%d] HOLD_START\n", button_id);
+            DB_LOG_BT("[BTN%d] HOLD_START\n", button_id);
             break;
 
         case BUTTON_EVENT_HOLD_END:
             if (btn->on_hold_end) {
                 btn->on_hold_end(button_id);
             }
-            printf("[BTN%d] HOLD_END (%dms)\n", button_id, data);
+            DB_LOG_BT("[BTN%d] HOLD_END (%dms)\n", button_id, data);
             break;
 
         case BUTTON_EVENT_HOLD_LEVEL:
-            printf("[BTN%d] HOLD_LEVEL (%dms)\n", button_id, data);
+            DB_LOG_BT("[BTN%d] HOLD_LEVEL (%dms)\n", button_id, data);
             break;
 
         default:
@@ -703,9 +705,9 @@ static void button_trigger_multiclick(uint8_t button_id) {
     button_trigger_event(button_id, BUTTON_EVENT_MULTI_CLICK, btn->click_count);
 
     if (level_found) {
-        printf("[BTN%d] Multi-click level triggered: %d clicks\n", button_id, btn->click_count);
+        DB_LOG_BT("[BTN%d] Multi-click level triggered: %d clicks\n", button_id, btn->click_count);
     } else {
-        printf("[BTN%d] Multi-click detected (no specific level): %d clicks\n", button_id, btn->click_count);
+        DB_LOG_BT("[BTN%d] Multi-click detected (no specific level): %d clicks\n", button_id, btn->click_count);
     }
 }
 

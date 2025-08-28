@@ -12,14 +12,14 @@
 #define FREQUENCY_CLK		1000000
 #define LED_CLK_PIN			GPIO_PD2
 #define LED_DATA_PIN		GPIO_PD3
-#define TIME_LED7SEG_TASK_MS 100 // ms
+
 
 /**
  * @brief 7-Segment LED sub-app shared data
  */
 typedef struct {
-	uint16_t value;         ///< Value to display (0-9999)
-	uint16_t value_err;
+	uint32_t value;         ///< Value to display (0-9999)
+	uint32_t value_err;
 	bool print_err;
 	bool enabled;           ///< Display enabled
 	bool led_nwk_on;

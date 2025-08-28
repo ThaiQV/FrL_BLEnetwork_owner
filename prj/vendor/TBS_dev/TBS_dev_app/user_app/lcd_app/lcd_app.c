@@ -77,13 +77,13 @@ uint8_t user_lcd_app_init(void)
 
 void user_lcd_app_task(void)
 {
-	static unsigned int lcdTimeTick = 0;
-	    if(lcdTimeTick <= get_system_time_ms()){
-	    	lcdTimeTick = get_system_time_ms() + TIME_LCD_TASK_MS ; //10ms
-	    }
-	    else{
-	        return ;
-	    }
+	static unsigned long lcdTimeTick = 0;
+	if(get_system_time_ms() - lcdTimeTick > TIME_BUTTON_TASK_MS){
+		lcdTimeTick = get_system_time_ms()  ; //10ms
+	}
+	else{
+		return ;
+	}
 
 	if(lcd_data.enable)
 	{

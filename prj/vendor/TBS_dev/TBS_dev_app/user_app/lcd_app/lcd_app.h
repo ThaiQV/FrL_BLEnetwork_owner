@@ -13,7 +13,6 @@
  * lcd
  */
 
-#define TIME_LCD_TASK_MS 	100;
 
 /* Structure for a standard (character)LCD display.   */
 typedef struct {

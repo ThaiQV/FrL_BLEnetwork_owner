@@ -79,40 +79,40 @@ bool button_pin_read(button_pin_t pin)
 }
 
 void on_button_click(uint8_t button_id) {
-    printf("Button %d clicked!\n", button_id);
+    ULOGA("Button %d clicked!\n", button_id);
 }
 
 void on_triple_click_specific(uint8_t button_id, uint8_t click_count)
 {
-	printf(">>> Button %d: Specific TRIPLE CLICK handler triggered\n", button_id);
+	ULOGA(">>> Button %d: Specific TRIPLE CLICK handler triggered\n", button_id);
 }
 void on_button_multiclick(uint8_t button_id, uint8_t click_count) {
-    printf(">>> Button %d: %d-CLICK detected!\n", button_id, click_count);
+    ULOGA(">>> Button %d: %d-CLICK detected!\n", button_id, click_count);
 
     // You can handle different click counts here
     switch (click_count) {
         case 1:
-            printf("    -> Single click action\n");
+            ULOGA("    -> Single click action\n");
             on_button_click(button_id);
             break;
         case 2:
-            printf("    -> Double click action\n");
+            ULOGA("    -> Double click action\n");
             on_button_click(button_id);
             break;
         case 3:
-            printf("    -> Triple click action\n");
+            ULOGA("    -> Triple click action\n");
             on_button_click(button_id);
             break;
         case 4:
-            printf("    -> Quad click action\n");
+            ULOGA("    -> Quad click action\n");
             on_button_click(button_id);
             break;
         case 5:
-            printf("    -> Penta click action\n");
+            ULOGA("    -> Penta click action\n");
             on_button_click(button_id);
             break;
         default:
-            printf("    -> %d clicks - that's impressive!\n", click_count);
+            ULOGA("    -> %d clicks - that's impressive!\n", click_count);
             on_button_click(button_id);
             break;
     }
@@ -125,6 +125,8 @@ static void ped_on_lick(uint8_t button_id);
 static void ppd_on_lick(uint8_t button_id);
 static void ppu_on_lick(uint8_t button_id);
 static void reset_hold_3s(uint8_t button_id, uint32_t actual_hold_time);
+static void peu_hold_5s(uint8_t button_id, uint32_t actual_hold_time);
+static void ped_hold_5s(uint8_t button_id, uint32_t actual_hold_time);
 
 
 
@@ -143,7 +145,7 @@ button_hal_t button_hal = {
 void user_button_app_init(void)
 {
     if (!button_manager_init(&button_hal)) {
-        printf("Error: Failed to initialize button manager!\n");
+        ULOGA("Error: Failed to initialize button manager!\n");
         return;
     }
 
@@ -154,11 +156,20 @@ void user_button_app_init(void)
     button_set_click_callback(BUTTON_ID_MAIN, main_on_lick);
     button_set_click_callback(BUTTON_ID_CMAIN, cmain_on_lick);
     button_add_hold_level(BUTTON_ID_RESET, 3000, reset_hold_3s);
+    button_add_hold_level(BUTTON_ID_PEU, 5000, peu_hold_5s);
+    button_add_hold_level(BUTTON_ID_PED, 5000, ped_hold_5s);
 
 }
 
 void user_button_app_task(void)
 {
+	static unsigned long buttonTimeTick = 0;
+	if(get_system_time_ms() - buttonTimeTick > TIME_BUTTON_TASK_MS){
+		buttonTimeTick = get_system_time_ms()  ; //10ms
+	}
+	else{
+		return ;
+	}
 	button_process_all();
 }
 
@@ -166,44 +177,68 @@ void user_button_app_task(void)
 
 static void main_on_lick(uint8_t button_id)
 {
-	printf("main_on_lick\n");
+	ULOGA("main_on_lick\n");
 	app_data.bt_call = 1;
 }
 
 static void cmain_on_lick(uint8_t button_id)
 {
-	printf("cmain_on_lick\n");
+	ULOGA("cmain_on_lick\n");
 	app_data.bt_endcall = 1;
 }
 
 static void peu_on_lick(uint8_t button_id)
 {
-	printf("peu_on_lick\n");
-	app_data.err_product++;
+	ULOGA("peu_on_lick\n");
+	if(app_data.err_product++ == 1000)
+	{
+		app_data.err_product = 0;
+	}
+
 }
 
 static void ped_on_lick(uint8_t button_id)
 {
-	printf("ped_on_lick\n");
-	app_data.err_product--;
+	ULOGA("ped_on_lick\n");
+	if(app_data.err_product)
+	{
+		app_data.err_product--;
+	}
 }
 
 static void ppd_on_lick(uint8_t button_id)
 {
-	printf("ppd_on_lick\n");
-	app_data.pass_product--;
+	ULOGA("ppd_on_lick\n");
+	if(app_data.pass_product)
+	{
+		app_data.pass_product--;
+	}
+
 }
 
 static void ppu_on_lick(uint8_t button_id)
 {
-	printf("ppu_on_lick\n");
-	app_data.pass_product++;
+	ULOGA("ppu_on_lick\n");
+	if(app_data.pass_product++ == 10000)
+	{
+		app_data.pass_product = 0;
+	}
 }
 
 static void reset_hold_3s(uint8_t button_id, uint32_t actual_hold_time)
 {
-	printf("reset_hold_3s\n");
+	ULOGA("reset_hold_3s\n");
 	app_data.bt_rst = 1;
 }
 
+static void peu_hold_5s(uint8_t button_id, uint32_t actual_hold_time)
+{
+	ULOGA("RST Factory\n");
+	fl_db_clearAll();
+}
 
+static void ped_hold_5s(uint8_t button_id, uint32_t actual_hold_time)
+{
+	ULOGA("PAIR\n");
+	fl_db_clearAll();
+}
