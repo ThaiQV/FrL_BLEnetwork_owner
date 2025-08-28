@@ -136,12 +136,13 @@ s8 RegisterPOLLING(fl_exIO_t _io) {
 /////////////////////////////////////blc_register_hci_handler for spp////////////////////////////
 static void fl_serial_AddLenIn1st(u8 *parr, u8 _size) {
 	u8 arr_bkp[UART_DATA_LEN];
-	if (_size > UART_DATA_LEN)
-	ERR(DRV,"Over Data!!!\r\n");
+	if (_size > UART_DATA_LEN) {
+		ERR(DRV,"Over Data!!!\r\n");
+		_size = UART_DATA_LEN;
+	}
 	memset(arr_bkp,0,sizeof(arr_bkp));
 	arr_bkp[0] = _size;
 	memcpy(arr_bkp + 1,parr,_size);
-
 	memset(parr,0,_size + 1);
 	memcpy(parr,arr_bkp,_size + 1);
 }

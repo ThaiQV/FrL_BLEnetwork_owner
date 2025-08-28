@@ -169,9 +169,9 @@ static void _getnsend_data_report(u8 var, u8 rspcmd) {
 			memcpy(pwmeter_data->mac,G_NODE_LIST.sla_info[var].mac,6);
 			//pack_powermeter_data(pwmeter_data,buffer);
 			wfdata.cmd = rspcmd;
-			wfdata.len_data = POWER_METER_BITSIZE - SIZEU8(pwmeter_data->mac) - SIZEU8(pwmeter_data->timestamp) - SIZEU8(pwmeter_data->type);
+			wfdata.len_data = POWER_METER_BITSIZE - SIZEU8(pwmeter_data->mac) - SIZEU8(pwmeter_data->timetamp) - SIZEU8(pwmeter_data->type);
 			//memcpy(wfdata.data,(u8*)&pwmeter_data,wfdata.len_data);
-			pack_powermeter_data(pwmeter_data,wfdata.data);
+			tbs_pack_powermeter_data(pwmeter_data,wfdata.data);
 			wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
 			u8 len_payload = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
 			memcpy(payload,(u8*) &wfdata,len_payload);
@@ -306,18 +306,6 @@ void TIMETAMP_RESPONSE(u8* _pdata) {
 void fl_ble_wifi_proc(u8* _pdata) {
 	u8 len_cmd = 0;
 	u8 cmd_in_data = 1;
-//	u8 i = 0;
-//	for (; i < GWIFI_SIZE && cmd_in_data < _pdata[0]; i++) {
-//		fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[cmd_in_data];
-//		if (data->cmd == (u8) G_WIFI_CON[i].req.cmd) {
-//			G_WIFI_CON[i].req.ReqFunc(&_pdata[cmd_in_data - 1],G_WIFI_CON[i].rsp.Rspfnc);
-//			len_cmd = data->len_data + SIZEU8(data->cmd) + SIZEU8(data->crc8) + SIZEU8(data->len_data);
-//			LOGA(DRV,"WIFI|cmd_in_data:%d,len_cmd:%d\r\n",cmd_in_data,len_cmd);
-//			LOGA(DRV,"WIFI|CMDID:%d,CON_cmdid:%d\r\n",data->cmd,(u8 )G_WIFI_CON[i].req.cmd);
-//			cmd_in_data += len_cmd;
-//			i=0;
-//		}
-//	}
 	for (; cmd_in_data < _pdata[0]; cmd_in_data += len_cmd) {
 		fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[cmd_in_data];
 		LOGA(DRV,"WIFI|cmd_in_data:%d,len_cmd:%d\r\n",cmd_in_data,len_cmd);

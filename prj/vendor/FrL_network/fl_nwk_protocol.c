@@ -461,6 +461,7 @@ void CMD_GETINFOSLAVE(u8* _data) {
 			&slaveID[1],&slaveID[2],&slaveID[3],&slaveID[4],&slaveID[5],&slaveID[6],&slaveID[7],&slaveID[8],&slaveID[9],&slaveID[10],&slaveID[11],
 			&slaveID[12],&slaveID[13],&slaveID[14],&slaveID[15],&slaveID[16],&slaveID[17],&slaveID[18],&slaveID[19]);
 	//p get info 255 <Period get again> <num slave for each> <num virtual slave> <timeout rsp>
+	if(G_NODE_LIST.slot_inused == 0xFF) return;
 	if (slave_num == 6 && slaveID[0] == 0xFF) {
 		CLEAR_INFO_RSP();
 		G_SLA_INFO_RSP.settings.time_interval = slaveID[1];

@@ -16,7 +16,7 @@
 
 #define FL_RXFIFO_SIZE		72
 #define FL_RXFIFO_NUM		2
-#define FL_TXFIFO_SIZE		40
+#define FL_TXFIFO_SIZE		72
 #define FL_TXFIFO_NUM		256
 
 #define UART_DATA_LEN    	(FL_TXFIFO_SIZE - 2)   // data max 252

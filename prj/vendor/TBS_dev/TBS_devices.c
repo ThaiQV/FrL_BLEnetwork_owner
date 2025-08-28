@@ -28,7 +28,27 @@ void tbs_counter_printf(void* _p){
 	LOGA(INF,"BT_Rst:%d\r\n",data->data.bt_rst);
 	LOGA(INF,"BT_Pass:%d\r\n",data->data.pass_product);
 	LOGA(INF,"BT_Err:%d\r\n",data->data.err_product);
-	P_PRINTFHEX_A(INF,data->bytes,SIZEU8(data->bytes),"Raw:");
+//	P_PRINTFHEX_A(INF,data->bytes,SIZEU8(data->bytes),"Raw:");
+}
+
+void tbs_power_meter_printf(void* _p) {
+	tbs_device_powermeter_t* dev = (tbs_device_powermeter_t*) _p;
+	LOGA(INF,"MAC:0x%02X%02X%02X%02X%02X%02X\r\n",dev->mac[0],dev->mac[1],dev->mac[2],dev->mac[3],dev->mac[4],dev->mac[5]);
+	LOGA(INF,"Timetamp:%d\r\n",dev->timetamp);
+	LOGA(INF,"Type:%d\r\n",dev->type);
+	LOGA(INF,"Frequency: %u\n",dev->data.frequency);
+	LOGA(INF,"Voltage: %u\n",dev->data.voltage);
+	LOGA(INF,"Current1: %u\n",dev->data.current1);
+	LOGA(INF,"Current2: %u\n",dev->data.current2);
+	LOGA(INF,"Current3: %u\n",dev->data.current3);
+	LOGA(INF,"Power1: %u\n",dev->data.power1);
+	LOGA(INF,"Power2: %u\n",dev->data.power2);
+	LOGA(INF,"Power3: %u\n",dev->data.power3);
+	LOGA(INF,"Energy1: %u\n",dev->data.energy1);
+	LOGA(INF,"Energy2: %u\n",dev->data.energy2);
+	LOGA(INF,"Energy3: %u\n", dev->data.energy3);
+//	u8* data_u8 = (u8*)_p;
+//	P_PRINTFHEX_A(INF,data_u8,POWER_METER_STRUCT_BYTESIZE,"Raw:");
 }
 
 #ifdef COUNTER_DEVICE
@@ -47,7 +67,7 @@ tbs_device_counter_t G_COUNTER_DEV = { .data = {
 
 tbs_device_powermeter_t G_POWER_METER = {
 				        .mac = {0xDE, 0xAD, 0xBE, 0xEF, 0x00, 0x01},
-				        .timestamp = 12345678,
+				        .timetamp = 12345678,
 						.type = TBS_POWERMETER,
 				        .data= {
 				        		.frequency = 100,
@@ -65,28 +85,13 @@ tbs_device_powermeter_t G_POWER_METER = {
 						}
 				    };
 void test_powermeter(void) {
-	u8 buffer[POWER_METER_SIZE];
-	memset(buffer,0,POWER_METER_SIZE);
-	pack_powermeter_data(&meter, buffer);
+	u8 buffer[POWER_METER_BITSIZE];
+	memset(buffer,0,POWER_METER_BITSIZE);
+	tbs_pack_powermeter_data(&G_POWER_METER, buffer);
 //P_PRINTFHEX_A(MCU,buffer,34,"PACK(%d):",SIZEU8(buffer));
-	fl_ble_send_wifi(buffer,POWER_METER_PACK_SIZE);
 	tbs_device_powermeter_t received;
-	unpack_powermeter_data(&received, buffer);
-	LOGA(MCU,"MAC: %02X:%02X:%02X:%02X:%02X:%02X\n",
-			received.mac[0], received.mac[1], received.mac[2],
-			received.mac[3], received.mac[4], received.mac[5]);
-	LOGA(MCU, "Timestamp: %u\n", received.timestamp);
-	LOGA(MCU, "Frequency: %u\n", received.frequency);
-	LOGA(MCU, "Voltage: %u\n", received.voltage);
-	LOGA(MCU, "Current1: %u\n", received.current1);
-	LOGA(MCU, "Current2: %u\n", received.current2);
-	LOGA(MCU, "Current3: %u\n", received.current3);
-	LOGA(MCU, "Power1: %u\n", received.power1);
-	LOGA(MCU, "Power2: %u\n", received.power2);
-	LOGA(MCU, "Power3: %u\n", received.power3);
-	LOGA(MCU, "Energy1: %u\n", received.energy1);
-	LOGA(MCU, "Energy2: %u\n", received.energy2);
-	LOGA(MCU, "Energy3: %u\n", received.energy3);
+	tbs_unpack_powermeter_data(&received, buffer);
+	tbs_power_meter_printf((void*)&received);
 }
 #endif
 /******************************************************************************/
@@ -115,18 +120,26 @@ void TBS_Counter_Run(void){
 #ifdef POWER_METER_DEVICE
 void TBS_PowerMeter_init(void){
 	memcpy(G_POWER_METER.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_POWER_METER.mac));
-	G_POWER_METER. = TBS_POWERMETER;
-	G_POWER_METER.timetamp = fl_rtc_get();
+	G_POWER_METER.type = TBS_POWERMETER;
+	G_POWER_METER.timetamp= fl_rtc_get();
+	test_powermeter();
 	//todo:Init Butt,lcd,7segs,.....
+
 }
 void TBS_PowerMeter_Run(void){
-	G_COUNTER_DEV.data.timetamp = fl_rtc_get();
+	G_POWER_METER.timetamp = fl_rtc_get();
 	//For testing : randon valid of fields
-	G_COUNTER_DEV.data.bt_call = RAND(0,1);
-	G_COUNTER_DEV.data.bt_endcall = G_COUNTER_DEV.data.bt_call?0:1;
-	G_COUNTER_DEV.data.bt_rst = RAND(0,1);
-	G_COUNTER_DEV.data.pass_product = RAND(1,1020);
-	G_COUNTER_DEV.data.err_product = RAND(1,500);
+	G_POWER_METER.data.frequency = RAND(0,128);
+	G_POWER_METER.data.voltage = RAND(0,512);
+//	G_POWER_METER.data.current1 = RAND(0,1024);
+//	G_POWER_METER.data.current2 = RAND(0,1024);
+//	G_POWER_METER.data.current3 = RAND(0,1024);
+//	G_POWER_METER.data.power1 = RAND(0,16384);
+//	G_POWER_METER.data.power2 = RAND(0,16384);
+//	G_POWER_METER.data.power3 = RAND(0,16384);
+//	G_POWER_METER.data.energy1 = RAND(0,16777216);
+//	G_POWER_METER.data.energy2 = RAND(0,16777216);
+//	G_POWER_METER.data.energy3 = RAND(0,16777216);
 }
 #endif
 /******************************************************************************/

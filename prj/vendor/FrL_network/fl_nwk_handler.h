@@ -36,7 +36,7 @@ typedef enum {
 	/*Frl protocols*/
 	NWK_HDR_55 = 0x55, //
 	// master -> req -> slave -> rsp
-	NWK_HDR_F5_INFO = 0xF5,
+	NWK_HDR_F5_INFO = 0xF5, //get data information real-time
 	NWK_HDR_ASSIGN = 0xFC,	//Use to assign SlaveID to slave
 	NWK_HDR_HEARTBEAT = 0xFD,
 	NWK_HDR_COLLECT = 0xFE, //Use to collect slave (master and slaves)
@@ -101,7 +101,7 @@ typedef union {
  */
 typedef struct {
 	u8 mac[6];         // MAC address (48 bits)
-	u32 timestamp;     // Timestamp (32 bits)
+	u32 timetamp;     // timetamp (32 bits)
 	u8 type;			//device type
 	// Measurement fields (bit-level precision noted)
 	struct {
@@ -122,7 +122,7 @@ typedef struct {
 
 #define POWER_METER_STRUCT_BYTESIZE			(SIZEU8(tbs_device_powermeter_t))
 #define POWER_METER_BITSIZE					34
-static inline void pack_powermeter_data(const tbs_device_powermeter_t *src, u8 *dst) {
+static inline void tbs_pack_powermeter_data(const tbs_device_powermeter_t *src, u8 *dst) {
     u32 bitpos = 0;
     u32 byte_idx = 0;
     memset(dst, 0, POWER_METER_BITSIZE);
@@ -131,9 +131,9 @@ static inline void pack_powermeter_data(const tbs_device_powermeter_t *src, u8 *
     memcpy(&dst[byte_idx], src->mac, sizeof(src->mac));
     byte_idx += sizeof(src->mac);
 
-    // Copy timestamp (4 bytes)
-    memcpy(&dst[byte_idx], &src->timestamp, sizeof(src->timestamp));
-    byte_idx += sizeof(src->timestamp);
+    // Copy timetamp (4 bytes)
+    memcpy(&dst[byte_idx], &src->timetamp, sizeof(src->timetamp));
+    byte_idx += sizeof(src->timetamp);
 
     // Copy type (1 byte)
     dst[byte_idx++] = src->type;
@@ -164,7 +164,7 @@ static inline void pack_powermeter_data(const tbs_device_powermeter_t *src, u8 *
 
     #undef WRITE_BITS
 }
-static inline void unpack_powermeter_data(tbs_device_powermeter_t *dst, const u8 *src) {
+static inline void tbs_unpack_powermeter_data(tbs_device_powermeter_t *dst, const u8 *src) {
     u32 bitpos = 0;
     u32 byte_idx = 0;
 
@@ -172,9 +172,9 @@ static inline void unpack_powermeter_data(tbs_device_powermeter_t *dst, const u8
     memcpy(dst->mac, &src[byte_idx], sizeof(dst->mac));
     byte_idx += sizeof(dst->mac);
 
-    // Read timestamp (4 bytes)
-    memcpy(&dst->timestamp, &src[byte_idx], sizeof(dst->timestamp));
-    byte_idx += sizeof(dst->timestamp);
+    // Read timetamp (4 bytes)
+    memcpy(&dst->timetamp, &src[byte_idx], sizeof(dst->timetamp));
+    byte_idx += sizeof(dst->timetamp);
 
     // Read type (1 byte)
     dst->type = src[byte_idx++];
@@ -220,7 +220,7 @@ typedef struct {
 	u8 *data;
 #else
 	//data of dev
-	u8 data[35];
+	u8 data[POWER_METER_STRUCT_BYTESIZE+1];
 #endif
 }__attribute__((packed)) fl_nodeinnetwork_t;
 
