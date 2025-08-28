@@ -15,14 +15,14 @@ typedef enum{
 	TBS_COUNTER = 0x00,
 	TBS_POWERMETER=0x01
 }tbs_dev_type_e;
-#define tbs_device_gettype(x)			(x[sizeof(u32)+6]) //mac[6] + timetamp (u32)
 #ifndef MASTER_CORE
-#define COUNTER_DEVICE
+//#define COUNTER_DEVICE
 #ifndef COUNTER_DEVICE
 #define POWER_METER_DEVICE
 #endif
 #endif
 void tbs_counter_printf(void* _p);
+void tbs_power_meter_printf(void* _p);
 void TBS_Device_Init(void);
 void TBS_Device_Run(void);
 

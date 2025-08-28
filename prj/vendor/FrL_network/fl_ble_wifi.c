@@ -46,7 +46,7 @@ typedef enum {
 	GF_CMD_PAIRING_RESPONSE = 0x05,
 	GF_CMD_TIMESTAMP_REQUEST = 0x08,
 	GF_CMD_TIMESTAMP_RESPONSE = 0x08,
-}__attribute__((packed)) fl_wifi_cmd_e;
+}fl_wifi_cmd_e;
 
 typedef void (*RspFunc)(u8*);
 typedef struct {
@@ -83,7 +83,6 @@ void GETLIST_REQUEST(u8* _pdata, RspFunc rspfnc);
 void GETLIST_RESPONSE(u8* _pdata);
 void PAIRING_REQUEST(u8* _pdata, RspFunc rspfnc);
 void PAIRING_RESPONSE(u8* _pdata){};
-
 void TIMETAMP_REQUEST(u8* _pdata, RspFunc rspfnc);
 void TIMETAMP_RESPONSE(u8* _pdata);
 
@@ -164,24 +163,21 @@ static void _getnsend_data_report(u8 var, u8 rspcmd) {
 	 */
 	else {
 		if (G_NODE_LIST.sla_info[var].dev_type == TBS_POWERMETER) {
-			//					tbs_device_powermeter_t meter = {
-			//							.mac = { 0xDE, 0xAD, 0xBE, 0xEF, 0x00, 0x01 }, .timestamp = 12345678, .frequency = 100, .voltage = 300, .current1 = 512,
-			//							.current2 = 513, .current3 = 514, .power1 = 1000, .power2 = 1001, .power3 = 1002, .energy1 = 123456, .energy2 = 654321,
-			//							.energy3 = 111111,
-			//							};
-			//					u8 buffer[POWER_METER_SIZE];
-			//					memset(buffer,0,POWER_METER_SIZE);
-			tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) G_NODE_LIST.sla_info[var].data;
-			memcpy(pwmeter_data->mac,G_NODE_LIST.sla_info[var].mac,6);
-			//pack_powermeter_data(pwmeter_data,buffer);
+//			tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) G_NODE_LIST.sla_info[var].data;
+//			memcpy(pwmeter_data->mac,G_NODE_LIST.sla_info[var].mac,6);
 			wfdata.cmd = rspcmd;
-			wfdata.len_data = POWER_METER_PACK_SIZE - SIZEU8(pwmeter_data->mac) - SIZEU8(pwmeter_data->timestamp);
-			//memcpy(wfdata.data,(u8*)&pwmeter_data,wfdata.len_data);
-			pack_powermeter_data(pwmeter_data,wfdata.data);
+			wfdata.len_data = POWER_METER_BITSIZE-1;
+			memcpy(wfdata.data,G_NODE_LIST.sla_info[var].data,wfdata.len_data);
+			//tbs_pack_powermeter_data(pwmeter_data,wfdata.data);
 			wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
 			u8 len_payload = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
 			memcpy(payload,(u8*) &wfdata,len_payload);
+			//For testing parsing
+			tbs_device_powermeter_t received;
+			tbs_unpack_powermeter_data(&received, wfdata.data);
+			tbs_power_meter_printf((void*)&received);
 			P_PRINTFHEX_A(MCU,payload,len_payload,"PW Meter struct(%d):",len_payload);
+			/*Send to WIFI*/
 			fl_ble_send_wifi(payload,len_payload);
 		}
 	}
@@ -189,13 +185,13 @@ static void _getnsend_data_report(u8 var, u8 rspcmd) {
 void REPORT_RESPONSE(u8* _pdata) {
 	extern fl_slaves_list_t G_NODE_LIST;
 	fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[1];
-//	LOGA(MCU,"LEN:0x%02X\r\n",data->len_data);
-//	LOGA(MCU,"cmdID:0x%02X\r\n",data->cmd);
-//	LOGA(MCU,"CRC8:0x%02X\r\n",data->crc8);
-//	P_PRINTFHEX_A(MCU,data->data,data->len_data,"Data:");
+	LOGA(MCU,"LEN:0x%02X\r\n",data->len_data);
+	LOGA(MCU,"cmdID:0x%02X\r\n",data->cmd);
+	LOGA(MCU,"CRC8:0x%02X\r\n",data->crc8);
+	P_PRINTFHEX_A(MCU,data->data,data->len_data,"Data:");
 	fl_wf_report_u report_fmt;
 	memcpy(report_fmt.bytes,data->data,data->len_data);
-//	fl_datawifi2ble_t wfdata;
+
 	if (IS_MAC_INVALID(report_fmt.frame.mac,0xFF)) {
 		LOG_P(MCU,"Send all nodelist!!!\r\n");
 		//todo : create array data of the all nodelist
@@ -206,8 +202,15 @@ void REPORT_RESPONSE(u8* _pdata) {
 	} else {
 		//todo: send data of the special nodes
 		u8 slave_idx = fl_master_SlaveID_get(report_fmt.frame.mac);
-		if (slave_idx != 0xFF) {
+		if (slave_idx != 0xFF && !memcmp(report_fmt.frame.timetamp_begin,report_fmt.frame.timetamp_end,4) &&
+				MAKE_U32(report_fmt.frame.timetamp_begin[0],report_fmt.frame.timetamp_begin[1],report_fmt.frame.timetamp_begin[2],report_fmt.frame.timetamp_begin[3]) == 0) {
 			_getnsend_data_report(slave_idx,G_WIFI_CON[_wf_CMD_find(data->cmd)].rsp.cmd);
+		}
+		//todo: get history from the flash
+		else
+		{
+//			P_PRINTFHEX_A(MCU,report_fmt.frame.mac,6,"MAC:");
+//			P_PRINTFHEX_A(MCU,G_NODE_LIST.sla_info[1].mac,6,"MAC2:");
 		}
 	}
 }
@@ -239,6 +242,8 @@ void GETLIST_RESPONSE(u8* _pdata) {
 		memcpy(&wfdata.data[++payload_len],G_NODE_LIST.sla_info[var].mac,SIZEU8(G_NODE_LIST.sla_info[var].mac));
 		payload_len+=SIZEU8(G_NODE_LIST.sla_info[var].mac);
 		wfdata.data[payload_len] =  G_NODE_LIST.sla_info[var].dev_type;
+		payload_len++;
+		wfdata.data[payload_len] =  G_NODE_LIST.sla_info[var].active;
 		payload_len++;
 		wfdata.len_data = payload_len;
 		wfdata.crc8 = fl_crc8(wfdata.data,payload_len);
@@ -287,7 +292,11 @@ void TIMETAMP_REQUEST(u8* _pdata, RspFunc rspfnc) {
 		fl_rtc_timestamp_to_datetime(timetamp_wifi_set,&cur_dt);
 		LOGA(MCU,"TIME SET:%02d/%02d/%02d - %02d:%02d:%02d\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second);
 		fl_rtc_set(timetamp_wifi_set);
-		rspfnc(_pdata);
+		/*todo: send heartbeat to network so synchronize timetamp*/
+		extern int fl_send_heartbeat(void);
+		fl_send_heartbeat();
+		//RSP only use to req timetamp from master
+		//rspfnc(_pdata);
 	}
 
 }
@@ -306,14 +315,36 @@ void TIMETAMP_RESPONSE(u8* _pdata) {
 /***                            Functions callback                           **/
 /******************************************************************************/
 /******************************************************************************/
-
 void fl_ble_wifi_proc(u8* _pdata) {
-	fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[1];
-	for (u8 i = 0; i < GWIFI_SIZE; i++) {
-		if (data->cmd == G_WIFI_CON[i].req.cmd) {
-			G_WIFI_CON[i].req.ReqFunc(_pdata,G_WIFI_CON[i].rsp.Rspfnc);
+	u8 len_cmd = 0;
+	u8 cmd_in_data = 1;
+	for (; cmd_in_data < _pdata[0]; cmd_in_data += len_cmd) {
+		fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[cmd_in_data];
+		LOGA(DRV,"WIFI|cmd_in_data:%d,len_cmd:%d\r\n",cmd_in_data,len_cmd);
+		for (u8 i = 0; i < GWIFI_SIZE; i++) {
+			if (data->cmd == G_WIFI_CON[i].req.cmd) {
+				G_WIFI_CON[i].req.ReqFunc(&_pdata[cmd_in_data - 1],G_WIFI_CON[i].rsp.Rspfnc);
+				LOGA(DRV,"WIFI|CMDID:%d,CON_cmdid:%d\r\n",data->cmd,(u8 )G_WIFI_CON[i].req.cmd);
+				break;
+			}
 		}
+		len_cmd = data->len_data + SIZEU8(data->cmd) + SIZEU8(data->crc8) + SIZEU8(data->len_data);
 	}
+}
+
+void fl_ble2wifi_EVENT_SEND(u8* _slave_mac){
+	fl_datawifi2ble_t wfdata;
+	wfdata.cmd = GF_CMD_REPORT_REQUEST;
+	memset(wfdata.data,0,SIZEU8(wfdata.data));
+	memcpy(wfdata.data,_slave_mac,6);
+	wfdata.len_data = 6 + 4 + 4; // mac + timetamp_begin + timetamp_end
+	wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
+	LOGA(MCU,"Ext-Call:0x%02X%02X%02X%02X%02X%02X\r\n",wfdata.data[0],wfdata.data[1],wfdata.data[2],wfdata.data[3],wfdata.data[4],wfdata.data[5]);
+	u8 cmd_data[30];
+	memset(cmd_data,0,SIZEU8(cmd_data));
+	cmd_data[0] = wfdata.len_data + SIZEU8(wfdata.cmd)+SIZEU8(wfdata.crc8)+SIZEU8(wfdata.len_data);
+	memcpy(&cmd_data[1],(u8*)&wfdata,cmd_data[0]);
+	REPORT_RESPONSE(cmd_data);
 }
 
 #endif

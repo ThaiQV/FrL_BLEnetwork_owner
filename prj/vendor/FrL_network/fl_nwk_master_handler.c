@@ -21,6 +21,7 @@
 #include "fl_adv_repeat.h"
 #include "fl_nwk_database.h"
 #include "fl_nwk_protocol.h"
+#include "fl_ble_wifi.h"
 
 #ifdef MASTER_CORE
 /******************************************************************************/
@@ -444,6 +445,36 @@ int _nwk_master_backup(void) {
  * @return	  	:none
  *
  ***************************************************/
+void _master_updateDB_for_Node(u8 node_indx ,fl_data_frame_u *packet)  {
+	G_NODE_LIST.sla_info[node_indx].active = true;
+	G_NODE_LIST.sla_info[node_indx].timelife = (clock_time() - G_NODE_LIST.sla_info[node_indx].timelife);
+	//create MAC + TIMETAMP + DEV_TYPE
+	u8 size_mac = SIZEU8(G_NODE_LIST.sla_info[node_indx].mac);
+	memcpy(&G_NODE_LIST.sla_info[node_indx].data[0],G_NODE_LIST.sla_info[node_indx].mac,size_mac);
+	/*Timetamp*/
+	fl_timetamp_withstep_t timetampStep = fl_rtc_getWithMilliStep();
+	//	u32 timetamp = fl_rtc_get();
+	G_NODE_LIST.sla_info[node_indx].data[size_mac] = U32_BYTE0(timetampStep.timetamp);
+	G_NODE_LIST.sla_info[node_indx].data[size_mac + 1] = U32_BYTE1(timetampStep.timetamp);
+	G_NODE_LIST.sla_info[node_indx].data[size_mac + 2] = U32_BYTE2(timetampStep.timetamp);
+	G_NODE_LIST.sla_info[node_indx].data[size_mac + 3] = U32_BYTE3(timetampStep.timetamp);
+	/*Dev type*/
+	G_NODE_LIST.sla_info[node_indx].data[size_mac + 4] = G_NODE_LIST.sla_info[node_indx].dev_type;
+	/*Data*/
+	P_PRINTFHEX_A(INF,packet->frame.payload,SIZEU8(packet->frame.payload),"PACK:");
+	if (G_NODE_LIST.sla_info[node_indx].dev_type == TBS_COUNTER) {
+		memcpy(&G_NODE_LIST.sla_info[node_indx].data[size_mac + 5],&packet->frame.payload[size_mac + 5],SIZEU8(packet->frame.payload) - (size_mac + 5));
+		tbs_counter_printf((void*) G_NODE_LIST.sla_info[node_indx].data);
+	}
+	if (G_NODE_LIST.sla_info[node_indx].dev_type == TBS_POWERMETER) {
+		memcpy(&G_NODE_LIST.sla_info[node_indx].data[size_mac + 5],&packet->frame.payload[0],SIZEU8(packet->frame.payload));
+		//for test
+		tbs_device_powermeter_t received;
+		tbs_unpack_powermeter_data(&received,G_NODE_LIST.sla_info[node_indx].data);
+		tbs_power_meter_printf((void*) &received);
+	}
+}
+
 int fl_master_ProccesRSP_cbk(void) {
 	fl_pack_t data_in_queue;
 	if (FL_QUEUE_GET(&G_HANDLE_MASTER_CONTAINER,&data_in_queue)) {
@@ -468,7 +499,6 @@ int fl_master_ProccesRSP_cbk(void) {
 				 **/
 			}
 			break;
-
 			case NWK_HDR_55: {
 				/*****************************************************************/
 				/* | HDR | Timetamp | Mill_time | SlaveID | payload | crc8 | Ep | */
@@ -478,14 +508,17 @@ int fl_master_ProccesRSP_cbk(void) {
 				u8 slave_id = packet.frame.slaveID.id_u8;
 				u8 node_indx = fl_master_SlaveID_find(slave_id);
 				if (node_indx != -1) {
-					G_NODE_LIST.sla_info[node_indx].active = true;
-					G_NODE_LIST.sla_info[node_indx].timelife = (clock_time() - G_NODE_LIST.sla_info[node_indx].timelife);
-					u32 cnt_inpack = MAKE_U32(packet.frame.payload[3],packet.frame.payload[2],packet.frame.payload[1],packet.frame.payload[0]);
-					LOGA(INF,"CMD_55(%d)0x%02X%02X%02X%02X%02X%02X(%d):%d\r\n",slave_id,G_NODE_LIST.sla_info[node_indx].mac[0],
-							G_NODE_LIST.sla_info[node_indx].mac[1],G_NODE_LIST.sla_info[node_indx].mac[2],G_NODE_LIST.sla_info[node_indx].mac[3],
-							G_NODE_LIST.sla_info[node_indx].mac[4],G_NODE_LIST.sla_info[node_indx].mac[5],packet.frame.endpoint.repeat_cnt,cnt_inpack);
-					//Send assignment to slave
+//					G_NODE_LIST.sla_info[node_indx].active = true;
+//					G_NODE_LIST.sla_info[node_indx].timelife = (clock_time() - G_NODE_LIST.sla_info[node_indx].timelife);
+//					u32 cnt_inpack = MAKE_U32(packet.frame.payload[3],packet.frame.payload[2],packet.frame.payload[1],packet.frame.payload[0]);
+//					LOGA(INF,"CMD_55(%d)0x%02X%02X%02X%02X%02X%02X(%d):%d\r\n",slave_id,G_NODE_LIST.sla_info[node_indx].mac[0],
+//							G_NODE_LIST.sla_info[node_indx].mac[1],G_NODE_LIST.sla_info[node_indx].mac[2],G_NODE_LIST.sla_info[node_indx].mac[3],
+//							G_NODE_LIST.sla_info[node_indx].mac[4],G_NODE_LIST.sla_info[node_indx].mac[5],packet.frame.endpoint.repeat_cnt,cnt_inpack);
+					_master_updateDB_for_Node(node_indx,&packet);
+					//Send rsp to slave
 					fl_adv_sendFIFO_add(fl_master_packet_RSP_55_build(slave_id));
+					//send to WIFI
+					fl_ble2wifi_EVENT_SEND(G_NODE_LIST.sla_info[node_indx].mac);
 				} else {
 					ERR(INF,"ID not foud:%02X\r\n",slave_id);
 				}
@@ -501,17 +534,7 @@ int fl_master_ProccesRSP_cbk(void) {
 					u8 slave_id = packet.frame.slaveID.id_u8;
 					node_indx = fl_master_SlaveID_find(slave_id);
 					if (node_indx != -1) {
-						G_NODE_LIST.sla_info[node_indx].active = true;
-						G_NODE_LIST.sla_info[node_indx].timelife = (clock_time() - G_NODE_LIST.sla_info[node_indx].timelife);
-						memcpy(G_NODE_LIST.sla_info[node_indx].data,packet.frame.payload,SIZEU8(packet.frame.payload));
-//						G_NODE_LIST.sla_info[node_indx].dev_type = (tbs_dev_type_e)tbs_device_gettype(G_NODE_LIST.sla_info[node_indx].data);
-						P_PRINTFHEX_A(INF,G_NODE_LIST.sla_info[node_indx].data,SIZEU8(G_NODE_LIST.sla_info[node_indx].data),
-								"INFO(%d)Devtype(%d)(%d ms)(%d):",slave_id,G_NODE_LIST.sla_info[node_indx].dev_type,
-								G_NODE_LIST.sla_info[node_indx].timelife / SYSTEM_TIMER_TICK_1MS,packet.frame.endpoint.repeat_cnt);
-						//For testing
-						if(G_NODE_LIST.sla_info[node_indx].dev_type==TBS_COUNTER){
-							tbs_counter_printf((void*)G_NODE_LIST.sla_info[node_indx].data);
-						}
+						_master_updateDB_for_Node(node_indx,&packet);
 					} else {
 						ERR(INF,"ID not foud:%02X\r\n",slave_id);
 					}

@@ -73,6 +73,9 @@ fl_nodeinnetwork_t G_INFORMATION ;
 #ifdef COUNTER_DEVICE
 extern tbs_device_counter_t G_COUNTER_DEV ;
 #endif
+#ifdef POWER_METER_DEVICE
+tbs_device_powermeter_t G_POWER_METER;
+#endif
 //flag debug of the network
 volatile u8 NWK_DEBUG_STT = 1; // it will be assigned into end-point byte (dbg :1bit)
 //volatile u8 NWK_REPEAT_MODE = 1; // slave repeat?
@@ -143,6 +146,7 @@ void fl_nwk_slave_init(void) {
 #endif
 #ifdef POWER_METER_DEVICE
 	G_INFORMATION.dev_type = TBS_POWERMETER;
+	G_INFORMATION.data =(u8*)&G_POWER_METER;
 #endif
 	//todo: TBS Device initialization
 	TBS_Device_Init();
@@ -363,26 +367,26 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 				master_timetamp = MAKE_U32(packet.frame.timetamp[3],packet.frame.timetamp[2],packet.frame.timetamp[1],packet.frame.timetamp[0]);
 				datetime_t cur_dt;
 				fl_rtc_timestamp_to_datetime(master_timetamp,&cur_dt);
-
-//				fl_timetamp_withstep_t millstep = fl_rtc_getWithMilliStep();
-//				u8 test_payload[SIZEU8(packet.frame.payload)];
-//				memset(test_payload,0,sizeof(test_payload));
-//				sprintf((char*) test_payload,"%02d:%02d:%02d-%03d/%03d",cur_dt.hour,cur_dt.minute,cur_dt.second,millstep.milstep, packet.frame.milltamp);
-				u8 _payload[SIZEU8(packet.frame.payload)];
+				u8 _payload[POWER_METER_STRUCT_BYTESIZE];
 				memset(_payload,0xFF,SIZEU8(_payload));
 				//u8 len_payload=0;
 				LOGA(APP,"(%d)SlaveID:%X | inPack:%X\r\n",memid_idx,G_INFORMATION.slaveID.id_u8,packet.frame.payload[memid_idx]);
 				packet.frame.endpoint.dbg = NWK_DEBUG_STT;
 				if (memid_idx != -1) {
 #ifdef COUNTER_DEVICE
-					//len_payload = SIZEU8(G_COUNTER_DEV.bytes) - SIZEU8(G_COUNTER_DEV.data.mac) - SIZEU8(G_COUNTER_DEV.data.timetamp);
 					tbs_device_counter_t *counter_data = (tbs_device_counter_t*)G_INFORMATION.data;
 					memcpy(_payload,counter_data->bytes,SIZEU8(counter_data->bytes));
 					tbs_counter_printf((void*)_payload);
 #endif
+#ifdef POWER_METER_DEVICE
+					tbs_power_meter_printf((void*)G_INFORMATION.data);
+					tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*)G_INFORMATION.data;
+					tbs_pack_powermeter_data(pwmeter_data,_payload);
+#endif
+					u8 indx_data = SIZEU8(pwmeter_data->type) +   SIZEU8(pwmeter_data->mac) +  SIZEU8(pwmeter_data->timetamp);
 					packet.frame.slaveID.id_u8 = G_INFORMATION.slaveID.id_u8;
 					memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
-					memcpy(&packet.frame.payload,_payload,SIZEU8(packet.frame.payload));
+					memcpy(&packet.frame.payload,&_payload[indx_data],SIZEU8(packet.frame.payload));
 					//CRC
 					packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
 				} else {

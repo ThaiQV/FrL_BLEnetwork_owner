@@ -136,12 +136,13 @@ s8 RegisterPOLLING(fl_exIO_t _io) {
 /////////////////////////////////////blc_register_hci_handler for spp////////////////////////////
 static void fl_serial_AddLenIn1st(u8 *parr, u8 _size) {
 	u8 arr_bkp[UART_DATA_LEN];
-	if (_size > UART_DATA_LEN)
-	ERR(DRV,"Over Data!!!\r\n");
+	if (_size > UART_DATA_LEN) {
+		ERR(DRV,"Over Data!!!\r\n");
+		_size = UART_DATA_LEN;
+	}
 	memset(arr_bkp,0,sizeof(arr_bkp));
 	arr_bkp[0] = _size;
 	memcpy(arr_bkp + 1,parr,_size);
-
 	memset(parr,0,_size + 1);
 	memcpy(parr,arr_bkp,_size + 1);
 }
@@ -159,7 +160,7 @@ static int rx_from_uart_cb(void) //UART data send to Master,we will handler the 
 //Add WIFI <-> BLE process cmd
 	fl_ble_wifi_proc(p);
 //	fl_serial_send(p,(unsigned int) p[0]+1);
-	u8 data_verify[UART_DATA_LEN];
+	u8 data_verify[FL_RXFIFO_SIZE];
 	memset(data_verify,0,sizeof(data_verify));
 	memcpy(data_verify,p + 1,p[0]);
 	PLOG_Parser_Cmd(data_verify);
@@ -208,7 +209,7 @@ int fl_serial_send(u8* _data, u8 _len) {
 void fl_input_serial_rec(void) {
 	u8* w = fl_rx_fifo.p + (fl_rx_fifo.wptr & (fl_rx_fifo.num - 1)) * fl_rx_fifo.size;
 	u32 data_len = uart_get_dma_rev_data_len(G_INPUT_EXT.serial.uart_num,G_INPUT_EXT.serial.dma_rx_chn);
-//	LOGA(DRV,"DMA Len:%d\r\n",data_len);
+	LOGA(DRV,"DMA Len:%d\r\n",data_len);
 	fl_serial_AddLenIn1st(w,(u8) data_len);
 	uart_clr_irq_status(G_INPUT_EXT.serial.uart_num,UART_CLR_RX);
 	if (w[0] != 0) {
