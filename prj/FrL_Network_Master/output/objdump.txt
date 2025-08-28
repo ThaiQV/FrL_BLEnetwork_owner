@@ -18608,7 +18608,7 @@ Disassembly of section .text:
 2000f474:	00150593          	addi	a1,a0,1
 2000f478:	87a6                	c.mv	a5,s1
 2000f47a:	8722                	c.mv	a4,s0
-2000f47c:	13e00693          	li	a3,318
+2000f47c:	14200693          	li	a3,322
 2000f480:	b8cb0613          	addi	a2,s6,-1140 # 20017b8c <__FUNCTION__.11027>
 2000f484:	2a8b8513          	addi	a0,s7,680 # 200182a8 <plog_cmd+0xf0>
 2000f488:	480040ef          	jal	ra,20013908 <printf>
@@ -18639,7 +18639,7 @@ Disassembly of section .text:
 2000f4e0:	00150593          	addi	a1,a0,1
 2000f4e4:	001d4703          	lbu	a4,1(s10)
 2000f4e8:	009007b3          	add	a5,zero,s1
-2000f4ec:	14200693          	li	a3,322
+2000f4ec:	14600693          	li	a3,326
 2000f4f0:	b8cb0613          	addi	a2,s6,-1140
 2000f4f4:	2dcc0513          	addi	a0,s8,732 # 200182dc <plog_cmd+0x124>
 2000f4f8:	410040ef          	jal	ra,20013908 <printf>
@@ -19501,8 +19501,8 @@ Disassembly of section .text:
 2000ff54:	0745                	c.addi	a4,17
 2000ff56:	09b10d13          	addi	s10,sp,155
 2000ff5a:	00ea05b3          	add	a1,s4,a4
-2000ff5e:	02200613          	li	a2,34
-2000ff62:	02200713          	li	a4,34
+2000ff5e:	02100613          	li	a2,33
+2000ff62:	02100713          	li	a4,33
 2000ff66:	856a                	c.mv	a0,s10
 2000ff68:	09310ca3          	sb	s3,153(sp)
 2000ff6c:	08e10c23          	sb	a4,152(sp)

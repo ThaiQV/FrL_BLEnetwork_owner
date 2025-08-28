@@ -166,7 +166,7 @@ static void _getnsend_data_report(u8 var, u8 rspcmd) {
 //			tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) G_NODE_LIST.sla_info[var].data;
 //			memcpy(pwmeter_data->mac,G_NODE_LIST.sla_info[var].mac,6);
 			wfdata.cmd = rspcmd;
-			wfdata.len_data = POWER_METER_BITSIZE;
+			wfdata.len_data = POWER_METER_BITSIZE-1;
 			memcpy(wfdata.data,G_NODE_LIST.sla_info[var].data,wfdata.len_data);
 			//tbs_pack_powermeter_data(pwmeter_data,wfdata.data);
 			wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
@@ -290,7 +290,11 @@ void TIMETAMP_REQUEST(u8* _pdata, RspFunc rspfnc) {
 		fl_rtc_timestamp_to_datetime(timetamp_wifi_set,&cur_dt);
 		LOGA(MCU,"TIME SET:%02d/%02d/%02d - %02d:%02d:%02d\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second);
 		fl_rtc_set(timetamp_wifi_set);
+		/*todo: send heartbeat to network so synchronize timetamp*/
+		//fl_api_slave_req(HDR_HE)
+		//RSP only use to req timetamp from master
 		//rspfnc(_pdata);
+
 	}
 
 }
