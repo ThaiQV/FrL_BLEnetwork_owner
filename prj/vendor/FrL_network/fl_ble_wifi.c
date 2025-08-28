@@ -291,10 +291,10 @@ void TIMETAMP_REQUEST(u8* _pdata, RspFunc rspfnc) {
 		LOGA(MCU,"TIME SET:%02d/%02d/%02d - %02d:%02d:%02d\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second);
 		fl_rtc_set(timetamp_wifi_set);
 		/*todo: send heartbeat to network so synchronize timetamp*/
-		//fl_api_slave_req(HDR_HE)
+		extern int fl_send_heartbeat(void);
+		fl_send_heartbeat();
 		//RSP only use to req timetamp from master
 		//rspfnc(_pdata);
-
 	}
 
 }
