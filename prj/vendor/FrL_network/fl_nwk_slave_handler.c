@@ -372,6 +372,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 				//u8 len_payload=0;
 				LOGA(APP,"(%d)SlaveID:%X | inPack:%X\r\n",memid_idx,G_INFORMATION.slaveID.id_u8,packet.frame.payload[memid_idx]);
 				packet.frame.endpoint.dbg = NWK_DEBUG_STT;
+				u8 indx_data = 0;
 				if (memid_idx != -1) {
 #ifdef COUNTER_DEVICE
 					tbs_device_counter_t *counter_data = (tbs_device_counter_t*)G_INFORMATION.data;
@@ -382,8 +383,9 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 					tbs_power_meter_printf((void*)G_INFORMATION.data);
 					tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*)G_INFORMATION.data;
 					tbs_pack_powermeter_data(pwmeter_data,_payload);
+					indx_data = SIZEU8(pwmeter_data->type) +   SIZEU8(pwmeter_data->mac) +  SIZEU8(pwmeter_data->timetamp);
 #endif
-					u8 indx_data = SIZEU8(pwmeter_data->type) +   SIZEU8(pwmeter_data->mac) +  SIZEU8(pwmeter_data->timetamp);
+
 					packet.frame.slaveID.id_u8 = G_INFORMATION.slaveID.id_u8;
 					memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
 					memcpy(&packet.frame.payload,&_payload[indx_data],SIZEU8(packet.frame.payload));

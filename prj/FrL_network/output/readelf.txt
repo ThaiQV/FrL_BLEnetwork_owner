@@ -10,7 +10,7 @@ ELF Header:
   Version:                           0x1
   Entry point address:               0x20000000
   Start of program headers:          52 (bytes into file)
-  Start of section headers:          374764 (bytes into file)
+  Start of section headers:          374812 (bytes into file)
   Flags:                             0x3, RVC, single-float ABI
   Size of this header:               52 (bytes)
   Size of program headers:           32 (bytes)
@@ -35,17 +35,17 @@ Section Headers:
   [11] .bss              NOBITS          000800d4 0140a6 00206c 00  WA  0   0  4
   [12] .debug_info       PROGBITS        00000000 0140a6 01948f 00      0   0  1
   [13] .debug_abbrev     PROGBITS        00000000 02d535 000e0c 00      0   0  1
-  [14] .debug_loc        PROGBITS        00000000 02e341 00cbed 00      0   0  1
-  [15] .debug_aranges    PROGBITS        00000000 03af30 000728 00      0   0  8
-  [16] .debug_ranges     PROGBITS        00000000 03b658 0042f8 00      0   0  8
-  [17] .debug_line       PROGBITS        00000000 03f950 00be0d 00      0   0  1
-  [18] .debug_str        PROGBITS        00000000 04b75d 00972d 01  MS  0   0  1
-  [19] .comment          PROGBITS        00000000 054e8a 000037 01  MS  0   0  1
-  [20] .riscv.attributes RISCV_ATTRIBUTE 00000000 054ec1 00003b 00      0   0  1
-  [21] .debug_frame      PROGBITS        00000000 054efc 001ff8 00      0   0  4
-  [22] .symtab           SYMTAB          00000000 056ef4 0023b0 10     23 432  4
-  [23] .strtab           STRTAB          00000000 0592a4 002443 00      0   0  1
-  [24] .shstrtab         STRTAB          00000000 05b6e7 000103 00      0   0  1
+  [14] .debug_loc        PROGBITS        00000000 02e341 00cc1d 00      0   0  1
+  [15] .debug_aranges    PROGBITS        00000000 03af60 000728 00      0   0  8
+  [16] .debug_ranges     PROGBITS        00000000 03b688 0042f8 00      0   0  8
+  [17] .debug_line       PROGBITS        00000000 03f980 00be0d 00      0   0  1
+  [18] .debug_str        PROGBITS        00000000 04b78d 00972d 01  MS  0   0  1
+  [19] .comment          PROGBITS        00000000 054eba 000037 01  MS  0   0  1
+  [20] .riscv.attributes RISCV_ATTRIBUTE 00000000 054ef1 00003b 00      0   0  1
+  [21] .debug_frame      PROGBITS        00000000 054f2c 001ff8 00      0   0  4
+  [22] .symtab           SYMTAB          00000000 056f24 0023b0 10     23 432  4
+  [23] .strtab           STRTAB          00000000 0592d4 002443 00      0   0  1
+  [24] .shstrtab         STRTAB          00000000 05b717 000103 00      0   0  1
 Key to Flags:
   W (write), A (alloc), X (execute), M (merge), S (strings), I (info),
   L (link order), O (extra OS processing required), G (group), T (TLS),
@@ -62,7 +62,7 @@ Program Headers:
   LOAD           0x003300 0x00001300 0x20001400 0x05102 0x05102 R E 0x1000
   LOAD           0x008508 0x20006508 0x20006508 0x0aff0 0x0aff0 R E 0x1000
   LOAD           0x014000 0x00080000 0x200114f8 0x000a6 0x02140 RW  0x1000
-  RISCV_ATTRIBUT 0x054ec1 0x00000000 0x00000000 0x0003b 0x00000 R   0x1
+  RISCV_ATTRIBUT 0x054ef1 0x00000000 0x00000000 0x0003b 0x00000 R   0x1
 
  Section to Segment mapping:
   Segment Sections...
