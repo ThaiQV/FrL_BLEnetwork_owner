@@ -29,6 +29,7 @@ SUBDIRS := \
 3rd-party/freertos-V5 \
 3rd-party/freertos-V5/portable/GCC/RISC-V \
 3rd-party/freertos-V5/portable/MemMang \
+Freelux_libs/counter_libs \
 Freelux_libs \
 application/app \
 application/audio \
@@ -41,7 +42,7 @@ common/usb_dbg \
 drivers/B91 \
 drivers/B91/ext_driver \
 drivers/B91/flash \
-vendor/FrL_Network/Peri_libs \
-vendor/FrL_Network \
+vendor/FrL_network/Peri_libs \
+vendor/FrL_network \
 vendor/common \
 

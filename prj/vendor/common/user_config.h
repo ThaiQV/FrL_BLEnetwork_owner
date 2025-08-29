@@ -27,6 +27,8 @@
 	#include "../B91_ble_sample/app_config.h"
 #elif (__PROJECT_B91_FREELUX_NWK__)
 #include "../FrL_Network/app_config.h"
+#elif (__PROJECT_B91_DFU__)
+#include "../B91_dfu/app_config.h"
 #elif (__PROJECT_B91_MODULE__ )
 	#include "../B91_module/app_config.h"
 #elif (__PROJECT_B91_FEATURE_TEST__)

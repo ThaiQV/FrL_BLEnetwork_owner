@@ -26,6 +26,7 @@ RM := rm -rf
 -include 3rd-party/freertos-V5/subdir.mk
 -include 3rd-party/freertos-V5/portable/GCC/RISC-V/subdir.mk
 -include 3rd-party/freertos-V5/portable/MemMang/subdir.mk
+-include Freelux_libs/counter_libs/subdir.mk
 -include Freelux_libs/subdir.mk
 -include application/app/subdir.mk
 -include application/audio/subdir.mk
@@ -38,8 +39,8 @@ RM := rm -rf
 -include drivers/B91/subdir.mk
 -include drivers/B91/ext_driver/subdir.mk
 -include drivers/B91/flash/subdir.mk
--include vendor/FrL_Network/Peri_libs/subdir.mk
--include vendor/FrL_Network/subdir.mk
+-include vendor/FrL_network/Peri_libs/subdir.mk
+-include vendor/FrL_network/subdir.mk
 -include vendor/common/subdir.mk
 -include objects.mk
 
@@ -88,7 +89,7 @@ all: FrL_Network_Master.elf secondary-outputs
 FrL_Network_Master.elf: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: Andes C Linker'
-	$(CROSS_COMPILE)gcc -O2 -nostartfiles -static -L"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/proj_lib" -mcmodel=medium -flto -g3 -mcpu=d25f -ffunction-sections -fdata-sections -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -T"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/boot.link" -Wl,--gc-sections -o "FrL_Network_Master.elf" $(OBJS) $(USER_OBJS) $(LIBS)
+	$(CROSS_COMPILE)gcc -O2 -nostartfiles -static -L"/cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/proj_lib" -mcmodel=medium -flto -g3 -mcpu=d25f -ffunction-sections -fdata-sections -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -T"/cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/boot.link" -Wl,--gc-sections -o "FrL_Network_Master.elf" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 	$(MAKE) --no-print-directory post-build
@@ -133,7 +134,7 @@ clean:
 	-@echo ' '
 
 post-build:
-	-"D:\Job\Freelux\Working\TBS_Monitoring\FrL_BLEnetwork_owner\prj/tl_check_fw.bat"   FrL_Network_Master
+	-"E:\All_projects\TELINK\TBS_Monitoring\FrL_BLEnetwork_owner\prj/tl_check_fw.bat"   FrL_Network_Master
 	-@echo ' '
 
 secondary-outputs: $(SYMBOL_OUTPUTS) $(READELF_OUTPUTS) $(OBJDUMP_OUTPUTS) $(SIZE_OUTPUTS)

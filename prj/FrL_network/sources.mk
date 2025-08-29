@@ -29,6 +29,7 @@ SUBDIRS := \
 3rd-party/freertos-V5 \
 3rd-party/freertos-V5/portable/GCC/RISC-V \
 3rd-party/freertos-V5/portable/MemMang \
+Freelux_libs/counter_libs \
 Freelux_libs \
 application/app \
 application/audio \

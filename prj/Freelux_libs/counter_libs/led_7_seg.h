@@ -9,7 +9,7 @@
 #define ET6226M_H
 
 #include <stdint.h>
-#include <stdbool.h>
+#include "types.h"
 
 #ifdef __cplusplus
 extern "C" {

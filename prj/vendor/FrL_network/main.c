@@ -27,6 +27,8 @@
 #include "app.h"
 #include "fl_input_ext.h"
 
+#include "product_counter.h"
+
 #if(FREERTOS_ENABLE)
 #include <FreeRTOS.h>
 #include <task.h>
@@ -189,6 +191,10 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 		user_init_deepRetn();
 	} else { //MCU power_on or wake_up from deepSleep mode
 		user_init_normal();
+
+		/* Test code */
+		product_counter_init();
+
 #if (FREERTOS_ENABLE)
 		extern void blc_ll_set_freertos_en(u8 en);
 		blc_ll_set_freertos_en(1);

@@ -9,7 +9,7 @@
 #define LCD16X2_H
 
 #include <stdint.h>
-#include <stdbool.h>
+#include "types.h"
 
 #ifdef __cplusplus
 extern "C" {

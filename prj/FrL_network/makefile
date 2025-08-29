@@ -26,6 +26,7 @@ RM := rm -rf
 -include 3rd-party/freertos-V5/subdir.mk
 -include 3rd-party/freertos-V5/portable/GCC/RISC-V/subdir.mk
 -include 3rd-party/freertos-V5/portable/MemMang/subdir.mk
+-include Freelux_libs/counter_libs/subdir.mk
 -include Freelux_libs/subdir.mk
 -include application/app/subdir.mk
 -include application/audio/subdir.mk
