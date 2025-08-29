@@ -167,6 +167,7 @@ static int rx_from_uart_cb(void) //UART data send to Master,we will handler the 
 	my_fifo_pop(&fl_rx_fifo);
 	return 0;
 }
+
 /**
  * @brief		this function is used to process tx uart data.
  * @param[in]	none
@@ -207,8 +208,14 @@ int fl_serial_send(u8* _data, u8 _len) {
 }
 
 void fl_input_serial_rec(void) {
-	u8* w = fl_rx_fifo.p + (fl_rx_fifo.wptr & (fl_rx_fifo.num - 1)) * fl_rx_fifo.size;
 	u32 data_len = uart_get_dma_rev_data_len(G_INPUT_EXT.serial.uart_num,G_INPUT_EXT.serial.dma_rx_chn);
+	if(data_len == 0 || data_len > UART_DATA_LEN){
+		ERR(MCU,"OVER DATA!!!\r\n");
+//		uart_clr_irq_status(G_INPUT_EXT.serial.uart_num,UART_CLR_RX);
+//		uart_reset(G_INPUT_EXT.serial.uart_num);
+		return;
+	}
+	u8* w = fl_rx_fifo.p + (fl_rx_fifo.wptr & (fl_rx_fifo.num - 1)) * fl_rx_fifo.size;
 	LOGA(DRV,"DMA Len:%d\r\n",data_len);
 	fl_serial_AddLenIn1st(w,(u8) data_len);
 	uart_clr_irq_status(G_INPUT_EXT.serial.uart_num,UART_CLR_RX);

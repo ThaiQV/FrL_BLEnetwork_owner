@@ -594,7 +594,6 @@ void fl_nwk_master_init(void) {
 	G_MASTER_INFO.nwk.chn[0] = master_profile.nwk.chn[0];
 	G_MASTER_INFO.nwk.chn[1] = master_profile.nwk.chn[1];
 	G_MASTER_INFO.nwk.chn[2] = master_profile.nwk.chn[2];
-
 	blt_soft_timer_add(_nwk_master_backup,2 * 1000 * 1000);
 }
 /***************************************************
@@ -660,6 +659,13 @@ void fl_nwk_master_nodelist_load(void) {
 			//G_NODE_LIST.sla_info[var].mac_short.mac_u32 = nodelist.slave[var].mac_u32;
 			memcpy(G_NODE_LIST.sla_info[var].mac,nodelist.slave[var].mac,6);
 			G_NODE_LIST.sla_info[var].dev_type=nodelist.slave[var].dev_type;
+			//update data_struct dev
+			memset(G_NODE_LIST.sla_info[var].data,0,SIZEU8(G_NODE_LIST.sla_info[var].data));
+			//create MAC + TIMETAMP + DEV_TYPE
+			u8 size_mac = SIZEU8(G_NODE_LIST.sla_info[var].mac);
+			memcpy(&G_NODE_LIST.sla_info[var].data[0],G_NODE_LIST.sla_info[var].mac,size_mac);
+			/*Dev type*/
+			G_NODE_LIST.sla_info[var].data[size_mac + 4] = G_NODE_LIST.sla_info[var].dev_type;
 		}
 	}
 }

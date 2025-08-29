@@ -131,10 +131,6 @@ _attribute_no_inline_ void user_init_normal(void) {
 	///////////////////// stimer Management initialization///////////////////
 	//blc_ll_initPowerManagement_module();
 	blt_soft_timer_init();
-	///////////////////// freelux adv initialization///////////////////
-	//fl_db_clearAll();//FOR CLEAN
-	////////////////// config adv scan /////////////////////
-	fl_adv_init();
 	///////////////////// TIME SYSTEM initialization///////////////////
 	fl_rtc_init();
 
@@ -143,6 +139,10 @@ _attribute_no_inline_ void user_init_normal(void) {
 #ifdef MASTER_CORE
 	fl_input_serial_init(UART1,UART1_TX_PE0,UART1_RX_PE2,115200);
 #endif
+	///////////////////// freelux adv initialization///////////////////
+	//fl_db_clearAll();//FOR CLEAN
+	////////////////// config adv scan /////////////////////
+	fl_adv_init();
 }
 
 /**
