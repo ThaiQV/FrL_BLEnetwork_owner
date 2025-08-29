@@ -33,6 +33,7 @@ extern fl_slaves_list_t G_NODE_LIST;
 //For getting automatic information
 #define GETINFO_1_TIMES_MAX			20
 #define GETINFO_FREQUENCY			20 //ms
+#define GETINFO_FIRST_DUTY			25*1000//s
 typedef struct {
 	fl_nodeinnetwork_t* id[GETINFO_1_TIMES_MAX];
 	u8 num_retrieved; // number of slaves retrieved out
@@ -106,6 +107,9 @@ fl_cmdlines_t G_CMDGET[] = { { { 's', 'l', 'a', 'l', 'i', 's', 't' }, 7, CMD_GET
 		{ { 'a', 'd', 'v', 'c', 'o', 'n', 'f', 'i', 'g' }, 9, CMD_GETADVSETTING },					// p get scan : use to get scanner adv settings
 		// p get info <mac_u32>
 		};
+
+
+static u8 FIRST_PROTOCOL_START = 0;
 #endif
 
 /******************************************************************************/
@@ -456,6 +460,7 @@ void CMD_GETADVSETTING(u8* _data) {
 	LOG_P(DRV,"************************\r\n");
 }
 void CMD_GETINFOSLAVE(u8* _data) {
+	extern fl_adv_settings_t G_ADV_SETTINGS ;
 	u8 slaveID[GETINFO_1_TIMES_MAX]; //Max 20 slaves
 	int slave_num = sscanf((char*) _data,"info %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd",&slaveID[0],
 			&slaveID[1],&slaveID[2],&slaveID[3],&slaveID[4],&slaveID[5],&slaveID[6],&slaveID[7],&slaveID[8],&slaveID[9],&slaveID[10],&slaveID[11],
@@ -475,13 +480,19 @@ void CMD_GETINFOSLAVE(u8* _data) {
 		G_SLA_INFO_RSP.settings.timeout_rsp = slaveID[4]+100;
 		G_SLA_INFO_RSP.settings.num_retry = slaveID[5];
 
-		LOGA(DRV,"GET ALL INFO AUTORUN (interval:%d s|NumOfTimes:%d |Total:%d |Timeout:%d ms)!!\r\n",G_SLA_INFO_RSP.settings.time_interval,
+		//SETTING global
+		G_ADV_SETTINGS.time_wait_rsp = G_SLA_INFO_RSP.settings.timeout_rsp;
+		G_ADV_SETTINGS.retry_times = G_SLA_INFO_RSP.settings.num_retry;
+
+		LOGA(DRV,"GET ALL INFO AUTORUN (interval:%d s|NumOfTimes:%d |Total:%d |Timeout:%d ms|Retry:%d)!!\r\n",G_SLA_INFO_RSP.settings.time_interval,
 				G_SLA_INFO_RSP.settings.num_1_times,
-				G_SLA_INFO_RSP.settings.total_slaves,G_SLA_INFO_RSP.settings.timeout_rsp);
+				G_SLA_INFO_RSP.settings.total_slaves,
+				G_ADV_SETTINGS.time_wait_rsp,
+				G_ADV_SETTINGS.retry_times);
 		//create timer checking to manage response
 		//Clear and re-start
 		blt_soft_timer_delete(&_getInfo_autorun);
-		blt_soft_timer_add(&_getInfo_autorun,GETINFO_FREQUENCY * 1000); //ms
+		blt_soft_timer_add(&_getInfo_autorun,(FIRST_PROTOCOL_START == 0 ? 1000 : GETINFO_FIRST_DUTY) * 1000); //ms
 	} else if (slave_num >= 1) {
 		//Clear and re-start
 		blt_soft_timer_delete(&_getInfo_autorun);
@@ -528,4 +539,18 @@ void _Passing_CmdLine(type_debug_t _type, u8 *_data) {
 		sys_reboot();
 	}//
 }
+
+void fl_nwk_protcol_ExtCall(type_debug_t _type, u8 *_data){
+	_Passing_CmdLine(_type,_data);
+}
+
+void fl_nwk_protocol_InitnRun(void){
+	extern fl_adv_settings_t G_ADV_SETTINGS ;
+	char cmd_fmt[50];
+	memset((u8*)cmd_fmt,0,SIZEU8(cmd_fmt));
+	sprintf(cmd_fmt,"p get info %d %d %d %d %d %d",255,0,8,G_NODE_LIST.slot_inused,G_ADV_SETTINGS.time_wait_rsp,G_ADV_SETTINGS.retry_times);
+	_Passing_CmdLine(GETCMD,(u8*)cmd_fmt);
+	FIRST_PROTOCOL_START =1; //don't change
+}
+
 #endif

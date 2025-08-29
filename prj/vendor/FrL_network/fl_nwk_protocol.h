@@ -22,6 +22,8 @@ typedef struct {
 		u8 *chn2;
 		u8 *chn3;
 	} nwk_chn;
+	u16 time_wait_rsp; //use to set timeout rsp -> get info
+	u8 retry_times;
 }__attribute__((packed)) fl_adv_settings_t;
 
 //typedef struct {
@@ -35,5 +37,7 @@ typedef struct {
 	u32 timetamp;
 }__attribute__((packed)) fl_slave_getinfo_t;
 
+void fl_nwk_protocol_InitnRun(void);
 void _Passing_CmdLine(type_debug_t _type, u8 *_data);
+void fl_nwk_protcol_ExtCall(type_debug_t _type, u8 *_data); //use to the other layers
 #endif /* VENDOR_FRL_NETWORK_FL_NWK_PROTOCOL_H_ */

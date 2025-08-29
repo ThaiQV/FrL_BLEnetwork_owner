@@ -71,17 +71,17 @@ tbs_device_powermeter_t G_POWER_METER = {
 				        .timetamp = 12345678,
 						.type = TBS_POWERMETER,
 				        .data= {
-				        		.frequency = 100,
-								.voltage = 300,
-								.current1 = 512,
-								.current2 = 513,
-								.current3 = 514,
-								.power1 = 1000,
-								.power2 = 1001,
-								.power3 = 1002,
-								.energy1 = 123456,
-								.energy2 = 654321,
-								.energy3 = 111111,
+				        		.frequency = 50,
+								.voltage = 220,
+								.current1 = 11,
+								.current2 = 22,
+								.current3 = 33,
+								.power1 = 242,
+								.power2 = 484,
+								.power3 = 726,
+								.energy1 = 111111,
+								.energy2 = 222222,
+								.energy3 = 333333,
 		//				        .reserve = 0xABCD
 						}
 				    };
@@ -130,8 +130,8 @@ void TBS_PowerMeter_init(void){
 void TBS_PowerMeter_Run(void){
 	G_POWER_METER.timetamp = fl_rtc_get();
 	//For testing : randon valid of fields
-	G_POWER_METER.data.frequency = RAND(0,128);
-	G_POWER_METER.data.voltage = RAND(0,512);
+//	G_POWER_METER.data.frequency = RAND(0,128);
+//	G_POWER_METER.data.voltage = RAND(0,512);
 //	G_POWER_METER.data.current1 = RAND(0,1024);
 //	G_POWER_METER.data.current2 = RAND(0,1024);
 //	G_POWER_METER.data.current3 = RAND(0,1024);
@@ -155,7 +155,6 @@ void TBS_PowerMeter_Run(void){
 /***                            Functions callback                           **/
 /******************************************************************************/
 /******************************************************************************/
-
 
 
 /******************************************************************************/
