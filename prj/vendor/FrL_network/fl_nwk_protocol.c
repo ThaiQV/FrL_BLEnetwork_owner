@@ -368,20 +368,21 @@ void CMD_HEARTBEAT(u8* _data) {
 
 }
 void CMD_REPEAT(u8* _data) {
-//	extern volatile u8 NWK_REPEAT_MODE;
-//	u8 ON[2] = { 'o', 'n' };
-//	u8 on_bool = 0;
-//	if (plog_IndexOf(_data,ON,2,CMDLINE_MAXLEN) != -1) {
-//		on_bool = 1;
-//	}
-//	NWK_REPEAT_MODE = on_bool;
-	extern volatile u8  REPEAT_LEVEL;
+	extern volatile u8  NWK_REPEAT_LEVEL;
+	extern volatile u8  NWK_REPEAT_MODE;
 	u16 repeat_cnt = 0;
 	//p set repeat 2
 	int rslt = sscanf((char*) _data,"repeat %hd",&repeat_cnt);
-	if(rslt == 1){
-		REPEAT_LEVEL = repeat_cnt;
-		LOGA(DRV,"Repeat Mode: %d\r\n",REPEAT_LEVEL);
+	if (rslt == 1) {
+		if (repeat_cnt <= 3) {
+			NWK_REPEAT_MODE = 1;
+			NWK_REPEAT_LEVEL = repeat_cnt;
+			LOGA(DRV,"Repeat Level: %d\r\n",NWK_REPEAT_LEVEL);
+		}
+		else {
+			NWK_REPEAT_MODE = 0;
+			LOGA(DRV,"Repeat NON-Level: %d\r\n",NWK_REPEAT_MODE);
+		}
 	}
 }
 void CMD_ADVINTERVAL(u8* _data) {
@@ -452,11 +453,14 @@ void CMD_GETSLALIST(u8* _data) {
 }
 void CMD_GETADVSETTING(u8* _data) {
 	extern fl_adv_settings_t G_ADV_SETTINGS;
+	extern volatile u8 NWK_REPEAT_MODE;
+	extern volatile u8 NWK_REPEAT_LEVEL;
 	LOG_P(DRV,"***** ADV Settings *****\r\n");
 	LOGA(DRV,"ADV interval:%d-%d|%d\r\n",(u8 )(G_ADV_SETTINGS.adv_interval_min * 0.625),(u8 )(G_ADV_SETTINGS.adv_interval_max * 0.625),
 			G_ADV_SETTINGS.adv_duration);
 	LOGA(DRV,"ADV scanner :%d-%d\r\n",(u8 )(G_ADV_SETTINGS.scan_window * 0.625),(u8 )(G_ADV_SETTINGS.scan_window * 0.625));
-	LOGA(DRV,"Channels: %d |%d |%d \r\n",*G_ADV_SETTINGS.nwk_chn.chn1,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3);
+	LOGA(DRV,"Channels    : %d |%d |%d \r\n",*G_ADV_SETTINGS.nwk_chn.chn1,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3);
+	LOGA(DRV,"REPEAT mode :%d(%d)\r\n",NWK_REPEAT_MODE,NWK_REPEAT_LEVEL);
 	LOG_P(DRV,"************************\r\n");
 }
 void CMD_GETINFOSLAVE(u8* _data) {

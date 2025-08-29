@@ -78,8 +78,8 @@ tbs_device_powermeter_t G_POWER_METER;
 #endif
 //flag debug of the network
 volatile u8 NWK_DEBUG_STT = 1; // it will be assigned into end-point byte (dbg :1bit)
-//volatile u8 NWK_REPEAT_MODE = 1; // slave repeat?
-volatile u8  REPEAT_LEVEL = 3;
+volatile u8 NWK_REPEAT_MODE = 1; // 1: level | 0 : non-level
+volatile u8  NWK_REPEAT_LEVEL = 3;
 /******************************************************************************/
 /******************************************************************************/
 /***                           Private definitions                           **/
@@ -197,9 +197,9 @@ void _nwk_slave_syncFromPack(fl_dataframe_format_t *packet){
 	NWK_DEBUG_STT = packet->endpoint.dbg;
 	DEBUG_TURN(NWK_DEBUG_STT);
 	//Sync repeat mode
-//	NWK_REPEAT_MODE = packet->endpoint.rep_mode;
+	NWK_REPEAT_MODE = packet->endpoint.repeat_mode;
 	//add repeat_cnt
-	REPEAT_LEVEL = packet->endpoint.rep_mode;
+	NWK_REPEAT_LEVEL = packet->endpoint.rep_settings;
 	//Sync mastertime origin
 	SYNC_ORIGIN_MASTER(master_timetamp,packet->milltamp);
 	LOGA(INF,"ORIGINAL MASTER-TIME:%d\r\n",ORIGINAL_MASTER_TIME.milstep);
@@ -275,8 +275,9 @@ bool fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 			memcpy(req_pack.frame.payload,_data,_len);
 			//create endpoint
 			req_pack.frame.endpoint.dbg = NWK_DEBUG_STT;
-			req_pack.frame.endpoint.repeat_cnt = REPEAT_LEVEL;
-			req_pack.frame.endpoint.rep_mode = REPEAT_LEVEL;
+			req_pack.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
+			req_pack.frame.endpoint.rep_settings = NWK_REPEAT_LEVEL;
+			req_pack.frame.endpoint.repeat_mode = NWK_REPEAT_MODE;
 			//Create packet from slave
 			req_pack.frame.endpoint.master = FL_FROM_SLAVE_ACK;
 		}
@@ -300,8 +301,9 @@ bool fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 			memcpy(req_pack.frame.payload,_data,_len);
 			//create endpoint
 			req_pack.frame.endpoint.dbg = NWK_DEBUG_STT;
-			req_pack.frame.endpoint.repeat_cnt = REPEAT_LEVEL;
-			req_pack.frame.endpoint.rep_mode = REPEAT_LEVEL;
+			req_pack.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
+			req_pack.frame.endpoint.rep_settings = NWK_REPEAT_LEVEL;
+			req_pack.frame.endpoint.repeat_mode = NWK_REPEAT_MODE;
 			//Create packet from slave
 			req_pack.frame.endpoint.master = FL_FROM_SLAVE;
 		}
@@ -351,7 +353,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 				//change endpoint to node source
 				packet.frame.endpoint.master = FL_FROM_SLAVE;
 				//add repeat_cnt
-				packet.frame.endpoint.repeat_cnt = REPEAT_LEVEL;
+				packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
 			} else {
 				//Non-rsp
 				packet_built.length = 0;
@@ -398,7 +400,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 				//change endpoint to node source
 				packet.frame.endpoint.master = FL_FROM_SLAVE;
 				//add repeat_cnt
-				packet.frame.endpoint.repeat_cnt = REPEAT_LEVEL;
+				packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
 			} else {
 				//Non-rsp
 				packet_built.length = 0;
@@ -417,7 +419,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 					//change endpoint to node source
 					packet.frame.endpoint.master = FL_FROM_SLAVE;
 					//add repeat_cnt
-					packet.frame.endpoint.repeat_cnt = REPEAT_LEVEL;
+					packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
 				}
 			} else {
 				//Non-rsp

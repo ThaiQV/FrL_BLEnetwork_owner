@@ -50,12 +50,14 @@ fl_pack_t fl_repeat_packet_build(fl_pack_t _pack) {
 	extern u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
 	fl_packet_parse(_pack,&packet.frame);
 
-	packet.frame.endpoint.repeat_cnt -= 1;
+	if(packet.frame.endpoint.repeat_mode) packet.frame.endpoint.repeat_cnt -= 1;
 
 	pack_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
 	memcpy(pack_built.data_arr,packet.bytes,pack_built.length);
 
-	LOGA(ZIG_GP,"%s :%d,TTL: %d\r\n",(packet.frame.endpoint.master == FL_FROM_SLAVE)?"SlaveID":"Master",packet.frame.slaveID.id_u8,packet.frame.endpoint.repeat_cnt);
+	LOGA(ZIG_GP,"%s :%d,TTL: %d/%d,Mode: %d\r\n",(packet.frame.endpoint.master == FL_FROM_SLAVE)?"SlaveID":"Master",
+			packet.frame.slaveID.id_u8,packet.frame.endpoint.repeat_cnt,packet.frame.endpoint.rep_settings,
+			packet.frame.endpoint.repeat_mode);
 
 	return pack_built;
 }
@@ -95,15 +97,19 @@ void fl_repeater_init(void) {
 	FL_QUEUE_CLEAR(&G_REPEAT_CONTAINER,PACK_REPEAT_SIZE);
 }
 void fl_repeat_run(fl_pack_t *_pack_repeat) {
-	//LOGA(ZIG_GP,"REPEAT(%d)-> run\r\n",_pack_repeat->length - 1);
-	if (FL_QUEUE_FIND(&G_REPEAT_CONTAINER,_pack_repeat,_pack_repeat->length - 1/*skip rssi*/) == -1) { // + repeat_cnt
-		if (FL_QUEUE_ADD(&G_REPEAT_CONTAINER,_pack_repeat) < 0) {
-			ERR(ZIG_GP,"Err <QUEUE ADD> - G_REPEAT_CONTAINER!!\r\n");
-		} else {
+	extern u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt) ;
+	fl_dataframe_format_t data_parsed;
+	if (fl_packet_parse(*_pack_repeat,&data_parsed)) {
+		u8 repeat_mode_non_level = (data_parsed.endpoint.repeat_mode == 0)?1:0;
+		if (FL_QUEUE_FIND(&G_REPEAT_CONTAINER,_pack_repeat,_pack_repeat->length - (1 + repeat_mode_non_level)/*skip rssi*/) == -1) { // + repeat_cnt :if repeat_mode is non-level
+			if (FL_QUEUE_ADD(&G_REPEAT_CONTAINER,_pack_repeat) < 0) {
+				ERR(ZIG_GP,"Err <QUEUE ADD> - G_REPEAT_CONTAINER!!\r\n");
+			} else {
 //			s8 rssi = _pack_repeat->data_arr[_pack_repeat->length - 1];
 //			LOGA(ZIG_GP,"QUEUE REPEAT ADD (len:%d|RSSI:%d): (%d)%d-%d\r\n",_pack_repeat->length,rssi,G_REPEAT_CONTAINER.count,
 //					G_REPEAT_CONTAINER.head_index,G_REPEAT_CONTAINER.tail_index);
-			fl_repeat_send_cbk();
+				fl_repeat_send_cbk();
+			}
 		}
 	} else {
 		LOG_P(ZIG_GP,"Packet has repeated!!!\r\n");
