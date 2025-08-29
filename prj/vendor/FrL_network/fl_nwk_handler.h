@@ -63,7 +63,8 @@ typedef struct {
 			u8 repeat_cnt :2;   // 2 bits
 			u8 master :2;  		// 2 bits
 			u8 dbg :1;			// 1 bit
-			u8 rep_mode :2;		//for setting slave
+			u8 rep_settings :2; //for setting slave
+			u8 repeat_mode:1;   // mode repeat : level or non-level
 		};
 	} endpoint;
 // LSB: don't change location byte

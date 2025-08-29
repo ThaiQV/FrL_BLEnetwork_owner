@@ -43,8 +43,8 @@ volatile u8 MASTER_INSTALL_STATE = 0;
 u16 PERIOD_HEARTBEAT = 0 * 1000; //
 //flag debug of the network
 volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into endpoint byte (dbg :1bit)
-//volatile u8 NWK_REPEAT_MODE = 1; // slave repeat?
-volatile u8 REPEAT_LEVEL = 3;
+volatile u8 NWK_REPEAT_MODE = 1; // 1: level | 0 : non-level
+volatile u8 NWK_REPEAT_LEVEL = 3;
 
 /******************************************************************************/
 /******************************************************************************/
@@ -125,10 +125,11 @@ fl_pack_t fl_master_packet_heartbeat_build(void) {
 
 	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
 
-	packet.frame.endpoint.repeat_cnt = REPEAT_LEVEL;
+	packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
 	packet.frame.endpoint.master = FL_FROM_MASTER; //non-ack
 	packet.frame.endpoint.dbg = NWK_DEBUG_STT;
-	packet.frame.endpoint.rep_mode = REPEAT_LEVEL;
+	packet.frame.endpoint.rep_settings = NWK_REPEAT_LEVEL;
+	packet.frame.endpoint.repeat_mode = NWK_REPEAT_MODE;
 
 	packet_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
 	memcpy(packet_built.data_arr,packet.bytes,packet_built.length);
@@ -164,10 +165,11 @@ fl_pack_t fl_master_packet_collect_build(void) {
 	//Add master's mac
 	memcpy(&packet.frame.payload[0],blc_ll_get_macAddrPublic(),6);
 
-	packet.frame.endpoint.repeat_cnt = REPEAT_LEVEL;
+	packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
 	packet.frame.endpoint.master = FL_FROM_MASTER_ACK; //ack
 	packet.frame.endpoint.dbg = NWK_DEBUG_STT;
-	packet.frame.endpoint.rep_mode = REPEAT_LEVEL;
+	packet.frame.endpoint.rep_settings = NWK_REPEAT_LEVEL;
+	packet.frame.endpoint.repeat_mode = NWK_REPEAT_MODE;
 
 	packet_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
 	memcpy(packet_built.data_arr,packet.bytes,packet_built.length);
@@ -213,10 +215,11 @@ fl_pack_t fl_master_packet_assignSlaveID_build(u8* _mac) {
 	//Create payload assignment
 	packet.frame.slaveID.id_u8 = fl_master_SlaveID_get(_mac);
 
-	packet.frame.endpoint.repeat_cnt = REPEAT_LEVEL;
+	packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
 	packet.frame.endpoint.master = FL_FROM_MASTER; //non-ack
 	packet.frame.endpoint.dbg = NWK_DEBUG_STT;
-	packet.frame.endpoint.rep_mode = REPEAT_LEVEL;
+	packet.frame.endpoint.rep_settings = NWK_REPEAT_LEVEL;
+	packet.frame.endpoint.repeat_mode = NWK_REPEAT_MODE;
 
 	packet_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
 	memcpy(packet_built.data_arr,packet.bytes,packet_built.length);
@@ -255,10 +258,11 @@ fl_pack_t fl_master_packet_RSP_55_build(u8 slaveID) {
 	//assign slaveID
 	packet.frame.slaveID.id_u8 = slaveID;
 
-	packet.frame.endpoint.repeat_cnt = REPEAT_LEVEL;
+	packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
 	packet.frame.endpoint.master = FL_FROM_MASTER; //non-ack
 	packet.frame.endpoint.dbg = NWK_DEBUG_STT;
-	packet.frame.endpoint.rep_mode = REPEAT_LEVEL;
+	packet.frame.endpoint.rep_settings = NWK_REPEAT_LEVEL;
+	packet.frame.endpoint.repeat_mode = NWK_REPEAT_MODE;
 
 	packet_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
 	memcpy(packet_built.data_arr,packet.bytes,packet_built.length);
@@ -308,10 +312,11 @@ fl_pack_t fl_master_packet_GetInfo_build(u8 *_slave_mac_arr, u8 _slave_num) {
 	//crc
 	packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
 
-	packet.frame.endpoint.repeat_cnt = REPEAT_LEVEL;
+	packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
 	packet.frame.endpoint.master = FL_FROM_MASTER_ACK;
 	packet.frame.endpoint.dbg = NWK_DEBUG_STT;
-	packet.frame.endpoint.rep_mode = REPEAT_LEVEL;
+	packet.frame.endpoint.rep_settings= NWK_REPEAT_LEVEL;
+	packet.frame.endpoint.repeat_mode = NWK_REPEAT_MODE;
 
 	packet_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
 	memcpy(packet_built.data_arr,packet.bytes,packet_built.length);
