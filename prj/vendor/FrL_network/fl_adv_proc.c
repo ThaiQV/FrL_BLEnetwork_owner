@@ -39,6 +39,8 @@ fl_adv_settings_t G_ADV_SETTINGS = {
 		.adv_duration = SEND_TIMEOUT_MS,
 		.scan_interval = SCAN_INTERVAL_60MS,
 		.scan_window = SCAN_WINDOW_60MS,
+		.time_wait_rsp = 10,
+		.retry_times = 2,
 		//.nwk_chn = {10,11,12}
 		};
 
@@ -358,6 +360,10 @@ void fl_adv_init(void) {
 	rf_set_power_level_index(MY_RF_POWER_INDEX);
 	blc_ll_setAdvCustomedChannel(*G_ADV_SETTINGS.nwk_chn.chn1,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3);
 	fl_adv_scanner_init();
+#ifdef MASTER_CORE
+	//Start network
+	fl_nwk_protocol_InitnRun();
+#endif
 }
 /***************************************************
  * @brief 		:init collection channel (0,1,2)

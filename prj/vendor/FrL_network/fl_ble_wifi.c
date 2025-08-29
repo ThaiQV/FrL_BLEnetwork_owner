@@ -13,6 +13,8 @@
 #include "fl_nwk_handler.h"
 #include "../TBS_dev/TBS_dev_config.h"
 #ifdef MASTER_CORE
+#include "fl_ble_wifi.h"
+#include "fl_nwk_protocol.h"
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -28,6 +30,7 @@ typedef struct {
 	u8 crc8;
 	u8 data[BLE_WIFI_MAXLEN - 3];
 }__attribute__((packed)) fl_datawifi2ble_t;
+
 
 /******************************************************************************/
 /******************************************************************************/
@@ -74,7 +77,7 @@ typedef union {
 /***                       Functions declare                   		         **/
 /******************************************************************************/
 /******************************************************************************/
-
+void fl_wifi2ble_Excute(fl_wifi2ble_exc_e cmd);
 void PING_REQ(u8* _pdata, RspFunc rspfnc);
 void PING_RSP(u8* _pdata);
 void REPORT_REQUEST(u8* _pdata, RspFunc rspfnc);
@@ -120,6 +123,7 @@ void PING_RSP(u8* _pdata) {
 
 }
 void REPORT_REQUEST(u8* _pdata, RspFunc rspfnc) {
+	extern fl_slaves_list_t G_NODE_LIST;
 	fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[1];
 	LOGA(MCU,"LEN:0x%02X\r\n",data->len_data);
 	LOGA(MCU,"cmdID:0x%02X\r\n",data->cmd);
@@ -132,6 +136,11 @@ void REPORT_REQUEST(u8* _pdata, RspFunc rspfnc) {
 	}
 	if (rspfnc != 0) {
 		rspfnc(_pdata);
+		fl_wf_report_u report_fmt;
+		memcpy(report_fmt.bytes,data->data,data->len_data);
+		if (IS_MAC_INVALID(report_fmt.frame.mac,0xFF) && G_NODE_LIST.slot_inused != 0xFF) {
+			fl_wifi2ble_Excute(W2B_START_NWK);
+		}
 	}
 }
 static void _getnsend_data_report(u8 var, u8 rspcmd) {
@@ -345,6 +354,27 @@ void fl_ble2wifi_EVENT_SEND(u8* _slave_mac){
 	cmd_data[0] = wfdata.len_data + SIZEU8(wfdata.cmd)+SIZEU8(wfdata.crc8)+SIZEU8(wfdata.len_data);
 	memcpy(&cmd_data[1],(u8*)&wfdata,cmd_data[0]);
 	REPORT_RESPONSE(cmd_data);
+}
+
+void fl_wifi2ble_Excute(fl_wifi2ble_exc_e cmd) {
+	extern fl_slaves_list_t G_NODE_LIST;
+	extern fl_adv_settings_t G_ADV_SETTINGS;
+	extern void fl_nwk_protcol_ExtCall(type_debug_t _type, u8 *_data);
+	type_debug_t cmd_type = SETCMD;
+	char cmd_fmt[UART_DATA_LEN];
+	memset(cmd_fmt,0,SIZEU8(cmd));
+	switch (cmd) {
+		case W2B_START_NWK: {
+			if(G_NODE_LIST.slot_inused == 0xFF){break;}
+			//p get info 255 <Period get again> <num slave for each> <num virtual slave> <timeout rsp> <retry cnt>
+			cmd_type = GETCMD;
+			sprintf(cmd_fmt,"p get info %d %d %d %d %d %d",255,0,8,G_NODE_LIST.slot_inused,G_ADV_SETTINGS.time_wait_rsp,G_ADV_SETTINGS.retry_times);
+			break;
+		}
+		default:
+		break;
+	}
+	if(cmd_fmt[0] == 'p') fl_nwk_protcol_ExtCall(cmd_type,(u8*)cmd_fmt);
 }
 
 #endif

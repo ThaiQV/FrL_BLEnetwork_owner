@@ -11,7 +11,14 @@
 #ifndef VENDOR_FRL_NETWORK_FL_BLE_WIFI_H_
 #define VENDOR_FRL_NETWORK_FL_BLE_WIFI_H_
 
+typedef enum{
+	W2B_STOP_NWK=1,
+	W2B_START_NWK,
+	//todo something
+}fl_wifi2ble_exc_e;
+
 void fl_ble_wifi_proc(u8* _pdata) ;
 void fl_ble2wifi_EVENT_SEND(u8* _slave_mac);
+void fl_wifi2ble_Excute(fl_wifi2ble_exc_e cmd);
 
 #endif /* VENDOR_FRL_NETWORK_FL_BLE_WIFI_H_ */
