@@ -415,9 +415,10 @@ void fl_input_external_init(void) {
 //init POLLING Container
 	InitPOLLING();
 #ifdef POWER_METER_DEVICE
-	fl_ExIO_init(I2C_GPIO_SDA_E2,I2C_GPIO_SCL_E0,GPIO_PD0);
+//	fl_ExIO_init(I2C_GPIO_SDA_E2,I2C_GPIO_SCL_E0,GPIO_PD0);
 //	//	//register function callback
 	fl_exIO_t GPIO_IN;
+	s8 regis=0;
 //	extern u8 TEST_Buttons(fl_exButton_states_e _state, void *_data);
 //	GPIO_IN.exc = &TEST_Buttons;
 //	GPIO_IN.status = BUTT_STATE_NONE;
@@ -425,7 +426,7 @@ void fl_input_external_init(void) {
 //	GPIO_IN.pin_read = (FucRead) &TCA95xx_read1;
 //	GPIO_IN.pin = (gpio_pin_e) TCA_P16;
 ////Register polling callback
-//	s8 regis = RegisterPOLLING(GPIO_IN);
+//	regis = RegisterPOLLING(GPIO_IN);
 //	LOGA(PERI,"Button(%d)Calling Register :%d\r\n",GPIO_IN.pin_read(GPIO_IN.pin),regis);
 
 
@@ -433,8 +434,8 @@ void fl_input_external_init(void) {
 	GPIO_IN.exc = &TEST_Buttons_RST;
 	GPIO_IN.status = BUTT_STATE_NONE;
 	GPIO_IN.mode = DET_LOW;
-	GPIO_IN.pin_read = (FucRead) &TCA95xx_read1;
-	GPIO_IN.pin = (gpio_pin_e) TCA_P10;
+	GPIO_IN.pin_read = (FucRead) &gpio_get_level;
+	GPIO_IN.pin = (gpio_pin_e) GPIO_PB0;
 
 	gpio_function_en(GPIO_IN.pin);
 	gpio_set_output(GPIO_IN.pin,0); 		//disable output

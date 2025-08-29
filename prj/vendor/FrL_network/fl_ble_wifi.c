@@ -179,7 +179,6 @@ static void _getnsend_data_report(u8 var, u8 rspcmd) {
 			wfdata.data[0]=G_NODE_LIST.sla_info[var].active;
 			memcpy(&wfdata.data[1],G_NODE_LIST.sla_info[var].data,wfdata.len_data);
 			wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
-
 			u8 len_payload = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
 			memcpy(payload,(u8*) &wfdata,len_payload);
 			//For testing parsing
