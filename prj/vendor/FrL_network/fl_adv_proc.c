@@ -47,7 +47,7 @@ fl_adv_settings_t G_ADV_SETTINGS = {
 extern volatile u8  REPEAT_LEVEL;
 
 /*---------------- Total ADV Rec --------------------------*/
-#define IN_DATA_SIZE 		128
+#define IN_DATA_SIZE 		64
 fl_pack_t g_data_array[IN_DATA_SIZE];
 fl_data_container_t G_DATA_CONTAINER = { .data = g_data_array, .head_index = 0, .tail_index = 0, .mask = IN_DATA_SIZE - 1, .count = 0 };
 
