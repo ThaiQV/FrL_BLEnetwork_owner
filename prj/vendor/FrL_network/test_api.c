@@ -82,7 +82,7 @@ int TEST_slave_sendREQ(void) {
 	}
 	return 0;
 }
-#ifdef COUNTER_DEVICE
+#ifdef POWER_METER_DEVICE
 u8 TEST_Buttons(fl_exButton_states_e _state, void *_data) {
 	u32 *time_tick = (u32*)_data;
 	static u32 test_pack_cnt = 0;
