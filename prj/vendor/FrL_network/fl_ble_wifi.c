@@ -24,13 +24,14 @@
 #define fl_ble_send_wifi				fl_serial_send
 
 #define BLE_WIFI_MAXLEN					(FL_TXFIFO_SIZE-3)
+
 typedef struct {
 	u8 len_data;
 	u8 cmd;
 	u8 crc8;
+	u8 status;
 	u8 data[BLE_WIFI_MAXLEN - 3];
 }__attribute__((packed)) fl_datawifi2ble_t;
-
 
 /******************************************************************************/
 /******************************************************************************/
@@ -122,6 +123,7 @@ void PING_REQ(u8* _pdata, RspFunc rspfnc) {
 void PING_RSP(u8* _pdata) {
 
 }
+
 void REPORT_REQUEST(u8* _pdata, RspFunc rspfnc) {
 	extern fl_slaves_list_t G_NODE_LIST;
 	fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[1];
@@ -157,7 +159,8 @@ static void _getnsend_data_report(u8 var, u8 rspcmd) {
 		tbs_device_counter_t *counter_data = (tbs_device_counter_t*) G_NODE_LIST.sla_info[var].data;
 		memcpy(counter_data->data.mac,G_NODE_LIST.sla_info[var].mac,6);
 		wfdata.cmd = rspcmd;
-		wfdata.len_data = SIZEU8(counter_data->bytes);
+		wfdata.len_data = SIZEU8(counter_data->bytes)+ SIZEU8(wfdata.status);
+		wfdata.status = G_NODE_LIST.sla_info[var].active;
 		memcpy(wfdata.data,counter_data->bytes,wfdata.len_data);
 		wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
 		u8 len_payload = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
@@ -172,13 +175,11 @@ static void _getnsend_data_report(u8 var, u8 rspcmd) {
 	 */
 	else {
 		if (G_NODE_LIST.sla_info[var].dev_type == TBS_POWERMETER) {
-//			tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) G_NODE_LIST.sla_info[var].data;
-//			memcpy(pwmeter_data->mac,G_NODE_LIST.sla_info[var].mac,6);
 			wfdata.cmd = rspcmd;
-			wfdata.len_data = POWER_METER_BITSIZE-1;
+			wfdata.len_data = (POWER_METER_BITSIZE-1) + SIZEU8(wfdata.status);
 			memcpy(wfdata.data,G_NODE_LIST.sla_info[var].data,wfdata.len_data);
-			//tbs_pack_powermeter_data(pwmeter_data,wfdata.data);
 			wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
+			wfdata.status = G_NODE_LIST.sla_info[var].active;
 			u8 len_payload = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
 			memcpy(payload,(u8*) &wfdata,len_payload);
 			//For testing parsing
