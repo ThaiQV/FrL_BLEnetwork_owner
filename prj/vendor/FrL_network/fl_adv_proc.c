@@ -44,7 +44,7 @@ fl_adv_settings_t G_ADV_SETTINGS = {
 		//.nwk_chn = {10,11,12}
 		};
 
-extern volatile u8  REPEAT_LEVEL;
+extern volatile u8  NWK_REPEAT_LEVEL;
 
 /*---------------- Total ADV Rec --------------------------*/
 #define IN_DATA_SIZE 		64
@@ -177,7 +177,7 @@ bool _align_QUEUE_SENDING(fl_pack_t _pack){
 		//check master original of the previous with currently
 		if(timetamp_in_pack > timetamp_in_pre_pack && timetamp_in_pack >= fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME)){
 //			man_loop.origin_indx = idx_inQUEUE;
-			man_loop.loop_times = (man_loop.loop_times > REPEAT_LEVEL) ? 1 : man_loop.loop_times + 1;
+			man_loop.loop_times = (man_loop.loop_times > NWK_REPEAT_LEVEL) ? 1 : man_loop.loop_times + 1;
 		}
 		//Check loop_times to skip packet with ttl < loop_times
 		fl_dataframe_format_t data_parsed;
@@ -531,7 +531,7 @@ fl_pack_t fl_packet_build(u8 *payload, u8 _len) {
 	//for testing repeat level
 //	static u8 rep_level = 0;
 	packet.frame.endpoint.ep_u8 = 0;
-	packet.frame.endpoint.repeat_cnt = REPEAT_LEVEL;
+	packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
 
 	pack_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
 	memcpy(pack_built.data_arr,packet.bytes,pack_built.length);
@@ -575,6 +575,7 @@ void fl_adv_run(void) {
 #else //SLAVE
 			//Todo: Repeat process
 			if (fl_adv_IsFromMe(data_in_queue) == false && data_parsed.endpoint.repeat_cnt > 0) {
+				//check repeat_mode
 				fl_repeat_run(&data_in_queue);
 			}
 			//Todo: Handle FORM MASTER REQ
