@@ -414,22 +414,34 @@ void fl_ExIO_init(i2c_sda_pin_e _sda, i2c_scl_pin_e _scl, gpio_pin_e _irq_pin) {
 void fl_input_external_init(void) {
 //init POLLING Container
 	InitPOLLING();
-#ifdef POWER_METER_DEVICE
-//	fl_ExIO_init(I2C_GPIO_SDA_E2,I2C_GPIO_SCL_E0,GPIO_PD0);
+#ifdef COUNTER_DEVICE
+	fl_ExIO_init(I2C_GPIO_SDA_E2,I2C_GPIO_SCL_E0,GPIO_PD0);
 //	//	//register function callback
 	fl_exIO_t GPIO_IN;
 	s8 regis=0;
-//	extern u8 TEST_Buttons(fl_exButton_states_e _state, void *_data);
-//	GPIO_IN.exc = &TEST_Buttons;
-//	GPIO_IN.status = BUTT_STATE_NONE;
-//	GPIO_IN.mode = DET_LOW;
-//	GPIO_IN.pin_read = (FucRead) &TCA95xx_read1;
-//	GPIO_IN.pin = (gpio_pin_e) TCA_P16;
-////Register polling callback
-//	regis = RegisterPOLLING(GPIO_IN);
-//	LOGA(PERI,"Button(%d)Calling Register :%d\r\n",GPIO_IN.pin_read(GPIO_IN.pin),regis);
+	extern u8 TEST_Buttons(fl_exButton_states_e _state, void *_data);
+	GPIO_IN.exc = &TEST_Buttons;
+	GPIO_IN.status = BUTT_STATE_NONE;
+	GPIO_IN.mode = DET_LOW;
+	GPIO_IN.pin_read = (FucRead) &TCA95xx_read1;
+	GPIO_IN.pin = (gpio_pin_e) TCA_P11;
+//Register polling callback
+	regis = RegisterPOLLING(GPIO_IN);
+	LOGA(PERI,"Button(%d)Calling Register :%d\r\n",GPIO_IN.pin_read(GPIO_IN.pin),regis);
 
-
+	extern u8 TEST_Buttons_RST(fl_exButton_states_e _state, void *_data);
+	GPIO_IN.exc = &TEST_Buttons_RST;
+	GPIO_IN.status = BUTT_STATE_NONE;
+	GPIO_IN.mode = DET_LOW;
+	GPIO_IN.pin_read = (FucRead) &TCA95xx_read1;
+	GPIO_IN.pin = (gpio_pin_e) TCA_P10;
+//Register polling callback
+	regis = RegisterPOLLING(GPIO_IN);
+	LOGA(PERI,"Button(%d)Reset Register :%d\r\n",GPIO_IN.pin_read(GPIO_IN.pin),regis);
+#endif
+#ifdef POWER_METER_DEVICE
+	fl_exIO_t GPIO_IN;
+	s8 regis=0;
 	extern u8 TEST_Buttons_RST(fl_exButton_states_e _state, void *_data);
 	GPIO_IN.exc = &TEST_Buttons_RST;
 	GPIO_IN.status = BUTT_STATE_NONE;
@@ -477,5 +489,5 @@ void fl_input_external_init(void) {
 
 #endif
 	/* --- Polling read input --- */
-	blt_soft_timer_add(_scan_external_input,FL_IO_SCAN_INTERVAL * 1000); //ms
+	//blt_soft_timer_add(_scan_external_input,FL_IO_SCAN_INTERVAL * 1000); //ms
 }
