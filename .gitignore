@@ -1,5 +1,5 @@
 # Ignore build output folders
-FrL_Network/
+prj/FrL_Network/
 FrL_Network_Master/
 B91_ble_sample/
 B91_module/
