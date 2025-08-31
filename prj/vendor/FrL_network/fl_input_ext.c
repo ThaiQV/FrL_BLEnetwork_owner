@@ -489,5 +489,5 @@ void fl_input_external_init(void) {
 
 #endif
 	/* --- Polling read input --- */
-	//blt_soft_timer_add(_scan_external_input,FL_IO_SCAN_INTERVAL * 1000); //ms
+	blt_soft_timer_add(_scan_external_input,FL_IO_SCAN_INTERVAL * 1000); //ms
 }
