@@ -20,6 +20,9 @@
 #include "fl_input_ext.h"
 #include "fl_nwk_protocol.h"
 
+//Public Key for the freelux network
+const u8 FL_NWK_PB_KEY[16] = "freeluxnetw0rk25";
+
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -94,7 +97,6 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 				fl_pack_t incomming_data;
 				incomming_data.length = pa->len + 1; //add rssi byte
 				memcpy(incomming_data.data_arr,pa->data,incomming_data.length);
-
 #ifdef MASTER_CORE
 				//skip from  master
 				if (fl_adv_IsFromMaster(incomming_data)) {

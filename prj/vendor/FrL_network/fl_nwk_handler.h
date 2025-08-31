@@ -16,6 +16,7 @@
 /**
  * @brief	callback function for rsp
  */
+
 typedef void (*fl_rsp_callback_fnc)(void*, void*);
 #define QUEUE_RSP_SLOT_MAX		10
 #define QUEUQ_REQcRSP_INTERVAL  20*1000 //ms
@@ -245,6 +246,7 @@ typedef struct {
 	struct {
 		u8 collect_chn[3];
 		u8 chn[3];
+		u8 private_key[16];
 	} nwk;
 	u32 my_mac;
 }__attribute__((packed)) fl_master_config_t;

@@ -10,7 +10,7 @@
 
 #include "tl_common.h"
 #include "fl_nwk_database.h"
-
+#include "fl_crypt/fl_aes.h"
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -226,16 +226,21 @@ void fl_db_masterprofile_save(fl_db_master_profile_t entry) {
 	flash_page_program(ADDR_MASTER_PROFILE_START,MASTER_PROFILE_ENTRY_SIZE,(uint8_t*) &entry);
 }
 fl_db_master_profile_t fl_db_masterprofile_init(void) {
-	fl_db_master_profile_t profile = { .magic = 0xFFFFFFFF};
+	fl_db_master_profile_t profile = { .magic = 0xFFFFFFFF };
 	profile = fl_db_masterprofile_load();
 	if (profile.magic != MASTER_PROFILE_MAGIC) {
 		//clear all and write default profiles
 		flash_erase_sector(ADDR_MASTER_PROFILE_START);
+		fl_aes_generate_private_key(0,MASTER_PROFILE_DEFAULT.nwk.private_key);
 		fl_db_masterprofile_save(MASTER_PROFILE_DEFAULT);
 		profile = fl_db_masterprofile_load();
 	}
 	//for debugging
-//	LOGA(FLA,"Magic: 0x%X\r\n",profile.magic);
+	ERR(FLA,"Private_key:0x%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X\r\n",
+			profile.nwk.private_key[0],profile.nwk.private_key[1],profile.nwk.private_key[2],profile.nwk.private_key[3],
+			profile.nwk.private_key[4],profile.nwk.private_key[5],profile.nwk.private_key[6],profile.nwk.private_key[7],
+			profile.nwk.private_key[8],profile.nwk.private_key[9],profile.nwk.private_key[10],profile.nwk.private_key[11],
+			profile.nwk.private_key[12],profile.nwk.private_key[13],profile.nwk.private_key[14],profile.nwk.private_key[15]);
 	LOGA(FLA,"NWK channel:%d |%d |%d \r\n",profile.nwk.chn[0],profile.nwk.chn[1],profile.nwk.chn[2]);
 	return profile;
 }
@@ -316,17 +321,17 @@ fl_slave_profiles_t fl_db_slaveprofile_init(void){
 /***                            Functions callback                           **/
 /******************************************************************************/
 /******************************************************************************/
-void fl_db_init(void){
+void fl_db_init(void) {
 
 	//First load firmware to device
 	//check flash -> clear all -> first init
 	u8 initialized_db[QUANTITY_FIELD_STORED_DB];
 	memset(initialized_db,0xFF,QUANTITY_FIELD_STORED_DB);
 	flash_dread(ADDR_DATABASE_INITIALIZATION,QUANTITY_FIELD_STORED_DB,(uint8_t*) &initialized_db);
-	for(u8 i = 0;i<QUANTITY_FIELD_STORED_DB;i++){
-		if(initialized_db[i]==0xFF){
+	for (u8 i = 0; i < QUANTITY_FIELD_STORED_DB; i++) {
+		if (initialized_db[i] == 0xFF) {
 			ERR(FLA,"Factory all DB....\r\n");
-			flash_erase_sector(ADDR_USERAREA_END-SECTOR_FLASH_SIZE);
+			flash_erase_sector(ADDR_USERAREA_END - SECTOR_FLASH_SIZE);
 			fl_db_clearAll();
 			memset(initialized_db,0x55,QUANTITY_FIELD_STORED_DB);
 			flash_page_program(ADDR_DATABASE_INITIALIZATION,QUANTITY_FIELD_STORED_DB,(uint8_t*) &initialized_db);
@@ -334,12 +339,12 @@ void fl_db_init(void){
 		}
 	}
 
-	LOGA(FLA,"RTC ADDR      :0x%X-0x%X\r\n",ADDR_RTC_START,ADDR_RTC_START+RTC_SIZE);
+	LOGA(FLA,"RTC ADDR      (%d):0x%X-0x%X\r\n",RTC_ENTRY_SIZE,ADDR_RTC_START,ADDR_RTC_START+RTC_SIZE);
 #ifdef MASTER_CORE
-	LOGA(FLA,"NODELIST      :0x%X-0x%X\r\n",ADDR_NODELIST_START,ADDR_NODELIST_START+NODELIST_SIZE);
-	LOGA(FLA,"MASTERPROFILE :0x%X-0x%X\r\n",ADDR_MASTER_PROFILE_START,ADDR_MASTER_PROFILE_START+MASTERPROFILE_SIZE);
+	LOGA(FLA,"NODELIST      (%d):0x%X-0x%X\r\n",NODELIST_NUMSLAVE_SIZE,ADDR_NODELIST_START,ADDR_NODELIST_START+NODELIST_SIZE);
+	LOGA(FLA,"MASTERPROFILE (%d):0x%X-0x%X\r\n",MASTER_PROFILE_ENTRY_SIZE,ADDR_MASTER_PROFILE_START,ADDR_MASTER_PROFILE_START+MASTERPROFILE_SIZE);
 #else
-	LOGA(FLA,"SLAVEPROFILE  :0x%X-0x%X\r\n",ADDR_SLAVE_PROFILE_START,ADDR_SLAVE_PROFILE_START+SLAVEPROFILE_SIZE);
+	LOGA(FLA,"SLAVEPROFILE  (%d):0x%X-0x%X\r\n",SLAVE_PROFILE_ENTRY_SIZE,ADDR_SLAVE_PROFILE_START,ADDR_SLAVE_PROFILE_START+SLAVEPROFILE_SIZE);
 #endif
 }
 void fl_db_all_save(void){

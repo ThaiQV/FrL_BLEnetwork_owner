@@ -174,7 +174,7 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 	PLOG_DEVICE_PROFILE(_bootloader,_fw,_hw);
 
 	//OFF ALL LOG
-	PLOG_Stop(ALL);
+//	PLOG_Stop(ALL);
 
 	if (!deepRetWakeUp) {  //read flash size
 #if (BATT_CHECK_ENABLE)

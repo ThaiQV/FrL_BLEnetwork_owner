@@ -60,6 +60,7 @@ typedef struct {
 	struct {
 		u8 chn[3];
 		//key
+		u8 private_key[16];
 	} nwk;
 	//Don't change
 	u32 magic;

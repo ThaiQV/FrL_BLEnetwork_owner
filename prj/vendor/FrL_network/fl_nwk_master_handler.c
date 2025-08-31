@@ -159,11 +159,20 @@ fl_pack_t fl_master_packet_collect_build(void) {
 
 	//Add new mill-step
 	packet.frame.milltamp = timetampStep.milstep;
+	/*****************************************************************/
+	/* | HDR | Timetamp | Mill_time | SlaveID | payload | crc8 | Ep | */
+	/* | 1B  |   4Bs    |    1B     |    1B   |   20Bs  |  1B  | 1B | -> .master = FL_FROM_SLAVE_ACK / FL_FROM_SLAVE */
+	/*****************************************************************/
+
+	/*****************************************************************/
+	/* |        PAYLOAD      |*/
+	/* | 6 bytes  Master MAC | */
 
 	packet.frame.slaveID.id_u8 = 0xFF;
 	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
 	//Add master's mac
 	memcpy(&packet.frame.payload[0],blc_ll_get_macAddrPublic(),6);
+
 
 	packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
 	packet.frame.endpoint.master = FL_FROM_MASTER_ACK; //ack
@@ -431,6 +440,7 @@ int _nwk_master_backup(void) {
 		profile.nwk.chn[0] = G_MASTER_INFO.nwk.chn[0];
 		profile.nwk.chn[1] = G_MASTER_INFO.nwk.chn[1];
 		profile.nwk.chn[2] = G_MASTER_INFO.nwk.chn[2];
+		memcpy(profile.nwk.private_key,G_MASTER_INFO.nwk.private_key,SIZEU8(G_MASTER_INFO.nwk.private_key));
 		fl_db_masterprofile_save(profile);
 		LOGA(INF,"Channels:%d |%d |%d\r\n",profile.nwk.chn[0],profile.nwk.chn[1],profile.nwk.chn[2])
 	}
@@ -599,6 +609,7 @@ void fl_nwk_master_init(void) {
 	G_MASTER_INFO.nwk.chn[0] = master_profile.nwk.chn[0];
 	G_MASTER_INFO.nwk.chn[1] = master_profile.nwk.chn[1];
 	G_MASTER_INFO.nwk.chn[2] = master_profile.nwk.chn[2];
+	memcpy(G_MASTER_INFO.nwk.private_key,master_profile.nwk.private_key,SIZEU8(master_profile.nwk.private_key));
 	blt_soft_timer_add(_nwk_master_backup,2 * 1000 * 1000);
 }
 /***************************************************

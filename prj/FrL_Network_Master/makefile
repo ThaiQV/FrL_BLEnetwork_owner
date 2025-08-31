@@ -40,6 +40,7 @@ RM := rm -rf
 -include drivers/B91/flash/subdir.mk
 -include vendor/FrL_Network/Peri_libs/subdir.mk
 -include vendor/FrL_Network/subdir.mk
+-include vendor/FrL_Network/fl_crypt/subdir.mk
 -include vendor/TBS_dev/subdir.mk
 -include vendor/common/subdir.mk
 -include objects.mk
