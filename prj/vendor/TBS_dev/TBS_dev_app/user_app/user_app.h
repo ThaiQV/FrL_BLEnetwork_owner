@@ -12,20 +12,12 @@
 //#include "lcd_app/lcd_app.h"
 //#include "led_7_seg_app/led_7_seg_app.h"
 
-/*  System tick
-enum{
-	SYSTEM_TIMER_TICK_1US 		= 16,
-	SYSTEM_TIMER_TICK_1MS 		= 16000,
-	SYSTEM_TIMER_TICK_1S 		= 16000000,
 
-	SYSTEM_TIMER_TICK_625US  	= 10000,  //625*16
-	SYSTEM_TIMER_TICK_1250US 	= 20000,  //1250*16
-};
-*/
-
-#define TIME_LED7SEG_TASK_MS 			(100 * SYSTEM_TIMER_TICK_1MS)  // ms
-#define TIME_LCD_TASK_MS 				(100 * SYSTEM_TIMER_TICK_1MS)
-#define TIME_BUTTON_TASK_MS				(10 * SYSTEM_TIMER_TICK_1MS)
+#define TIME_LED7SEG_TASK_MS 			(100)  // ms
+#define TIME_LCD_TASK_MS 				(100)
+#define TIME_BUTTON_TASK_MS				(10)
+#define TIME_LED_TASK_MS				(10)
+#define TIME_DTATSTORAGE_TASK_MS		(30 * 1000) //60s
 
 //typedef struct {
 //	led7seg_shared_data_t 	*led7seg;

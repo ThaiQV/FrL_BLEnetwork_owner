@@ -70,14 +70,23 @@ lcd_shared_data_t lcd_data;
 
 uint8_t user_lcd_app_init(void)
 {
+	gpio_function_en(GPIO_PC0);
+	gpio_set_output(GPIO_PC0, 1); 			//enable output
+	gpio_set_input(GPIO_PC0, 0);			//disable input
+	gpio_set_up_down_res(GPIO_PC0, GPIO_PIN_PULLUP_10K);
+	gpio_set_level(GPIO_PC0, 1);
+
 	lcd16x2_error_t result = lcd16x2_init(&lcd_handle, &lcd_config);
 	lcd_data.enable = 1;
+
+	lcd16x2_printf(&lcd_handle, "TBS couter On");
+
 	return result;
 }
 
 void user_lcd_app_task(void)
 {
-	static unsigned long lcdTimeTick = 0;
+	static uint64_t lcdTimeTick = 0;
 	if(get_system_time_ms() - lcdTimeTick > TIME_BUTTON_TASK_MS){
 		lcdTimeTick = get_system_time_ms()  ; //10ms
 	}

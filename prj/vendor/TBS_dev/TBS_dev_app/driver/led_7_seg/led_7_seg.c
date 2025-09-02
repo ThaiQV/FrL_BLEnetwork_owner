@@ -329,7 +329,7 @@ bool et6226m_clear_display(et6226m_handle_t *handle)
     }
 
     // Clear all digits
-    for (int i = 1; i <= 4; i++) {
+    for (int i = 1; i < 4; i++) {
         et6226m_display_digit(handle, i, ET6226M_CHAR_BLANK);
     }
 

@@ -70,27 +70,13 @@ void user_led_7_seg_app_init(void)
 	led7seg_data.value_err = 0;
 	led7seg_data.enabled = 1;
 	led7seg_data.print_err = 0;
-	led7seg_data.led_nwk_on = false;
-	led7seg_data.led_call_on = false;
 //	et6226m_display_printf(&display_handle,"E%d", 123);
-
-	gpio_function_en(GPIO_PA5);
-	gpio_set_output(GPIO_PA5, 1); 			//enable output
-	gpio_set_input(GPIO_PA5, 0);			//disable input
-	gpio_set_up_down_res(GPIO_PA5, GPIO_PIN_PULLUP_10K);
-	gpio_set_level(GPIO_PA5, 0);
-
-	gpio_function_en(GPIO_PA6);
-	gpio_set_output(GPIO_PA6, 1); 			//enable output
-	gpio_set_input(GPIO_PA6, 0);			//disable input
-	gpio_set_up_down_res(GPIO_PA6, GPIO_PIN_PULLUP_10K);
-	gpio_set_level(GPIO_PA6, 0);
 
 }
 
 void user_led_7_seg_app_task(void)
 {
-    static unsigned long led7segTimeTick = 0;
+    static uint64_t led7segTimeTick = 0;
 	if(get_system_time_ms() - led7segTimeTick > TIME_BUTTON_TASK_MS){
 		led7segTimeTick = get_system_time_ms()  ; //10ms
 	}
@@ -112,9 +98,6 @@ void user_led_7_seg_app_task(void)
     {
     	et6226m_display_number(&display_handle, led7seg_data.value, false);
     }
-
-    gpio_set_level(GPIO_PA5, !(led7seg_data.led_call_on));
-    gpio_set_level(GPIO_PA6, !(led7seg_data.led_nwk_on));
 
 }
 

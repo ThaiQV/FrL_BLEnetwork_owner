@@ -17,6 +17,8 @@
 #define BUTTON_ID_PED			4
 #define BUTTON_ID_PPD			5
 #define BUTTON_ID_PPU			6
+// add pin
+#define BUTTON_ID_MAX			7
 
 extern tca9555_handle_t tca9555_handle;
 extern app_share_data_t app_data;
@@ -32,7 +34,7 @@ typedef struct {
             PortPin_Map *PPD;
             PortPin_Map *PPU;
         };
-        PortPin_Map *all_pins[7]; // 3 control + 8 data = 11 pins
+        PortPin_Map *all_pins[BUTTON_ID_MAX]; // 3 control + 8 data = 11 pins
     };
 } Button_Pin_TypeDef;
 
@@ -48,7 +50,7 @@ Button_Pin_TypeDef button_pin_map = {
 
 void button_pin_init_all(void)
 {
-	for(uint8_t i = 0; i < 7; i++)
+	for(uint8_t i = 0; i < BUTTON_ID_MAX; i++)
 	{
 		if(button_pin_map.all_pins[i] != NULL)
 		{
@@ -76,6 +78,11 @@ bool button_pin_read(button_pin_t pin)
 	tca9555_pin_state_t value;
 	tca9555_read_pin_input(&tca9555_handle, button_pin_map.all_pins[pin]->tca_port, button_pin_map.all_pins[pin]->tca_pin, &value);
 	return value;
+}
+
+uint64_t bt_MsTick_get(void)
+{
+	return get_system_time_ms();
 }
 
 void on_button_click(uint8_t button_id) {
@@ -118,6 +125,21 @@ void on_button_multiclick(uint8_t button_id, uint8_t click_count) {
     }
 }
 
+void my_combo_callback(uint8_t *button_ids, uint8_t count, uint32_t hold_time)
+{
+	ULOGA("my_combo_callback %d, %d, %d, %d \n", button_ids[0], button_ids[1], count, hold_time);
+}
+
+void my_pattern_callback(uint8_t *pattern, uint8_t length)
+{
+	ULOGA("my_pattern_callback: " );
+	for (int i =0; i < length; i++)
+	{
+		printf(" %d", pattern[i]);
+	}
+	printf("/n");
+}
+
 static void main_on_lick(uint8_t button_id);
 static void cmain_on_lick(uint8_t button_id);
 static void peu_on_lick(uint8_t button_id);
@@ -125,21 +147,15 @@ static void ped_on_lick(uint8_t button_id);
 static void ppd_on_lick(uint8_t button_id);
 static void ppu_on_lick(uint8_t button_id);
 static void reset_hold_3s(uint8_t button_id, uint32_t actual_hold_time);
-static void peu_hold_5s(uint8_t button_id, uint32_t actual_hold_time);
-static void ped_hold_5s(uint8_t button_id, uint32_t actual_hold_time);
+static void peu_rst_hold_5s(uint8_t *button_ids, uint8_t count, uint32_t hold_time);
+static void ped_rst_hold_5s(uint8_t *button_ids, uint8_t count, uint32_t hold_time);
 
-
-
-uint32_t bt_get_system_time_ms(void)
-{
-	return reg_system_tick/SYSTEM_TIMER_TICK_1MS;
-}
 
 button_hal_t button_hal = {
     .button_pin_init_all = button_pin_init_all,
     .button_pin_init = button_pin_init,
     .button_pin_read = button_pin_read,
-    .get_system_time_ms = bt_get_system_time_ms,
+    .get_system_time_ms = bt_MsTick_get,
 };
 
 void user_button_app_init(void)
@@ -155,15 +171,30 @@ void user_button_app_init(void)
     button_set_click_callback(BUTTON_ID_PPU, ppu_on_lick);
     button_set_click_callback(BUTTON_ID_MAIN, main_on_lick);
     button_set_click_callback(BUTTON_ID_CMAIN, cmain_on_lick);
-    button_add_hold_level(BUTTON_ID_RESET, 3000, reset_hold_3s);
-    button_add_hold_level(BUTTON_ID_PEU, 5000, peu_hold_5s);
-    button_add_hold_level(BUTTON_ID_PED, 5000, ped_hold_5s);
+    button_set_release_callback(BUTTON_ID_RESET, reset_hold_3s);
+    button_set_multiclick_callback(BUTTON_ID_PPD, on_button_multiclick);
+
+    // Combo:
+    uint8_t combo_buttons1[] = {BUTTON_ID_PED, BUTTON_ID_RESET};
+    uint8_t combo_id1 = button_add_combo(combo_buttons1, 2, 500); // 500ms detection window
+    button_set_combo_hold_callback(combo_id1, 5000, ped_rst_hold_5s);
+
+    uint8_t combo_buttons2[] = {BUTTON_ID_PEU, BUTTON_ID_RESET};
+    uint8_t combo_id2 = button_add_combo(combo_buttons2, 2, 500); // 500ms detection window
+    button_set_combo_hold_callback(combo_id2, 5000, peu_rst_hold_5s);
+//    button_set_combo_click_callback(combo_id, my_combo_callback);
+
+    // Pattern:
+//    uint8_t pattern_buttons[] = {2, 3, 4};
+//    uint8_t pattern_id = button_add_pattern(pattern_buttons, 3, 1000); // 1s timeout
+//    button_set_pattern_callback(pattern_id, my_pattern_callback);
+
 
 }
 
 void user_button_app_task(void)
 {
-	static unsigned long buttonTimeTick = 0;
+	static uint64_t buttonTimeTick = 0;
 	if(get_system_time_ms() - buttonTimeTick > TIME_BUTTON_TASK_MS){
 		buttonTimeTick = get_system_time_ms()  ; //10ms
 	}
@@ -190,7 +221,7 @@ static void cmain_on_lick(uint8_t button_id)
 static void peu_on_lick(uint8_t button_id)
 {
 	ULOGA("peu_on_lick\n");
-	if(app_data.err_product++ == 1000)
+	if(app_data.err_product++ >= 1000)
 	{
 		app_data.err_product = 0;
 	}
@@ -219,26 +250,32 @@ static void ppd_on_lick(uint8_t button_id)
 static void ppu_on_lick(uint8_t button_id)
 {
 	ULOGA("ppu_on_lick\n");
-	if(app_data.pass_product++ == 10000)
+	if(app_data.pass_product++ >= 10000)
 	{
 		app_data.pass_product = 0;
 	}
 }
 
-static void reset_hold_3s(uint8_t button_id, uint32_t actual_hold_time)
+static void reset_hold_3s(uint8_t button_id, uint32_t press_duration_ms)
 {
-	ULOGA("reset_hold_3s\n");
-	app_data.bt_rst = 1;
+	ULOGA("reset_hold_3s: %d\n", press_duration_ms);
+	if(press_duration_ms > 3000)
+	{
+		app_data.bt_rst = 1;
+	}
 }
 
-static void peu_hold_5s(uint8_t button_id, uint32_t actual_hold_time)
+static void peu_rst_hold_5s(uint8_t *button_ids, uint8_t count, uint32_t hold_time)
 {
 	ULOGA("RST Factory\n");
 	fl_db_clearAll();
+	sys_reboot();
 }
 
-static void ped_hold_5s(uint8_t button_id, uint32_t actual_hold_time)
+static void ped_rst_hold_5s(uint8_t *button_ids, uint8_t count, uint32_t hold_time)
 {
 	ULOGA("PAIR\n");
 	fl_db_clearAll();
+	sys_reboot();
+
 }
