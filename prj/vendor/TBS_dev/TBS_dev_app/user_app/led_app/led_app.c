@@ -148,7 +148,7 @@ void user_led_app_task(void)
 
 
 //	if(led_data.led_nwk_on)
-	if(IsJoinedNetwork())
+	if(IsOnline())
 	{
 //		led_on(LED_ID_NWK);
 		gpio_set_level(GPIO_PA6, 0);

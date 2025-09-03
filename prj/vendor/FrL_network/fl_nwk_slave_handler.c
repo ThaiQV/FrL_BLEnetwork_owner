@@ -34,7 +34,7 @@ volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME = {.timetamp = 0,.milstep =
 											}while(0) //Sync original time-master req
 
 #define JOIN_NETWORK_TIME 			30*1000 	//ms
-#define RECHECKING_NETWOK_TIME 		1*60*1000 	//ms - 2mins
+#define RECHECKING_NETWOK_TIME 		80*1000 	//ms - 1.5mins
 
 fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
 fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_55,NWK_HDR_RECONNECT}; // register cmdid REQ
@@ -97,6 +97,12 @@ bool IsJoinedNetwork(void)	{
 }
 bool IsOnline(void){
 	return G_INFORMATION.active;
+}
+
+int _isOnline_check(void) {
+	LOG_P(INF,"Device -> offline\r\n");
+	G_INFORMATION.active = false;
+	return 0;
 }
 
 int _nwk_slave_backup(void){
@@ -173,6 +179,11 @@ void fl_nwk_slave_init(void) {
 	//Interval checking network
 	fl_nwk_slave_reconnect();
 
+	//check online
+	blt_soft_timer_delete(&_isOnline_check);
+	blt_soft_timer_add(_isOnline_check,RECHECKING_NETWOK_TIME*1000); //2 mins
+	G_INFORMATION.active = false;
+
 	//test random send req
 //	TEST_slave_sendREQ();
 }
@@ -208,6 +219,9 @@ void _nwk_slave_syncFromPack(fl_dataframe_format_t *packet){
 	{
 		G_INFORMATION.active=true;
 	}
+	//check online
+	blt_soft_timer_delete(&_isOnline_check);
+	blt_soft_timer_add(_isOnline_check,RECHECKING_NETWOK_TIME*1000); //2 mins
 }
 
 s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms) {
