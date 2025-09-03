@@ -96,6 +96,7 @@ typedef struct {
 #define ET6226M_CHAR_E             0x79
 #define ET6226M_CHAR_L             0x38
 #define ET6226M_CHAR_P             0x73
+#define ET6226M_CHAR_8_DOT         0xFF
 
 /**
  * @brief Brightness levels

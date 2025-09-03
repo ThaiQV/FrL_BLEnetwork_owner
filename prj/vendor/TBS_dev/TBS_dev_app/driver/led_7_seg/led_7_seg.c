@@ -29,6 +29,7 @@ static const uint8_t digit_patterns[10] = ET6226M_DIGIT_PATTERNS;
 static const uint8_t char_patterns[256] = {
     [' '] = ET6226M_CHAR_BLANK,
     ['-'] = ET6226M_CHAR_MINUS,
+	[','] = ET6226M_CHAR_8_DOT,
     ['0'] = 0x3F, ['1'] = 0x06, ['2'] = 0x5B, ['3'] = 0x4F, ['4'] = 0x66,
     ['5'] = 0x6D, ['6'] = 0x7D, ['7'] = 0x07, ['8'] = 0x7F, ['9'] = 0x6F,
     ['A'] = 0x77, ['B'] = 0x7C, ['C'] = 0x39, ['D'] = 0x5E, ['E'] = 0x79 + ET6226M_REG_DP /* print "E."*/,

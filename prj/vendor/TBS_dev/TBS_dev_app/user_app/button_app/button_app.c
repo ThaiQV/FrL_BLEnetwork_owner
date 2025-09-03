@@ -147,6 +147,7 @@ static void ped_on_lick(uint8_t button_id);
 static void ppd_on_lick(uint8_t button_id);
 static void ppu_on_lick(uint8_t button_id);
 static void reset_hold_3s(uint8_t button_id, uint32_t actual_hold_time);
+static void reset_hold_3ss(uint8_t button_id, uint32_t actual_hold_time);
 static void peu_rst_hold_5s(uint8_t *button_ids, uint8_t count, uint32_t hold_time);
 static void ped_rst_hold_5s(uint8_t *button_ids, uint8_t count, uint32_t hold_time);
 
@@ -172,7 +173,7 @@ void user_button_app_init(void)
     button_set_click_callback(BUTTON_ID_MAIN, main_on_lick);
     button_set_click_callback(BUTTON_ID_CMAIN, cmain_on_lick);
     button_set_release_callback(BUTTON_ID_RESET, reset_hold_3s);
-    button_set_multiclick_callback(BUTTON_ID_PPD, on_button_multiclick);
+//    button_add_hold_level(BUTTON_ID_RESET, 3000, reset_hold_3ss);
 
     // Combo:
     uint8_t combo_buttons1[] = {BUTTON_ID_PED, BUTTON_ID_RESET};
@@ -225,6 +226,7 @@ static void peu_on_lick(uint8_t button_id)
 	{
 		app_data.err_product = 0;
 	}
+	app_data.print_err_led7 = 1;
 
 }
 
@@ -235,6 +237,7 @@ static void ped_on_lick(uint8_t button_id)
 	{
 		app_data.err_product--;
 	}
+	app_data.print_err_led7 = 1;
 }
 
 static void ppd_on_lick(uint8_t button_id)
@@ -244,7 +247,7 @@ static void ppd_on_lick(uint8_t button_id)
 	{
 		app_data.pass_product--;
 	}
-
+	app_data.print_err_led7 = 0;
 }
 
 static void ppu_on_lick(uint8_t button_id)
@@ -254,6 +257,13 @@ static void ppu_on_lick(uint8_t button_id)
 	{
 		app_data.pass_product = 0;
 	}
+	app_data.print_err_led7 = 0;
+}
+
+static void reset_hold_3ss(uint8_t button_id, uint32_t press_duration_ms)
+{
+	ULOGA("reset_hold_3s: %d\n", press_duration_ms);
+		app_data.bt_rst = 1;
 }
 
 static void reset_hold_3s(uint8_t button_id, uint32_t press_duration_ms)

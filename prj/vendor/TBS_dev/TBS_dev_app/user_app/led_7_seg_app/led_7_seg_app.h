@@ -20,8 +20,10 @@
 typedef struct {
 	uint32_t value;         ///< Value to display (0-9999)
 	uint32_t value_err;
+	uint64_t time_out_err;
 	bool print_err;
 	bool enabled;           ///< Display enabled
+	uint8_t chage_printf;
 } led7seg_shared_data_t;
 
 void user_led_7_seg_app_init(void);

@@ -80,7 +80,10 @@ uint8_t user_lcd_app_init(void)
 	lcd16x2_clear(&lcd_handle);
 	lcd_data.enable = 1;
 
-//	lcd16x2_printf(&lcd_handle, "TBS couter On");
+	lcd16x2_set_cursor(&lcd_handle, 0, 0);
+	lcd16x2_printf(&lcd_handle, "TBS com         ");
+	lcd16x2_set_cursor(&lcd_handle, 1, 0);
+	lcd16x2_printf(&lcd_handle, "      Couter    ");
 
 	return result;
 }

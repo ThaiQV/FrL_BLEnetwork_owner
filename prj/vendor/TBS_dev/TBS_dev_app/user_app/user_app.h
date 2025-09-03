@@ -12,12 +12,14 @@
 //#include "lcd_app/lcd_app.h"
 //#include "led_7_seg_app/led_7_seg_app.h"
 
-
+#define TIME_APP_TASK_MS				(1)
 #define TIME_LED7SEG_TASK_MS 			(100)  // ms
 #define TIME_LCD_TASK_MS 				(100)
 #define TIME_BUTTON_TASK_MS				(10)
 #define TIME_LED_TASK_MS				(10)
 #define TIME_DTATSTORAGE_TASK_MS		(30 * 1000) //60s
+
+#define TIME_OUT_PRINTF_ERR_MS			(10 * 1000) //60s
 
 //typedef struct {
 //	led7seg_shared_data_t 	*led7seg;
@@ -34,6 +36,7 @@ typedef struct {
 	int32_t pass_product;
 	int32_t err_product;
 	bool is_call;
+	uint8_t print_err_led7;
 }app_share_data_t;
 
 

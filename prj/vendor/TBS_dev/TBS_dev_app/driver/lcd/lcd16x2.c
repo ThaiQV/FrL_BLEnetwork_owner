@@ -464,23 +464,56 @@ lcd16x2_error_t lcd16x2_print_char(lcd16x2_handle_t *handle, char ch)
     return lcd16x2_send_data(handle, (uint8_t)ch);
 }
 
+//lcd16x2_error_t lcd16x2_print_string(lcd16x2_handle_t *handle, const char *str)
+//{
+//    lcd16x2_error_t result = lcd16x2_validate_handle(handle);
+//    if (result != LCD16X2_OK) {
+//        return result;
+//    }
+//
+//    if (str == NULL) {
+//        return LCD16X2_ERROR_NULL_POINTER;
+//    }
+//
+//    while (*str) {
+//        result = lcd16x2_print_char(handle, *str);
+//        if (result != LCD16X2_OK) {
+//            return result;
+//        }
+//        str++;
+//    }
+//
+//    return LCD16X2_OK;
+//}
+
 lcd16x2_error_t lcd16x2_print_string(lcd16x2_handle_t *handle, const char *str)
 {
     lcd16x2_error_t result = lcd16x2_validate_handle(handle);
     if (result != LCD16X2_OK) {
         return result;
     }
-
     if (str == NULL) {
         return LCD16X2_ERROR_NULL_POINTER;
     }
 
-    while (*str) {
+    uint8_t char_count = 0;
+    const uint8_t MAX_CHARS = handle->config.cols;
+
+    while (*str && char_count < MAX_CHARS) {
         result = lcd16x2_print_char(handle, *str);
         if (result != LCD16X2_OK) {
             return result;
         }
         str++;
+        char_count++;
+    }
+
+    while (char_count < MAX_CHARS) {
+        result = lcd16x2_print_char(handle, ' ');
+        if (result != LCD16X2_OK) {
+            return result;
+        }
+        char_count++;
     }
 
     return LCD16X2_OK;

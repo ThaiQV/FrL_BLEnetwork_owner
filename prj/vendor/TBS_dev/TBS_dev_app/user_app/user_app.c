@@ -82,6 +82,18 @@ void user_app_init(void)
 }
 void user_app_loop(void)
 {
+	static uint64_t appTimeTick = 0;
+	if(get_system_time_ms() - appTimeTick > TIME_APP_TASK_MS){
+		appTimeTick = get_system_time_ms()  ; //10ms
+	}
+	else{
+		return ;
+	}
+
+	if(get_system_time_ms() < 3500)
+	{
+		return;
+	}
 	/* input app */
 	user_button_app_task();
 
@@ -106,9 +118,29 @@ static void user_app_data_sys(void)
 	char line1[16];
 	char line2[16];
 
+	if(app_data.print_err_led7)
+	{
+		if(app_data.print_err_led7 == 1)
+		{
+			app_data.print_err_led7 = 2;
+			led7seg_data.print_err = 1;
+			led7seg_data.time_out_err = get_system_time_ms();
+		}
+
+		if(get_system_time_ms() - led7seg_data.time_out_err > TIME_OUT_PRINTF_ERR_MS){
+			app_data.print_err_led7 = 0;
+			led7seg_data.print_err = 0;
+			led7seg_data.chage_printf = 1;
+		}
+	}
+	else
+	{
+		led7seg_data.print_err = 0;
+	}
 
 	if(led7seg_data.value != app_data.pass_product)
 	{
+		led7seg_data.chage_printf = 1;
 		led7seg_data.value = app_data.pass_product;
 		sprintf(line1, "pass %4d       \n", (int)app_data.pass_product);
 		memcpy(lcd_data.display.line1, line1, 16);
@@ -117,6 +149,7 @@ static void user_app_data_sys(void)
 
 	if(led7seg_data.value_err != app_data.err_product)
 	{
+		led7seg_data.chage_printf = 1;
 		led7seg_data.value_err = app_data.err_product;
 		sprintf(line2, "err  %4d       \n", (int)app_data.err_product);
 		memcpy(lcd_data.display.line2, line2, 16);
@@ -134,6 +167,8 @@ static void user_app_data_sys(void)
 			app_data.is_call = 1;
 		}
 		app_data.bt_call = 0;
+		led7seg_data.print_err = 0;
+		led7seg_data.chage_printf = 1;
 	}
 
 	if(app_data.bt_endcall)
@@ -147,6 +182,8 @@ static void user_app_data_sys(void)
 			app_data.is_call = 0;
 		}
 		app_data.bt_endcall = 0;
+		led7seg_data.print_err = 0;
+		led7seg_data.chage_printf = 1;
 	}
 
 	if(app_data.bt_rst)
@@ -162,6 +199,8 @@ static void user_app_data_sys(void)
 		data_storage_data.product_pass = app_data.pass_product;
 		data_storage_data.product_error = app_data.err_product;
 		app_data.bt_rst = 0;
+		led7seg_data.print_err = 0;
+		led7seg_data.chage_printf = 1;
 	}
 
 	if(app_data.reset_factory)
@@ -184,6 +223,8 @@ static void user_app_data_sys(void)
 		sys_reboot();
 		app_data.pair = 0;
 	}
+
+
 
     static unsigned int nwk_check_TimeTick = 0;
 	if(get_system_time_ms() - nwk_check_TimeTick > TIME_BUTTON_TASK_MS){

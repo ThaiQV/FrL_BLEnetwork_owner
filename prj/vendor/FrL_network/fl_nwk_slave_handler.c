@@ -77,7 +77,7 @@ extern tbs_device_counter_t G_COUNTER_DEV ;
 tbs_device_powermeter_t G_POWER_METER;
 #endif
 //flag debug of the network
-volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into end-point byte (dbg :1bit)
+volatile u8 NWK_DEBUG_STT = 1; // it will be assigned into end-point byte (dbg :1bit)
 volatile u8 NWK_REPEAT_MODE = 1; // 1: level | 0 : non-level
 volatile u8  NWK_REPEAT_LEVEL = 3;
 /******************************************************************************/

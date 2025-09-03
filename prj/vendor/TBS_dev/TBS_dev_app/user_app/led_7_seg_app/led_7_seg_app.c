@@ -70,14 +70,16 @@ void user_led_7_seg_app_init(void)
 	led7seg_data.value_err = 0;
 	led7seg_data.enabled = 1;
 	led7seg_data.print_err = 0;
-//	et6226m_display_printf(&display_handle,"E%d", 123);
+	led7seg_data.chage_printf = 1;
+	led7seg_data.time_out_err = 0;
+	et6226m_display_printf(&display_handle, ",,,,");
 
 }
 
 void user_led_7_seg_app_task(void)
 {
     static uint64_t led7segTimeTick = 0;
-	if(get_system_time_ms() - led7segTimeTick > TIME_BUTTON_TASK_MS){
+	if(get_system_time_ms() - led7segTimeTick > TIME_LED7SEG_TASK_MS){
 		led7segTimeTick = get_system_time_ms()  ; //10ms
 	}
 	else{
@@ -89,6 +91,13 @@ void user_led_7_seg_app_task(void)
     	et6226m_clear_display(&display_handle);
     	return;
     }
+
+    if(led7seg_data.chage_printf == 0)
+    {
+    	return;
+    }
+
+    led7seg_data.chage_printf = 0;
 
     if(led7seg_data.print_err)
     {
