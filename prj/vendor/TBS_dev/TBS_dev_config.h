@@ -15,8 +15,9 @@ typedef enum{
 	TBS_COUNTER = 0x00,
 	TBS_POWERMETER=0x01
 }tbs_dev_type_e;
+
 #ifndef MASTER_CORE
-#define COUNTER_DEVICE
+//#define COUNTER_DEVICE
 #ifndef COUNTER_DEVICE
 #define POWER_METER_DEVICE
 #endif

@@ -43,7 +43,7 @@ volatile u8 MASTER_INSTALL_STATE = 0;
 u16 PERIOD_HEARTBEAT = 0 * 1000; //
 //flag debug of the network
 volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into endpoint byte (dbg :1bit)
-volatile u8 NWK_REPEAT_MODE = 1; // 1: level | 0 : non-level
+volatile u8 NWK_REPEAT_MODE = 0; // 1: level | 0 : non-level
 volatile u8 NWK_REPEAT_LEVEL = 3;
 
 /******************************************************************************/
