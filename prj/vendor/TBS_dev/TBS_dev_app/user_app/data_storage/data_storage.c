@@ -4,6 +4,12 @@
  * @date 2025
  */
 
+#ifndef MASTER_CORE
+
+#include "vendor/TBS_dev/TBS_dev_config.h"
+
+#ifdef COUNTER_DEVICE
+
 #include "../../user_lib.h"
 #include "data_storage.h"
 #include "Freelux_libs/storage_weekly_data.h"
@@ -69,3 +75,6 @@ void user_datastorage_app_task(void)
 	storage_get_data(data_storage_data.timestamp, pre_data_save.data, sizeof(data_save_t));
 	ULOGA("read data: timestamp %d %d %d %d\n", data_storage_data.timestamp, pre_data_save.is_online, pre_data_save.product_pass, pre_data_save.product_error);
 }
+
+#endif /* COUNTER_DEVICE*/
+#endif /* MASTER_CORE*/

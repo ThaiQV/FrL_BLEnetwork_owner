@@ -7,11 +7,9 @@
 #ifndef APPS_USER_USER_LIB_H_
 #define APPS_USER_USER_LIB_H_
 
+#ifndef MASTER_CORE
+
 #include "tl_common.h"
-
-
-
-
 
 #define ULOGA(...)	LOGA(DEFAULT,__VA_ARGS__)
 
@@ -29,5 +27,6 @@
 #include "user_app/data_storage/data_storage.h"
 #include "user_app/user_app.h"
 
+#endif /* MASTER_CORE*/
 #endif /* APPS_USER_USER_LIB_H_ */
 

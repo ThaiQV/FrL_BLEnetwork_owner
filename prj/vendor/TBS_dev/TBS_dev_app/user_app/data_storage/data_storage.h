@@ -7,6 +7,9 @@
 #ifndef DATA_STORAGE_H_
 #define DATA_STORAGE_H_
 
+#ifndef MASTER_CORE
+#ifdef COUNTER_DEVICE
+
 typedef struct {
 	union {
 		struct {
@@ -29,4 +32,6 @@ typedef struct {
 void user_datastorage_app_init(void);
 void user_datastorage_app_task(void);
 
+#endif /* COUNTER_DEVICE*/
+#endif /* MASTER_CORE*/
 #endif /* DATA_STORAGE_H_ */

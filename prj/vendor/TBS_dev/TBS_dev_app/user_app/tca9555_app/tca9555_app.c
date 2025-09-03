@@ -3,6 +3,13 @@
  *
  *      Author: hoang
  */
+
+#ifndef MASTER_CORE
+
+#include "vendor/TBS_dev/TBS_dev_config.h"
+
+#ifdef COUNTER_DEVICE
+
 #include "../../user_lib.h"
 #include "tca9555_app.h"
 
@@ -59,3 +66,6 @@ void user_tca9555_app_init(void)
 	tca9555_init(&tca9555_handle, &tca9555_config, TCA9555_ADDR_A2_L_A1_L_A0_L);
 }
 /*****************************************************************/
+
+#endif /* COUNTER_DEVICE*/
+#endif /* MASTER_CORE*/

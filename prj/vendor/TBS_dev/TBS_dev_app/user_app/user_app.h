@@ -4,8 +4,11 @@
  *      Author: Nghia Hoang
  */
 
-#ifndef LCD_H
-#define LCD_H
+#ifndef USER_APP_H
+#define USER_APP_H
+
+#ifndef MASTER_CORE
+#ifdef COUNTER_DEVICE
 
 #include <stdint.h>
 //#include "button_app/button_app.h"
@@ -44,4 +47,6 @@ void user_app_init(void);
 void user_app_loop(void);
 void user_app_run(void);
 
+#endif /* COUNTER_DEVICE*/
+#endif /* MASTER_CORE*/
 #endif

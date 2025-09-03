@@ -5,7 +5,10 @@
  */
 #ifndef LED_APP_H
 #define LED_APP_H
-//
+
+#ifndef MASTER_CORE
+#ifdef COUNTER_DEVICE
+
 //#include <stdint.h>
 //#include <stdbool.h>
 
@@ -19,4 +22,6 @@ typedef struct {
 void user_led_app_init(void);
 void user_led_app_task(void);
 
+#endif /* COUNTER_DEVICE*/
+#endif /* MASTER_CORE*/
 #endif /* LED_7_SEG_APP_H*/

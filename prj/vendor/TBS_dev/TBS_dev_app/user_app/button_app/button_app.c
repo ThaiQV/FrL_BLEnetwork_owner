@@ -3,6 +3,13 @@
  *
  *      Author: hoang
  */
+
+#ifndef MASTER_CORE
+
+#include "vendor/TBS_dev/TBS_dev_config.h"
+
+#ifdef COUNTER_DEVICE
+
 #include "../../user_lib.h"
 #include "button_app.h"
 
@@ -286,3 +293,6 @@ static void ped_rst_hold_5s(uint8_t *button_ids, uint8_t count, uint32_t hold_ti
 	ULOGA("peu_rst_hold_5s\n");
 	app_data.pair = 1;
 }
+
+#endif /* COUNTER_DEVICE*/
+#endif /* MASTER_CORE*/
