@@ -171,7 +171,7 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 
 		/* Test code */
 		LOG_P(APP,"DFU\n");
-		firmware_header_check();
+		firmware_check();
 
 		irq_enable();
 		/// wdt init

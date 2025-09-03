@@ -16,6 +16,12 @@ volatile uint16_t  Flash_Sector_Size = 0x00;                                    
 void __delay_us(unsigned int us)
 {
 	delay_us(us);
+
+//	uint32_t i;
+//	for(i = 0; i < (2*us); i++)
+//	{
+//		__asm__("nop");
+//	}
 }
 unsigned char writeSPIByte(unsigned char transmit)
 {
@@ -41,9 +47,11 @@ unsigned char writeSPIByte(unsigned char transmit)
     	ret |= mask;      //Read current bit fromSPI In line
     }
     __delay_us(1);      //Ensure minimum delay of 500nS between SPI Clock high and SPI Clock Low
+//    __asm__("nop");
     PIN_CLEAR(PIN_CLK);
     mask = mask >> 1;   //Shift mask so that next bit is written and read from SPI lines
     __delay_us(1);      //Ensure minimum delay of 1000ns between bits
+//    __asm__("nop");
   }while (mask != 0);
 
   return ret;
