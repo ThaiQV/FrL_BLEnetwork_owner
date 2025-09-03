@@ -107,12 +107,21 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 				//u32 test_adv_cnt = MAKE_U32(pa->data[3],pa->data[2],pa->data[1],pa->data[0]);
 				//LOGA(BLE,"ADV rec:%d!!!\r\n",test_adv_cnt);
 
-				//if(0xFF == IsNWKHDR(pa->data[0])) return 0;
+				if(0xFF == IsNWKHDR(pa->data[0])) return 0;
 
 				fl_pack_t incomming_data;
 				incomming_data.length = pa->len + 1; //add rssi byte
-				//aes_decrypt(FL_NWK_PB_KEY,(unsigned char*)pa->data,incomming_data.data_arr);
-				memcpy(incomming_data.data_arr,pa->data,incomming_data.length);
+				//memcpy(incomming_data.data_arr,pa->data,incomming_data.length);
+				incomming_data.data_arr[0] = pa->data[0];
+				//Add decrypt
+				u32 decrypted_len;
+				if (!fl_aes_decryptWpadding(FL_NWK_PB_KEY,&pa->data[1],incomming_data.length -1,&incomming_data.data_arr[1],&decrypted_len)) {
+//					P_PRINTFHEX_A(INF,decrypted,decrypted_len,"Decrypted OK(len:%d):",decrypted_len);
+					//ERR(INF,"Padding Err\r\n");
+					return 0;
+				}
+				//update lenght data decrypted
+				//incomming_data.length=decrypted_len;
 #ifdef MASTER_CORE
 				//skip from  master
 				if (fl_adv_IsFromMaster(incomming_data)) {
@@ -280,11 +289,6 @@ void fl_adv_sendFIFO_run(void) {
 	}
 }
 
-void fl_adv_encrypt(u8* _data, u8* data_encryp) {
-	aes_encrypt((unsigned char*)FL_NWK_PB_KEY,(u8 *) &_data[1],(u8 *) &data_encryp[1]); //skip hdr
-	data_encryp[0] = _data[0];
-}
-
 /**
  * @brief      Setting and sending ADV packets
  * @param	   none
@@ -304,35 +308,35 @@ void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms) {
 				app_own_address_type,0,NULL,BLT_ENABLE_ADV_ALL,ADV_FP_NONE);
 		if (status != BLE_SUCCESS) {
 			ERR(BLE,"Set ADV param is FAIL !!!\r\n")
-			while (1)
-				;
+			while (1);
 		}  //debug: adv setting err
 		/*Encryt data*/
-//		u8 payload_encrypt[_size];
-//		memset(payload_encrypt,0,_size);
-////		fl_adv_encrypt(_data,payload_encrypt);
-//		aes_encrypt((unsigned char*)FL_NWK_PB_KEY,(u8 *) &_data[1],(u8 *) &payload_encrypt[1]); //skip hdr
-//		payload_encrypt[0] = _data[0];
-//		P_PRINTFHEX_A(INF,payload_encrypt,_size,"Encrypt:");
-//		u8 decrypt[_size];
-//		memset(decrypt,0,_size);
-//		aes_decrypt((unsigned char*)FL_NWK_PB_KEY,&payload_encrypt[1],&decrypt[1]);
-//		P_PRINTFHEX_A(INF,decrypt,_size,"Decrypt:");
-
 		u8 encrypted[32];
+		memset(encrypted,0,SIZEU8(encrypted));
 		u32 encrypted_len;
-		fl_aes_encryptWpadding(FL_NWK_PB_KEY,_data,_size,encrypted,&encrypted_len);
+		fl_aes_encryptWpadding(FL_NWK_PB_KEY,&_data[1],_size-1,&encrypted[1],&encrypted_len);
 		P_PRINTFHEX_A(INF,encrypted,encrypted_len,"Encrypt OK(len:%d):",encrypted_len);
-		u8 decrypted[32];
-		u32 decrypted_len;
-		if (fl_aes_decryptWpadding(FL_NWK_PB_KEY,encrypted,encrypted_len,decrypted,&decrypted_len)) {
-			P_PRINTFHEX_A(INF,decrypted,decrypted_len,"Decrypted OK(len:%d):",decrypted_len);
-		} else {
-			P_PRINTF(INF,"Padding Err");
+		encrypted[0]=_data[0];
+
+		if (0xFF == IsNWKHDR(encrypted[0]))
+			ERR(BLE,"Set ADV HDR is FAIL !!!\r\n")
+
+		fl_pack_t incomming_data;
+//		incomming_data.length = pa->len + 1; //add rssi byte
+//		//memcpy(incomming_data.data_arr,pa->data,incomming_data.length);
+//		incomming_data.data_arr[0] = pa->data[0];
+		//Add decrypt
+//		u32 decrypted_len
+		if (!fl_aes_decryptWpadding(FL_NWK_PB_KEY,&encrypted[1],encrypted_len,&incomming_data.data_arr[1],(u32*)&incomming_data.length)) {
+			//					P_PRINTFHEX_A(INF,decrypted,decrypted_len,"Decrypted OK(len:%d):",decrypted_len);
+			ERR(INF,"Padding Err\r\n");
+			return;
 		}
+		incomming_data.data_arr[0]=encrypted[0];
 
-		bls_ll_setAdvData(_data,_size);
+		P_PRINTFHEX_A(INF,incomming_data.data_arr,incomming_data.length,"Decrypt OK(len:%d):",incomming_data.length);
 
+		bls_ll_setAdvData(encrypted,encrypted_len);
 		bls_ll_setAdvDuration(_timeout_ms * 1000,1); // ms->us
 		bls_app_registerEventCallback(BLT_EV_FLAG_ADV_DURATION_TIMEOUT,&fl_durationADV_timeout_proccess);
 //		TICK_GET_PROCESSING_TIME = clock_time();
