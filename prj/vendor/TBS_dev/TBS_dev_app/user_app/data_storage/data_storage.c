@@ -7,6 +7,7 @@
 #include "../../user_lib.h"
 #include "data_storage.h"
 #include "Freelux_libs/storage_weekly_data.h"
+#include "Freelux_libs/fl_ble_wifi_protocol.h"
 
 static data_save_t pre_data_save;
 data_storage_share_data_t data_storage_data;

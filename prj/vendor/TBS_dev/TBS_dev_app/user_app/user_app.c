@@ -12,6 +12,7 @@
 #include "vendor/FrL_network/fl_nwk_handler.h"
 #include "vendor/FrL_network/fl_nwk_api.h"
 #include "vendor/FrL_network/fl_nwk_database.h"
+#include "Freelux_libs/storage_weekly_data.h"
 
 #define TIME_DELAY_REBOOT		5000//ms
 
@@ -109,7 +110,7 @@ static void user_app_data_sys(void)
 	if(led7seg_data.value != app_data.pass_product)
 	{
 		led7seg_data.value = app_data.pass_product;
-		sprintf(line1, "pass %4d       ", (int)app_data.pass_product);
+		sprintf(line1, "pass %4d       \n", (int)app_data.pass_product);
 		memcpy(lcd_data.display.line1, line1, 16);
 		G_COUNTER_DEV.data.pass_product = app_data.pass_product;
 	}
@@ -117,7 +118,7 @@ static void user_app_data_sys(void)
 	if(led7seg_data.value_err != app_data.err_product)
 	{
 		led7seg_data.value_err = app_data.err_product;
-		sprintf(line2, "err  %4d       ", (int)app_data.err_product);
+		sprintf(line2, "err  %4d       \n", (int)app_data.err_product);
 		memcpy(lcd_data.display.line2, line2, 16);
 		G_COUNTER_DEV.data.err_product = app_data.err_product;
 	}
@@ -154,8 +155,8 @@ static void user_app_data_sys(void)
 		fl_api_slave_req(NWK_HDR_55, G_COUNTER_DEV.bytes, SIZEU8(G_COUNTER_DEV), NULL, 0);
 		G_COUNTER_DEV.data.bt_rst = 0;
 		led_data.led_call_blink_3 = 1;
-		lcd16x2_clear(&lcd_handle);
-		lcd16x2_print_string(&lcd_handle, "Reset all data");
+//		lcd16x2_clear(&lcd_handle);
+//		lcd16x2_print_string(&lcd_handle, "Reset all data");
 		app_data.err_product = 0;
 		app_data.pass_product = 0;
 		data_storage_data.product_pass = app_data.pass_product;

@@ -77,6 +77,7 @@ uint8_t user_lcd_app_init(void)
 	gpio_set_level(GPIO_PC0, 1);
 
 	lcd16x2_error_t result = lcd16x2_init(&lcd_handle, &lcd_config);
+	lcd16x2_clear(&lcd_handle);
 	lcd_data.enable = 1;
 
 //	lcd16x2_printf(&lcd_handle, "TBS couter On");
@@ -105,7 +106,7 @@ void user_lcd_app_task(void)
 
 void user_lcd_app_test(void)
 {
-	lcd16x2_error_t result = lcd16x2_init(&lcd_handle, &lcd_config);
+	lcd16x2_init(&lcd_handle, &lcd_config);
 
 	lcd16x2_clear(&lcd_handle);
 	lcd16x2_print_string(&lcd_handle, "Hello World!");
