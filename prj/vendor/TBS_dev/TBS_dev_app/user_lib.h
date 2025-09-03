@@ -13,7 +13,7 @@
 
 
 
-#define ULOGA(...)	LOGA(DEFAULT,##__VA_ARGS__)
+#define ULOGA(...)	LOGA(DEFAULT,__VA_ARGS__)
 
 #include "driver/common/msTick.h"
 #include "driver/lcd/lcd16x2.h"
