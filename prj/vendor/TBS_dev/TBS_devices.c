@@ -13,6 +13,7 @@
 #include "TBS_dev_config.h"
 #include "../FrL_Network/fl_nwk_handler.h"
 #include "../FrL_Network/fl_nwk_api.h"
+#include "TBS_dev_app/user_lib.h"
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -251,7 +252,7 @@ void TBS_PowerMeter_Run(void){
 /******************************************************************************/
 void TBS_Device_Init(void){
 #ifdef COUNTER_DEVICE
-	TBS_Counter_init();
+	user_app_init();
 #endif
 #ifdef POWER_METER_DEVICE
 	TBS_PowerMeter_init();
@@ -259,7 +260,7 @@ void TBS_Device_Init(void){
 }
 void TBS_Device_Run(void){
 #ifdef COUNTER_DEVICE
-	TBS_Counter_Run();
+	user_app_loop();
 #endif
 #ifdef POWER_METER_DEVICE
 	TBS_PowerMeter_Run();
