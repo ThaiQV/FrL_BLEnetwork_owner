@@ -31,15 +31,11 @@ Led_Pin_TypeDef led_pin_map = {
 		.NWK = GPIO_PA6,
 };
 
+
+
 /*
  *  Static functions
  */
-void led_callback(uint8_t led_id);
-
-void led_callback(uint8_t led_id)
-{
-	user_datastorage_app_init();
-}
 void led_pin_init_all(void)
 {
     for(int i=0; i < LED_ID_MAX ; i++)
@@ -93,6 +89,12 @@ led_hal_t hal = {
 };
 
 led_shared_data_t led_data;
+void led_callback(uint8_t led_id);
+
+void led_callback(uint8_t led_id)
+{
+	ULOGA("led blink callback \n");
+}
 
 void user_led_app_init(void)
 {
@@ -105,7 +107,7 @@ void user_led_app_init(void)
 //	led_blink(LED_ID_CALL, 1000);
 //
 //	led_blink_duty(LED_ID_NWK, 500, 25);
-//	led_set_blink_complete_callback(LED_ID_CALL, led_callback);
+	led_set_blink_complete_callback(LED_ID_CALL, led_callback);
 
 //	led_blink_count(led1, 200, 80, 10);
 
@@ -116,7 +118,7 @@ void user_led_app_init(void)
 
 void user_led_app_task(void)
 {
-	static call_blink = 1;
+
 	static uint64_t ledTimeTick = 0;
 	if(get_system_time_ms() - ledTimeTick > TIME_LED_TASK_MS){
 		ledTimeTick = get_system_time_ms()  ; //10ms
@@ -125,23 +127,25 @@ void user_led_app_task(void)
 		return ;
 	}
 
-	if(led_data.led_call_blink_3)
+	if(led_is_ready(LED_ID_CALL))
 	{
-		if(call_blink)
+		if(led_data.led_call_blink_3)
 		{
 			led_blink_count(LED_ID_CALL, 500, 50, 3);
-			call_blink = 0;
+			led_data.led_call_blink_3 = 0;
+
+		}
+		else if(led_data.led_call_on)
+		{
+			led_on(LED_ID_CALL);
+		}
+		else
+		{
+			led_off(LED_ID_CALL);
 		}
 	}
-	else if(led_data.led_call_on)
-	{
-		call_blink = 1;
-		led_on(LED_ID_CALL);
-	}
-	else
-	{
-		led_off(LED_ID_CALL);
-	}
+
+
 
 	if(led_data.led_nwk_on)
 	{

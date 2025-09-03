@@ -1,6 +1,6 @@
 /**
  * @file led_driver.c
- * @brief Flexible multi-LED driver implementation
+ * @brief Flexible multi-LED driver implementation with seamless mode transitions
  * @author Nghia Hoang
  * @date 2025
  */
@@ -25,6 +25,8 @@ static void led_process_blink(uint8_t led_id);
 static void led_process_pattern(uint8_t led_id);
 static uint32_t calculate_on_time(uint32_t period_ms, uint8_t duty_cycle);
 static uint32_t calculate_off_time(uint32_t period_ms, uint8_t duty_cycle);
+static void led_reset_to_idle(uint8_t led_id);
+static void led_interrupt_current_operation(uint8_t led_id);
 
 // =============================================================================
 // PUBLIC FUNCTION IMPLEMENTATIONS
@@ -90,6 +92,9 @@ uint8_t led_add(uint8_t gpio_pin, bool active_high)
     led->physical_state = false;
     led->pattern_count = 0;
     led->active_pattern = 0;
+    led->current_blink_count = 0;
+    led->target_blink_count = 0;
+    led->operation_complete = false;
 
     // Initialize hardware pin
     if (g_led_manager.hal.led_pin_init) {
@@ -136,9 +141,14 @@ bool led_on(uint8_t led_id)
         return false;
     }
 
+    // Interrupt any current operation
+    led_interrupt_current_operation(led_id);
+
+    // Set to ON mode
     led->mode = LED_MODE_ON;
     led_set_state(led_id, LED_STATE_ON);
     led_update_physical_state(led_id, true);
+    led->operation_complete = false;
 
     return true;
 }
@@ -151,9 +161,14 @@ bool led_off(uint8_t led_id)
 
     led_config_t *led = &g_led_manager.leds[led_id];
 
+    // Interrupt any current operation
+    led_interrupt_current_operation(led_id);
+
+    // Set to OFF mode
     led->mode = LED_MODE_OFF;
     led_set_state(led_id, LED_STATE_IDLE);
     led_update_physical_state(led_id, false);
+    led->operation_complete = false;
 
     return true;
 }
@@ -169,7 +184,8 @@ bool led_toggle(uint8_t led_id)
         return false;
     }
 
-    if (led->mode == LED_MODE_ON) {
+    // Toggle based on current physical state
+    if (led->physical_state) {
         return led_off(led_id);
     } else {
         return led_on(led_id);
@@ -183,11 +199,6 @@ bool led_blink(uint8_t led_id, uint32_t period_ms)
 
 bool led_blink_duty(uint8_t led_id, uint32_t period_ms, uint8_t duty_cycle)
 {
-    return led_blink_count(led_id, period_ms, duty_cycle, 0); // 0 = infinite
-}
-
-bool led_blink_count(uint8_t led_id, uint32_t period_ms, uint8_t duty_cycle, uint16_t count)
-{
     if (!is_valid_led_id(led_id) || duty_cycle > 100 || period_ms == 0) {
         return false;
     }
@@ -197,15 +208,18 @@ bool led_blink_count(uint8_t led_id, uint32_t period_ms, uint8_t duty_cycle, uin
         return false;
     }
 
-    // Set mode
-    led->mode = (count == 0) ? LED_MODE_BLINK_CONTINUOUS : LED_MODE_BLINK_COUNTED;
+    // Interrupt any current operation
+    led_interrupt_current_operation(led_id);
+
+    // Set continuous blink mode
+    led->mode = LED_MODE_BLINK_CONTINUOUS;
 
     // Setup pattern 0 as default blink pattern
     led->patterns[0].period_ms = period_ms;
     led->patterns[0].duty_cycle = duty_cycle;
-    led->patterns[0].blink_count = count;
+    led->patterns[0].blink_count = 0; // infinite
     led->patterns[0].pause_after_ms = 0;
-    led->patterns[0].repeat = (count == 0);
+    led->patterns[0].repeat = true;
     led->patterns[0].enabled = true;
 
     if (led->pattern_count == 0) {
@@ -213,9 +227,54 @@ bool led_blink_count(uint8_t led_id, uint32_t period_ms, uint8_t duty_cycle, uin
     }
     led->active_pattern = 0;
 
-    // Initialize timing
-    led->cycle_start_time = g_led_manager.hal.get_system_time_ms();
+    // Initialize state
     led->current_blink_count = 0;
+    led->target_blink_count = 0;
+    led->operation_complete = false;
+    led->cycle_start_time = g_led_manager.hal.get_system_time_ms();
+
+    // Start with LED on
+    led_set_state(led_id, LED_STATE_BLINK_ON);
+    led_update_physical_state(led_id, true);
+
+    return true;
+}
+
+bool led_blink_count(uint8_t led_id, uint32_t period_ms, uint8_t duty_cycle, uint16_t count)
+{
+    if (!is_valid_led_id(led_id) || duty_cycle > 100 || period_ms == 0 || count == 0) {
+        return false;
+    }
+
+    led_config_t *led = &g_led_manager.leds[led_id];
+    if (!led->enabled) {
+        return false;
+    }
+
+    // Interrupt any current operation
+    led_interrupt_current_operation(led_id);
+
+    // Set counted blink mode
+    led->mode = LED_MODE_BLINK_COUNTED;
+
+    // Setup pattern 0 as default blink pattern
+    led->patterns[0].period_ms = period_ms;
+    led->patterns[0].duty_cycle = duty_cycle;
+    led->patterns[0].blink_count = count;
+    led->patterns[0].pause_after_ms = 0;
+    led->patterns[0].repeat = false;
+    led->patterns[0].enabled = true;
+
+    if (led->pattern_count == 0) {
+        led->pattern_count = 1;
+    }
+    led->active_pattern = 0;
+
+    // Initialize state
+    led->current_blink_count = 0;
+    led->target_blink_count = count;
+    led->operation_complete = false;
+    led->cycle_start_time = g_led_manager.hal.get_system_time_ms();
 
     // Start with LED on
     led_set_state(led_id, LED_STATE_BLINK_ON);
@@ -299,9 +358,14 @@ bool led_start_pattern(uint8_t led_id, uint8_t pattern_id)
         return false;
     }
 
+    // Interrupt any current operation
+    led_interrupt_current_operation(led_id);
+
     led->mode = LED_MODE_PATTERN;
     led->active_pattern = pattern_id;
     led->current_blink_count = 0;
+    led->target_blink_count = led->patterns[pattern_id].blink_count;
+    led->operation_complete = false;
     led->cycle_start_time = g_led_manager.hal.get_system_time_ms();
 
     led_set_state(led_id, LED_STATE_BLINK_ON);
@@ -411,6 +475,66 @@ uint16_t led_get_blink_count(uint8_t led_id)
     }
 
     return g_led_manager.leds[led_id].current_blink_count;
+}
+
+bool led_is_ready(uint8_t led_id)
+{
+    if (!is_valid_led_id(led_id)) {
+        return false;
+    }
+
+    led_config_t *led = &g_led_manager.leds[led_id];
+    
+    // LED is ready if it's in idle state or operation is complete
+    return (led->state == LED_STATE_IDLE || 
+            led->state == LED_STATE_COMPLETED ||
+            led->operation_complete ||
+            led->mode == LED_MODE_OFF ||
+            led->mode == LED_MODE_ON);
+}
+
+bool led_is_blink_complete(uint8_t led_id)
+{
+    if (!is_valid_led_id(led_id)) {
+        return false;
+    }
+
+    led_config_t *led = &g_led_manager.leds[led_id];
+    
+    return (led->operation_complete && 
+            (led->mode == LED_MODE_OFF || led->state == LED_STATE_COMPLETED));
+}
+
+float led_get_blink_progress(uint8_t led_id)
+{
+    if (!is_valid_led_id(led_id)) {
+        return 0.0f;
+    }
+
+    led_config_t *led = &g_led_manager.leds[led_id];
+
+    if (led->target_blink_count == 0) {
+        return 0.0f; // Infinite blink
+    }
+
+    return (float)led->current_blink_count / (float)led->target_blink_count;
+}
+
+bool led_clear_complete_flag(uint8_t led_id)
+{
+    if (!is_valid_led_id(led_id)) {
+        return false;
+    }
+
+    led_config_t *led = &g_led_manager.leds[led_id];
+    led->operation_complete = false;
+    
+    // If in completed state, move to idle
+    if (led->state == LED_STATE_COMPLETED) {
+        led_set_state(led_id, LED_STATE_IDLE);
+    }
+
+    return true;
 }
 
 void led_process_all(void)
@@ -565,11 +689,15 @@ static void led_process_blink(uint8_t led_id)
 
                 // Check if we've completed the required number of blinks
                 if (led->mode == LED_MODE_BLINK_COUNTED &&
-                    pattern->blink_count > 0 &&
-                    led->current_blink_count >= pattern->blink_count) {
+                    led->target_blink_count > 0 &&
+                    led->current_blink_count >= led->target_blink_count) {
 
-                    // Blink sequence complete
-                    led_off(led_id);
+                    // Blink sequence complete - go to completed state
+                    led->operation_complete = true;
+                    led_set_state(led_id, LED_STATE_COMPLETED);
+                    led_update_physical_state(led_id, false);
+
+                    // Call completion callback
                     if (led->on_blink_complete) {
                         led->on_blink_complete(led_id);
                     }
@@ -581,6 +709,10 @@ static void led_process_blink(uint8_t led_id)
             }
             break;
         }
+
+        case LED_STATE_COMPLETED:
+            // Operation completed, waiting for new command
+            break;
 
         default:
             break;
@@ -614,6 +746,8 @@ static void led_process_pattern(uint8_t led_id)
                     led->current_blink_count >= pattern->blink_count) {
 
                     // Pattern complete
+                    led->operation_complete = true;
+                    
                     if (pattern->pause_after_ms > 0) {
                         led_set_state(led_id, LED_STATE_IDLE);
                         led_update_physical_state(led_id, false);
@@ -621,11 +755,13 @@ static void led_process_pattern(uint8_t led_id)
                     } else if (pattern->repeat) {
                         // Restart pattern
                         led->current_blink_count = 0;
+                        led->operation_complete = false;
                         led_set_state(led_id, LED_STATE_BLINK_ON);
                         led_update_physical_state(led_id, true);
                     } else {
                         // Pattern finished
-                        led_off(led_id);
+                        led_set_state(led_id, LED_STATE_COMPLETED);
+                        led_update_physical_state(led_id, false);
                     }
 
                     if (led->on_pattern_complete) {
@@ -645,10 +781,15 @@ static void led_process_pattern(uint8_t led_id)
             if (pattern->pause_after_ms > 0) {
                 if (elapsed >= pattern->pause_after_ms && pattern->repeat) {
                     led->current_blink_count = 0;
+                    led->operation_complete = false;
                     led_set_state(led_id, LED_STATE_BLINK_ON);
                     led_update_physical_state(led_id, true);
                 }
             }
+            break;
+
+        case LED_STATE_COMPLETED:
+            // Pattern completed, waiting for new command
             break;
 
         default:
@@ -664,4 +805,38 @@ static uint32_t calculate_on_time(uint32_t period_ms, uint8_t duty_cycle)
 static uint32_t calculate_off_time(uint32_t period_ms, uint8_t duty_cycle)
 {
     return period_ms - calculate_on_time(period_ms, duty_cycle);
+}
+
+static void led_reset_to_idle(uint8_t led_id)
+{
+    if (!is_valid_led_id(led_id)) {
+        return;
+    }
+
+    led_config_t *led = &g_led_manager.leds[led_id];
+    
+    // Reset timing and counters
+    led->current_blink_count = 0;
+    led->target_blink_count = 0;
+    led->operation_complete = false;
+    led->cycle_start_time = g_led_manager.hal.get_system_time_ms();
+    led->last_change_time = led->cycle_start_time;
+    
+    // Set to idle state
+    led_set_state(led_id, LED_STATE_IDLE);
+}
+
+static void led_interrupt_current_operation(uint8_t led_id)
+{
+    if (!is_valid_led_id(led_id)) {
+        return;
+    }
+
+    led_config_t *led = &g_led_manager.leds[led_id];
+    
+    // Reset all operation states
+    led_reset_to_idle(led_id);
+    
+    // Clear any completion flags
+    led->operation_complete = false;
 }

@@ -79,7 +79,7 @@ uint8_t user_lcd_app_init(void)
 	lcd16x2_error_t result = lcd16x2_init(&lcd_handle, &lcd_config);
 	lcd_data.enable = 1;
 
-	lcd16x2_printf(&lcd_handle, "TBS couter On");
+//	lcd16x2_printf(&lcd_handle, "TBS couter On");
 
 	return result;
 }

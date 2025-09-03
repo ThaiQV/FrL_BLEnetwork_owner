@@ -12,10 +12,11 @@
  * - Continuous and counted blink modes
  * - LED state management
  * - Non-blocking operation
+ * - Seamless transition between modes (blink -> on/off -> blink)
  */
 
-#ifndef LED_H
-#define LED_H
+#ifndef LED_DRIVER_H
+#define LED_DRIVER_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -70,7 +71,7 @@ typedef enum {
     LED_MODE_OFF = 0,           ///< LED is off
     LED_MODE_ON,                ///< LED is constantly on
     LED_MODE_BLINK_CONTINUOUS,  ///< LED blinks continuously
-    LED_MODE_BLINK_COUNTED,     ///< LED blinks for specified count then stops
+    LED_MODE_BLINK_COUNTED,     ///< LED blinks for specified count then goes to idle
     LED_MODE_PATTERN            ///< LED follows custom pattern
 } led_mode_t;
 
@@ -78,11 +79,12 @@ typedef enum {
  * @brief LED internal states
  */
 typedef enum {
-    LED_STATE_IDLE = 0,         ///< LED idle (off)
+    LED_STATE_IDLE = 0,         ///< LED idle (ready for new commands)
     LED_STATE_ON,               ///< LED constantly on
     LED_STATE_BLINK_ON,         ///< LED in blink cycle - on phase
     LED_STATE_BLINK_OFF,        ///< LED in blink cycle - off phase
-    LED_STATE_PATTERN_ACTIVE    ///< LED executing pattern
+    LED_STATE_PATTERN_ACTIVE,   ///< LED executing pattern
+    LED_STATE_COMPLETED         ///< LED completed operation, ready for new command
 } led_state_t;
 
 /**
@@ -160,9 +162,11 @@ typedef struct {
     uint32_t last_change_time;  ///< Last state change time
     uint32_t cycle_start_time;  ///< Current cycle start time
     uint16_t current_blink_count; ///< Current blink count in pattern
+    uint16_t target_blink_count; ///< Target blink count for current operation
     bool physical_state;        ///< Current physical LED state (on/off)
     bool enabled;               ///< LED enable/disable flag
     bool initialized;           ///< Hardware initialization flag
+    bool operation_complete;    ///< Flag indicating operation completion
 
 } led_config_t;
 
@@ -208,21 +212,21 @@ uint8_t led_add(uint8_t gpio_pin, bool active_high);
 bool led_remove(uint8_t led_id);
 
 /**
- * @brief Turn LED on
+ * @brief Turn LED on (interrupts any ongoing operation)
  * @param led_id LED ID
  * @return true if successful, false otherwise
  */
 bool led_on(uint8_t led_id);
 
 /**
- * @brief Turn LED off
+ * @brief Turn LED off (interrupts any ongoing operation)
  * @param led_id LED ID
  * @return true if successful, false otherwise
  */
 bool led_off(uint8_t led_id);
 
 /**
- * @brief Toggle LED state
+ * @brief Toggle LED state (interrupts any ongoing operation)
  * @param led_id LED ID
  * @return true if successful, false otherwise
  */
@@ -237,7 +241,7 @@ bool led_toggle(uint8_t led_id);
 bool led_blink(uint8_t led_id, uint32_t period_ms);
 
 /**
- * @brief Start blink with custom duty cycle
+ * @brief Start blink with custom duty cycle (continuous)
  * @param led_id LED ID
  * @param period_ms Blink period in milliseconds
  * @param duty_cycle Duty cycle percentage (0-100)
@@ -250,7 +254,7 @@ bool led_blink_duty(uint8_t led_id, uint32_t period_ms, uint8_t duty_cycle);
  * @param led_id LED ID
  * @param period_ms Blink period in milliseconds
  * @param duty_cycle Duty cycle percentage (0-100)
- * @param count Number of blinks
+ * @param count Number of blinks (must be > 0)
  * @return true if successful, false otherwise
  */
 bool led_blink_count(uint8_t led_id, uint32_t period_ms, uint8_t duty_cycle, uint16_t count);
@@ -359,6 +363,34 @@ bool led_is_on(uint8_t led_id);
  * @return Current blink count (0 if not blinking)
  */
 uint16_t led_get_blink_count(uint8_t led_id);
+
+/**
+ * @brief Check if LED operation is complete and ready for new command
+ * @param led_id LED ID
+ * @return true if ready for new command, false otherwise
+ */
+bool led_is_ready(uint8_t led_id);
+
+/**
+ * @brief Check if LED blink sequence is complete
+ * @param led_id LED ID
+ * @return true if blink sequence completed, false otherwise
+ */
+bool led_is_blink_complete(uint8_t led_id);
+
+/**
+ * @brief Get blink progress as percentage (0.0 - 1.0)
+ * @param led_id LED ID
+ * @return Progress percentage (0.0 = not started, 1.0 = complete)
+ */
+float led_get_blink_progress(uint8_t led_id);
+
+/**
+ * @brief Clear completion flag and reset LED to idle state
+ * @param led_id LED ID
+ * @return true if successful, false otherwise
+ */
+bool led_clear_complete_flag(uint8_t led_id);
 
 /**
  * @brief Process all registered LEDs (call this in main loop)

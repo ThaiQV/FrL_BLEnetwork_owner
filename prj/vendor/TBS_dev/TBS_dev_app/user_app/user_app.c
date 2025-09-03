@@ -36,6 +36,8 @@ app_share_data_t app_data = {
 		.bt_rst = 0,
 		.timetamp = 0,
 		.is_call = 0,
+		.reset_factory = 0,
+		.pair = 0,
 };
 
 /**
@@ -102,8 +104,6 @@ static void user_app_data_sys(void)
 {
 	char line1[16];
 	char line2[16];
-	static bool reboot = 0;
-	static unsigned int reboot_TimeTick_ms = 0;
 
 
 	if(led7seg_data.value != app_data.pass_product)
@@ -153,11 +153,9 @@ static void user_app_data_sys(void)
 		G_COUNTER_DEV.data.bt_rst = 1;
 		fl_api_slave_req(NWK_HDR_55, G_COUNTER_DEV.bytes, SIZEU8(G_COUNTER_DEV), NULL, 0);
 		G_COUNTER_DEV.data.bt_rst = 0;
-		reboot = 1;
-		reboot_TimeTick_ms = get_system_time_ms() + TIME_DELAY_REBOOT;
+		led_data.led_call_blink_3 = 1;
 		lcd16x2_clear(&lcd_handle);
 		lcd16x2_print_string(&lcd_handle, "Reset all data");
-//		storage_clean();
 		app_data.err_product = 0;
 		app_data.pass_product = 0;
 		data_storage_data.product_pass = app_data.pass_product;
@@ -165,20 +163,26 @@ static void user_app_data_sys(void)
 		app_data.bt_rst = 0;
 	}
 
-	if(reboot)
+	if(app_data.reset_factory)
 	{
-		if(led_data.led_call_blink_3 == 0)
-		{
-			led_data.led_call_blink_3 = 1;
-		}
-
-	    if (reboot_TimeTick_ms < get_system_time_ms())
-	    {
-	        reboot = 0;
-	        led_data.led_call_blink_3 = 0;
-	    }
+		ULOGA("RST Factory\n");
+		lcd16x2_clear(&lcd_handle);
+		lcd16x2_print_string(&lcd_handle, "Factory Reset");
+		fl_db_clearAll();
+		storage_clean();
+		sys_reboot();
+		app_data.reset_factory = 0;
 	}
 
+	if(app_data.pair)
+	{
+		ULOGA("PAIR\n");
+		lcd16x2_clear(&lcd_handle);
+		lcd16x2_print_string(&lcd_handle, "Pair");
+		fl_db_clearAll();
+		sys_reboot();
+		app_data.pair = 0;
+	}
 
     static unsigned int nwk_check_TimeTick = 0;
 	if(get_system_time_ms() - nwk_check_TimeTick > TIME_BUTTON_TASK_MS){

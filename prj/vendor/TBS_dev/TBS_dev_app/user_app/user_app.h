@@ -29,6 +29,8 @@ typedef struct {
 	uint8_t bt_call;
 	uint8_t bt_endcall;
 	uint8_t bt_rst;
+	uint8_t reset_factory;
+	uint8_t pair;
 	int32_t pass_product;
 	int32_t err_product;
 	bool is_call;

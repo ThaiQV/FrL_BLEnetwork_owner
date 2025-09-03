@@ -267,15 +267,12 @@ static void reset_hold_3s(uint8_t button_id, uint32_t press_duration_ms)
 
 static void peu_rst_hold_5s(uint8_t *button_ids, uint8_t count, uint32_t hold_time)
 {
-	ULOGA("RST Factory\n");
-	fl_db_clearAll();
-	sys_reboot();
+	ULOGA("peu_rst_hold_5s\n");
+	app_data.reset_factory  =1;
 }
 
 static void ped_rst_hold_5s(uint8_t *button_ids, uint8_t count, uint32_t hold_time)
 {
-	ULOGA("PAIR\n");
-	fl_db_clearAll();
-	sys_reboot();
-
+	ULOGA("peu_rst_hold_5s\n");
+	app_data.pair = 1;
 }
