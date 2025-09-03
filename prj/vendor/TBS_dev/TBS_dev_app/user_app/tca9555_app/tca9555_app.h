@@ -7,6 +7,9 @@
 #ifndef TCA9555_APP_H_
 #define TCA9555_APP_H_
 
+#ifndef MASTER_CORE
+#ifdef COUNTER_DEVICE
+
 /*
  * i2c and tca9555
  */
@@ -27,4 +30,6 @@
 
 void user_tca9555_app_init(void);
 
+#endif /* COUNTER_DEVICE*/
+#endif /* MASTER_CORE*/
 #endif /* VENDOR_USER_USER_APP_TCA9555_APP_TCA9555_APP_H_ */
