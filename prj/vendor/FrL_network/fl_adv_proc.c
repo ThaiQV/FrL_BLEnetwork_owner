@@ -288,6 +288,43 @@ void fl_adv_sendFIFO_run(void) {
 	}
 }
 
+void fl_adv_encrypt_head16(unsigned char* key, u8* input, u8 input_len, u8* output) {
+	const u8 block_len = 16;
+	if (input_len < 16)
+		return; //
+
+	u8 encrypted_block[block_len + 1]; // +1 padding
+	u8 encrypted_len = 0;
+
+	// Encrypt first 16bytes
+	fl_aes_encryptWpadding(key,input,block_len,encrypted_block,&encrypted_len);
+
+	// Copy 16 bytes encrypted into the data
+	memcpy(output,encrypted_block,block_len);
+
+	// Copy the others(15 bytes)
+	memcpy(output + block_len,input + block_len,input_len - block_len);
+}
+
+bool fl_adv_decrypt_head16(unsigned char* key, u8* input, u8 input_len, u8* output) {
+    const u8 block_len = 16;
+    if (input_len < 16) return false;
+
+    u8 decrypted_block[block_len + 1];
+    u8 decrypted_len = 0;
+
+    // Decrypt first 16bytes
+    bool ok = fl_aes_decryptWpadding(key, input, block_len, decrypted_block, &decrypted_len);
+    if (!ok || decrypted_len != block_len) return false;
+
+    // Copy 16 bytes decrypted into the data
+    memcpy(output, decrypted_block, block_len);
+
+    // Copy the others(15 bytes)
+    memcpy(output + block_len, input + block_len, input_len - block_len);
+
+    return true;
+}
 /**
  * @brief      Setting and sending ADV packets
  * @param	   none
@@ -313,8 +350,8 @@ void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms) {
 		u8 encrypted[32];
 		memset(encrypted,0,SIZEU8(encrypted));
 		u8 encrypted_len;
-		fl_aes_encryptWpadding(FL_NWK_PB_KEY,_data,_size,encrypted,&encrypted_len);
-		P_PRINTFHEX_A(INF,encrypted,encrypted_len,"Encrypt OK(len:%d):",encrypted_len);
+//		fl_aes_encryptWpadding(FL_NWK_PB_KEY,_data,_size,encrypted,&encrypted_len);
+//		P_PRINTFHEX_A(INF,encrypted,encrypted_len,"Encrypt OK(len:%d):",encrypted_len);
 //		if (0xFF == IsNWKHDR(encrypted[0]))
 //			ERR(BLE,"Set ADV HDR is FAIL !!!\r\n")
 
@@ -331,6 +368,7 @@ void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms) {
 //		}
 //		P_PRINTFHEX_A(INF,incomming_data.data_arr,incomming_data.length,"Decrypt OK(len:%d):",incomming_data.length);
 
+		fl_adv_encrypt_head16(FL_NWK_PB_KEY,_data,_size,encrypted,&encrypted_len);
 		bls_ll_setAdvData(encrypted,_size);
 
 		bls_ll_setAdvDuration(_timeout_ms * 1000,1); // ms->us
