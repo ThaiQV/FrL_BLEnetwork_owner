@@ -4,6 +4,12 @@
  *      Author: hoang
  */
 
+#ifndef MASTER_CORE
+
+#include "vendor/TBS_dev/TBS_dev_config.h"
+
+#ifdef COUNTER_DEVICE
+
 #include "../../user_lib.h"
 
 LCD_Pin_TypeDef lcd_pin_map = {
@@ -143,3 +149,6 @@ void user_lcd_app_test(void)
 //		}
 //	}
 }
+
+#endif /* COUNTER_DEVICE*/
+#endif /* MASTER_CORE*/
