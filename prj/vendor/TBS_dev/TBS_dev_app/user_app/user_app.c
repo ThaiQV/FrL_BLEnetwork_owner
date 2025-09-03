@@ -4,6 +4,12 @@
  *      Author: Nghia Hoang
  */
 
+#ifndef MASTER_CORE
+
+#include "vendor/TBS_dev/TBS_dev_config.h"
+
+#ifdef COUNTER_DEVICE
+
 #include "stdio.h"
 #include "../user_lib.h"
 #include "led_7_seg_app/led_7_seg_app.h"
@@ -299,5 +305,6 @@ void user_app_run(void)
 
 }
 
-
+#endif /* COUNTER_DEVICE*/
+#endif /* MASTER_CORE*/
 

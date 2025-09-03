@@ -4,6 +4,12 @@
  * @date 2025
  */
 
+#ifndef MASTER_CORE
+
+#include "vendor/TBS_dev/TBS_dev_config.h"
+
+#ifdef COUNTER_DEVICE
+
 #include "../../user_lib.h"
 #include "led_app.h"
 
@@ -163,3 +169,5 @@ void user_led_app_task(void)
 
 }
 
+#endif /* COUNTER_DEVICE*/
+#endif /* MASTER_CORE*/

@@ -7,6 +7,9 @@
 #ifndef LCD_APP_H_
 #define LCD_APP_H_
 
+#ifndef MASTER_CORE
+#ifdef COUNTER_DEVICE
+
 #include "../../driver/tca9555/tca9555.h"
 
 /*
@@ -52,4 +55,6 @@ void user_lcd_app_task(void);
 
 void user_lcd_app_test(void);
 
+#endif /* COUNTER_DEVICE*/
+#endif /* MASTER_CORE*/
 #endif /* VENDOR_USER_USER_APP_LCD_APP_LCD_APP_H_ */
