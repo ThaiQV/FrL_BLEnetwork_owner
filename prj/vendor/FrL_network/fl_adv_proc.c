@@ -19,9 +19,9 @@
 #include "Freelux_libs/fl_sys_datetime.h"
 #include "fl_input_ext.h"
 #include "fl_nwk_protocol.h"
-
+#include "fl_crypt/fl_aes.h"
 //Public Key for the freelux network
-const u8 FL_NWK_PB_KEY[16] = "freeluxnetw0rk25";
+unsigned char FL_NWK_PB_KEY[16] = "freeluxnetw0rk25";
 
 /******************************************************************************/
 /******************************************************************************/
@@ -34,7 +34,7 @@ const u8 FL_NWK_PB_KEY[16] = "freeluxnetw0rk25";
 #define SEND_TIMEOUT_MS		50 //ms
 extern _attribute_data_retention_ volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME;
 #endif
-_attribute_data_retention_ volatile u8 F_SENDING_STATE = 0;
+volatile u8 F_SENDING_STATE = 0;
 
 fl_adv_settings_t G_ADV_SETTINGS = {
 		.adv_interval_min = ADV_INTERVAL_20MS,
@@ -58,6 +58,10 @@ fl_data_container_t G_DATA_CONTAINER = { .data = g_data_array, .head_index = 0, 
 #define QUEUE_SENDING_SIZE 		16
 fl_pack_t g_sending_array[QUEUE_SENDING_SIZE];
 fl_data_container_t G_QUEUE_SENDING = { .data = g_sending_array, .head_index = 0, .tail_index = 0, .mask = QUEUE_SENDING_SIZE - 1, .count = 0 };
+
+fl_hdr_nwk_type_e FL_NWK_HDR[]={NWK_HDR_RECONNECT,NWK_HDR_55,NWK_HDR_F5_INFO,NWK_HDR_ASSIGN,NWK_HDR_HEARTBEAT,NWK_HDR_COLLECT};
+#define FL_NWK_HDR_SIZE	(sizeof(FL_NWK_HDR)/sizeof(FL_NWK_HDR[0]))
+
 /******************************************************************************/
 /******************************************************************************/
 /***                           Private definitions                           **/
@@ -76,6 +80,14 @@ void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms);
 fl_pack_t fl_packet_build(u8 *payload, u8 _len);
 s8 fl_adv_IsFromMaster(fl_pack_t data_in_queue);
 u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
+
+u8 IsNWKHDR(u8 _hdr){
+	for (u8 var = 0;  var < FL_NWK_HDR_SIZE; ++ var) {
+		if(FL_NWK_HDR[var] == _hdr) return var;
+	}
+	return 0xFF;
+}
+
 /******************************************************************************/
 /******************************************************************************/
 /***                            Functions callback                           **/
@@ -94,8 +106,12 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 				//P_PRINTFHEX_A(BLE,pa->mac,6,"%s","MAC:");
 				//u32 test_adv_cnt = MAKE_U32(pa->data[3],pa->data[2],pa->data[1],pa->data[0]);
 				//LOGA(BLE,"ADV rec:%d!!!\r\n",test_adv_cnt);
+
+				//if(0xFF == IsNWKHDR(pa->data[0])) return 0;
+
 				fl_pack_t incomming_data;
 				incomming_data.length = pa->len + 1; //add rssi byte
+				//aes_decrypt(FL_NWK_PB_KEY,(unsigned char*)pa->data,incomming_data.data_arr);
 				memcpy(incomming_data.data_arr,pa->data,incomming_data.length);
 #ifdef MASTER_CORE
 				//skip from  master
@@ -257,11 +273,18 @@ void fl_adv_sendFIFO_run(void) {
 #endif
 //			LOGA(APP,"ADV FIFO(%d):%d/%d\r\n",G_QUEUE_SENDING.count,G_QUEUE_SENDING.head_index,G_QUEUE_SENDING.tail_index);
 			F_SENDING_STATE = 1;
+			P_PRINTFHEX_A(INF,data_in_queue.data_arr,data_in_queue.length,"Raw Data(len:%d):",data_in_queue.length);
 			fl_adv_send(data_in_queue.data_arr,data_in_queue.length,G_ADV_SETTINGS.adv_duration);
 			return;
 		}
 	}
 }
+
+void fl_adv_encrypt(u8* _data, u8* data_encryp) {
+	aes_encrypt((unsigned char*)FL_NWK_PB_KEY,(u8 *) &_data[1],(u8 *) &data_encryp[1]); //skip hdr
+	data_encryp[0] = _data[0];
+}
+
 /**
  * @brief      Setting and sending ADV packets
  * @param	   none
@@ -284,7 +307,32 @@ void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms) {
 			while (1)
 				;
 		}  //debug: adv setting err
+		/*Encryt data*/
+//		u8 payload_encrypt[_size];
+//		memset(payload_encrypt,0,_size);
+////		fl_adv_encrypt(_data,payload_encrypt);
+//		aes_encrypt((unsigned char*)FL_NWK_PB_KEY,(u8 *) &_data[1],(u8 *) &payload_encrypt[1]); //skip hdr
+//		payload_encrypt[0] = _data[0];
+//		P_PRINTFHEX_A(INF,payload_encrypt,_size,"Encrypt:");
+//		u8 decrypt[_size];
+//		memset(decrypt,0,_size);
+//		aes_decrypt((unsigned char*)FL_NWK_PB_KEY,&payload_encrypt[1],&decrypt[1]);
+//		P_PRINTFHEX_A(INF,decrypt,_size,"Decrypt:");
+
+		u8 encrypted[32];
+		u32 encrypted_len;
+		fl_aes_encryptWpadding(FL_NWK_PB_KEY,_data,_size,encrypted,&encrypted_len);
+		P_PRINTFHEX_A(INF,encrypted,encrypted_len,"Encrypt OK(len:%d):",encrypted_len);
+		u8 decrypted[32];
+		u32 decrypted_len;
+		if (fl_aes_decryptWpadding(FL_NWK_PB_KEY,encrypted,encrypted_len,decrypted,&decrypted_len)) {
+			P_PRINTFHEX_A(INF,decrypted,decrypted_len,"Decrypted OK(len:%d):",decrypted_len);
+		} else {
+			P_PRINTF(INF,"Padding Err");
+		}
+
 		bls_ll_setAdvData(_data,_size);
+
 		bls_ll_setAdvDuration(_timeout_ms * 1000,1); // ms->us
 		bls_app_registerEventCallback(BLT_EV_FLAG_ADV_DURATION_TIMEOUT,&fl_durationADV_timeout_proccess);
 //		TICK_GET_PROCESSING_TIME = clock_time();

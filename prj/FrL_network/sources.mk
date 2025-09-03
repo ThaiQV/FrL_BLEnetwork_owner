@@ -43,6 +43,7 @@ drivers/B91/ext_driver \
 drivers/B91/flash \
 vendor/FrL_Network/Peri_libs \
 vendor/FrL_Network \
+vendor/FrL_Network/fl_crypt \
 vendor/TBS_dev \
 vendor/common \
 
