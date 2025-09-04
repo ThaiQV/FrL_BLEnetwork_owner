@@ -113,11 +113,15 @@ int _nwk_slave_backup(void){
 		LOGA(INF,"** JoinNWK :%d\r\n",G_INFORMATION.profile.run_stt.join_nwk);
 		LOGA(INF,"** RstFac  :%d\r\n",G_INFORMATION.profile.run_stt.rst_factory);
 		LOGA(INF,"** Channels:%d |%d |%d\r\n",G_INFORMATION.profile.nwk.chn[0],G_INFORMATION.profile.nwk.chn[1],G_INFORMATION.profile.nwk.chn[2])
-		LOGA(INF,"** Key     :0x%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X\r\n",
-				G_INFORMATION.profile.nwk.private_key[0],G_INFORMATION.profile.nwk.private_key[1],G_INFORMATION.profile.nwk.private_key[2],G_INFORMATION.profile.nwk.private_key[3],
-				G_INFORMATION.profile.nwk.private_key[4],G_INFORMATION.profile.nwk.private_key[5],G_INFORMATION.profile.nwk.private_key[6],G_INFORMATION.profile.nwk.private_key[7],
-				G_INFORMATION.profile.nwk.private_key[8],G_INFORMATION.profile.nwk.private_key[9],G_INFORMATION.profile.nwk.private_key[10],G_INFORMATION.profile.nwk.private_key[11],
-				G_INFORMATION.profile.nwk.private_key[12],G_INFORMATION.profile.nwk.private_key[13],G_INFORMATION.profile.nwk.private_key[14],G_INFORMATION.profile.nwk.private_key[15]);
+		LOGA(FLA,"** NWK Key :%s(%02X%02X)\r\n",(G_INFORMATION.profile.nwk.private_key[0] != 0xFF && G_INFORMATION.profile.nwk.private_key[1] != 0xFF )?"*****":"NULL",
+				G_INFORMATION.profile.nwk.private_key[0],G_INFORMATION.profile.nwk.private_key[1]);
+
+//		LOGA(INF,"** Key     :0x%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X\r\n",
+//				G_INFORMATION.profile.nwk.private_key[0],G_INFORMATION.profile.nwk.private_key[1],G_INFORMATION.profile.nwk.private_key[2],G_INFORMATION.profile.nwk.private_key[3],
+//				G_INFORMATION.profile.nwk.private_key[4],G_INFORMATION.profile.nwk.private_key[5],G_INFORMATION.profile.nwk.private_key[6],G_INFORMATION.profile.nwk.private_key[7],
+//				G_INFORMATION.profile.nwk.private_key[8],G_INFORMATION.profile.nwk.private_key[9],G_INFORMATION.profile.nwk.private_key[10],G_INFORMATION.profile.nwk.private_key[11],
+//				G_INFORMATION.profile.nwk.private_key[12],G_INFORMATION.profile.nwk.private_key[13],G_INFORMATION.profile.nwk.private_key[14],G_INFORMATION.profile.nwk.private_key[15]);
+
 	}
 	return 0;
 }
@@ -338,7 +342,6 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 	fl_pack_t packet_built;
 	packet_built.length = 0;
 	memset(packet_built.data_arr,0,SIZEU8(packet_built.data_arr));
-
 	fl_data_frame_u packet;
 	extern u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
 	if(!fl_packet_parse(_pack,&packet.frame)){

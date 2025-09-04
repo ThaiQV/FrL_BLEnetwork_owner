@@ -42,10 +42,11 @@
 #define RTC_ENTRY_SIZE          		8       // 4 bytes timestamp + 4 bytes magic
 #define RTC_MAX_ENTRIES         		(RTC_SIZE / RTC_ENTRY_SIZE -1)
 
+#define NWK_PRIVATE_KEY_SIZE 			13
 #ifdef MASTER_CORE
-
 /******************** NODE LIST ********************/
 #define NODELIST_SLAVE_MAX				200
+
 typedef struct {
 	uint8_t slaveid;
 	uint8_t mac[6];
@@ -60,7 +61,7 @@ typedef struct {
 	struct {
 		u8 chn[3];
 		//key
-		u8 private_key[16];
+		u8 private_key[NWK_PRIVATE_KEY_SIZE];
 	} nwk;
 	//Don't change
 	u32 magic;
@@ -84,7 +85,7 @@ typedef struct {
 	u8 slaveid;
 	struct {
 		u8 chn[3];
-		u8 private_key[16];//todo: encrypt
+		u8 private_key[NWK_PRIVATE_KEY_SIZE];//todo: encrypt
 		u32 mac_parent;
 	} nwk;
 	struct {

@@ -247,11 +247,11 @@ fl_db_master_profile_t fl_db_masterprofile_init(void) {
 		profile = fl_db_masterprofile_load();
 	}
 	//for debugging
-	LOGA(FLA,"Private_key:0x%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X\r\n",
+	LOGA(FLA,"Private_key:0x%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X\r\n",
 			profile.nwk.private_key[0],profile.nwk.private_key[1],profile.nwk.private_key[2],profile.nwk.private_key[3],
 			profile.nwk.private_key[4],profile.nwk.private_key[5],profile.nwk.private_key[6],profile.nwk.private_key[7],
 			profile.nwk.private_key[8],profile.nwk.private_key[9],profile.nwk.private_key[10],profile.nwk.private_key[11],
-			profile.nwk.private_key[12],profile.nwk.private_key[13],profile.nwk.private_key[14],profile.nwk.private_key[15]);
+			profile.nwk.private_key[12]);
 	LOGA(FLA,"NWK channel:%d |%d |%d \r\n",profile.nwk.chn[0],profile.nwk.chn[1],profile.nwk.chn[2]);
 	return profile;
 }

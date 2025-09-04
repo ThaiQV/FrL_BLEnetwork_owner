@@ -13,7 +13,7 @@
 
 #include "fl_nwk_database.h"
 #include "../TBS_dev/TBS_dev_config.h"
-#define NWK_PRIVATE_KEY_SIZE 13
+
 /**
  * @brief	callback function for rsp
  */

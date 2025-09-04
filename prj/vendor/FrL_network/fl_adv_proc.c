@@ -120,6 +120,17 @@ static bool fl_nwk_decrypt16(unsigned char * key,u8* _data,u8 _size, u8* decrypt
 	return (timetamp_hdr>ORIGINAL_TIME_TRUST && IsNWKHDR(decrypted[0])!=0xFF);
 #undef BLOCK_SIZE
 }
+
+void _nwk_mykey_build(u8* mykey){
+#ifdef MASTER_CORE
+	extern fl_master_config_t G_MASTER_INFO;
+	memcpy(mykey,G_MASTER_INFO.nwk.private_key,NWK_PRIVATE_KEY_SIZE);
+#else
+	extern fl_nodeinnetwork_t G_INFORMATION ;
+	memcpy(mykey,G_INFORMATION.profile.nwk.private_key,NWK_PRIVATE_KEY_SIZE);
+#endif
+	memcpy(&mykey[NWK_PRIVATE_KEY_SIZE],FL_NWK_PB_KEY,16-NWK_PRIVATE_KEY_SIZE);
+}
 /******************************************************************************/
 /******************************************************************************/
 /***                            Functions callback                           **/
