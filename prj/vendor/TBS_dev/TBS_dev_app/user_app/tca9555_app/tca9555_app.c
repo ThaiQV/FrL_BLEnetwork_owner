@@ -21,7 +21,7 @@ void i2c_init(void)
 	i2c_set_pin(I2C_PIN_SDA, I2C_PIN_SCL);
 }
 
-int8_t user_i2c_read(uint8_t device_addr, uint8_t reg_addr, uint8_t *data, uint16_t length)
+uint8_t user_i2c_read(uint8_t device_addr, uint8_t reg_addr, uint8_t *data, uint16_t length)
 {
 	i2c_master_write_read(device_addr, &reg_addr, 1,data, length);
 //	printf("i2c read:" );

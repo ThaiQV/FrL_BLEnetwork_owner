@@ -79,6 +79,7 @@ bool led_pin_get(led_pin_t pin)
 	if (pin < LED_ID_MAX) {
 		return gpio_get_level(led_pin_map.all_pins[pin]);
 	}
+	return true;
 }
 
 uint64_t led_MsTick_get(void)
@@ -110,10 +111,12 @@ void user_led_app_init(void)
 	led_data.led_call_on = 0;
 	led_data.led_nwk_on = 0;
 
+	led_all_on();
+
 //	led_blink(LED_ID_CALL, 1000);
 //
 //	led_blink_duty(LED_ID_NWK, 500, 25);
-	led_set_blink_complete_callback(LED_ID_CALL, led_callback);
+//	led_set_blink_complete_callback(LED_ID_CALL, led_callback);
 
 //	led_blink_count(led1, 200, 80, 10);
 
@@ -153,16 +156,13 @@ void user_led_app_task(void)
 
 
 
-//	if(led_data.led_nwk_on)
-	if(IsJoinedNetwork())
+	if(led_data.led_nwk_on)
 	{
-//		led_on(LED_ID_NWK);
-		gpio_set_level(GPIO_PA6, 0);
+		led_on(LED_ID_NWK);
 	}
 	else
 	{
-//		led_off(LED_ID_NWK);
-		gpio_set_level(GPIO_PA6, 1);
+		led_off(LED_ID_NWK);
 	}
 
 	led_process_all();

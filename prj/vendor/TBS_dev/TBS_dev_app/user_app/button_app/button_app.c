@@ -154,7 +154,7 @@ static void ped_on_lick(uint8_t button_id);
 static void ppd_on_lick(uint8_t button_id);
 static void ppu_on_lick(uint8_t button_id);
 static void reset_hold_3s(uint8_t button_id, uint32_t actual_hold_time);
-static void reset_hold_3ss(uint8_t button_id, uint32_t actual_hold_time);
+//static void reset_hold_3ss(uint8_t button_id, uint32_t actual_hold_time);
 static void peu_rst_hold_5s(uint8_t *button_ids, uint8_t count, uint32_t hold_time);
 static void ped_rst_hold_5s(uint8_t *button_ids, uint8_t count, uint32_t hold_time);
 
@@ -267,11 +267,11 @@ static void ppu_on_lick(uint8_t button_id)
 	app_data.print_err_led7 = 0;
 }
 
-static void reset_hold_3ss(uint8_t button_id, uint32_t press_duration_ms)
-{
-	ULOGA("reset_hold_3s: %d\n", press_duration_ms);
-		app_data.bt_rst = 1;
-}
+//static void reset_hold_3ss(uint8_t button_id, uint32_t press_duration_ms)
+//{
+//	ULOGA("reset_hold_3s: %d\n", press_duration_ms);
+//		app_data.bt_rst = 1;
+//}
 
 static void reset_hold_3s(uint8_t button_id, uint32_t press_duration_ms)
 {

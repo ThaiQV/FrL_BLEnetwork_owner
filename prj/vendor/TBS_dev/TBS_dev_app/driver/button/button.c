@@ -10,7 +10,12 @@
 #include <string.h>
 #include <stdio.h>
 
-#define DB_LOG_BT(...)	ULOGA(__VA_ARGS__)
+#define BUTTON_DRV_DEBUG			0
+#if	U_APP_DEBUG
+#define DB_LOG_BT(...)	//ULOGA(__VA_ARGS__)
+#else
+#define DB_LOG_BT(...)
+#endif
 
 // =============================================================================
 // GLOBAL VARIABLES
@@ -353,7 +358,7 @@ bool button_remove_multiclick_level(uint8_t button_id, uint8_t level_index) {
         return false;
     }
 
-    uint8_t removed_clicks = btn->multiclick_levels[level_index].click_count;
+//    uint8_t removed_clicks = btn->multiclick_levels[level_index].click_count;
 
     // Shift remaining levels down
     for (uint8_t i = level_index; i < btn->multiclick_level_count - 1; i++) {
