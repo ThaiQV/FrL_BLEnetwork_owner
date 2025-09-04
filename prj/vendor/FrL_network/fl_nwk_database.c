@@ -10,7 +10,7 @@
 
 #include "tl_common.h"
 #include "fl_nwk_database.h"
-#include "fl_crypt/fl_aes.h"
+
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -201,6 +201,17 @@ fl_db_master_profile_t fl_db_masterprofile_load(void) {
 	}
 	return entry;
 }
+
+void fl_db_generate_private_key(u8 *private_key_out) {
+    u32 timestamp = clock_time();  //
+    u32 rand_val = trng_rand();    //
+    u8 mac[6];
+    extern u8* 	blc_ll_get_macAddrPublic(void);
+    memcpy(mac,blc_ll_get_macAddrPublic(),6);
+    for (int i = 0; i < 16; i++) {
+        private_key_out[i] = mac[i % 6] ^ ((timestamp >> (i % 4) * 8) & 0xFF) ^ ((rand_val >> (i % 4) * 8) & 0xFF);
+    }
+}
 /***************************************************
  * @brief 		:store profile into the flash
  *
@@ -231,7 +242,7 @@ fl_db_master_profile_t fl_db_masterprofile_init(void) {
 	if (profile.magic != MASTER_PROFILE_MAGIC) {
 		//clear all and write default profiles
 		flash_erase_sector(ADDR_MASTER_PROFILE_START);
-		fl_aes_generate_private_key(0,MASTER_PROFILE_DEFAULT.nwk.private_key);
+		fl_db_generate_private_key(MASTER_PROFILE_DEFAULT.nwk.private_key);
 		fl_db_masterprofile_save(MASTER_PROFILE_DEFAULT);
 		profile = fl_db_masterprofile_load();
 	}
@@ -322,7 +333,6 @@ fl_slave_profiles_t fl_db_slaveprofile_init(void){
 /******************************************************************************/
 /******************************************************************************/
 void fl_db_init(void) {
-
 	//First load firmware to device
 	//check flash -> clear all -> first init
 	u8 initialized_db[QUANTITY_FIELD_STORED_DB];
