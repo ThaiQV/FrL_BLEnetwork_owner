@@ -202,6 +202,9 @@ static void user_app_data_sys(void)
 //		lcd16x2_print_string(&lcd_handle, "Reset all data");
 		app_data.err_product = 0;
 		app_data.pass_product = 0;
+		app_data.is_call = 0;
+		led_data.led_call_on = 0;
+		app_data.print_err_led7 = 0;
 		data_storage_data.product_pass = app_data.pass_product;
 		data_storage_data.product_error = app_data.err_product;
 		app_data.bt_rst = 0;

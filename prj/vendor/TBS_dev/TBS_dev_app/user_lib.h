@@ -11,7 +11,12 @@
 
 #include "tl_common.h"
 
-#define ULOGA(...)	LOGA(DEFAULT,__VA_ARGS__)
+#define U_APP_DEBUG			0
+#if	U_APP_DEBUG
+#define ULOGA(...)	//LOGA(DEFAULT,##__VA_ARGS__)
+#else
+#define ULOGA(...)
+#endif
 
 #include "driver/common/msTick.h"
 #include "driver/lcd/lcd16x2.h"

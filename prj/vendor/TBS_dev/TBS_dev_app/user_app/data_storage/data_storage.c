@@ -20,7 +20,7 @@ data_storage_share_data_t data_storage_data;
 
 void user_datastorage_app_init(void)
 {
-	ble_wifi_protocol_init();
+//	ble_wifi_protocol_init();
 	nvm_init();
 	storage_init();
 	//read data save;
