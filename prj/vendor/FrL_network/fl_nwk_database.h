@@ -84,7 +84,7 @@ typedef struct {
 	u8 slaveid;
 	struct {
 		u8 chn[3];
-//		u8 key[];//todo: encrypt
+		u8 private_key[16];//todo: encrypt
 		u32 mac_parent;
 	} nwk;
 	struct {

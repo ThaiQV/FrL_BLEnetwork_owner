@@ -23,7 +23,7 @@
 
 //Public Key for the freelux network
 unsigned char FL_NWK_PB_KEY[16] = "freeluxnetw0rk25";
-
+const u32 ORIGINAL_TIME_TRUST = 1735689600; //00:00:00 UTC - 1/1/2025
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -103,11 +103,11 @@ static void fl_nwk_encrypt16(unsigned char * key,u8* _data,u8 _size, u8* encrypt
 	memcpy(encrypted,data_buffer,_size);
 #undef BLOCK_SIZE
 }
-static void fl_nwk_decrypt16(unsigned char * key,u8* _data,u8 _size, u8* decrypted){
+static bool fl_nwk_decrypt16(unsigned char * key,u8* _data,u8 _size, u8* decrypted){
 #define BLOCK_SIZE 16
 	if(_size < BLOCK_SIZE){
 		ERR(INF,"Decrypt size!!!\r\n");
-		return;
+		return false;
 	}
 	u8 headbytes[BLOCK_SIZE];
 	memcpy(headbytes,_data,SIZEU8(headbytes));
@@ -115,7 +115,9 @@ static void fl_nwk_decrypt16(unsigned char * key,u8* _data,u8 _size, u8* decrypt
 	memcpy(data_buffer,_data,SIZEU8(data_buffer));
 	aes_decrypt(key,headbytes,data_buffer);
 	memcpy(decrypted,data_buffer,_size);
-
+/*Checking result decrypt*/
+	u32 timetamp_hdr = MAKE_U32(decrypted[3],decrypted[2],decrypted[1],decrypted[0]);
+	return (timetamp_hdr>ORIGINAL_TIME_TRUST && IsNWKHDR(decrypted[0])!=0xFF);
 #undef BLOCK_SIZE
 }
 /******************************************************************************/
@@ -142,8 +144,7 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 				//memcpy(incomming_data.data_arr,pa->data,incomming_data.length);
 //				incomming_data.data_arr[0] = pa->data[0];
 				//Add decrypt
-				fl_nwk_decrypt16(FL_NWK_PB_KEY,pa->data,incomming_data.length,incomming_data.data_arr);
-				if(0xFF == IsNWKHDR(incomming_data.data_arr[0])) return 0;
+				if(!fl_nwk_decrypt16(FL_NWK_PB_KEY,pa->data,incomming_data.length,incomming_data.data_arr)) return 0;
 #ifdef MASTER_CORE
 				//skip from  master
 				if (fl_adv_IsFromMaster(incomming_data)) {
@@ -304,7 +305,7 @@ void fl_adv_sendFIFO_run(void) {
 #endif
 //			LOGA(APP,"ADV FIFO(%d):%d/%d\r\n",G_QUEUE_SENDING.count,G_QUEUE_SENDING.head_index,G_QUEUE_SENDING.tail_index);
 			F_SENDING_STATE = 1;
-			P_PRINTFHEX_A(INF,data_in_queue.data_arr,data_in_queue.length,"Raw Data(len:%d):",data_in_queue.length);
+//			P_PRINTFHEX_A(INF,data_in_queue.data_arr,data_in_queue.length,"Raw Data(len:%d):",data_in_queue.length);
 			fl_adv_send(data_in_queue.data_arr,data_in_queue.length,G_ADV_SETTINGS.adv_duration);
 			return;
 		}
@@ -336,13 +337,12 @@ void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms) {
 		u8 encrypted[_size];
 		memset(encrypted,0,SIZEU8(encrypted));
 		fl_nwk_encrypt16(FL_NWK_PB_KEY,_data,_size,encrypted);
-		P_PRINTFHEX_A(INF,encrypted,_size,"Encrypt(%d):",_size);
-		u8 decrypted[_size];
-		memset(decrypted,0,SIZEU8(decrypted));
-		fl_nwk_decrypt16(FL_NWK_PB_KEY,encrypted,_size,decrypted);
-		P_PRINTFHEX_A(INF,decrypted,_size,"Decrypt(%d):",_size);
-
-
+//		P_PRINTFHEX_A(INF,encrypted,_size,"Encrypt(%d):",_size);
+//		u8 decrypted[_size];
+//		memset(decrypted,0,SIZEU8(decrypted));
+//		fl_nwk_decrypt16(FL_NWK_PB_KEY,encrypted,_size,decrypted);
+//		P_PRINTFHEX_A(INF,decrypted,_size,"Decrypt(%d):",_size);
+//
 		bls_ll_setAdvData(encrypted,_size);
 		bls_ll_setAdvDuration(_timeout_ms * 1000,1); // ms->us
 		bls_app_registerEventCallback(BLT_EV_FLAG_ADV_DURATION_TIMEOUT,&fl_durationADV_timeout_proccess);
@@ -443,7 +443,7 @@ void fl_adv_collection_channel_init(void){
 	rf_set_power_level_index(MY_RF_POWER_INDEX);
 	//clear all G_SENDING
 	FL_QUEUE_CLEAR(&G_QUEUE_SENDING,QUEUE_SENDING_SIZE);
-	blc_ll_setAdvCustomedChannel(30,31,32);
+	blc_ll_setAdvCustomedChannel(0,1,2);
 
 	blc_hci_le_setEventMask_cmd(HCI_LE_EVT_MASK_ADVERTISING_REPORT);
 	blc_hci_registerControllerEventHandler(fl_controller_event_callback);

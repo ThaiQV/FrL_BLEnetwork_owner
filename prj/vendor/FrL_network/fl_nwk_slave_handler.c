@@ -113,6 +113,11 @@ int _nwk_slave_backup(void){
 		LOGA(INF,"** JoinNWK :%d\r\n",G_INFORMATION.profile.run_stt.join_nwk);
 		LOGA(INF,"** RstFac  :%d\r\n",G_INFORMATION.profile.run_stt.rst_factory);
 		LOGA(INF,"** Channels:%d |%d |%d\r\n",G_INFORMATION.profile.nwk.chn[0],G_INFORMATION.profile.nwk.chn[1],G_INFORMATION.profile.nwk.chn[2])
+		LOGA(INF,"** Key     :0x%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X\r\n",
+				G_INFORMATION.profile.nwk.private_key[0],G_INFORMATION.profile.nwk.private_key[1],G_INFORMATION.profile.nwk.private_key[2],G_INFORMATION.profile.nwk.private_key[3],
+				G_INFORMATION.profile.nwk.private_key[4],G_INFORMATION.profile.nwk.private_key[5],G_INFORMATION.profile.nwk.private_key[6],G_INFORMATION.profile.nwk.private_key[7],
+				G_INFORMATION.profile.nwk.private_key[8],G_INFORMATION.profile.nwk.private_key[9],G_INFORMATION.profile.nwk.private_key[10],G_INFORMATION.profile.nwk.private_key[11],
+				G_INFORMATION.profile.nwk.private_key[12],G_INFORMATION.profile.nwk.private_key[13],G_INFORMATION.profile.nwk.private_key[14],G_INFORMATION.profile.nwk.private_key[15]);
 	}
 	return 0;
 }
@@ -412,6 +417,8 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 			_nwk_slave_syncFromPack(&packet.frame);
 			if (IsJoinedNetwork() == 0) {
 				if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
+					//get master's mac
+					G_INFORMATION.profile.nwk.mac_parent = MAKE_U32(packet.frame.payload[3],packet.frame.payload[2],packet.frame.payload[1],packet.frame.payload[0]);
 					//Process rsp
 					memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
 					memcpy(packet.frame.payload,G_INFORMATION.mac,SIZEU8(G_INFORMATION.mac));
@@ -441,8 +448,8 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 				G_INFORMATION.profile.nwk.chn[0] = packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac)];
 				G_INFORMATION.profile.nwk.chn[1] = packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac) + 1];
 				G_INFORMATION.profile.nwk.chn[2] = packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac) + 2];
-				//get master's mac
-				G_INFORMATION.profile.nwk.mac_parent = MAKE_U32(packet.frame.payload[7],packet.frame.payload[8],packet.frame.payload[9],packet.frame.payload[10]);
+				//Get private_key
+				memcpy(G_INFORMATION.profile.nwk.private_key,&packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac) + 3],NWK_PRIVATE_KEY_SIZE);
 			}
 			//debug
 			else{

@@ -247,7 +247,7 @@ fl_db_master_profile_t fl_db_masterprofile_init(void) {
 		profile = fl_db_masterprofile_load();
 	}
 	//for debugging
-	ERR(FLA,"Private_key:0x%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X\r\n",
+	LOGA(FLA,"Private_key:0x%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X\r\n",
 			profile.nwk.private_key[0],profile.nwk.private_key[1],profile.nwk.private_key[2],profile.nwk.private_key[3],
 			profile.nwk.private_key[4],profile.nwk.private_key[5],profile.nwk.private_key[6],profile.nwk.private_key[7],
 			profile.nwk.private_key[8],profile.nwk.private_key[9],profile.nwk.private_key[10],profile.nwk.private_key[11],
@@ -323,7 +323,7 @@ fl_slave_profiles_t fl_db_slaveprofile_init(void){
 	LOGA(FLA,"NWK channel:%d |%d |%d \r\n",profile.nwk.chn[0],profile.nwk.chn[1],profile.nwk.chn[2]);
 	LOGA(FLA,"NWK Parent(%d):0x%X\r\n",profile.run_stt.join_nwk,profile.nwk.mac_parent);
 	LOGA(FLA,"Factory Reset:%d\r\n",profile.run_stt.rst_factory);
-
+	LOGA(FLA,"NWK Key:%s(%02X%02X)\r\n",(profile.nwk.private_key[0] != 0xFF && profile.nwk.private_key[1] != 0xFF )?"*****":"NULL",profile.nwk.private_key[0],profile.nwk.private_key[1]);
 	return profile;
 }
 #endif

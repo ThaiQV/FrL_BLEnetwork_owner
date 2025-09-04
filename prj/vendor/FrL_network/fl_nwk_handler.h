@@ -13,10 +13,10 @@
 
 #include "fl_nwk_database.h"
 #include "../TBS_dev/TBS_dev_config.h"
+#define NWK_PRIVATE_KEY_SIZE 13
 /**
  * @brief	callback function for rsp
  */
-
 typedef void (*fl_rsp_callback_fnc)(void*, void*);
 #define QUEUE_RSP_SLOT_MAX		10
 #define QUEUQ_REQcRSP_INTERVAL  20*1000 //ms

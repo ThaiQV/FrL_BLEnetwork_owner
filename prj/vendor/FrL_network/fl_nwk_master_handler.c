@@ -161,12 +161,12 @@ fl_pack_t fl_master_packet_collect_build(void) {
 	packet.frame.milltamp = timetampStep.milstep;
 	/*****************************************************************/
 	/* | HDR | Timetamp | Mill_time | SlaveID | payload | crc8 | Ep | */
-	/* | 1B  |   4Bs    |    1B     |    1B   |   20Bs  |  1B  | 1B | -> .master = FL_FROM_SLAVE_ACK / FL_FROM_SLAVE */
+	/* | 1B  |   4Bs    |    1B     |    1B   |   22Bs  |  1B  | 1B | -> .master = FL_FROM_SLAVE_ACK / FL_FROM_SLAVE */
 	/*****************************************************************/
 
 	/*****************************************************************/
-	/* |        PAYLOAD      |*/
-	/* | 6 bytes  Master MAC | */
+	/* |      PAYLOAD 		 |*/
+	/* | 6 bytes  Master MAC |*/
 
 	packet.frame.slaveID.id_u8 = 0xFF;
 	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
@@ -209,18 +209,25 @@ fl_pack_t fl_master_packet_assignSlaveID_build(u8* _mac) {
 
 	//Add new mill-step
 	packet.frame.milltamp = timetampStep.milstep;
+	/*****************************************************************/
+	/* | HDR | Timetamp | Mill_time | SlaveID | payload | crc8 | Ep | */
+	/* | 1B  |   4Bs    |    1B     |    1B   |   22Bs  |  1B  | 1B | -> .master = FL_FROM_SLAVE */
+	/*****************************************************************/
 
+	/*****************************************************************/
+	/* |       			  			PAYLOAD   		   			      |*/
+	/* | 6 bytes  Slave's MAC |3 bytes Channel | 13 bytes Private_key | */
 	//Add slave's mac
 	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
-
 	memcpy(&packet.frame.payload[0],_mac,6);
 	//Add channel communication
 	packet.frame.payload[6] = *G_ADV_SETTINGS.nwk_chn.chn1;
 	packet.frame.payload[7] = *G_ADV_SETTINGS.nwk_chn.chn2;
 	packet.frame.payload[8] = *G_ADV_SETTINGS.nwk_chn.chn3;
-	//Add master's mac
-	memcpy(&packet.frame.payload[9],blc_ll_get_macAddrPublic(),6);
-
+	//Add private key => use to decrypte packet data
+	memcpy(&packet.frame.payload[9],G_MASTER_INFO.nwk.private_key,NWK_PRIVATE_KEY_SIZE);
+	//Calculate crc
+	packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
 	//Create payload assignment
 	packet.frame.slaveID.id_u8 = fl_master_SlaveID_get(_mac);
 
