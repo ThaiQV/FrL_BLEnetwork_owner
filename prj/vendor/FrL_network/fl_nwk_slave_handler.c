@@ -282,6 +282,9 @@ bool fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 			//Create payload
 			memset(req_pack.frame.payload,0xFF,SIZEU8(req_pack.frame.payload));
 			memcpy(req_pack.frame.payload,_data,_len);
+			//crc
+			req_pack.frame.crc8 = fl_crc8(req_pack.frame.payload,SIZEU8(req_pack.frame.payload));
+
 			//create endpoint
 			req_pack.frame.endpoint.dbg = NWK_DEBUG_STT;
 			req_pack.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
@@ -308,6 +311,8 @@ bool fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 			//Create payload
 			memset(req_pack.frame.payload,0xFF,SIZEU8(req_pack.frame.payload));
 			memcpy(req_pack.frame.payload,_data,_len);
+			//crc
+			req_pack.frame.crc8 = fl_crc8(req_pack.frame.payload,SIZEU8(req_pack.frame.payload));
 			//create endpoint
 			req_pack.frame.endpoint.dbg = NWK_DEBUG_STT;
 			req_pack.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
@@ -395,7 +400,6 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 					tbs_pack_powermeter_data(pwmeter_data,_payload);
 					indx_data = SIZEU8(pwmeter_data->type) +   SIZEU8(pwmeter_data->mac) +  SIZEU8(pwmeter_data->timetamp);
 #endif
-
 					packet.frame.slaveID.id_u8 = G_INFORMATION.slaveID.id_u8;
 					memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
 					memcpy(&packet.frame.payload,&_payload[indx_data],SIZEU8(packet.frame.payload));
@@ -468,7 +472,8 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 			return packet_built;
 		break;
 	}
-
+	//crc
+	packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
 	packet_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
 	memcpy(packet_built.data_arr,packet.bytes,packet_built.length);
 

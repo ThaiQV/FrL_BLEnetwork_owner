@@ -20,7 +20,6 @@
 #include "fl_input_ext.h"
 #include "fl_nwk_protocol.h"
 
-
 //Public Key for the freelux network
 unsigned char FL_NWK_PB_KEY[16] = "freeluxnetw0rk25";
 const u32 ORIGINAL_TIME_TRUST = 1735689600; //00:00:00 UTC - 1/1/2025
@@ -117,7 +116,10 @@ static bool fl_nwk_decrypt16(unsigned char * key,u8* _data,u8 _size, u8* decrypt
 	memcpy(decrypted,data_buffer,_size);
 /*Checking result decrypt*/
 	u32 timetamp_hdr = MAKE_U32(decrypted[3],decrypted[2],decrypted[1],decrypted[0]);
-	return (timetamp_hdr>ORIGINAL_TIME_TRUST && IsNWKHDR(decrypted[0])!=0xFF);
+	fl_data_frame_u packet_frame;
+	memcpy(packet_frame.bytes,decrypted,SIZEU8(packet_frame.bytes));
+	u8 pack_crc = fl_crc8(packet_frame.frame.payload,SIZEU8(packet_frame.frame.payload));
+	return (timetamp_hdr>ORIGINAL_TIME_TRUST && IsNWKHDR(decrypted[0])!=0xFF && pack_crc == packet_frame.frame.crc8);
 #undef BLOCK_SIZE
 }
 

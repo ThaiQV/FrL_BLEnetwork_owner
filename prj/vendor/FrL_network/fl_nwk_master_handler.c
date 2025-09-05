@@ -120,10 +120,10 @@ fl_pack_t fl_master_packet_heartbeat_build(void) {
 
 	//Add new mill-step
 	packet.frame.milltamp = timetampStep.milstep;
-
 	packet.frame.slaveID.id_u8 = 0xFF; // all grps + all members
-
 	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
+	//crc
+	packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
 
 	packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
 	packet.frame.endpoint.master = FL_FROM_MASTER; //non-ack
@@ -173,6 +173,8 @@ fl_pack_t fl_master_packet_collect_build(void) {
 	//Add master's mac
 	memcpy(&packet.frame.payload[0],blc_ll_get_macAddrPublic(),6);
 
+	//crc
+	packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
 
 	packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
 	packet.frame.endpoint.master = FL_FROM_MASTER_ACK; //ack
@@ -271,6 +273,8 @@ fl_pack_t fl_master_packet_RSP_55_build(u8 slaveID) {
 	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
 	u8 ack[2] = { 'O', 'K' };
 	memcpy(packet.frame.payload,ack,SIZEU8(ack));
+	//crc
+	packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
 	//assign slaveID
 	packet.frame.slaveID.id_u8 = slaveID;
 
