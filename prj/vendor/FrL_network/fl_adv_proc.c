@@ -23,6 +23,8 @@
 //Public Key for the freelux network
 unsigned char FL_NWK_PB_KEY[16] = "freeluxnetw0rk25";
 const u32 ORIGINAL_TIME_TRUST = 1735689600; //00:00:00 UTC - 1/1/2025
+unsigned char FL_NWK_USE_KEY[16]; //this key used to encrypt -> decrypt
+volatile u8* FL_NWK_COLLECTION_MODE; //
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -122,16 +124,32 @@ static bool fl_nwk_decrypt16(unsigned char * key,u8* _data,u8 _size, u8* decrypt
 	return (timetamp_hdr>ORIGINAL_TIME_TRUST && IsNWKHDR(decrypted[0])!=0xFF && pack_crc == packet_frame.frame.crc8);
 #undef BLOCK_SIZE
 }
-
-void _nwk_mykey_build(u8* mykey){
+/***************************************************
+ * @brief 		:Generate used key for the network
+ * 				**Need to call before encrypt/decrypt function
+ *
+ * @param[in] 	:none
+ *
+ * @return	  	:none
+ *
+ ***************************************************/
+static inline void NWK_MYKEY(void){
+	const unsigned char KEY_NULL[4] = { 0xFF, 0xFF, 0xFF, 0xFF };
+	u8 key_buffer[NWK_PRIVATE_KEY_SIZE];
 #ifdef MASTER_CORE
 	extern fl_master_config_t G_MASTER_INFO;
-	memcpy(mykey,G_MASTER_INFO.nwk.private_key,NWK_PRIVATE_KEY_SIZE);
+	memcpy(key_buffer,G_MASTER_INFO.nwk.private_key,NWK_PRIVATE_KEY_SIZE);
 #else
 	extern fl_nodeinnetwork_t G_INFORMATION ;
-	memcpy(mykey,G_INFORMATION.profile.nwk.private_key,NWK_PRIVATE_KEY_SIZE);
+	memcpy(key_buffer,G_INFORMATION.profile.nwk.private_key,NWK_PRIVATE_KEY_SIZE);
 #endif
-	memcpy(&mykey[NWK_PRIVATE_KEY_SIZE],FL_NWK_PB_KEY,16-NWK_PRIVATE_KEY_SIZE);
+	if (memcmp(key_buffer,KEY_NULL,SIZEU8(KEY_NULL)) == 0 || *FL_NWK_COLLECTION_MODE == 1) {
+		memcpy(FL_NWK_USE_KEY,FL_NWK_PB_KEY,SIZEU8(FL_NWK_PB_KEY));
+	} else {
+		//build
+		memcpy(FL_NWK_USE_KEY,key_buffer,NWK_PRIVATE_KEY_SIZE);
+		memcpy(&FL_NWK_USE_KEY[NWK_PRIVATE_KEY_SIZE],FL_NWK_PB_KEY,SIZEU8(FL_NWK_PB_KEY)-NWK_PRIVATE_KEY_SIZE);
+	}
 }
 /******************************************************************************/
 /******************************************************************************/
@@ -157,7 +175,8 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 				//memcpy(incomming_data.data_arr,pa->data,incomming_data.length);
 //				incomming_data.data_arr[0] = pa->data[0];
 				//Add decrypt
-				if(!fl_nwk_decrypt16(FL_NWK_PB_KEY,pa->data,incomming_data.length,incomming_data.data_arr)) return 0;
+				NWK_MYKEY();
+				if(!fl_nwk_decrypt16(FL_NWK_USE_KEY,pa->data,incomming_data.length,incomming_data.data_arr)) return 0;
 #ifdef MASTER_CORE
 				//skip from  master
 				if (fl_adv_IsFromMaster(incomming_data)) {
@@ -349,7 +368,8 @@ void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms) {
 		/*Encryt data*/
 		u8 encrypted[_size];
 		memset(encrypted,0,SIZEU8(encrypted));
-		fl_nwk_encrypt16(FL_NWK_PB_KEY,_data,_size,encrypted);
+		NWK_MYKEY();
+		fl_nwk_encrypt16(FL_NWK_USE_KEY,_data,_size,encrypted);
 //		P_PRINTFHEX_A(INF,encrypted,_size,"Encrypt(%d):",_size);
 //		u8 decrypted[_size];
 //		memset(decrypted,0,SIZEU8(decrypted));
@@ -417,7 +437,8 @@ void fl_adv_init(void) {
 	G_ADV_SETTINGS.nwk_chn.chn1 = &G_MASTER_INFO.nwk.chn[0];
 	G_ADV_SETTINGS.nwk_chn.chn2 = &G_MASTER_INFO.nwk.chn[1];
 	G_ADV_SETTINGS.nwk_chn.chn3 = &G_MASTER_INFO.nwk.chn[2];
-
+	extern volatile u8 MASTER_INSTALL_STATE;
+	FL_NWK_COLLECTION_MODE = &MASTER_INSTALL_STATE;
 #else
 	fl_input_external_init();
 	extern fl_nodeinnetwork_t G_INFORMATION;
@@ -427,6 +448,7 @@ void fl_adv_init(void) {
 	G_ADV_SETTINGS.nwk_chn.chn1 = &G_INFORMATION.profile.nwk.chn[0];
 	G_ADV_SETTINGS.nwk_chn.chn2 = &G_INFORMATION.profile.nwk.chn[1];
 	G_ADV_SETTINGS.nwk_chn.chn3 = &G_INFORMATION.profile.nwk.chn[2];
+	FL_NWK_COLLECTION_MODE = &G_INFORMATION.profile.run_stt.join_nwk;
 #endif
 	// Init REQ call RSP
 	fl_queue_REQnRSP_TimeoutStart();
