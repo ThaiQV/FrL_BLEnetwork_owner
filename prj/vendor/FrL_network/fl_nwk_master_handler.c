@@ -31,7 +31,7 @@
 /******************************************************************************/
 #define TIME_COLLECT_NODE				5*1000 //
 
-#define PACK_HANDLE_MASTER_SIZE 		256
+#define PACK_HANDLE_MASTER_SIZE 		32
 fl_pack_t g_handle_master_array[PACK_HANDLE_MASTER_SIZE];
 fl_data_container_t G_HANDLE_MASTER_CONTAINER = {.data = g_handle_master_array, .head_index = 0, .tail_index = 0, .mask = PACK_HANDLE_MASTER_SIZE - 1, .count = 0 };
 
@@ -43,7 +43,7 @@ volatile u8 MASTER_INSTALL_STATE = 0;
 u16 PERIOD_HEARTBEAT = 0 * 1000; //
 //flag debug of the network
 volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into endpoint byte (dbg :1bit)
-volatile u8 NWK_REPEAT_MODE = 1; // 1: level | 0 : non-level
+volatile u8 NWK_REPEAT_MODE = 0; // 1: level | 0 : non-level
 volatile u8 NWK_REPEAT_LEVEL = 3;
 
 /******************************************************************************/
@@ -723,21 +723,18 @@ void fl_nwk_master_heartbeat_run(void) {
  *
  ***************************************************/
 void fl_nwk_master_collection_run(void) {
-	static u8 previous_mode = 0;
 	if (MASTER_INSTALL_STATE) {
-		if (blt_soft_timer_find(&fl_send_collection_req) < 0) {
-			LOG_P(APP,"Install mode : On\r\n");
-			fl_nwk_master_nodelist_load();
+		if (blt_soft_timer_find(&fl_send_collection_req) == -1) {
+			blt_soft_timer_add(&fl_send_collection_req,50*1000);
 			fl_adv_collection_channel_init();
-			blt_soft_timer_add(&fl_send_collection_req,1000 * 1000); // 1s
+			fl_nwk_master_nodelist_load();
 		}
-		previous_mode = MASTER_INSTALL_STATE;
-	} else {
-		if (previous_mode == 1 && MASTER_INSTALL_STATE == 0) {
-			LOG_P(APP,"Install mode : Off\r\n");
+	}
+	else
+	{
+		if (blt_soft_timer_find(&fl_send_collection_req) != -1) {
 			blt_soft_timer_delete(&fl_send_collection_req);
 			fl_adv_collection_channel_deinit();
-			previous_mode = MASTER_INSTALL_STATE;
 			//store nodelist
 			fl_nwk_master_nodelist_store();
 		}
@@ -753,8 +750,6 @@ void fl_nwk_master_collection_run(void) {
  *
  ***************************************************/
 void fl_nwk_master_process(void) {
-	//refesh node list
-//	fl_input_collection_node_handle(&fl_send_collection_req,TIME_COLLECT_NODE + RAND(-2500,2500));
 	//install mode
 	fl_nwk_master_collection_run();
 	//Heartbeat processor
@@ -776,7 +771,5 @@ void fl_nwk_master_run(fl_pack_t *_pack_handle) {
 			fl_master_ProccesRSP_cbk();
 		}
 	}
-	//TEST
-//	fl_master_StatusNodePrintf();
 }
 #endif

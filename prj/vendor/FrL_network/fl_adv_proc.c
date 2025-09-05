@@ -331,9 +331,9 @@ void fl_adv_sendFIFO_run(void) {
  * @return     none
  */
 void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms) {
-	while (blc_ll_getCurrentState() == BLS_LINK_STATE_SCAN && blc_ll_getCurrentState() == BLS_LINK_STATE_ADV) {
-	};
-	if (_data && _size >= 2) {
+//	while (blc_ll_getCurrentState() == BLS_LINK_STATE_SCAN && blc_ll_getCurrentState() == BLS_LINK_STATE_ADV) {
+//	};
+	if (_data && _size >= 1) {
 //		LOG_P(APP,"Sending..... \r\n");
 		rf_set_power_level_index(MY_RF_POWER_INDEX);
 //		bls_ll_setAdvEnable(BLC_ADV_ENABLE);

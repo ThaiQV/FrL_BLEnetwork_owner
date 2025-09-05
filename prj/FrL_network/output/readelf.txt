@@ -10,7 +10,7 @@ ELF Header:
   Version:                           0x1
   Entry point address:               0x20000000
   Start of program headers:          52 (bytes into file)
-  Start of section headers:          390312 (bytes into file)
+  Start of section headers:          390020 (bytes into file)
   Flags:                             0x3, RVC, single-float ABI
   Size of this header:               52 (bytes)
   Size of program headers:           32 (bytes)
@@ -30,22 +30,22 @@ Section Headers:
   [ 6] .text             PROGBITS        20006508 008508 00a80c 00  AX  0   0  4
   [ 7] .rodata           PROGBITS        20010d14 012d14 001750 00   A  0   0  4
   [ 8] .eh_frame         PROGBITS        20012480 014480 0000f8 00   A  0   0  4
-  [ 9] .data             PROGBITS        00080000 015000 0000ae 00  WA  0   0  4
-  [10] .sbss             NOBITS          000800b0 0150ae 000034 00  WA  0   0  4
-  [11] .bss              NOBITS          000800e4 0150ae 001654 00  WA  0   0  4
-  [12] .debug_info       PROGBITS        00000000 0150ae 01a8f9 00      0   0  1
-  [13] .debug_abbrev     PROGBITS        00000000 02f9a7 000ea5 00      0   0  1
-  [14] .debug_loc        PROGBITS        00000000 03084c 00cef0 00      0   0  1
-  [15] .debug_aranges    PROGBITS        00000000 03d740 000790 00      0   0  8
-  [16] .debug_ranges     PROGBITS        00000000 03ded0 004218 00      0   0  8
-  [17] .debug_line       PROGBITS        00000000 0420e8 00c8c9 00      0   0  1
-  [18] .debug_str        PROGBITS        00000000 04e9b1 009bfc 01  MS  0   0  1
-  [19] .comment          PROGBITS        00000000 0585ad 000037 01  MS  0   0  1
-  [20] .riscv.attributes RISCV_ATTRIBUTE 00000000 0585e4 00003b 00      0   0  1
-  [21] .debug_frame      PROGBITS        00000000 058620 002210 00      0   0  4
-  [22] .symtab           SYMTAB          00000000 05a830 002560 10     23 459  4
-  [23] .strtab           STRTAB          00000000 05cd90 002614 00      0   0  1
-  [24] .shstrtab         STRTAB          00000000 05f3a4 000103 00      0   0  1
+  [ 9] .data             PROGBITS        00080000 015000 0000aa 00  WA  0   0  4
+  [10] .sbss             NOBITS          000800b0 0150aa 000034 00  WA  0   0  4
+  [11] .bss              NOBITS          000800e4 0150aa 001654 00  WA  0   0  4
+  [12] .debug_info       PROGBITS        00000000 0150aa 01a8f5 00      0   0  1
+  [13] .debug_abbrev     PROGBITS        00000000 02f99f 000ea5 00      0   0  1
+  [14] .debug_loc        PROGBITS        00000000 030844 00ce63 00      0   0  1
+  [15] .debug_aranges    PROGBITS        00000000 03d6a8 000790 00      0   0  8
+  [16] .debug_ranges     PROGBITS        00000000 03de38 0041a0 00      0   0  8
+  [17] .debug_line       PROGBITS        00000000 041fd8 00c8a9 00      0   0  1
+  [18] .debug_str        PROGBITS        00000000 04e881 009bfc 01  MS  0   0  1
+  [19] .comment          PROGBITS        00000000 05847d 000037 01  MS  0   0  1
+  [20] .riscv.attributes RISCV_ATTRIBUTE 00000000 0584b4 00003b 00      0   0  1
+  [21] .debug_frame      PROGBITS        00000000 0584f0 00221c 00      0   0  4
+  [22] .symtab           SYMTAB          00000000 05a70c 002560 10     23 459  4
+  [23] .strtab           STRTAB          00000000 05cc6c 002614 00      0   0  1
+  [24] .shstrtab         STRTAB          00000000 05f280 000103 00      0   0  1
 Key to Flags:
   W (write), A (alloc), X (execute), M (merge), S (strings), I (info),
   L (link order), O (extra OS processing required), G (group), T (TLS),
@@ -61,8 +61,8 @@ Program Headers:
   LOAD           0x002178 0x00000178 0x200002e8 0x01114 0x01114 RW  0x1000
   LOAD           0x003300 0x00001300 0x20001400 0x05102 0x05102 R E 0x1000
   LOAD           0x008508 0x20006508 0x20006508 0x0c070 0x0c070 R E 0x1000
-  LOAD           0x015000 0x00080000 0x20012578 0x000ae 0x01738 RW  0x1000
-  RISCV_ATTRIBUT 0x0585e4 0x00000000 0x00000000 0x0003b 0x00000 R   0x1
+  LOAD           0x015000 0x00080000 0x20012578 0x000aa 0x01738 RW  0x1000
+  RISCV_ATTRIBUT 0x0584b4 0x00000000 0x00000000 0x0003b 0x00000 R   0x1
 
  Section to Segment mapping:
   Segment Sections...
@@ -273,27 +273,27 @@ Symbol table '.symtab' contains 598 entries:
    188: 2000939c   162 FUNC    LOCAL  DEFAULT    6 blt_soft_timer_sort
    189: 20009440   310 FUNC    LOCAL  DEFAULT    6 blt_soft_timer_process
    190: 20009578    58 FUNC    LOCAL  DEFAULT    6 fl_packet_parse
-   191: 200095b4    48 FUNC    LOCAL  DEFAULT    6 FL_QUEUE_CLEAR
-   192: 200095e4  5968 FUNC    LOCAL  DEFAULT    6 blc_l2cap_packet_receive
-   193: 2000ad34   192 FUNC    LOCAL  DEFAULT    6 blt_soft_timer_add
-   194: 2000adf4   330 FUNC    LOCAL  DEFAULT    6 TEST_Buttons_RST
-   195: 2000af40   690 FUNC    LOCAL  DEFAULT    6 _rsp_callback
+   191: 200095b4    86 FUNC    LOCAL  DEFAULT    6 FL_QUEUE_CLEAR
+   192: 2000960c  5968 FUNC    LOCAL  DEFAULT    6 blc_l2cap_packet_receive
+   193: 2000ad5c   192 FUNC    LOCAL  DEFAULT    6 blt_soft_timer_add
+   194: 2000ae1c   330 FUNC    LOCAL  DEFAULT    6 TEST_Buttons_RST
+   195: 2000af68   690 FUNC    LOCAL  DEFAULT    6 _rsp_callback
    196: 00004da8   180 FUNC    LOCAL  DEFAULT    5 gpio_irq_handler
-   197: 2000b1f4   390 FUNC    LOCAL  DEFAULT    6 fl_nwk_joinnwk_timeout
-   198: 2000dc2c   582 FUNC    LOCAL  DEFAULT    6 fl_controller_event_callb
-   199: 2000b37c   586 FUNC    LOCAL  DEFAULT    6 _nwk_slave_syncFromPack
-   200: 2000b5c8   442 FUNC    LOCAL  DEFAULT    6 fl_queue_REQnRSP_TimeoutS
-   201: 2000b784   258 FUNC    LOCAL  DEFAULT    6 fl_db_slaveprofile_save
-   202: 2000b888  1114 FUNC    LOCAL  DEFAULT    6 _nwk_slave_backup
-   203: 2000bce4   216 FUNC    LOCAL  DEFAULT    6 fl_db_slaveprofile_load
-   204: 2000bdc0   210 FUNC    LOCAL  DEFAULT    6 RegisterPOLLING
-   205: 2000be94   238 FUNC    LOCAL  DEFAULT    6 fl_adv_sendFIFO_add
-   206: 2000bf84  1234 FUNC    LOCAL  DEFAULT    6 fl_req_slave_packet_creat
-   207: 2000c458   472 FUNC    LOCAL  DEFAULT    6 TEST_Buttons
-   208: 2000c630   198 FUNC    LOCAL  DEFAULT    6 fl_nwk_slave_reconnect
-   209: 2000c6f8   182 FUNC    LOCAL  DEFAULT    6 app_system_time_sync
-   210: 2000c7b0  5242 FUNC    LOCAL  DEFAULT    6 user_init_normal
-   211: 2000de74  8322 FUNC    LOCAL  DEFAULT    6 main_loop
+   197: 2000b21c   390 FUNC    LOCAL  DEFAULT    6 fl_nwk_joinnwk_timeout
+   198: 2000dc54   582 FUNC    LOCAL  DEFAULT    6 fl_controller_event_callb
+   199: 2000b3a4   586 FUNC    LOCAL  DEFAULT    6 _nwk_slave_syncFromPack
+   200: 2000b5f0   442 FUNC    LOCAL  DEFAULT    6 fl_queue_REQnRSP_TimeoutS
+   201: 2000b7ac   258 FUNC    LOCAL  DEFAULT    6 fl_db_slaveprofile_save
+   202: 2000b8b0  1114 FUNC    LOCAL  DEFAULT    6 _nwk_slave_backup
+   203: 2000bd0c   216 FUNC    LOCAL  DEFAULT    6 fl_db_slaveprofile_load
+   204: 2000bde8   210 FUNC    LOCAL  DEFAULT    6 RegisterPOLLING
+   205: 2000bebc   238 FUNC    LOCAL  DEFAULT    6 fl_adv_sendFIFO_add
+   206: 2000bfac  1234 FUNC    LOCAL  DEFAULT    6 fl_req_slave_packet_creat
+   207: 2000c480   472 FUNC    LOCAL  DEFAULT    6 TEST_Buttons
+   208: 2000c658   198 FUNC    LOCAL  DEFAULT    6 fl_nwk_slave_reconnect
+   209: 2000c720   182 FUNC    LOCAL  DEFAULT    6 app_system_time_sync
+   210: 2000c7d8  5242 FUNC    LOCAL  DEFAULT    6 user_init_normal
+   211: 2000de9c  8282 FUNC    LOCAL  DEFAULT    6 main_loop
    212: 00000158    32 OBJECT  LOCAL  DEFAULT    3 aes_data_buff
    213: 000800e4    47 OBJECT  LOCAL  DEFAULT   11 G_INFORMATION
    214: 00080114    21 OBJECT  LOCAL  DEFAULT   11 G_INPUT_EXT
@@ -484,12 +484,12 @@ Symbol table '.symtab' contains 598 entries:
    399: 200111b4    29 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13442
    400: 200111d4    18 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13443
    401: 200111e8    20 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13464
-   402: 200111fc    12 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13486
+   402: 200111fc    12 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13483
    403: 20011208    24 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13569
-   404: 20011220    20 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13577
+   404: 20011220    20 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13574
    405: 20011234    32 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13600
    406: 20011254    26 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13697
-   407: 20011270    11 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13752
+   407: 20011270    11 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13749
    408: 2001127c    24 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13911
    409: 20011294    23 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13964
    410: 200112ac    23 OBJECT  LOCAL  DEFAULT    7 __FUNCTION__.13986
@@ -507,24 +507,24 @@ Symbol table '.symtab' contains 598 entries:
    422: 20011a24   100 OBJECT  LOCAL  DEFAULT    7 gen_method_legacy
    423: 20011a88   100 OBJECT  LOCAL  DEFAULT    7 gen_method_sc
    424: 000800b0     1 OBJECT  LOCAL  DEFAULT   10 F_SENDING_STATE
-   425: 000800b4     5 OBJECT  LOCAL  DEFAULT   10 ORIGINAL_MASTER_TIME
-   426: 000800bc     4 OBJECT  LOCAL  DEFAULT   10 g_chip_version
-   427: 000800c0     4 OBJECT  LOCAL  DEFAULT   10 g_pm_status_info
-   428: 000800c4     1 OBJECT  LOCAL  DEFAULT   10 g_single_tong_freqoffset
-   429: 000800c8     4 OBJECT  LOCAL  DEFAULT   10 mcause
-   430: 000800cc     4 OBJECT  LOCAL  DEFAULT   10 mepc
-   431: 000800d0     4 OBJECT  LOCAL  DEFAULT   10 pre_crc32.13300
-   432: 000800d4     4 OBJECT  LOCAL  DEFAULT   10 test_pack_cnt.10342
-   433: 00080086     2 OBJECT  LOCAL  DEFAULT    9 FmDebug
-   434: 00080088     2 OBJECT  LOCAL  DEFAULT    9 G_TCA9555
-   435: 0008008a     1 OBJECT  LOCAL  DEFAULT    9 NWK_DEBUG_STT
-   436: 0008008b     1 OBJECT  LOCAL  DEFAULT    9 NWK_REPEAT_LEVEL
-   437: 0008008c     1 OBJECT  LOCAL  DEFAULT    9 NWK_REPEAT_MODE
-   438: 00080090     4 OBJECT  LOCAL  DEFAULT    9 TXADDR
-   439: 00080094     6 OBJECT  LOCAL  DEFAULT    9 blt_tx_empty_packet
-   440: 0008009c     8 OBJECT  LOCAL  DEFAULT    9 g_pm_early_wakeup_time_us
-   441: 000800a4     4 OBJECT  LOCAL  DEFAULT    9 g_pm_r_delay_cycle
-   442: 000800a8     6 OBJECT  LOCAL  DEFAULT    9 sys_clk
+   425: 000800b1     1 OBJECT  LOCAL  DEFAULT   10 NWK_DEBUG_STT
+   426: 000800b2     1 OBJECT  LOCAL  DEFAULT   10 NWK_REPEAT_MODE
+   427: 000800b4     5 OBJECT  LOCAL  DEFAULT   10 ORIGINAL_MASTER_TIME
+   428: 000800bc     4 OBJECT  LOCAL  DEFAULT   10 g_chip_version
+   429: 000800c0     4 OBJECT  LOCAL  DEFAULT   10 g_pm_status_info
+   430: 000800c4     1 OBJECT  LOCAL  DEFAULT   10 g_single_tong_freqoffset
+   431: 000800c8     4 OBJECT  LOCAL  DEFAULT   10 mcause
+   432: 000800cc     4 OBJECT  LOCAL  DEFAULT   10 mepc
+   433: 000800d0     4 OBJECT  LOCAL  DEFAULT   10 pre_crc32.13300
+   434: 000800d4     4 OBJECT  LOCAL  DEFAULT   10 test_pack_cnt.10342
+   435: 00080086     2 OBJECT  LOCAL  DEFAULT    9 FmDebug
+   436: 00080088     2 OBJECT  LOCAL  DEFAULT    9 G_TCA9555
+   437: 0008008a     1 OBJECT  LOCAL  DEFAULT    9 NWK_REPEAT_LEVEL
+   438: 0008008c     4 OBJECT  LOCAL  DEFAULT    9 TXADDR
+   439: 00080090     6 OBJECT  LOCAL  DEFAULT    9 blt_tx_empty_packet
+   440: 00080098     8 OBJECT  LOCAL  DEFAULT    9 g_pm_early_wakeup_time_us
+   441: 000800a0     4 OBJECT  LOCAL  DEFAULT    9 g_pm_r_delay_cycle
+   442: 000800a4     6 OBJECT  LOCAL  DEFAULT    9 sys_clk
    443: 2001245c     4 OBJECT  LOCAL  DEFAULT    7 rf_rx_dma_config
    444: 20012460     4 OBJECT  LOCAL  DEFAULT    7 rf_tx_dma_config
    445: 00000000     0 FILE    LOCAL  DEFAULT  ABS memcpy.c
@@ -587,7 +587,7 @@ Symbol table '.symtab' contains 598 entries:
    502: 20010cca     0 NOTYPE  GLOBAL HIDDEN     6 __riscv_save_7
    503: 000800b0     0 NOTYPE  GLOBAL DEFAULT   10 _BSS_VMA_START
    504: 00005188    72 FUNC    GLOBAL DEFAULT    5 entry_irq63
-   505: 000800ae     0 NOTYPE  GLOBAL DEFAULT    9 _DATA_VMA_END
+   505: 000800aa     0 NOTYPE  GLOBAL DEFAULT    9 _DATA_VMA_END
    506: 00005584    72 FUNC    GLOBAL DEFAULT    5 entry_irq46
    507: 00005868    68 FUNC    GLOBAL DEFAULT    5 entry_irq31
    508: 00005cf4    68 FUNC    GLOBAL DEFAULT    5 entry_irq16
@@ -617,7 +617,7 @@ Symbol table '.symtab' contains 598 entries:
    532: 20010ce4     0 NOTYPE  GLOBAL HIDDEN     6 __riscv_save_3
    533: 000056b4     4 FUNC    GLOBAL DEFAULT    5 entry_irq38
    534: 00006300     0 NOTYPE  GLOBAL DEFAULT    5 __vectors
-   535: 00012626     0 NOTYPE  GLOBAL DEFAULT  ABS BIN_SIZE
+   535: 00012622     0 NOTYPE  GLOBAL DEFAULT  ABS BIN_SIZE
    536: 20012444    16 OBJECT  GLOBAL DEFAULT    7 __digits
    537: 20001400     0 NOTYPE  GLOBAL DEFAULT  ABS _RAMCODE_LMA_START
    538: 000800e0     4 OBJECT  GLOBAL DEFAULT   10 __printf_count
