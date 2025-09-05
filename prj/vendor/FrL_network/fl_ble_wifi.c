@@ -49,6 +49,8 @@ typedef enum {
 	GF_CMD_PAIRING_RESPONSE = 0x05,
 	GF_CMD_TIMESTAMP_REQUEST = 0x08,
 	GF_CMD_TIMESTAMP_RESPONSE = 0x08,
+	GF_CMD_RSTFACTORY_REQUEST = 0x0A,
+	GF_CMD_RSTFACTORY_RESPONSE = 0x0A,
 }fl_wifi_cmd_e;
 
 typedef void (*RspFunc)(u8*);
@@ -88,6 +90,9 @@ void PAIRING_REQUEST(u8* _pdata, RspFunc rspfnc);
 void PAIRING_RESPONSE(u8* _pdata){};
 void TIMETAMP_REQUEST(u8* _pdata, RspFunc rspfnc);
 void TIMETAMP_RESPONSE(u8* _pdata);
+void RSTFACTORY_REQUEST(u8* _pdata, RspFunc rspfnc);
+void RSTFACTORY_RESPONSE(u8* _pdata);
+
 
 fl_wifiprotocol_proc_t G_WIFI_CON[] = {
 			{ { GF_CMD_PING, PING_REQ }, { GF_CMD_PING, PING_RSP } }, //ping
@@ -95,6 +100,7 @@ fl_wifiprotocol_proc_t G_WIFI_CON[] = {
 			{ { GF_CMD_GET_LIST_REQUEST, GETLIST_REQUEST },{GF_CMD_GET_LIST_RESPONSE, GETLIST_RESPONSE } },
 			{ { GF_CMD_PAIRING_REQUEST, PAIRING_REQUEST }, {GF_CMD_PAIRING_RESPONSE, PAIRING_RESPONSE } },
 			{ { GF_CMD_TIMESTAMP_REQUEST, TIMETAMP_REQUEST }, {GF_CMD_TIMESTAMP_RESPONSE, TIMETAMP_RESPONSE } },
+			{ { GF_CMD_RSTFACTORY_REQUEST, RSTFACTORY_REQUEST }, {GF_CMD_RSTFACTORY_RESPONSE, RSTFACTORY_RESPONSE } },
 			};
 
 #define GWIFI_SIZE 				(sizeof(G_WIFI_CON)/sizeof(G_WIFI_CON[0]))
@@ -319,6 +325,29 @@ void TIMETAMP_RESPONSE(u8* _pdata) {
 	u8 payload_len = wfdata.len_data + SIZEU8(wfdata.cmd)+SIZEU8(wfdata.crc8)+SIZEU8(wfdata.len_data);
 	fl_ble_send_wifi((u8*)&wfdata,payload_len);
 }
+void RSTFACTORY_REQUEST(u8* _pdata, RspFunc rspfnc){
+	fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[1];
+	LOGA(MCU,"LEN:0x%02X\r\n",data->len_data);
+	LOGA(MCU,"cmdID:0x%02X\r\n",data->cmd);
+	LOGA(MCU,"CRC8:0x%02X\r\n",data->crc8);
+	P_PRINTFHEX_A(MCU,data->data,data->len_data,"Data:");
+	u8 crc8_cal = fl_crc8(data->data,data->len_data);
+	if (crc8_cal != data->crc8) {
+		ERR(MCU,"ERR >> CRC8:0x%02X | 0x%02X\r\n",data->crc8,crc8_cal);
+		return;
+	}
+	ERR(APP,"Clear and reset factory.....\r\n");
+	fl_db_clearAll();
+	delay_ms(1000);
+	sys_reboot();
+
+	return;
+	//don'ts send rsp
+	if (rspfnc != 0) {
+		return;
+	}
+}
+void RSTFACTORY_RESPONSE(u8* _pdata){}
 /******************************************************************************/
 /******************************************************************************/
 /***                            Functions callback                           **/
