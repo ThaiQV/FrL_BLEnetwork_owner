@@ -77,8 +77,8 @@ extern tbs_device_counter_t G_COUNTER_DEV ;
 tbs_device_powermeter_t G_POWER_METER;
 #endif
 //flag debug of the network
-volatile u8 NWK_DEBUG_STT = 1; // it will be assigned into end-point byte (dbg :1bit)
-volatile u8 NWK_REPEAT_MODE = 1; // 1: level | 0 : non-level
+volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into end-point byte (dbg :1bit)
+volatile u8 NWK_REPEAT_MODE = 0; // 1: level | 0 : non-level
 volatile u8  NWK_REPEAT_LEVEL = 3;
 /******************************************************************************/
 /******************************************************************************/
@@ -118,6 +118,15 @@ int _nwk_slave_backup(void){
 		LOGA(INF,"** JoinNWK :%d\r\n",G_INFORMATION.profile.run_stt.join_nwk);
 		LOGA(INF,"** RstFac  :%d\r\n",G_INFORMATION.profile.run_stt.rst_factory);
 		LOGA(INF,"** Channels:%d |%d |%d\r\n",G_INFORMATION.profile.nwk.chn[0],G_INFORMATION.profile.nwk.chn[1],G_INFORMATION.profile.nwk.chn[2])
+		LOGA(FLA,"** NWK Key :%s(%02X%02X)\r\n",(G_INFORMATION.profile.nwk.private_key[0] != 0xFF && G_INFORMATION.profile.nwk.private_key[1] != 0xFF )?"*****":"NULL",
+				G_INFORMATION.profile.nwk.private_key[0],G_INFORMATION.profile.nwk.private_key[1]);
+
+//		LOGA(INF,"** Key     :0x%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X\r\n",
+//				G_INFORMATION.profile.nwk.private_key[0],G_INFORMATION.profile.nwk.private_key[1],G_INFORMATION.profile.nwk.private_key[2],G_INFORMATION.profile.nwk.private_key[3],
+//				G_INFORMATION.profile.nwk.private_key[4],G_INFORMATION.profile.nwk.private_key[5],G_INFORMATION.profile.nwk.private_key[6],G_INFORMATION.profile.nwk.private_key[7],
+//				G_INFORMATION.profile.nwk.private_key[8],G_INFORMATION.profile.nwk.private_key[9],G_INFORMATION.profile.nwk.private_key[10],G_INFORMATION.profile.nwk.private_key[11],
+//				G_INFORMATION.profile.nwk.private_key[12],G_INFORMATION.profile.nwk.private_key[13],G_INFORMATION.profile.nwk.private_key[14],G_INFORMATION.profile.nwk.private_key[15]);
+
 	}
 	return 0;
 }
@@ -284,6 +293,9 @@ bool fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 			//Create payload
 			memset(req_pack.frame.payload,0xFF,SIZEU8(req_pack.frame.payload));
 			memcpy(req_pack.frame.payload,_data,_len);
+			//crc
+			req_pack.frame.crc8 = fl_crc8(req_pack.frame.payload,SIZEU8(req_pack.frame.payload));
+
 			//create endpoint
 			req_pack.frame.endpoint.dbg = NWK_DEBUG_STT;
 			req_pack.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
@@ -310,6 +322,8 @@ bool fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 			//Create payload
 			memset(req_pack.frame.payload,0xFF,SIZEU8(req_pack.frame.payload));
 			memcpy(req_pack.frame.payload,_data,_len);
+			//crc
+			req_pack.frame.crc8 = fl_crc8(req_pack.frame.payload,SIZEU8(req_pack.frame.payload));
 			//create endpoint
 			req_pack.frame.endpoint.dbg = NWK_DEBUG_STT;
 			req_pack.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
@@ -344,7 +358,6 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 	fl_pack_t packet_built;
 	packet_built.length = 0;
 	memset(packet_built.data_arr,0,SIZEU8(packet_built.data_arr));
-
 	fl_data_frame_u packet;
 	extern u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
 	if(!fl_packet_parse(_pack,&packet.frame)){
@@ -398,7 +411,6 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 					tbs_pack_powermeter_data(pwmeter_data,_payload);
 					indx_data = SIZEU8(pwmeter_data->type) +   SIZEU8(pwmeter_data->mac) +  SIZEU8(pwmeter_data->timetamp);
 #endif
-
 					packet.frame.slaveID.id_u8 = G_INFORMATION.slaveID.id_u8;
 					memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
 					memcpy(&packet.frame.payload,&_payload[indx_data],SIZEU8(packet.frame.payload));
@@ -423,6 +435,8 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 			_nwk_slave_syncFromPack(&packet.frame);
 			if (IsJoinedNetwork() == 0) {
 				if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
+					//get master's mac
+					G_INFORMATION.profile.nwk.mac_parent = MAKE_U32(packet.frame.payload[3],packet.frame.payload[2],packet.frame.payload[1],packet.frame.payload[0]);
 					//Process rsp
 					memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
 					memcpy(packet.frame.payload,G_INFORMATION.mac,SIZEU8(G_INFORMATION.mac));
@@ -452,8 +466,8 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 				G_INFORMATION.profile.nwk.chn[0] = packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac)];
 				G_INFORMATION.profile.nwk.chn[1] = packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac) + 1];
 				G_INFORMATION.profile.nwk.chn[2] = packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac) + 2];
-				//get master's mac
-				G_INFORMATION.profile.nwk.mac_parent = MAKE_U32(packet.frame.payload[7],packet.frame.payload[8],packet.frame.payload[9],packet.frame.payload[10]);
+				//Get private_key
+				memcpy(G_INFORMATION.profile.nwk.private_key,&packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac) + 3],NWK_PRIVATE_KEY_SIZE);
 			}
 			//debug
 			else{
@@ -469,7 +483,8 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 			return packet_built;
 		break;
 	}
-
+	//crc
+	packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
 	packet_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
 	memcpy(packet_built.data_arr,packet.bytes,packet_built.length);
 

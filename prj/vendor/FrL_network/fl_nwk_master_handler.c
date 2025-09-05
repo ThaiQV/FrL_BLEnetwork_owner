@@ -31,7 +31,7 @@
 /******************************************************************************/
 #define TIME_COLLECT_NODE				5*1000 //
 
-#define PACK_HANDLE_MASTER_SIZE 		256
+#define PACK_HANDLE_MASTER_SIZE 		32
 fl_pack_t g_handle_master_array[PACK_HANDLE_MASTER_SIZE];
 fl_data_container_t G_HANDLE_MASTER_CONTAINER = {.data = g_handle_master_array, .head_index = 0, .tail_index = 0, .mask = PACK_HANDLE_MASTER_SIZE - 1, .count = 0 };
 
@@ -43,7 +43,7 @@ volatile u8 MASTER_INSTALL_STATE = 0;
 u16 PERIOD_HEARTBEAT = 0 * 1000; //
 //flag debug of the network
 volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into endpoint byte (dbg :1bit)
-volatile u8 NWK_REPEAT_MODE = 1; // 1: level | 0 : non-level
+volatile u8 NWK_REPEAT_MODE = 0; // 1: level | 0 : non-level
 volatile u8 NWK_REPEAT_LEVEL = 3;
 
 /******************************************************************************/
@@ -120,10 +120,10 @@ fl_pack_t fl_master_packet_heartbeat_build(void) {
 
 	//Add new mill-step
 	packet.frame.milltamp = timetampStep.milstep;
-
 	packet.frame.slaveID.id_u8 = 0xFF; // all grps + all members
-
 	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
+	//crc
+	packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
 
 	packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
 	packet.frame.endpoint.master = FL_FROM_MASTER; //non-ack
@@ -159,11 +159,22 @@ fl_pack_t fl_master_packet_collect_build(void) {
 
 	//Add new mill-step
 	packet.frame.milltamp = timetampStep.milstep;
+	/*****************************************************************/
+	/* | HDR | Timetamp | Mill_time | SlaveID | payload | crc8 | Ep | */
+	/* | 1B  |   4Bs    |    1B     |    1B   |   22Bs  |  1B  | 1B | -> .master = FL_FROM_SLAVE_ACK / FL_FROM_SLAVE */
+	/*****************************************************************/
+
+	/*****************************************************************/
+	/* |      PAYLOAD 		 |*/
+	/* | 6 bytes  Master MAC |*/
 
 	packet.frame.slaveID.id_u8 = 0xFF;
 	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
 	//Add master's mac
 	memcpy(&packet.frame.payload[0],blc_ll_get_macAddrPublic(),6);
+
+	//crc
+	packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
 
 	packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
 	packet.frame.endpoint.master = FL_FROM_MASTER_ACK; //ack
@@ -200,18 +211,25 @@ fl_pack_t fl_master_packet_assignSlaveID_build(u8* _mac) {
 
 	//Add new mill-step
 	packet.frame.milltamp = timetampStep.milstep;
+	/*****************************************************************/
+	/* | HDR | Timetamp | Mill_time | SlaveID | payload | crc8 | Ep | */
+	/* | 1B  |   4Bs    |    1B     |    1B   |   22Bs  |  1B  | 1B | -> .master = FL_FROM_SLAVE */
+	/*****************************************************************/
 
+	/*****************************************************************/
+	/* |       			  			PAYLOAD   		   			      |*/
+	/* | 6 bytes  Slave's MAC |3 bytes Channel | 13 bytes Private_key | */
 	//Add slave's mac
 	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
-
 	memcpy(&packet.frame.payload[0],_mac,6);
 	//Add channel communication
 	packet.frame.payload[6] = *G_ADV_SETTINGS.nwk_chn.chn1;
 	packet.frame.payload[7] = *G_ADV_SETTINGS.nwk_chn.chn2;
 	packet.frame.payload[8] = *G_ADV_SETTINGS.nwk_chn.chn3;
-	//Add master's mac
-	memcpy(&packet.frame.payload[9],blc_ll_get_macAddrPublic(),6);
-
+	//Add private key => use to decrypte packet data
+	memcpy(&packet.frame.payload[9],G_MASTER_INFO.nwk.private_key,NWK_PRIVATE_KEY_SIZE);
+	//Calculate crc
+	packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
 	//Create payload assignment
 	packet.frame.slaveID.id_u8 = fl_master_SlaveID_get(_mac);
 
@@ -255,6 +273,8 @@ fl_pack_t fl_master_packet_RSP_55_build(u8 slaveID) {
 	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
 	u8 ack[2] = { 'O', 'K' };
 	memcpy(packet.frame.payload,ack,SIZEU8(ack));
+	//crc
+	packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
 	//assign slaveID
 	packet.frame.slaveID.id_u8 = slaveID;
 
@@ -431,6 +451,7 @@ int _nwk_master_backup(void) {
 		profile.nwk.chn[0] = G_MASTER_INFO.nwk.chn[0];
 		profile.nwk.chn[1] = G_MASTER_INFO.nwk.chn[1];
 		profile.nwk.chn[2] = G_MASTER_INFO.nwk.chn[2];
+		memcpy(profile.nwk.private_key,G_MASTER_INFO.nwk.private_key,SIZEU8(G_MASTER_INFO.nwk.private_key));
 		fl_db_masterprofile_save(profile);
 		LOGA(INF,"Channels:%d |%d |%d\r\n",profile.nwk.chn[0],profile.nwk.chn[1],profile.nwk.chn[2])
 	}
@@ -599,6 +620,7 @@ void fl_nwk_master_init(void) {
 	G_MASTER_INFO.nwk.chn[0] = master_profile.nwk.chn[0];
 	G_MASTER_INFO.nwk.chn[1] = master_profile.nwk.chn[1];
 	G_MASTER_INFO.nwk.chn[2] = master_profile.nwk.chn[2];
+	memcpy(G_MASTER_INFO.nwk.private_key,master_profile.nwk.private_key,SIZEU8(master_profile.nwk.private_key));
 	blt_soft_timer_add(_nwk_master_backup,2 * 1000 * 1000);
 }
 /***************************************************
@@ -701,21 +723,18 @@ void fl_nwk_master_heartbeat_run(void) {
  *
  ***************************************************/
 void fl_nwk_master_collection_run(void) {
-	static u8 previous_mode = 0;
 	if (MASTER_INSTALL_STATE) {
-		if (blt_soft_timer_find(&fl_send_collection_req) < 0) {
-			LOG_P(APP,"Install mode : On\r\n");
-			fl_nwk_master_nodelist_load();
+		if (blt_soft_timer_find(&fl_send_collection_req) == -1) {
+			blt_soft_timer_add(&fl_send_collection_req,50*1000);
 			fl_adv_collection_channel_init();
-			blt_soft_timer_add(&fl_send_collection_req,1000 * 1000); // 1s
+			fl_nwk_master_nodelist_load();
 		}
-		previous_mode = MASTER_INSTALL_STATE;
-	} else {
-		if (previous_mode == 1 && MASTER_INSTALL_STATE == 0) {
-			LOG_P(APP,"Install mode : Off\r\n");
+	}
+	else
+	{
+		if (blt_soft_timer_find(&fl_send_collection_req) != -1) {
 			blt_soft_timer_delete(&fl_send_collection_req);
 			fl_adv_collection_channel_deinit();
-			previous_mode = MASTER_INSTALL_STATE;
 			//store nodelist
 			fl_nwk_master_nodelist_store();
 		}
@@ -731,8 +750,6 @@ void fl_nwk_master_collection_run(void) {
  *
  ***************************************************/
 void fl_nwk_master_process(void) {
-	//refesh node list
-//	fl_input_collection_node_handle(&fl_send_collection_req,TIME_COLLECT_NODE + RAND(-2500,2500));
 	//install mode
 	fl_nwk_master_collection_run();
 	//Heartbeat processor
@@ -754,7 +771,5 @@ void fl_nwk_master_run(fl_pack_t *_pack_handle) {
 			fl_master_ProccesRSP_cbk();
 		}
 	}
-	//TEST
-//	fl_master_StatusNodePrintf();
 }
 #endif

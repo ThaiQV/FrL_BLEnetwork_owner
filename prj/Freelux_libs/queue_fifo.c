@@ -37,7 +37,10 @@
 /******************************************************************************/
 
 void FL_QUEUE_CLEAR(fl_data_container_t *pCont, u16 _size) {
-	memset(pCont->data,0,sizeof(pCont->data)/sizeof(fl_pack_t));
+	for (u16 var = 0; var  < _size; ++var) {
+		memset(&pCont->data[var],0,sizeof(fl_pack_t));
+	}
+
 //	pCont->data->
 	pCont->mask = _size - 1;
 	pCont->tail_index = 0;

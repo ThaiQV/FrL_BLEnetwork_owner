@@ -20,6 +20,11 @@
 #include "fl_input_ext.h"
 #include "fl_nwk_protocol.h"
 
+//Public Key for the freelux network
+unsigned char FL_NWK_PB_KEY[16] = "freeluxnetw0rk25";
+const u32 ORIGINAL_TIME_TRUST = 1735689600; //00:00:00 UTC - 1/1/2025
+unsigned char FL_NWK_USE_KEY[16]; //this key used to encrypt -> decrypt
+volatile u8* FL_NWK_COLLECTION_MODE; //
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -31,7 +36,7 @@
 #define SEND_TIMEOUT_MS		50 //ms
 extern _attribute_data_retention_ volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME;
 #endif
-_attribute_data_retention_ volatile u8 F_SENDING_STATE = 0;
+volatile u8 F_SENDING_STATE = 0;
 
 fl_adv_settings_t G_ADV_SETTINGS = {
 		.adv_interval_min = ADV_INTERVAL_20MS,
@@ -55,6 +60,10 @@ fl_data_container_t G_DATA_CONTAINER = { .data = g_data_array, .head_index = 0, 
 #define QUEUE_SENDING_SIZE 		16
 fl_pack_t g_sending_array[QUEUE_SENDING_SIZE];
 fl_data_container_t G_QUEUE_SENDING = { .data = g_sending_array, .head_index = 0, .tail_index = 0, .mask = QUEUE_SENDING_SIZE - 1, .count = 0 };
+
+fl_hdr_nwk_type_e FL_NWK_HDR[]={NWK_HDR_RECONNECT,NWK_HDR_55,NWK_HDR_F5_INFO,NWK_HDR_ASSIGN,NWK_HDR_HEARTBEAT,NWK_HDR_COLLECT};
+#define FL_NWK_HDR_SIZE	(sizeof(FL_NWK_HDR)/sizeof(FL_NWK_HDR[0]))
+
 /******************************************************************************/
 /******************************************************************************/
 /***                           Private definitions                           **/
@@ -73,6 +82,75 @@ void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms);
 fl_pack_t fl_packet_build(u8 *payload, u8 _len);
 s8 fl_adv_IsFromMaster(fl_pack_t data_in_queue);
 u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
+
+u8 IsNWKHDR(u8 _hdr){
+	for (u8 var = 0;  var < FL_NWK_HDR_SIZE; ++ var) {
+		if(FL_NWK_HDR[var] == _hdr) return var;
+	}
+	return 0xFF;
+}
+
+static void fl_nwk_encrypt16(unsigned char * key,u8* _data,u8 _size, u8* encrypted){
+#define BLOCK_SIZE 16
+	if(_size < BLOCK_SIZE){
+		ERR(INF,"Encrypt size!!!\r\n");
+		return;
+	}
+	u8 headbytes[BLOCK_SIZE];
+	memcpy(headbytes,_data,SIZEU8(headbytes));
+	u8 data_buffer[_size];
+	memcpy(data_buffer,_data,SIZEU8(data_buffer));
+	aes_encrypt(key,headbytes,data_buffer);
+	memcpy(encrypted,data_buffer,_size);
+#undef BLOCK_SIZE
+}
+static bool fl_nwk_decrypt16(unsigned char * key,u8* _data,u8 _size, u8* decrypted){
+#define BLOCK_SIZE 16
+	if(_size < BLOCK_SIZE){
+		ERR(INF,"Decrypt size!!!\r\n");
+		return false;
+	}
+	u8 headbytes[BLOCK_SIZE];
+	memcpy(headbytes,_data,SIZEU8(headbytes));
+	u8 data_buffer[_size];
+	memcpy(data_buffer,_data,SIZEU8(data_buffer));
+	aes_decrypt(key,headbytes,data_buffer);
+	memcpy(decrypted,data_buffer,_size);
+/*Checking result decrypt*/
+	u32 timetamp_hdr = MAKE_U32(decrypted[3],decrypted[2],decrypted[1],decrypted[0]);
+	fl_data_frame_u packet_frame;
+	memcpy(packet_frame.bytes,decrypted,SIZEU8(packet_frame.bytes));
+	u8 pack_crc = fl_crc8(packet_frame.frame.payload,SIZEU8(packet_frame.frame.payload));
+	return (timetamp_hdr>ORIGINAL_TIME_TRUST && IsNWKHDR(decrypted[0])!=0xFF && pack_crc == packet_frame.frame.crc8);
+#undef BLOCK_SIZE
+}
+/***************************************************
+ * @brief 		:Generate used key for the network
+ * 				**Need to call before encrypt/decrypt function
+ *
+ * @param[in] 	:none
+ *
+ * @return	  	:none
+ *
+ ***************************************************/
+static inline void NWK_MYKEY(void){
+	const unsigned char KEY_NULL[4] = { 0xFF, 0xFF, 0xFF, 0xFF };
+	u8 key_buffer[NWK_PRIVATE_KEY_SIZE];
+#ifdef MASTER_CORE
+	extern fl_master_config_t G_MASTER_INFO;
+	memcpy(key_buffer,G_MASTER_INFO.nwk.private_key,NWK_PRIVATE_KEY_SIZE);
+#else
+	extern fl_nodeinnetwork_t G_INFORMATION ;
+	memcpy(key_buffer,G_INFORMATION.profile.nwk.private_key,NWK_PRIVATE_KEY_SIZE);
+#endif
+	if (memcmp(key_buffer,KEY_NULL,SIZEU8(KEY_NULL)) == 0 || *FL_NWK_COLLECTION_MODE == 1) {
+		memcpy(FL_NWK_USE_KEY,FL_NWK_PB_KEY,SIZEU8(FL_NWK_PB_KEY));
+	} else {
+		//build
+		memcpy(FL_NWK_USE_KEY,key_buffer,NWK_PRIVATE_KEY_SIZE);
+		memcpy(&FL_NWK_USE_KEY[NWK_PRIVATE_KEY_SIZE],FL_NWK_PB_KEY,SIZEU8(FL_NWK_PB_KEY)-NWK_PRIVATE_KEY_SIZE);
+	}
+}
 /******************************************************************************/
 /******************************************************************************/
 /***                            Functions callback                           **/
@@ -91,17 +169,21 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 				//P_PRINTFHEX_A(BLE,pa->mac,6,"%s","MAC:");
 				//u32 test_adv_cnt = MAKE_U32(pa->data[3],pa->data[2],pa->data[1],pa->data[0]);
 				//LOGA(BLE,"ADV rec:%d!!!\r\n",test_adv_cnt);
+
 				fl_pack_t incomming_data;
 				incomming_data.length = pa->len + 1; //add rssi byte
-				memcpy(incomming_data.data_arr,pa->data,incomming_data.length);
-
+				//memcpy(incomming_data.data_arr,pa->data,incomming_data.length);
+//				incomming_data.data_arr[0] = pa->data[0];
+				//Add decrypt
+				NWK_MYKEY();
+				if(!fl_nwk_decrypt16(FL_NWK_USE_KEY,pa->data,incomming_data.length,incomming_data.data_arr)) return 0;
 #ifdef MASTER_CORE
 				//skip from  master
 				if (fl_adv_IsFromMaster(incomming_data)) {
 					return 0;
 				}
 #else
-				if (!fl_nwk_slave_checkHDR(pa->data[0])) {
+				if (!fl_nwk_slave_checkHDR(incomming_data.data_arr[0])) {
 					return 0;
 				}
 //				/* Skip repeate-adv loop */
@@ -255,20 +337,22 @@ void fl_adv_sendFIFO_run(void) {
 #endif
 //			LOGA(APP,"ADV FIFO(%d):%d/%d\r\n",G_QUEUE_SENDING.count,G_QUEUE_SENDING.head_index,G_QUEUE_SENDING.tail_index);
 			F_SENDING_STATE = 1;
+//			P_PRINTFHEX_A(INF,data_in_queue.data_arr,data_in_queue.length,"Raw Data(len:%d):",data_in_queue.length);
 			fl_adv_send(data_in_queue.data_arr,data_in_queue.length,G_ADV_SETTINGS.adv_duration);
 			return;
 		}
 	}
 }
+
 /**
  * @brief      Setting and sending ADV packets
  * @param	   none
  * @return     none
  */
 void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms) {
-	while (blc_ll_getCurrentState() == BLS_LINK_STATE_SCAN && blc_ll_getCurrentState() == BLS_LINK_STATE_ADV) {
-	};
-	if (_data && _size >= 2) {
+//	while (blc_ll_getCurrentState() == BLS_LINK_STATE_SCAN && blc_ll_getCurrentState() == BLS_LINK_STATE_ADV) {
+//	};
+	if (_data && _size >= 1) {
 //		LOG_P(APP,"Sending..... \r\n");
 		rf_set_power_level_index(MY_RF_POWER_INDEX);
 //		bls_ll_setAdvEnable(BLC_ADV_ENABLE);
@@ -279,10 +363,20 @@ void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms) {
 				app_own_address_type,0,NULL,BLT_ENABLE_ADV_ALL,ADV_FP_NONE);
 		if (status != BLE_SUCCESS) {
 			ERR(BLE,"Set ADV param is FAIL !!!\r\n")
-			while (1)
-				;
+			while (1);
 		}  //debug: adv setting err
-		bls_ll_setAdvData(_data,_size);
+		/*Encryt data*/
+		u8 encrypted[_size];
+		memset(encrypted,0,SIZEU8(encrypted));
+		NWK_MYKEY();
+		fl_nwk_encrypt16(FL_NWK_USE_KEY,_data,_size,encrypted);
+//		P_PRINTFHEX_A(INF,encrypted,_size,"Encrypt(%d):",_size);
+//		u8 decrypted[_size];
+//		memset(decrypted,0,SIZEU8(decrypted));
+//		fl_nwk_decrypt16(FL_NWK_PB_KEY,encrypted,_size,decrypted);
+//		P_PRINTFHEX_A(INF,decrypted,_size,"Decrypt(%d):",_size);
+//
+		bls_ll_setAdvData(encrypted,_size);
 		bls_ll_setAdvDuration(_timeout_ms * 1000,1); // ms->us
 		bls_app_registerEventCallback(BLT_EV_FLAG_ADV_DURATION_TIMEOUT,&fl_durationADV_timeout_proccess);
 //		TICK_GET_PROCESSING_TIME = clock_time();
@@ -343,7 +437,8 @@ void fl_adv_init(void) {
 	G_ADV_SETTINGS.nwk_chn.chn1 = &G_MASTER_INFO.nwk.chn[0];
 	G_ADV_SETTINGS.nwk_chn.chn2 = &G_MASTER_INFO.nwk.chn[1];
 	G_ADV_SETTINGS.nwk_chn.chn3 = &G_MASTER_INFO.nwk.chn[2];
-
+	extern volatile u8 MASTER_INSTALL_STATE;
+	FL_NWK_COLLECTION_MODE = &MASTER_INSTALL_STATE;
 #else
 	fl_input_external_init();
 	extern fl_nodeinnetwork_t G_INFORMATION;
@@ -353,6 +448,7 @@ void fl_adv_init(void) {
 	G_ADV_SETTINGS.nwk_chn.chn1 = &G_INFORMATION.profile.nwk.chn[0];
 	G_ADV_SETTINGS.nwk_chn.chn2 = &G_INFORMATION.profile.nwk.chn[1];
 	G_ADV_SETTINGS.nwk_chn.chn3 = &G_INFORMATION.profile.nwk.chn[2];
+	FL_NWK_COLLECTION_MODE = &G_INFORMATION.profile.run_stt.join_nwk;
 #endif
 	// Init REQ call RSP
 	fl_queue_REQnRSP_TimeoutStart();

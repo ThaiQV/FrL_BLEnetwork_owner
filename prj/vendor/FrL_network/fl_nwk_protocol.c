@@ -32,7 +32,7 @@ fl_slave_getinfo_t G_SLA_INFO; //for cmdlines
 extern fl_slaves_list_t G_NODE_LIST;
 //For getting automatic information
 #define GETINFO_1_TIMES_MAX			20
-#define GETINFO_FREQUENCY			20 //ms
+#define GETINFO_FREQUENCY			10 //ms
 #define GETINFO_FIRST_DUTY			25*1000//s
 typedef struct {
 	fl_nodeinnetwork_t* id[GETINFO_1_TIMES_MAX];
