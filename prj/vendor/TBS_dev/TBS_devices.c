@@ -12,11 +12,15 @@
 #include "tl_common.h"
 #include "TBS_dev_config.h"
 #include "../FrL_Network/fl_nwk_handler.h"
+#include "../FrL_Network/fl_nwk_api.h"
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
 /******************************************************************************/
 /******************************************************************************/
+
+
+#ifdef COUNTER_DEVICE
 void tbs_counter_printf(void* _p){
 	tbs_device_counter_t *data = (tbs_device_counter_t*)_p;
 	LOGA(INF,"MAC:0x%02X%02X%02X%02X%02X%02X\r\n",data->data.mac[0],data->data.mac[1],data->data.mac[2],
@@ -30,6 +34,19 @@ void tbs_counter_printf(void* _p){
 	LOGA(INF,"BT_Err:%d\r\n",data->data.err_product);
 //	P_PRINTFHEX_A(INF,data->bytes,SIZEU8(data->bytes),"Raw:");
 }
+
+tbs_device_counter_t G_COUNTER_DEV = { .data = {
+												.timetamp = 0,
+												.type = TBS_COUNTER,
+												.bt_call = 0,
+												.bt_endcall = 0,
+												.bt_rst = 0,
+												.pass_product = 100,
+												.err_product = 5
+												}
+									};
+#endif
+#ifdef POWER_METER_DEVICE
 
 void tbs_power_meter_printf(void* _p) {
 	tbs_device_powermeter_t* dev = (tbs_device_powermeter_t*) _p;
@@ -50,21 +67,6 @@ void tbs_power_meter_printf(void* _p) {
 //	u8* data_u8 = (u8*)_p;
 //	P_PRINTFHEX_A(INF,data_u8,POWER_METER_STRUCT_BYTESIZE,"Raw:");
 }
-
-#ifdef COUNTER_DEVICE
-tbs_device_counter_t G_COUNTER_DEV = { .data = {
-												.timetamp = 0,
-												.type = TBS_COUNTER,
-												.bt_call = 0,
-												.bt_endcall = 0,
-												.bt_rst = 0,
-												.pass_product = 100,
-												.err_product = 5
-												}
-									};
-#endif
-#ifdef POWER_METER_DEVICE
-
 tbs_device_powermeter_t G_POWER_METER = {
 				        .mac = {0xDE, 0xAD, 0xBE, 0xEF, 0x00, 0x01},
 				        .timetamp = 12345678,
@@ -100,19 +102,43 @@ void test_powermeter(void) {
 /******************************************************************************/
 /******************************************************************************/
 #ifdef COUNTER_DEVICE
+
+void TEST_rsp_callback(void *_data,void* _data2){
+	fl_rsp_container_t *data =  (fl_rsp_container_t*)_data;
+	LOGA(API,"Timeout:%d\r\n",data->timeout);
+	LOGA(API,"cmdID  :%0X\r\n",data->rsp_check.hdr_cmdid);
+	LOGA(API,"SlaveID:%0X\r\n",data->rsp_check.slaveID);
+	//rsp data
+	if(data->timeout > 0){
+		fl_pack_t *packet = (fl_pack_t *)_data2;
+		P_PRINTFHEX_A(API,packet->data_arr,packet->length,"RSP: ");
+	}else{
+		ERR(API,"NON-RSP\r\n");
+	}
+}
+int TEST_Counter_Event(void){
+//	G_COUNTER_DEV.data.bt_call = RAND(0,1);
+//	G_COUNTER_DEV.data.bt_endcall = G_COUNTER_DEV.data.bt_call ? 0 : 1;
+//	G_COUNTER_DEV.data.bt_rst = G_COUNTER_DEV.data.bt_call?0:RAND(0,1);
+	//fl_api_slave_req(NWK_HDR_55,G_COUNTER_DEV.bytes,SIZEU8(G_COUNTER_DEV.bytes),&TEST_rsp_callback,500);
+	u32 period =  RAND(1,6);
+	P_INFO("TEST EVNET callback after %d s\r\n",period);
+	return period*1000*1000;
+}
+
 void TBS_Counter_init(void){
 	memcpy(G_COUNTER_DEV.data.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_COUNTER_DEV.data.mac));
 	G_COUNTER_DEV.data.type = TBS_COUNTER;
 	G_COUNTER_DEV.data.timetamp = fl_rtc_get();
 	//todo:Init Butt,lcd,7segs,.....
-
+	//blt_soft_timer_add(&TEST_Counter_Event,5000*1000);
 }
 void TBS_Counter_Run(void){
 	G_COUNTER_DEV.data.timetamp = fl_rtc_get();
 	//For testing : randon valid of fields
-	G_COUNTER_DEV.data.bt_call = RAND(0,1);
-	G_COUNTER_DEV.data.bt_endcall = G_COUNTER_DEV.data.bt_call?0:1;
-	G_COUNTER_DEV.data.bt_rst = RAND(0,1);
+//	G_COUNTER_DEV.data.bt_call = RAND(0,1);
+//	G_COUNTER_DEV.data.bt_endcall = G_COUNTER_DEV.data.bt_call?0:1;
+//	G_COUNTER_DEV.data.bt_rst = RAND(0,1);
 	G_COUNTER_DEV.data.pass_product = RAND(1,1020);
 	G_COUNTER_DEV.data.err_product = RAND(1,500);
 }
@@ -124,7 +150,6 @@ void TBS_PowerMeter_init(void){
 	G_POWER_METER.timetamp= fl_rtc_get();
 	test_powermeter();
 	//todo:Init Butt,lcd,7segs,.....
-
 }
 void TBS_PowerMeter_Run(void){
 	G_POWER_METER.timetamp = fl_rtc_get();

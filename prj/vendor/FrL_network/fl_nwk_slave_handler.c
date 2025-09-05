@@ -77,7 +77,7 @@ extern tbs_device_counter_t G_COUNTER_DEV ;
 tbs_device_powermeter_t G_POWER_METER;
 #endif
 //flag debug of the network
-volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into end-point byte (dbg :1bit)
+volatile u8 NWK_DEBUG_STT = 1; // it will be assigned into end-point byte (dbg :1bit)
 volatile u8 NWK_REPEAT_MODE = 0; // 1: level | 0 : non-level
 volatile u8  NWK_REPEAT_LEVEL = 3;
 /******************************************************************************/
@@ -185,10 +185,10 @@ void fl_nwk_slave_init(void) {
 	blt_soft_timer_add(_nwk_slave_backup,2*1000*1000);
 
 	//Interval checking network
-	fl_nwk_slave_reconnect();
+//	fl_nwk_slave_reconnect();
 	//check online
-	blt_soft_timer_delete(&_isOnline_check);
-	blt_soft_timer_add(_isOnline_check,RECHECKING_NETWOK_TIME*1000); //2 mins
+//	blt_soft_timer_delete(&_isOnline_check);
+//	blt_soft_timer_add(_isOnline_check,RECHECKING_NETWOK_TIME*1000); //2 mins
 	G_INFORMATION.active = false;
 	//test random send req
 //	TEST_slave_sendREQ();
@@ -225,8 +225,8 @@ void _nwk_slave_syncFromPack(fl_dataframe_format_t *packet){
 	{
 		G_INFORMATION.active=true;
 		//check online
-		blt_soft_timer_delete(&_isOnline_check);
-		blt_soft_timer_add(_isOnline_check,RECHECKING_NETWOK_TIME*1000); //2 mins
+//		blt_soft_timer_delete(&_isOnline_check);
+//		blt_soft_timer_add(_isOnline_check,RECHECKING_NETWOK_TIME*1000); //2 mins
 	}
 }
 
@@ -273,13 +273,6 @@ bool fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 		case NWK_HDR_55: {
 			LOGA(INF,"Send 55 REQ to Master:%d/%d\r\n",ORIGINAL_MASTER_TIME.timetamp,ORIGINAL_MASTER_TIME.milstep);
 			req_pack.frame.hdr = NWK_HDR_55;
-
-//			req_pack.frame.timetamp[0] = U32_BYTE0(ORIGINAL_MASTER_TIME.timetamp);
-//			req_pack.frame.timetamp[1] = U32_BYTE1(ORIGINAL_MASTER_TIME.timetamp);
-//			req_pack.frame.timetamp[2] = U32_BYTE2(ORIGINAL_MASTER_TIME.timetamp);
-//			req_pack.frame.timetamp[3] = U32_BYTE3(ORIGINAL_MASTER_TIME.timetamp);
-
-//			req_pack.frame.milltamp = ORIGINAL_MASTER_TIME.milstep;
 
 			fl_timetamp_withstep_t field_timetamp = GenerateTimetampField();
 

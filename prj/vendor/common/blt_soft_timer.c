@@ -203,10 +203,12 @@ void blt_soft_timer_process(int type) {
 		if ((u32) (blt_timer.timer[0].t - now) < 3000 * SYSTEM_TIMER_TICK_1MS) {
 			bls_pm_setAppWakeupLowPower(blt_timer.timer[0].t,1);
 		} else {
+			ERR(DRV,"blt>soft-timer :disable\r\n");
 			bls_pm_setAppWakeupLowPower(0,0);  //disable
 		}
 
 	} else {
+		ERR(DRV,"blt>soft-timer :disable\r\n");
 		bls_pm_setAppWakeupLowPower(0,0);  //disable
 	}
 

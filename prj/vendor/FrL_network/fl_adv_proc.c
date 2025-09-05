@@ -432,7 +432,7 @@ void fl_adv_init(void) {
 	extern fl_master_config_t G_MASTER_INFO;
 	//fl_adv_sendtest();
 	fl_nwk_master_init();
-	fl_input_external_init();
+//	fl_input_external_init();
 
 	G_ADV_SETTINGS.nwk_chn.chn1 = &G_MASTER_INFO.nwk.chn[0];
 	G_ADV_SETTINGS.nwk_chn.chn2 = &G_MASTER_INFO.nwk.chn[1];
@@ -440,7 +440,7 @@ void fl_adv_init(void) {
 	extern volatile u8 MASTER_INSTALL_STATE;
 	FL_NWK_COLLECTION_MODE = &MASTER_INSTALL_STATE;
 #else
-	fl_input_external_init();
+//	fl_input_external_init();
 	extern fl_nodeinnetwork_t G_INFORMATION;
 	fl_nwk_slave_init();
 	fl_repeater_init();

@@ -18,7 +18,6 @@ void _rsp_callback(void *_data,void* _data2){
 	LOGA(API,"cmdID  :%0X\r\n",data->rsp_check.hdr_cmdid);
 	LOGA(API,"SlaveID:%0X\r\n",data->rsp_check.slaveID);
 	//rsp data
-
 	if(data->timeout >= 0){
 		fl_pack_t *packet = (fl_pack_t *)_data2;
 		P_PRINTFHEX_A(API,packet->data_arr,packet->length,"RSP: ");
