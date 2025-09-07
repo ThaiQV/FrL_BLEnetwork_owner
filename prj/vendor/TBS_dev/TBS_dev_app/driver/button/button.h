@@ -10,9 +10,9 @@
  * - Configurable hold levels (1s, 2s, 3s, etc.)
  * - Press, release, click, and hold events
  * - Multi-click detection (single, double, triple, etc.)
- * - **NEW**: Simultaneous multi-button interactions (combo buttons)
- * - **NEW**: Chord detection (multiple buttons pressed together)
- * - **NEW**: Sequential button patterns
+ * - Simultaneous multi-button interactions (combo buttons)
+ * - Chord detection (multiple buttons pressed together)
+ * - Sequential button patterns
  * - Debounce filtering
  * - Configurable multi-click timeout
  */
@@ -35,16 +35,16 @@ extern "C" {
 #define MAX_BUTTONS         16       ///< Maximum number of buttons supported
 #define MAX_HOLD_LEVELS     5        ///< Maximum hold levels per button
 #define MAX_MULTI_CLICK     10       ///< Maximum multi-click count supported
-#define MAX_COMBO_BUTTONS   4        ///< **NEW**: Maximum buttons in a combo
-#define MAX_COMBOS          8        ///< **NEW**: Maximum number of combo configurations
-#define MAX_PATTERN_LENGTH  8        ///< **NEW**: Maximum buttons in a sequence pattern
-#define MAX_PATTERNS        4        ///< **NEW**: Maximum number of patterns
+#define MAX_COMBO_BUTTONS   4        ///< Maximum buttons in a combo
+#define MAX_COMBOS          8        ///< Maximum number of combo configurations
+#define MAX_PATTERN_LENGTH  8        ///< Maximum buttons in a sequence pattern
+#define MAX_PATTERNS        4        ///< Maximum number of patterns
 #define DEFAULT_DEBOUNCE_TIME   20   ///< Default debounce time (ms)
 #define DEFAULT_CLICK_TIMEOUT   500  ///< Default click timeout (ms)
 #define DEFAULT_MULTICLICK_TIMEOUT  500  ///< Default multi-click timeout (ms)
 #define DEFAULT_CLICK_SEPARATION 150   ///< Default time between clicks (ms)
-#define DEFAULT_COMBO_TIMEOUT   1000 ///< **NEW**: Default combo detection timeout (ms)
-#define DEFAULT_PATTERN_TIMEOUT 2000 ///< **NEW**: Default pattern timeout (ms)
+#define DEFAULT_COMBO_TIMEOUT   1000 ///< Default combo detection timeout (ms)
+#define DEFAULT_PATTERN_TIMEOUT 2000 ///< Default pattern timeout (ms)
 
 // =============================================================================
 // TYPE DEFINITIONS
@@ -62,7 +62,7 @@ typedef enum {
     BUTTON_EVENT_HOLD_START,    ///< Hold started
     BUTTON_EVENT_HOLD_LEVEL,    ///< Hold level reached
     BUTTON_EVENT_HOLD_END,      ///< Hold ended
-    // **NEW**: Multi-button events
+    // Multi-button events
     BUTTON_EVENT_COMBO_PRESS,   ///< Multiple buttons pressed together
     BUTTON_EVENT_COMBO_RELEASE, ///< Multiple buttons released together
     BUTTON_EVENT_COMBO_CLICK,   ///< Multiple buttons clicked together
@@ -82,7 +82,7 @@ typedef enum {
 } button_state_t;
 
 /**
- * @brief **NEW**: Combo detection state
+ * @brief Combo detection state
  */
 typedef enum {
     COMBO_STATE_IDLE = 0,       ///< No combo in progress
@@ -92,7 +92,7 @@ typedef enum {
 } combo_state_t;
 
 /**
- * @brief **NEW**: Pattern detection state
+ * @brief Pattern detection state
  */
 typedef enum {
     PATTERN_STATE_IDLE = 0,     ///< No pattern in progress
@@ -174,7 +174,7 @@ typedef struct {
 } button_multiclick_t;
 
 /**
- * @brief **NEW**: Button combination configuration
+ * @brief Button combination configuration
  */
 typedef struct {
     uint8_t button_ids[MAX_COMBO_BUTTONS];  ///< Array of button IDs in combo
@@ -197,7 +197,7 @@ typedef struct {
 } button_combo_t;
 
 /**
- * @brief **NEW**: Button sequence pattern configuration
+ * @brief Button sequence pattern configuration
  */
 typedef struct {
     uint8_t pattern[MAX_PATTERN_LENGTH];    ///< Sequence of button IDs
@@ -254,12 +254,12 @@ typedef struct {
     bool stable_state;          ///< Debounced stable state
     bool enabled;               ///< Button enable/disable flag
     bool initialized;           ///< Hardware initialization flag
-    bool in_combo;              ///< **NEW**: True if button is part of active combo
+    bool in_combo;              ///< True if button is part of active combo
 
 } button_config_t;
 
 /**
- * @brief **NEW**: Global button state tracking for combos and patterns
+ * @brief Global button state tracking for combos and patterns
  */
 typedef struct {
     uint16_t pressed_buttons_mask;          ///< Bitmask of currently pressed buttons
@@ -277,7 +277,7 @@ typedef struct {
     button_hal_t hal;                       ///< Hardware abstraction layer
     bool initialized;                       ///< Manager initialization flag
 
-    // **NEW**: Multi-button features
+    // Multi-button features
     button_combo_t combos[MAX_COMBOS];      ///< Button combination configurations
     uint8_t combo_count;                    ///< Number of registered combos
     button_pattern_t patterns[MAX_PATTERNS]; ///< Button sequence patterns
@@ -497,7 +497,7 @@ bool button_process_single(uint8_t button_id);
 void button_get_stats(uint8_t *total_buttons, uint8_t *active_buttons);
 
 // =============================================================================
-// **NEW**: MULTI-BUTTON COMBO API
+// MULTI-BUTTON COMBO API
 // =============================================================================
 
 /**
@@ -562,7 +562,7 @@ bool button_set_combo_hold_callback(uint8_t combo_id, uint32_t hold_threshold,
 bool button_set_combo_enabled(uint8_t combo_id, bool enabled);
 
 // =============================================================================
-// **NEW**: BUTTON SEQUENCE PATTERN API
+// BUTTON SEQUENCE PATTERN API
 // =============================================================================
 
 /**
@@ -606,7 +606,7 @@ bool button_set_pattern_enabled(uint8_t pattern_id, bool enabled);
 bool button_reset_pattern(uint8_t pattern_id);
 
 // =============================================================================
-// **NEW**: UTILITY FUNCTIONS
+// UTILITY FUNCTIONS
 // =============================================================================
 
 /**

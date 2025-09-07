@@ -179,8 +179,8 @@ void user_button_app_init(void)
     button_set_click_callback(BUTTON_ID_PPU, ppu_on_lick);
     button_set_click_callback(BUTTON_ID_MAIN, main_on_lick);
     button_set_click_callback(BUTTON_ID_CMAIN, cmain_on_lick);
-    button_set_release_callback(BUTTON_ID_RESET, reset_hold_3s);
-//    button_add_hold_level(BUTTON_ID_RESET, 3000, reset_hold_3ss);
+//    button_set_release_callback(BUTTON_ID_RESET, reset_hold_3s);
+    button_add_hold_level(BUTTON_ID_RESET, 3000, reset_hold_3s);
 
     // Combo:
     uint8_t combo_buttons1[] = {BUTTON_ID_PED, BUTTON_ID_RESET};

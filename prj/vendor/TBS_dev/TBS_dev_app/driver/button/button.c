@@ -11,8 +11,8 @@
 #include <stdio.h>
 
 #define BUTTON_DRV_DEBUG			0
-#if	U_APP_DEBUG
-#define DB_LOG_BT(...)	//ULOGA(__VA_ARGS__)
+#if	BUTTON_DRV_DEBUG
+#define DB_LOG_BT(...)	ULOGA(__VA_ARGS__)
 #else
 #define DB_LOG_BT(...)
 #endif
@@ -33,7 +33,7 @@ static void button_trigger_event(uint8_t button_id, button_event_t event, uint32
 static void button_trigger_multiclick(uint8_t button_id);
 static void button_sort_multiclick_levels(uint8_t button_id);
 
-// **NEW**: Multi-button private functions
+// Multi-button private functions
 static void button_update_global_state(void);
 static void button_process_combos(void);
 static void button_process_patterns(void);
@@ -61,7 +61,7 @@ bool button_manager_init(const button_hal_t *hal) {
     g_button_manager.initialized = true;
     g_button_manager.hal.button_pin_init_all();
 
-    // **NEW**: Initialize global state for multi-button features
+    // Initialize global state for multi-button features
     g_button_manager.global_state.pressed_buttons_mask = 0;
     g_button_manager.global_state.global_state_change_time = 0;
     g_button_manager.global_state.last_pressed_button = 0xFF;
@@ -124,7 +124,7 @@ uint8_t button_add(uint8_t gpio_pin, bool active_low) {
     btn->multiclick_level_count = 0;
     btn->last_hold_level = 0;
     btn->click_count = 0;
-    btn->in_combo = false;  // **NEW**: Initialize combo state
+    btn->in_combo = false;  // Initialize combo state
 
     // Clear all callbacks
     btn->on_press = NULL;
@@ -151,7 +151,7 @@ bool button_remove(uint8_t button_id) {
         return false;
     }
 
-    // **NEW**: Remove button from any combos that contain it
+    // Remove button from any combos that contain it
     for (uint8_t i = 0; i < g_button_manager.combo_count; i++) {
         button_combo_t *combo = &g_button_manager.combos[i];
         for (uint8_t j = 0; j < combo->button_count; j++) {
@@ -163,7 +163,7 @@ bool button_remove(uint8_t button_id) {
         }
     }
 
-    // **NEW**: Remove button from any patterns that contain it
+    // Remove button from any patterns that contain it
     for (uint8_t i = 0; i < g_button_manager.pattern_count; i++) {
         button_pattern_t *pattern = &g_button_manager.patterns[i];
         for (uint8_t j = 0; j < pattern->pattern_length; j++) {
@@ -358,7 +358,7 @@ bool button_remove_multiclick_level(uint8_t button_id, uint8_t level_index) {
         return false;
     }
 
-//    uint8_t removed_clicks = btn->multiclick_levels[level_index].click_count;
+    uint8_t removed_clicks = btn->multiclick_levels[level_index].click_count;
 
     // Shift remaining levels down
     for (uint8_t i = level_index; i < btn->multiclick_level_count - 1; i++) {
@@ -368,8 +368,7 @@ bool button_remove_multiclick_level(uint8_t button_id, uint8_t level_index) {
     btn->multiclick_level_count--;
     memset(&btn->multiclick_levels[btn->multiclick_level_count], 0, sizeof(button_multiclick_t));
 
-    DB_LOG_BT("[BTN] Removed multi-click level (%d clicks) from button %d\n",
-           removed_clicks, button_id);
+    DB_LOG_BT("[BTN] Removed multi-click level (%d clicks) from button %d\n",removed_clicks, button_id);
     return true;
 }
 
@@ -486,7 +485,7 @@ void button_process_all(void) {
         }
     }
 
-    // **NEW**: Process multi-button features after individual button processing
+    // Process multi-button features after individual button processing
     button_update_global_state();
     button_process_combos();
     button_process_patterns();
@@ -499,7 +498,7 @@ bool button_process_single(uint8_t button_id) {
 
     button_process_state_machine(button_id);
 
-    // **NEW**: Also update global state when processing single button
+    // Also update global state when processing single button
     button_update_global_state();
     button_process_combos();
     button_process_patterns();
@@ -524,7 +523,7 @@ void button_get_stats(uint8_t *total_buttons, uint8_t *active_buttons) {
 }
 
 // =============================================================================
-// **NEW**: MULTI-BUTTON COMBO API IMPLEMENTATION
+// MULTI-BUTTON COMBO API IMPLEMENTATION
 // =============================================================================
 
 uint8_t button_add_combo(uint8_t *button_ids, uint8_t button_count, uint32_t detection_window) {
@@ -659,7 +658,7 @@ bool button_set_combo_enabled(uint8_t combo_id, bool enabled) {
 }
 
 // =============================================================================
-// **NEW**: BUTTON SEQUENCE PATTERN API IMPLEMENTATION
+// BUTTON SEQUENCE PATTERN API IMPLEMENTATION
 // =============================================================================
 
 uint8_t button_add_pattern(uint8_t *pattern, uint8_t pattern_length, uint32_t timeout) {
@@ -771,7 +770,7 @@ bool button_reset_pattern(uint8_t pattern_id) {
 }
 
 // =============================================================================
-// **NEW**: UTILITY FUNCTIONS IMPLEMENTATION
+// UTILITY FUNCTIONS IMPLEMENTATION
 // =============================================================================
 
 uint8_t button_get_pressed_buttons(uint8_t *pressed_buttons, uint8_t max_buttons) {
@@ -860,7 +859,7 @@ static bool button_validate_id(uint8_t button_id) {
     return true;
 }
 
-// **NEW**: Validate combo ID
+// Validate combo ID
 static bool button_validate_combo_id(uint8_t combo_id) {
     if (!g_button_manager.initialized) {
         DB_LOG_BT("[BTN_COMBO] Error: Manager not initialized\n");
@@ -875,7 +874,7 @@ static bool button_validate_combo_id(uint8_t combo_id) {
     return true;
 }
 
-// **NEW**: Validate pattern ID
+// Validate pattern ID
 static bool button_validate_pattern_id(uint8_t pattern_id) {
     if (!g_button_manager.initialized) {
         DB_LOG_BT("[BTN_PATTERN] Error: Manager not initialized\n");
@@ -894,6 +893,11 @@ static void button_process_state_machine(uint8_t button_id) {
     button_config_t *btn = &g_button_manager.buttons[button_id];
 
     if (!btn->enabled) {
+        return;
+    }
+
+    if(btn->in_combo)
+    {
         return;
     }
 
@@ -1168,7 +1172,7 @@ static void button_sort_multiclick_levels(uint8_t button_id) {
 }
 
 // =============================================================================
-// **NEW**: MULTI-BUTTON PRIVATE FUNCTION IMPLEMENTATIONS
+// MULTI-BUTTON PRIVATE FUNCTION IMPLEMENTATIONS
 // =============================================================================
 
 static void button_update_global_state(void) {
