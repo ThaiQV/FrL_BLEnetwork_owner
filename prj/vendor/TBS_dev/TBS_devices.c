@@ -18,9 +18,6 @@
 /***                                Global Parameters                        **/
 /******************************************************************************/
 /******************************************************************************/
-
-
-#ifdef COUNTER_DEVICE
 void tbs_counter_printf(void* _p){
 	tbs_device_counter_t *data = (tbs_device_counter_t*)_p;
 	LOGA(INF,"MAC:0x%02X%02X%02X%02X%02X%02X\r\n",data->data.mac[0],data->data.mac[1],data->data.mac[2],
@@ -34,19 +31,6 @@ void tbs_counter_printf(void* _p){
 	LOGA(INF,"BT_Err:%d\r\n",data->data.err_product);
 //	P_PRINTFHEX_A(INF,data->bytes,SIZEU8(data->bytes),"Raw:");
 }
-
-tbs_device_counter_t G_COUNTER_DEV = { .data = {
-												.timetamp = 0,
-												.type = TBS_COUNTER,
-												.bt_call = 0,
-												.bt_endcall = 0,
-												.bt_rst = 0,
-												.pass_product = 100,
-												.err_product = 5
-												}
-									};
-#endif
-#ifdef POWER_METER_DEVICE
 
 void tbs_power_meter_printf(void* _p) {
 	tbs_device_powermeter_t* dev = (tbs_device_powermeter_t*) _p;
@@ -67,6 +51,22 @@ void tbs_power_meter_printf(void* _p) {
 //	u8* data_u8 = (u8*)_p;
 //	P_PRINTFHEX_A(INF,data_u8,POWER_METER_STRUCT_BYTESIZE,"Raw:");
 }
+
+#ifdef COUNTER_DEVICE
+
+tbs_device_counter_t G_COUNTER_DEV = { .data = {
+												.timetamp = 0,
+												.type = TBS_COUNTER,
+												.bt_call = 0,
+												.bt_endcall = 0,
+												.bt_rst = 0,
+												.pass_product = 100,
+												.err_product = 5
+												}
+									};
+#endif
+#ifdef POWER_METER_DEVICE
+
 tbs_device_powermeter_t G_POWER_METER = {
 				        .mac = {0xDE, 0xAD, 0xBE, 0xEF, 0x00, 0x01},
 				        .timetamp = 12345678,
@@ -102,6 +102,14 @@ void test_powermeter(void) {
 /******************************************************************************/
 /******************************************************************************/
 #ifdef COUNTER_DEVICE
+/* TEST CASE  EVENT */
+typedef struct {
+	u32 lifetime;
+	u16 req_num;
+	u16 rsp_num;
+} test_sendevent_t;
+
+test_sendevent_t TEST_EVENT ={0,0,0};
 
 void TEST_rsp_callback(void *_data,void* _data2){
 	fl_rsp_container_t *data =  (fl_rsp_container_t*)_data;
@@ -112,26 +120,39 @@ void TEST_rsp_callback(void *_data,void* _data2){
 	if(data->timeout > 0){
 		fl_pack_t *packet = (fl_pack_t *)_data2;
 		P_PRINTFHEX_A(API,packet->data_arr,packet->length,"RSP: ");
+//		P_INFO("Master RSP:%c%c\r\n",packet->data_arr[7],packet->data_arr[8]);
+		TEST_EVENT.rsp_num++;
 	}else{
-		ERR(API,"NON-RSP\r\n");
+//		P_INFO("Master RSP: NON-RSP \r\n");
 	}
+	u32 lifetime = fl_rtc_get() - TEST_EVENT.lifetime;
+	P_INFO("==============================\r\n");
+	P_INFO("* LifeTime:%dh%dm%ds\r\n",lifetime / 3600,(lifetime % 3600) / 60,lifetime % 60);
+	P_INFO("* REQUEST :%d\r\n",TEST_EVENT.req_num);
+	P_INFO("* RESPONSE:%d\r\n",TEST_EVENT.rsp_num);
+	P_INFO("==============================\r\n");
 }
 int TEST_Counter_Event(void){
-//	G_COUNTER_DEV.data.bt_call = RAND(0,1);
-//	G_COUNTER_DEV.data.bt_endcall = G_COUNTER_DEV.data.bt_call ? 0 : 1;
-//	G_COUNTER_DEV.data.bt_rst = G_COUNTER_DEV.data.bt_call?0:RAND(0,1);
-	//fl_api_slave_req(NWK_HDR_55,G_COUNTER_DEV.bytes,SIZEU8(G_COUNTER_DEV.bytes),&TEST_rsp_callback,500);
-	u32 period =  RAND(1,6);
-	P_INFO("TEST EVNET callback after %d s\r\n",period);
+	u32 period = RAND(1,30);
+	if (IsJoinedNetwork() && IsOnline()) {
+		G_COUNTER_DEV.data.bt_call = RAND(0,1);
+		G_COUNTER_DEV.data.bt_endcall = G_COUNTER_DEV.data.bt_call ? 0 : 1;
+		G_COUNTER_DEV.data.bt_rst = G_COUNTER_DEV.data.bt_call ? 0 : RAND(0,1);
+		fl_api_slave_req(NWK_HDR_55,G_COUNTER_DEV.bytes,SIZEU8(G_COUNTER_DEV.bytes),&TEST_rsp_callback,500,1);
+		TEST_EVENT.req_num++;
+		P_INFO("TEST EVNET after:%d s\r\n",period);
+	}
 	return period*1000*1000;
 }
+/* END TEST*/
 
 void TBS_Counter_init(void){
 	memcpy(G_COUNTER_DEV.data.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_COUNTER_DEV.data.mac));
 	G_COUNTER_DEV.data.type = TBS_COUNTER;
 	G_COUNTER_DEV.data.timetamp = fl_rtc_get();
 	//todo:Init Butt,lcd,7segs,.....
-	//blt_soft_timer_add(&TEST_Counter_Event,5000*1000);
+	TEST_EVENT.lifetime = fl_rtc_get();
+	blt_soft_timer_add(&TEST_Counter_Event,5000*1000);
 }
 void TBS_Counter_Run(void){
 	G_COUNTER_DEV.data.timetamp = fl_rtc_get();

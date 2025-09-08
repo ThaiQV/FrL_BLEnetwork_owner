@@ -318,9 +318,9 @@ void fl_adv_sendFIFO_run(void) {
 
 #ifdef MASTER_CORE
 		if (FL_QUEUE_GET(&G_QUEUE_SENDING,&data_in_queue)) {
+			fl_nwk_master_heartbeat_run();
 #else
 		while (FL_QUEUE_GET_LOOP(&G_QUEUE_SENDING,&data_in_queue)) {
-
 			fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(data_in_queue);
 			u32 inpack = fl_rtc_timetamp2milltampStep(timetamp_inpack);
 			u32 origin_pack = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
@@ -353,9 +353,7 @@ void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms) {
 //	while (blc_ll_getCurrentState() == BLS_LINK_STATE_SCAN && blc_ll_getCurrentState() == BLS_LINK_STATE_ADV) {
 //	};
 	if (_data && _size >= 1) {
-//		LOG_P(APP,"Sending..... \r\n");
 		rf_set_power_level_index(MY_RF_POWER_INDEX);
-//		bls_ll_setAdvEnable(BLC_ADV_ENABLE);
 		u8 mac[6];
 		own_addr_type_t app_own_address_type = OWN_ADDRESS_PUBLIC;
 		memcpy(mac,(app_own_address_type == OWN_ADDRESS_PUBLIC) ? blc_ll_get_macAddrPublic() : blc_ll_get_macAddrRandom(),6);
@@ -370,17 +368,10 @@ void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms) {
 		memset(encrypted,0,SIZEU8(encrypted));
 		NWK_MYKEY();
 		fl_nwk_encrypt16(FL_NWK_USE_KEY,_data,_size,encrypted);
-//		P_PRINTFHEX_A(INF,encrypted,_size,"Encrypt(%d):",_size);
-//		u8 decrypted[_size];
-//		memset(decrypted,0,SIZEU8(decrypted));
-//		fl_nwk_decrypt16(FL_NWK_PB_KEY,encrypted,_size,decrypted);
-//		P_PRINTFHEX_A(INF,decrypted,_size,"Decrypt(%d):",_size);
-//
 		bls_ll_setAdvData(encrypted,_size);
 		bls_ll_setAdvDuration(_timeout_ms * 1000,1); // ms->us
 		bls_app_registerEventCallback(BLT_EV_FLAG_ADV_DURATION_TIMEOUT,&fl_durationADV_timeout_proccess);
-//		TICK_GET_PROCESSING_TIME = clock_time();
-//		LOGA(BLE,"Scan time:%d\r\n",(clock_time()-TICK_GET_PROCESSING_TIME)/SYSTEM_TIMER_TICK_1MS);
+
 		bls_ll_setAdvEnable(BLC_ADV_ENABLE);
 	} else {
 		ERR(APP,"Err: ADV send!\r\n");

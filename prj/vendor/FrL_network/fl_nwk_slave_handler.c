@@ -77,7 +77,7 @@ extern tbs_device_counter_t G_COUNTER_DEV ;
 tbs_device_powermeter_t G_POWER_METER;
 #endif
 //flag debug of the network
-volatile u8 NWK_DEBUG_STT = 1; // it will be assigned into end-point byte (dbg :1bit)
+volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into end-point byte (dbg :1bit)
 volatile u8 NWK_REPEAT_MODE = 0; // 1: level | 0 : non-level
 volatile u8  NWK_REPEAT_LEVEL = 3;
 /******************************************************************************/
@@ -230,18 +230,16 @@ void _nwk_slave_syncFromPack(fl_dataframe_format_t *packet){
 	}
 }
 
-s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms) {
+s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry) {
 	//register timeout cb
 	if (_cb != 0 && _timeout_ms*1000 >= 2*QUEUQ_REQcRSP_INTERVAL) {
 		if(fl_req_slave_packet_createNsend(_cmdid,_data,_len)){
-			fl_queueREQcRSP_add(_cmdid,G_INFORMATION.slaveID.id_u8,&_cb,_timeout_ms*1000);
+			return fl_queueREQcRSP_add(_cmdid,G_INFORMATION.slaveID.id_u8,_data,_len,&_cb,_timeout_ms*1000,_retry);
 		}
 	} else if(_cb == 0 && _timeout_ms ==0){
 		return (fl_req_slave_packet_createNsend(_cmdid,_data,_len) == 0?-1:0); // none rsp
 	}
-	else {
-		ERR(API,"Cann't set timeout (%d/%d ms)!!\r\n",(u32)_cb,_timeout_ms);
-	}
+	ERR(API,"Can't register REQ (%d/%d ms)!!\r\n",(u32)_cb,_timeout_ms);
 	return -1;
 }
 
@@ -553,7 +551,7 @@ int fl_nwk_slave_reconnect(void){
 	}
 	if(IsJoinedNetwork() && G_INFORMATION.active == false){
 		LOGA(INF,"Reconnect network (%d s)!!!\r\n",RECHECKING_NETWOK_TIME/1000);
-		fl_api_slave_req(NWK_HDR_RECONNECT,G_INFORMATION.mac,SIZEU8(G_INFORMATION.mac),0,0);
+		fl_api_slave_req(NWK_HDR_RECONNECT,G_INFORMATION.mac,SIZEU8(G_INFORMATION.mac),0,0,0);
 	}
 	return 0;
 }
@@ -636,7 +634,6 @@ void fl_nwk_slave_process(void){
 	fl_nwk_slave_joinnwk_exc();
 	//todo TBS_device process
 	TBS_Device_Run();
-
 }
 /***************************************************
  * @brief 		:Main functions to process income packet

@@ -228,11 +228,17 @@ typedef struct {
 
 typedef struct {
 	fl_rsp_callback_fnc rsp_cb;
-	s32 timeout;
+	s32 timeout; //use to count-down
+	s32 timeout_set; //use to retry
+	u8 retry;
 	struct {
 		u8 hdr_cmdid;
 		u8 slaveID;
 	} rsp_check;
+	struct {
+		u8 payload[22];
+		u8 len;
+	} req_payload;
 }__attribute__((packed)) fl_rsp_container_t;
 
 #ifdef MASTER_CORE
@@ -269,13 +275,14 @@ inline u8 fl_crc8(u8* _pdata, u8 _len) {
 
 #define DEBUG_TURN(x) do { \
 							if (x) { PLOG_Start(ALL); } \
-							else   { PLOG_Stop(ALL); } \
+							else   { PLOG_Stop(ALL);  }\
 						} while(0)
 
 #ifdef MASTER_CORE
 void fl_nwk_master_init(void);
 void fl_nwk_master_run(fl_pack_t *_pack_handle);
 void fl_nwk_master_process(void);
+void fl_nwk_master_heartbeat_run(void);
 fl_pack_t fl_master_packet_GetInfo_build(u8 *_slave_mac_arr, u8 _slave_num);
 void fl_master_nodelist_AddRefesh(fl_nodeinnetwork_t _node);
 s16 fl_master_SlaveID_find(u8 _id);
@@ -295,9 +302,9 @@ fl_timetamp_withstep_t fl_adv_timetampStepInPack(fl_pack_t _pack);
 bool fl_req_slave_packet_createNsend(u8 _cmdid, u8* _data, u8 _len);
 void fl_queue_REQcRSP_ScanRec(fl_pack_t _pack,void *_id);
 int fl_nwk_slave_reconnect(void);
+s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry);
 #endif
-s8 fl_queueREQcRSP_add(u8 cmdid, u8 slaveid, fl_rsp_callback_fnc *_cb, u32 _timeout_ms);
-
+s8 fl_queueREQcRSP_add(u8 cmdid,u8 slaveid,u8* _payloadreq,u8 _len,fl_rsp_callback_fnc *_cb, u32 _timeout_ms,u8 _retry);
 int fl_queue_REQnRSP_TimeoutStart(void);
 void fl_adv_setting_update(void);
 int fl_adv_sendFIFO_add(fl_pack_t _pack);
