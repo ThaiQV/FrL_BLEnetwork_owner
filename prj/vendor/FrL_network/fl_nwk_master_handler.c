@@ -463,7 +463,7 @@ bool fl_req_master_packet_createNsend(u8* _slave_mac,u8 _cmdid,u8* _data, u8 _le
 
 			req_pack.frame.slaveID.id_u8 = slaveID;
 			//Create payload
-			memset(req_pack.frame.payload,0xFF,SIZEU8(req_pack.frame.payload));
+			memset(req_pack.frame.payload,0x0,SIZEU8(req_pack.frame.payload));
 			memcpy(req_pack.frame.payload,_data,_len);
 			//crc
 			req_pack.frame.crc8 = fl_crc8(req_pack.frame.payload,SIZEU8(req_pack.frame.payload));
@@ -610,10 +610,15 @@ int fl_master_ProccesRSP_cbk(void) {
 	if (FL_QUEUE_GET(&G_HANDLE_MASTER_CONTAINER,&data_in_queue)) {
 		fl_data_frame_u packet;
 		extern u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
+
 		if(!fl_packet_parse(data_in_queue,&packet.frame)) return -1;
+
 		if(!MASTER_INSTALL_STATE && G_NODE_LIST.slot_inused == 0xFF){return -1;}
+
 		LOGA(INF,"HDR_RSP ID: %02X\r\n",packet.frame.hdr);
 		P_PRINTFHEX_A(INF,packet.frame.payload,SIZEU8(packet.frame.payload),"%d:",packet.frame.slaveID.id_u8);
+		fl_queue_REQcRSP_ScanRec(data_in_queue);
+
 		switch ((fl_hdr_nwk_type_e) packet.frame.hdr) {
 			case NWK_HDR_HEARTBEAT: {
 				/** - NON-RSP

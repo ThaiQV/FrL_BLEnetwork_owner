@@ -361,7 +361,7 @@ void SENDMESS_REQUEST(u8* _pdata, RspFunc rspfnc){
 	memset(message,0,SIZEU8(message));
 	u8 len_mess = (data->len_data - SIZEU8(mac) > SIZEU8(message))? SIZEU8(message):data->len_data - SIZEU8(mac);
 	memcpy(message,&data->data[SIZEU8(mac)],len_mess);
-	fl_api_master_req(mac,NWK_HDR_F6_SENDMESS,message,len_mess,&_slave_rsp_callback,100,1);
+	fl_api_master_req(mac,NWK_HDR_F6_SENDMESS,message,len_mess,&_slave_rsp_callback,200,1);
 	if (rspfnc != 0) {
 		//don't rsp
 	}

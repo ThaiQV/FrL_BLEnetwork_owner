@@ -97,6 +97,10 @@ typedef union {
 	} data;
 	u8 bytes[22];
 }__attribute__((packed)) tbs_device_counter_t;
+//typedef struct {
+//	u8 len;
+//	u8 message[22];
+//}__attribute__((packed)) tbs_counter_lcd_t;
 //For POWER-METER DEVICEs
 /*
  * | Frequency | Voltage | Current 1 | Current 2 | Current 3 | Power 1 | Power 2 | Power 3 | Energy 1 | Energy 2 | Energy 3 | Reserve | (sum 176 bits)
@@ -221,6 +225,9 @@ typedef struct {
 	fl_slave_profiles_t profile;
 	//pointer data of device
 	u8 *data;
+#ifdef COUNTER_DEVICE
+	u8 *lcd_mess[COUNTER_LCD_MESS_MAX];
+#endif
 #else
 	//data of dev
 	u8 data[POWER_METER_STRUCT_BYTESIZE+1];
