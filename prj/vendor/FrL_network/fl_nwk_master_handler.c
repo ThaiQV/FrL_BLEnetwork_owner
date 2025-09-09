@@ -40,7 +40,7 @@ fl_master_config_t G_MASTER_INFO = { .nwk = { .chn = { 10, 11, 12 }, .collect_ch
 
 volatile u8 MASTER_INSTALL_STATE = 0;
 //Period of the heartbeat
-u16 PERIOD_HEARTBEAT = 0 * 1000; //
+u16 PERIOD_HEARTBEAT = (16+1)*100; // 16 slots sending and 100ms interval adv
 //flag debug of the network
 volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into endpoint byte (dbg :1bit)
 volatile u8 NWK_REPEAT_MODE = 0; // 1: level | 0 : non-level
@@ -56,6 +56,7 @@ s16 fl_master_SlaveID_find(u8 _id);
 void fl_nwk_master_nodelist_init(void);
 void fl_nwk_master_nodelist_load(void);
 void fl_nwk_master_nodelist_store(void);
+void fl_nwk_master_heartbeat_init(void);
 
 void _master_nodelist_printf(fl_slaves_list_t *_node, u8 _size) {
 	if (_size < 0xFF && _size > 0) {
@@ -424,6 +425,7 @@ int fl_send_collection_req(void) {
  *
  ***************************************************/
 int fl_send_heartbeat(void) {
+	if(G_NODE_LIST.slot_inused == 0xFF){return -1;}
 	datetime_t cur_dt;
 	u32 cur_timetamp = fl_rtc_get();
 	fl_rtc_timestamp_to_datetime(cur_timetamp,&cur_dt);
@@ -432,7 +434,7 @@ int fl_send_heartbeat(void) {
 			PERIOD_HEARTBEAT);
 	fl_pack_t packet_built = fl_master_packet_heartbeat_build();
 	fl_adv_sendFIFO_add(packet_built);
-	return -1; //
+	return 0; //
 }
 /***************************************************
  * @brief 		: check change and store
@@ -471,7 +473,7 @@ int _nwk_master_backup(void) {
  * @return	  	:none
  *
  ***************************************************/
-void _master_updateDB_for_Node(u8 node_indx ,fl_data_frame_u *packet)  {
+static void _master_updateDB_for_Node(u8 node_indx ,fl_data_frame_u *packet)  {
 	G_NODE_LIST.sla_info[node_indx].active = true;
 	G_NODE_LIST.sla_info[node_indx].timelife = (clock_time() - G_NODE_LIST.sla_info[node_indx].timelife);
 	//create MAC + TIMETAMP + DEV_TYPE
@@ -506,7 +508,8 @@ int fl_master_ProccesRSP_cbk(void) {
 	if (FL_QUEUE_GET(&G_HANDLE_MASTER_CONTAINER,&data_in_queue)) {
 		fl_data_frame_u packet;
 		extern u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
-		fl_packet_parse(data_in_queue,&packet.frame);
+		if(!fl_packet_parse(data_in_queue,&packet.frame)) return -1;
+		if(!MASTER_INSTALL_STATE && G_NODE_LIST.slot_inused == 0xFF){return -1;}
 		LOGA(INF,"HDR_RSP ID: %02X\r\n",packet.frame.hdr);
 		P_PRINTFHEX_A(INF,packet.frame.payload,SIZEU8(packet.frame.payload),"%d:",packet.frame.slaveID.id_u8);
 		switch ((fl_hdr_nwk_type_e) packet.frame.hdr) {
@@ -547,6 +550,7 @@ int fl_master_ProccesRSP_cbk(void) {
 					fl_ble2wifi_EVENT_SEND(G_NODE_LIST.sla_info[node_indx].mac);
 				} else {
 					ERR(INF,"ID not foud:%02X\r\n",slave_id);
+					return -1;
 				}
 			}
 			break;
@@ -563,10 +567,12 @@ int fl_master_ProccesRSP_cbk(void) {
 						_master_updateDB_for_Node(node_indx,&packet);
 					} else {
 						ERR(INF,"ID not foud:%02X\r\n",slave_id);
+						return -1;
 					}
 				} else {
 					ERR(INF,"CRC Fail!!\r\n");
 					P_PRINTFHEX_A(INF,packet.bytes,SIZEU8(packet.bytes),"[ERR]PACK:");
+					return -1;
 				}
 			}
 			break;
@@ -577,7 +583,7 @@ int fl_master_ProccesRSP_cbk(void) {
 				MAC_ZERO_CLEAR(mac,0);
 				memcpy(mac,&packet.frame.payload[0],sizeof(mac));
 				if (IS_MAC_INVALID(mac,0) || IS_MAC_INVALID(mac,0xFF)) {
-					break;
+					return -1;
 				}
 				s16 node_indx = fl_master_Node_find(mac);
 				if (node_indx == -1) {
@@ -601,6 +607,7 @@ int fl_master_ProccesRSP_cbk(void) {
 		}
 	} else {
 		ERR(INF,"Err <QUEUE GET>-G_HANDLE_MASTER_CONTAINER!!\r\n");
+		return -1;
 	}
 	return 0;
 }
@@ -622,6 +629,7 @@ void fl_nwk_master_init(void) {
 	G_MASTER_INFO.nwk.chn[2] = master_profile.nwk.chn[2];
 	memcpy(G_MASTER_INFO.nwk.private_key,master_profile.nwk.private_key,SIZEU8(master_profile.nwk.private_key));
 	blt_soft_timer_add(_nwk_master_backup,2 * 1000 * 1000);
+	fl_nwk_master_heartbeat_init();
 }
 /***************************************************
  * @brief 		: init nodelist
@@ -705,14 +713,13 @@ void fl_nwk_master_nodelist_load(void) {
  * @return	  	:none
  *
  ***************************************************/
+void fl_nwk_master_heartbeat_init(void){
+	blt_soft_timer_add(&fl_send_heartbeat,PERIOD_HEARTBEAT * 1000);
+}
 void fl_nwk_master_heartbeat_run(void) {
-	if (!MASTER_INSTALL_STATE && PERIOD_HEARTBEAT != 0) {
-		if (blt_soft_timer_find(&fl_send_heartbeat) < 0) {
-			blt_soft_timer_add(&fl_send_heartbeat,PERIOD_HEARTBEAT * 1000);
-		}
-	} else {
-		blt_soft_timer_delete(&fl_send_heartbeat);
-	}
+//	LOGA(INF,"Restart HearBeat:%d ms\r\n",PERIOD_HEARTBEAT);
+//	blt_soft_timer_restart(&fl_send_heartbeat,PERIOD_HEARTBEAT * 1000);
+	blt_soft_timer_restart(&fl_send_heartbeat,0);
 }
 /***************************************************
  * @brief 		: collection slave (install mode)
@@ -752,8 +759,7 @@ void fl_nwk_master_collection_run(void) {
 void fl_nwk_master_process(void) {
 	//install mode
 	fl_nwk_master_collection_run();
-	//Heartbeat processor
-	fl_nwk_master_heartbeat_run();
+	//todo: something tasks
 }
 /***************************************************
  * @brief 		: execute response from nodes
@@ -768,7 +774,10 @@ void fl_nwk_master_run(fl_pack_t *_pack_handle) {
 		if (FL_QUEUE_ADD(&G_HANDLE_MASTER_CONTAINER,_pack_handle) < 0) {
 			ERR(INF,"Err <QUEUE ADD>-G_HANDLE_MASTER_CONTAINER!!\r\n");
 		} else {
-			fl_master_ProccesRSP_cbk();
+			if(fl_master_ProccesRSP_cbk() != -1)
+			{
+				fl_nwk_master_heartbeat_run();
+			}
 		}
 	}
 }

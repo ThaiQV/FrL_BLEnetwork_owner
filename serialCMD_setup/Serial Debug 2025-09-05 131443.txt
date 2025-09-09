@@ -1,0 +1,9 @@
+TEST EVNET callback after 5 s
+[ERR][fl_sys_datetime.c] fl_rtc_sync(117):Synchronize system time (spread:44)!!!
+TEST EVNET callback after 5 s
+TEST EVNET callback after 5 s
+TEST EVNET callback after 5 s
+TEST EVNET callback after 5 s
+TEST EVNET callback after 5 s
+TEST EVNET callback after 5 s
+TEST EVNET callback after 5 s

@@ -83,7 +83,16 @@ typedef struct blt_soft_timer_t {
 } blt_soft_timer_t;
 
 
-
+/***************************************************
+ * @brief 		:restart timer
+ *
+ * @param[in] 	:func: callback fnc
+ * 				 interval_us: new interval time us
+ *
+ * @return	  	:false or true
+ *
+ ***************************************************/
+bool blt_soft_timer_restart(blt_timer_callback_t func, u32 interval_us);
 
 //////////////////////// USER  INTERFACE ///////////////////////////////////
 //return 0 means Fail, others OK

@@ -34,7 +34,7 @@ volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME = {.timetamp = 0,.milstep =
 											}while(0) //Sync original time-master req
 
 #define JOIN_NETWORK_TIME 			30*1000 	//ms
-#define RECHECKING_NETWOK_TIME 		80*1000 	//ms - 1.5mins
+#define RECHECKING_NETWOK_TIME 		30*1000 	//ms - 1mins
 
 fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
 fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_55,NWK_HDR_RECONNECT}; // register cmdid REQ
@@ -53,7 +53,7 @@ static inline u8 IsREQHDR(fl_hdr_nwk_type_e cmdid) {
 
 static inline fl_timetamp_withstep_t GenerateTimetampField(void){
 	fl_timetamp_withstep_t cur_timetamp = fl_rtc_getWithMilliStep();
-	u32 mill_sys = fl_rtc_timetamp2milltampStep(cur_timetamp);
+	u32 mill_sys = fl_rtc_timetamp2milltampStep(cur_timetamp)+ 30;
 	u32 origin_master = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
 	if(mill_sys < origin_master){
 		cur_timetamp = ORIGINAL_MASTER_TIME;
@@ -99,7 +99,7 @@ bool IsOnline(void){
 	return G_INFORMATION.active;
 }
 int _isOnline_check(void) {
-	LOG_P(INF,"Device -> offline\r\n");
+	ERR(INF,"Device -> offline\r\n");
 	G_INFORMATION.active = false;
 	return 0;
 }
@@ -185,11 +185,11 @@ void fl_nwk_slave_init(void) {
 	blt_soft_timer_add(_nwk_slave_backup,2*1000*1000);
 
 	//Interval checking network
-	fl_nwk_slave_reconnect();
-	//check online
-	blt_soft_timer_delete(&_isOnline_check);
-	blt_soft_timer_add(_isOnline_check,RECHECKING_NETWOK_TIME*1000); //2 mins
+//	fl_nwk_slave_reconnect();
+	//Checking online
+	blt_soft_timer_add(&_isOnline_check,RECHECKING_NETWOK_TIME*1000);
 	G_INFORMATION.active = false;
+
 	//test random send req
 //	TEST_slave_sendREQ();
 }
@@ -224,24 +224,20 @@ void _nwk_slave_syncFromPack(fl_dataframe_format_t *packet){
 	//if(packet->slaveID.id_u8 == G_INFORMATION.slaveID.id_u8)
 	{
 		G_INFORMATION.active=true;
-		//check online
-		blt_soft_timer_delete(&_isOnline_check);
-		blt_soft_timer_add(_isOnline_check,RECHECKING_NETWOK_TIME*1000); //2 mins
+		blt_soft_timer_restart(&_isOnline_check,0);
 	}
 }
 
-s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms) {
+s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry) {
 	//register timeout cb
 	if (_cb != 0 && _timeout_ms*1000 >= 2*QUEUQ_REQcRSP_INTERVAL) {
 		if(fl_req_slave_packet_createNsend(_cmdid,_data,_len)){
-			fl_queueREQcRSP_add(_cmdid,G_INFORMATION.slaveID.id_u8,&_cb,_timeout_ms*1000);
+			return fl_queueREQcRSP_add(_cmdid,G_INFORMATION.slaveID.id_u8,_data,_len,&_cb,_timeout_ms*1000,_retry);
 		}
 	} else if(_cb == 0 && _timeout_ms ==0){
 		return (fl_req_slave_packet_createNsend(_cmdid,_data,_len) == 0?-1:0); // none rsp
 	}
-	else {
-		ERR(API,"Cann't set timeout (%d/%d ms)!!\r\n",(u32)_cb,_timeout_ms);
-	}
+	ERR(API,"Can't register REQ (%d/%d ms)!!\r\n",(u32)_cb,_timeout_ms);
 	return -1;
 }
 
@@ -273,13 +269,6 @@ bool fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 		case NWK_HDR_55: {
 			LOGA(INF,"Send 55 REQ to Master:%d/%d\r\n",ORIGINAL_MASTER_TIME.timetamp,ORIGINAL_MASTER_TIME.milstep);
 			req_pack.frame.hdr = NWK_HDR_55;
-
-//			req_pack.frame.timetamp[0] = U32_BYTE0(ORIGINAL_MASTER_TIME.timetamp);
-//			req_pack.frame.timetamp[1] = U32_BYTE1(ORIGINAL_MASTER_TIME.timetamp);
-//			req_pack.frame.timetamp[2] = U32_BYTE2(ORIGINAL_MASTER_TIME.timetamp);
-//			req_pack.frame.timetamp[3] = U32_BYTE3(ORIGINAL_MASTER_TIME.timetamp);
-
-//			req_pack.frame.milltamp = ORIGINAL_MASTER_TIME.milstep;
 
 			fl_timetamp_withstep_t field_timetamp = GenerateTimetampField();
 
@@ -372,7 +361,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 			if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
 				//Process rsp
 				memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
-				memcpy(packet.frame.payload,blc_ll_get_macAddrPublic(),4);
+				memcpy(packet.frame.payload,blc_ll_get_macAddrPublic(),6);
 				packet.frame.endpoint.dbg = NWK_DEBUG_STT;
 				//change endpoint to node source
 				packet.frame.endpoint.master = FL_FROM_SLAVE;
@@ -560,7 +549,7 @@ int fl_nwk_slave_reconnect(void){
 	}
 	if(IsJoinedNetwork() && G_INFORMATION.active == false){
 		LOGA(INF,"Reconnect network (%d s)!!!\r\n",RECHECKING_NETWOK_TIME/1000);
-		fl_api_slave_req(NWK_HDR_RECONNECT,G_INFORMATION.mac,SIZEU8(G_INFORMATION.mac),0,0);
+		fl_api_slave_req(NWK_HDR_RECONNECT,G_INFORMATION.mac,SIZEU8(G_INFORMATION.mac),0,0,0);
 	}
 	return 0;
 }
@@ -643,7 +632,6 @@ void fl_nwk_slave_process(void){
 	fl_nwk_slave_joinnwk_exc();
 	//todo TBS_device process
 	TBS_Device_Run();
-
 }
 /***************************************************
  * @brief 		:Main functions to process income packet

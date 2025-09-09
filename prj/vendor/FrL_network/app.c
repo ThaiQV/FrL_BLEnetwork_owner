@@ -140,7 +140,7 @@ _attribute_no_inline_ void user_init_normal(void) {
 	fl_input_serial_init(UART1,UART1_TX_PE0,UART1_RX_PE2,115200);
 #endif
 	///////////////////// freelux adv initialization///////////////////
-	//fl_db_clearAll();//FOR CLEAN
+//	fl_db_clearAll();//FOR CLEAN
 	////////////////// config adv scan /////////////////////
 	fl_adv_init();
 }

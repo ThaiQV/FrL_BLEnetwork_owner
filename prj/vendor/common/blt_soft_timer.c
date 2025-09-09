@@ -150,7 +150,33 @@ int blt_soft_timer_delete(blt_timer_callback_t func) {
 
 	return 0;
 }
-
+/***************************************************
+ * @brief 		:restart timer
+ *
+ * @param[in] 	:func: callback fnc
+ * 				 interval_us: new interval time us
+ *
+ * @return	  	:false or true
+ *
+ ***************************************************/
+bool blt_soft_timer_restart(blt_timer_callback_t func, u32 interval_us){
+	s8 indx = -1;
+	indx=blt_soft_timer_find(func);
+	u32 interval_new=0;
+	if( indx != -1){
+		if(interval_us == 0) {
+			interval_new = blt_timer.timer[indx].interval/SYSTEM_TIMER_TICK_1US;
+		}
+		else{
+			interval_new = interval_us;
+		}
+//		LOGA(DRV,"soft-timer restart(%d):%d\r\n",indx,interval_new);
+		blt_soft_timer_delete(func);
+		blt_soft_timer_add(func,interval_new);
+		return true;
+	}
+	return false;
+}
 /**
  * @brief		This function is used to manage software timer tasks
  * @param[in]	type - the type for trigger
@@ -203,10 +229,12 @@ void blt_soft_timer_process(int type) {
 		if ((u32) (blt_timer.timer[0].t - now) < 3000 * SYSTEM_TIMER_TICK_1MS) {
 			bls_pm_setAppWakeupLowPower(blt_timer.timer[0].t,1);
 		} else {
+			ERR(DRV,"blt>soft-timer :disable\r\n");
 			bls_pm_setAppWakeupLowPower(0,0);  //disable
 		}
 
 	} else {
+		ERR(DRV,"blt>soft-timer :disable\r\n");
 		bls_pm_setAppWakeupLowPower(0,0);  //disable
 	}
 

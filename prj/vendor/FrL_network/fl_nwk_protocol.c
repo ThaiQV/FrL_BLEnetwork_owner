@@ -199,7 +199,7 @@ int _getInfo_autorun(void) {
 	if(var == 0) goto OUTPUT_RESULT; //done
 
 	LOGA(DRV,"GetInfo: %d->%d/%d\r\n",G_SLA_INFO_RSP.num_retrieved,var + G_SLA_INFO_RSP.num_retrieved - 1,G_SLA_INFO_RSP.total_slaves);
-	P_INFO("Loading...(%d->%d/%d)\r\n",G_SLA_INFO_RSP.num_retrieved,var + G_SLA_INFO_RSP.num_retrieved - 1,G_SLA_INFO_RSP.total_slaves);
+//	P_INFO("Loading...(%d->%d/%d)\r\n",G_SLA_INFO_RSP.num_retrieved,var + G_SLA_INFO_RSP.num_retrieved - 1,G_SLA_INFO_RSP.total_slaves);
 	fl_pack_t info_pack = fl_master_packet_GetInfo_build(slave_arr,var);
 	P_PRINTFHEX_A(DRV,info_pack.data_arr,info_pack.length,"%s(%d):","Info Pack",info_pack.length);
 	fl_adv_sendFIFO_add(info_pack);
@@ -213,10 +213,10 @@ int _getInfo_autorun(void) {
 	return GETINFO_FREQUENCY*1000;
 //======== OUTPUT
 	OUTPUT_RESULT:
-	P_INFO("**Online :%d/%d\r\n",G_SLA_INFO_RSP.rslt.num_onl,G_SLA_INFO_RSP.total_slaves);
+	//P_INFO("**Online :%d/%d\r\n",G_SLA_INFO_RSP.rslt.num_onl,G_SLA_INFO_RSP.total_slaves);
 	if (G_SLA_INFO_RSP.rslt.num_onl < G_SLA_INFO_RSP.total_slaves) {
 		G_SLA_INFO_RSP.rslt.num_off = G_SLA_INFO_RSP.total_slaves - G_SLA_INFO_RSP.rslt.num_onl;
-		P_INFO("**Offline:%d/%d\r\n",G_SLA_INFO_RSP.rslt.num_off,G_SLA_INFO_RSP.total_slaves);
+		P_INFO("**Offline:%d/%d\r\n",G_SLA_INFO_RSP.rslt.num_off,G_SLA_INFO_RSP.settings.total_slaves);
 		for (idx_get = 0; idx_get < G_SLA_INFO_RSP.rslt.num_off; ++idx_get) {
 			P_INFO("[%d]Mac:0x%02X%02X%02X%02X%02X%02X\r\n",G_SLA_INFO_RSP.rslt.offline[idx_get]->slaveID.id_u8,
 					G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[0],G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[1],G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[2],
@@ -236,13 +236,16 @@ int _getInfo_autorun(void) {
 			P_INFO("#Retry offline list:%d/%d\r\n",G_SLA_INFO_RSP.num_retry,G_SLA_INFO_RSP.settings.num_retry);
 			return GETINFO_FREQUENCY*1000;
 		}
-		ERR(DRV,"**Offline:%d/%d\r\n",G_SLA_INFO_RSP.rslt.num_off,G_SLA_INFO_RSP.total_slaves);
-		for (idx_get = 0; idx_get < G_SLA_INFO_RSP.rslt.num_off; ++idx_get) {
-			ERR(DRV,"[%d]Mac:0x%02X%02X%02X%02X%02X%02X\r\n",G_SLA_INFO_RSP.rslt.offline[idx_get]->slaveID.id_u8,
-					G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[0],G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[1],
-					G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[2],G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[3],
-					G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[4],G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[5]);
-		}
+//		ERR(DRV,"**Offline:%d/%d\r\n",G_SLA_INFO_RSP.rslt.num_off,G_SLA_INFO_RSP.total_slaves);
+//		for (idx_get = 0; idx_get < G_SLA_INFO_RSP.rslt.num_off; ++idx_get) {
+//			ERR(DRV,"[%d]Mac:0x%02X%02X%02X%02X%02X%02X\r\n",G_SLA_INFO_RSP.rslt.offline[idx_get]->slaveID.id_u8,
+//					G_SLA_INFO_RSP.rslt.offline[idx_ge`t]->mac[0],G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[1],
+//					G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[2],G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[3],
+//					G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[4],G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[5]);
+//		}
+	}
+	else{
+		P_INFO("**Online:%d/%d\r\n",G_SLA_INFO_RSP.settings.total_slaves-G_SLA_INFO_RSP.rslt.num_off,G_SLA_INFO_RSP.settings.total_slaves);
 	}
 	//PLOG_Stop(INF);
 	P_INFO("**RTT    :%d ms\r\n",(clock_time() - G_SLA_INFO_RSP.time_start)/SYSTEM_TIMER_TICK_1MS);
@@ -491,9 +494,12 @@ void CMD_GETINFOSLAVE(u8* _data) {
 		G_SLA_INFO_RSP.num_1_times = G_SLA_INFO_RSP.settings.num_1_times;
 
 		G_SLA_INFO_RSP.settings.total_slaves = slaveID[3] > MAX_NODES ? MAX_NODES : slaveID[3];
+		if(slaveID[3] == 0xFF && G_NODE_LIST.slot_inused != 0xFF){
+			G_SLA_INFO_RSP.settings.total_slaves = G_NODE_LIST.slot_inused;
+		}
 		G_SLA_INFO_RSP.total_slaves = G_SLA_INFO_RSP.settings.total_slaves;
 
-		G_SLA_INFO_RSP.settings.timeout_rsp = slaveID[4]+100;
+		G_SLA_INFO_RSP.settings.timeout_rsp = slaveID[4]+(u8 )(G_ADV_SETTINGS.adv_interval_max * 0.625);
 		G_SLA_INFO_RSP.settings.num_retry = slaveID[5];
 
 		//SETTING global

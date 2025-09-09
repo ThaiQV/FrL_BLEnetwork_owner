@@ -18,12 +18,13 @@ void _rsp_callback(void *_data,void* _data2){
 	LOGA(API,"cmdID  :%0X\r\n",data->rsp_check.hdr_cmdid);
 	LOGA(API,"SlaveID:%0X\r\n",data->rsp_check.slaveID);
 	//rsp data
-
 	if(data->timeout >= 0){
 		fl_pack_t *packet = (fl_pack_t *)_data2;
 		P_PRINTFHEX_A(API,packet->data_arr,packet->length,"RSP: ");
 	}
+	//s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms);
 }
+
 //void _rsp_callback1(void *_data){
 //	_rsp_callback(_data);
 //}
@@ -52,7 +53,7 @@ int TEST_slave_sendREQ(void) {
 			test_u8[1] = U32_BYTE1(test_pack_cnt);
 			test_u8[2] = U32_BYTE2(test_pack_cnt);
 			test_u8[3] = U32_BYTE3(test_pack_cnt);
-			fl_api_slave_req(NWK_HDR_55,test_u8,SIZEU8(test_u8),&_rsp_callback,1029);
+			fl_api_slave_req(NWK_HDR_55,test_u8,SIZEU8(test_u8),&_rsp_callback,1029,0);
 //			test_pack_cnt++;
 //			test_u8[0] = U32_BYTE0(test_pack_cnt);
 //			test_u8[1] = U32_BYTE1(test_pack_cnt);
@@ -93,7 +94,7 @@ u8 TEST_Buttons(fl_exButton_states_e _state, void *_data) {
 	test_u8[2] = U32_BYTE2(test_pack_cnt);
 	test_u8[3] = U32_BYTE3(test_pack_cnt);
 	if (IsJoinedNetwork() && IsOnline()){
-		fl_api_slave_req(NWK_HDR_55,test_u8,SIZEU8(test_u8),&_rsp_callback,800);
+		fl_api_slave_req(NWK_HDR_55,test_u8,SIZEU8(test_u8),&_rsp_callback,800,0);
 		LOGA(PERI,"BUTT Calling %s (%d ms):%d\r\n",_state == BUTT_STATE_PRESSnHOLD ? "Press & hold" : "Press & Release",
 				(clock_time()-*time_tick)/SYSTEM_TIMER_TICK_1MS,test_pack_cnt);
 	}
