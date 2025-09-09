@@ -104,6 +104,20 @@ void test_powermeter(void) {
 /******************************************************************************/
 /******************************************************************************/
 #ifdef COUNTER_DEVICE
+void Counter_LCD_Print(void){
+	static u32 crc32 = 0;
+	u32 crc32_curr = fl_db_crc32((u8*)G_COUNTER_LCD,SIZEU8(G_COUNTER_LCD[0])*COUNTER_LCD_MESS_MAX);
+	if (crc32 != crc32_curr) {
+		LOG_P(PERI,"========================\r\n");
+		for (u8 i = 0; i < COUNTER_LCD_MESS_MAX; i++) {
+			if (G_COUNTER_LCD[i][0] != 0)
+				LOGA(PERI,"[%d]%s\r\n",i,(char* )G_COUNTER_LCD[i]);
+		}
+		LOG_P(PERI,"========================\r\n");
+		crc32=crc32_curr;
+	}
+}
+
 /* TEST CASE  EVENT */
 typedef struct {
 	u32 lifetime;
@@ -167,6 +181,7 @@ void TBS_Counter_Run(void){
 //	G_COUNTER_DEV.data.bt_rst = RAND(0,1);
 	G_COUNTER_DEV.data.pass_product = RAND(1,1020);
 	G_COUNTER_DEV.data.err_product = RAND(1,500);
+	Counter_LCD_Print();
 }
 #endif
 #ifdef POWER_METER_DEVICE
