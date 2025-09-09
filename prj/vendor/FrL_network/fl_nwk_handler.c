@@ -129,7 +129,8 @@ int fl_queue_REQnRSP_TimeoutStart(void){
 #ifdef MASTER_CORE
 #else
 						if(-1!=fl_api_slave_req(REQ_BUF.rsp_check.hdr_cmdid,REQ_BUF.req_payload.payload,REQ_BUF.req_payload.len,REQ_BUF.rsp_cb,
-								REQ_BUF.timeout_set,REQ_BUF.retry)){
+								(u32)REQ_BUF.timeout_set/1000,REQ_BUF.retry)){
+							LOGA(API,"Retry;%d\r\n",REQ_BUF.retry);
 							continue;
 						}
 #endif

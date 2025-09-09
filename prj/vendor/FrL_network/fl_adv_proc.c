@@ -318,7 +318,7 @@ void fl_adv_sendFIFO_run(void) {
 
 #ifdef MASTER_CORE
 		if (FL_QUEUE_GET(&G_QUEUE_SENDING,&data_in_queue)) {
-			fl_nwk_master_heartbeat_run();
+//			fl_nwk_master_heartbeat_run();
 #else
 		while (FL_QUEUE_GET_LOOP(&G_QUEUE_SENDING,&data_in_queue)) {
 			fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(data_in_queue);

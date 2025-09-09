@@ -165,11 +165,12 @@ bool blt_soft_timer_restart(blt_timer_callback_t func, u32 interval_us){
 	u32 interval_new=0;
 	if( indx != -1){
 		if(interval_us == 0) {
-			interval_new = blt_timer.timer[indx].interval;
+			interval_new = blt_timer.timer[indx].interval/SYSTEM_TIMER_TICK_1US;
 		}
 		else{
 			interval_new = interval_us;
 		}
+//		LOGA(DRV,"soft-timer restart(%d):%d\r\n",indx,interval_new);
 		blt_soft_timer_delete(func);
 		blt_soft_timer_add(func,interval_new);
 		return true;

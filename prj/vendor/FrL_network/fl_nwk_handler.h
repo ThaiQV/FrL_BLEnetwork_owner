@@ -291,8 +291,6 @@ void fl_nwk_master_nodelist_load(void);
 void fl_queue_REQcRSP_ScanRec(fl_pack_t _pack);
 #else
 extern volatile u8 NWK_DEBUG_STT; // it will be assigned into end-point byte (dbg :1bit);
-bool IsJoinedNetwork(void);
-bool IsOnline(void);
 void fl_nwk_slave_init(void);
 void fl_nwk_slave_run(fl_pack_t *_pack_handle);
 void fl_nwk_slave_process(void);
