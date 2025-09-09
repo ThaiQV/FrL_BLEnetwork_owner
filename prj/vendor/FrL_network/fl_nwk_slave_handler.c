@@ -20,6 +20,7 @@
 //Test api
 #include "test_api.h"
 #include "../TBS_dev/TBS_dev_config.h"
+#ifndef MASTER_CORE
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -232,7 +233,7 @@ s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 
 	//register timeout cb
 	if (_cb != 0 && _timeout_ms*1000 >= 2*QUEUQ_REQcRSP_INTERVAL) {
 		if(fl_req_slave_packet_createNsend(_cmdid,_data,_len)){
-			return fl_queueREQcRSP_add(_cmdid,G_INFORMATION.slaveID.id_u8,_data,_len,&_cb,_timeout_ms*1000,_retry);
+			return fl_queueREQcRSP_add(G_INFORMATION.slaveID.id_u8,_cmdid,_data,_len,&_cb,_timeout_ms*1000,_retry);
 		}
 	} else if(_cb == 0 && _timeout_ms ==0){
 		return (fl_req_slave_packet_createNsend(_cmdid,_data,_len) == 0?-1:0); // none rsp
@@ -261,7 +262,7 @@ bool fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 	fl_pack_t rslt = {.length = 0};
 	fl_hdr_nwk_type_e cmdid = (fl_hdr_nwk_type_e)_cmdid;
 	if(!IsREQHDR(cmdid)){
-		ERR(API,"REQ CMD ID has been registered!!\r\n");
+		ERR(API,"REQ CMD ID hasn't been registered!!\r\n");
 		return false;
 	}
 	fl_data_frame_u req_pack;
@@ -657,4 +658,5 @@ void fl_nwk_slave_run(fl_pack_t *_pack_handle) {
 		LOG_P(INF,"Packet has processed!!!\r\n");
 	}
 }
+#endif
 #endif

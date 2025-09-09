@@ -46,6 +46,19 @@ volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into endpoint byte (dbg :1
 volatile u8 NWK_REPEAT_MODE = 0; // 1: level | 0 : non-level
 volatile u8 NWK_REPEAT_LEVEL = 3;
 
+fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_F6_SENDMESS}; // register cmdid REQ
+
+#define NWK_HDR_REQ_SIZE (sizeof(G_NWK_HDR_REQLIST)/sizeof(G_NWK_HDR_REQLIST[0]))
+
+static inline u8 IsREQHDR(fl_hdr_nwk_type_e cmdid) {
+	for (u8 i = 0; i < NWK_HDR_REQ_SIZE; i++) {
+		if (cmdid == G_NWK_HDR_REQLIST[i]) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
 /******************************************************************************/
 /******************************************************************************/
 /***                           Private definitions                           **/
@@ -146,7 +159,6 @@ fl_pack_t fl_master_packet_heartbeat_build(void) {
  ***************************************************/
 fl_pack_t fl_master_packet_collect_build(void) {
 	fl_pack_t packet_built;
-
 	fl_data_frame_u packet;
 	memset(packet.bytes,0,SIZEU8(packet.bytes));
 	packet.frame.hdr = NWK_HDR_COLLECT;
@@ -398,6 +410,96 @@ u8 fl_master_SlaveID_get(u8* _mac) {
 	return 0xFF;
 }
 
+s8 fl_master_SlaveMAC_get(u8 _slaveid,u8* mac){
+	s8 indx = fl_master_SlaveID_find(_slaveid);
+	if(indx != -1){
+		memcpy(mac,G_NODE_LIST.sla_info[indx].mac,SIZEU8(G_NODE_LIST.sla_info[indx].mac));
+		return 1;
+	}
+	return -1;
+}
+/***************************************************
+ * @brief 		: create and send packet request to slave via the freelux protocol
+ *
+ * @param[in] 	: _cmdid : id cmd
+ * 				  _data : pointer to data
+ * 				  _len  : size data
+ *
+ * @return	  	: 0: fail, 1: success
+ *
+ ***************************************************/
+bool fl_req_master_packet_createNsend(u8* _slave_mac,u8 _cmdid,u8* _data, u8 _len){
+	/*****************************************************************/
+	/* | HDR | Timetamp | Mill_time | SlaveID | payload | crc8 | Ep | */
+	/* | 1B  |   4Bs    |    1B     |    1B   |   22Bs  |  1B  | 1B | -> .master = FL_FROM_SLAVE_ACK / FL_FROM_SLAVE */
+	/*****************************************************************/
+	//**todo: Need to convert _data to payload base on special command ID
+	//
+	fl_pack_t rslt = {.length = 0};
+	fl_hdr_nwk_type_e cmdid = (fl_hdr_nwk_type_e)_cmdid;
+	if(!IsREQHDR(cmdid)){
+		ERR(API,"REQ CMD ID hasn't been registered!!\r\n");
+		return false;
+	}
+	s8 slaveID = fl_master_Node_find(_slave_mac);
+	if(slaveID == -1){
+		ERR(API,"SlaveID NOT FOUND!!\r\n");
+		return false;
+	}
+	fl_data_frame_u req_pack;
+	switch (cmdid) {
+		case NWK_HDR_F6_SENDMESS: {
+			req_pack.frame.hdr = cmdid;
+			fl_timetamp_withstep_t timetampStep = fl_rtc_getWithMilliStep();
+		//	u32 timetamp = fl_rtc_get();
+			req_pack.frame.timetamp[0] = U32_BYTE0(timetampStep.timetamp);
+			req_pack.frame.timetamp[1] = U32_BYTE1(timetampStep.timetamp);
+			req_pack.frame.timetamp[2] = U32_BYTE2(timetampStep.timetamp);
+			req_pack.frame.timetamp[3] = U32_BYTE3(timetampStep.timetamp);
+
+			//Add new mill-step
+			req_pack.frame.milltamp = timetampStep.milstep;
+			LOGA(INF,"Send F6 REQ to Slave %d:%d/%d\r\n",slaveID,timetampStep.timetamp,timetampStep.milstep);
+
+			req_pack.frame.slaveID.id_u8 = slaveID;
+			//Create payload
+			memset(req_pack.frame.payload,0xFF,SIZEU8(req_pack.frame.payload));
+			memcpy(req_pack.frame.payload,_data,_len);
+			//crc
+			req_pack.frame.crc8 = fl_crc8(req_pack.frame.payload,SIZEU8(req_pack.frame.payload));
+
+			//create endpoint
+			req_pack.frame.endpoint.dbg = NWK_DEBUG_STT;
+			req_pack.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
+			req_pack.frame.endpoint.rep_settings = NWK_REPEAT_LEVEL;
+			req_pack.frame.endpoint.repeat_mode = NWK_REPEAT_MODE;
+			//Create packet from slave
+			req_pack.frame.endpoint.master = FL_FROM_MASTER_ACK;
+		}
+		break;
+		default:
+		break;
+	}
+	//copy to data struct
+	rslt.length = SIZEU8(req_pack.bytes) - 1; //skip rssi
+	memcpy(rslt.data_arr,req_pack.bytes,rslt.length );
+	P_PRINTFHEX_A(INF,rslt.data_arr,rslt.length,"REQ %X ",_cmdid);
+	//Send ADV
+	fl_adv_sendFIFO_add(rslt);
+	return true;
+}
+s8 fl_api_master_req(u8* _mac_slave,u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry) {
+	//register timeout cb
+	if (_cb != 0 && _timeout_ms*1000 >= 2*QUEUQ_REQcRSP_INTERVAL) {
+		if(fl_req_master_packet_createNsend(_mac_slave,_cmdid,_data,_len)){
+			return fl_queueREQcRSP_add(fl_master_Node_find(_mac_slave),_cmdid,_data,_len,&_cb,_timeout_ms*1000,_retry);
+		}
+	} else if(_cb == 0 && _timeout_ms ==0){
+		return (fl_req_master_packet_createNsend(_mac_slave,_cmdid,_data,_len) == 0?-1:0); // none rsp
+	}
+	ERR(API,"Can't register REQ (%d/%d ms)!!\r\n",(u32)_cb,_timeout_ms);
+	return -1;
+}
 /***************************************************
  * @brief 		:soft-timer callback for the processing response
  *
