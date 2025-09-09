@@ -34,7 +34,7 @@ volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME = {.timetamp = 0,.milstep =
 											}while(0) //Sync original time-master req
 
 #define JOIN_NETWORK_TIME 			30*1000 	//ms
-#define RECHECKING_NETWOK_TIME 		60*1000 	//ms - 1mins
+#define RECHECKING_NETWOK_TIME 		30*1000 	//ms - 1mins
 
 fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
 fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_55,NWK_HDR_RECONNECT}; // register cmdid REQ
