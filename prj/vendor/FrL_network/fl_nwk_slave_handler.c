@@ -20,6 +20,7 @@
 //Test api
 #include "test_api.h"
 #include "../TBS_dev/TBS_dev_config.h"
+#ifndef MASTER_CORE
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -36,7 +37,7 @@ volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME = {.timetamp = 0,.milstep =
 #define JOIN_NETWORK_TIME 			30*1000 	//ms
 #define RECHECKING_NETWOK_TIME 		30*1000 	//ms - 1mins
 
-fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
+fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_F6_SENDMESS,NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
 fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_55,NWK_HDR_RECONNECT}; // register cmdid REQ
 
 #define NWK_HDR_SIZE (sizeof(G_NWK_HDR_LIST)/sizeof(G_NWK_HDR_LIST[0]))
@@ -72,6 +73,7 @@ fl_nodeinnetwork_t G_INFORMATION ;
 #ifndef MASTER_CORE
 #ifdef COUNTER_DEVICE
 extern tbs_device_counter_t G_COUNTER_DEV ;
+extern u8 G_COUNTER_LCD[COUNTER_LCD_MESS_MAX][22];
 #endif
 #ifdef POWER_METER_DEVICE
 tbs_device_powermeter_t G_POWER_METER;
@@ -157,6 +159,9 @@ void fl_nwk_slave_init(void) {
 #ifdef COUNTER_DEVICE
 	G_INFORMATION.dev_type = TBS_COUNTER;
 	G_INFORMATION.data =(u8*)&G_COUNTER_DEV;
+	for (u8 i = 0; i < COUNTER_LCD_MESS_MAX; i++) {
+		G_INFORMATION.lcd_mess[i] = &G_COUNTER_LCD[i][0];
+	}
 #endif
 #ifdef POWER_METER_DEVICE
 	G_INFORMATION.dev_type = TBS_POWERMETER;
@@ -232,7 +237,7 @@ s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 
 	//register timeout cb
 	if (_cb != 0 && _timeout_ms*1000 >= 2*QUEUQ_REQcRSP_INTERVAL) {
 		if(fl_req_slave_packet_createNsend(_cmdid,_data,_len)){
-			return fl_queueREQcRSP_add(_cmdid,G_INFORMATION.slaveID.id_u8,_data,_len,&_cb,_timeout_ms*1000,_retry);
+			return fl_queueREQcRSP_add(G_INFORMATION.slaveID.id_u8,_cmdid,_data,_len,&_cb,_timeout_ms*1000,_retry);
 		}
 	} else if(_cb == 0 && _timeout_ms ==0){
 		return (fl_req_slave_packet_createNsend(_cmdid,_data,_len) == 0?-1:0); // none rsp
@@ -261,7 +266,7 @@ bool fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 	fl_pack_t rslt = {.length = 0};
 	fl_hdr_nwk_type_e cmdid = (fl_hdr_nwk_type_e)_cmdid;
 	if(!IsREQHDR(cmdid)){
-		ERR(API,"REQ CMD ID has been registered!!\r\n");
+		ERR(API,"REQ CMD ID hasn't been registered!!\r\n");
 		return false;
 	}
 	fl_data_frame_u req_pack;
@@ -354,6 +359,13 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 		packet_built.length = 0;
 		return packet_built;
 	}
+	//check crc_pack
+	u8 crc = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
+	if(crc != packet.frame.crc8){
+		ERR(INF,"ERR CRC 0x%02X | 0x%02X\r\n",packet.frame.crc8,crc);
+		packet_built.length = 0;
+		return packet_built;
+	}
 	LOGA(INF,"(%d|%x)HDR_REQ ID: %02X - ACK:%d\r\n",IsJoinedNetwork(),G_INFORMATION.slaveID.id_u8,packet.frame.hdr,packet.frame.endpoint.master);
 	switch ((fl_hdr_nwk_type_e) packet.frame.hdr) {
 		case NWK_HDR_HEARTBEAT:
@@ -420,6 +432,34 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 			}
 		}
 		break;
+		case NWK_HDR_F6_SENDMESS: {
+			_nwk_slave_syncFromPack(&packet.frame);
+			if (IsJoinedNetwork()) {
+				//check packet_slaveid
+				if(packet.frame.slaveID.id_u8 == G_INFORMATION.slaveID.id_u8){
+					u8 slot_indx = packet.frame.payload[0];
+					memset(G_INFORMATION.lcd_mess[slot_indx],0,SIZEU8(G_INFORMATION.lcd_mess[slot_indx]));
+					memcpy(G_INFORMATION.lcd_mess[slot_indx],&packet.frame.payload[1],SIZEU8(packet.frame.payload) -1);
+					if(packet.frame.endpoint.master == FL_FROM_MASTER_ACK){
+						u8 ok[2] = {'o','k'};
+						memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
+						memcpy(packet.frame.payload,ok,SIZEU8(ok));
+						//change endpoint to node source
+						packet.frame.endpoint.master = FL_FROM_SLAVE;
+						//add repeat_cnt
+						packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
+					}
+					else{
+						//Non-rsp
+						packet_built.length = 0;
+						return packet_built;
+					}
+				}
+
+			}
+		}
+		break;
+		/*============================================================================================*/
 		case NWK_HDR_COLLECT: {
 			_nwk_slave_syncFromPack(&packet.frame);
 			if (IsJoinedNetwork() == 0) {
@@ -657,4 +697,5 @@ void fl_nwk_slave_run(fl_pack_t *_pack_handle) {
 		LOG_P(INF,"Packet has processed!!!\r\n");
 	}
 }
+#endif
 #endif

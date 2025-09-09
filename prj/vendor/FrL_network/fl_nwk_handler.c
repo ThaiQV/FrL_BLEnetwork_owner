@@ -84,7 +84,7 @@ s8 fl_queueREQcRSP_find(fl_rsp_callback_fnc *_cb,u32 _timeout_ms, u8 *o_avaislot
 	return -1;
 }
 
-s8 fl_queueREQcRSP_add(u8 cmdid,u8 slaveid,u8* _payloadreq,u8 _len,fl_rsp_callback_fnc *_cb, u32 _timeout_ms,u8 _retry){
+s8 fl_queueREQcRSP_add(u8 slaveid,u8 cmdid,u8* _payloadreq,u8 _len,fl_rsp_callback_fnc *_cb, u32 _timeout_ms,u8 _retry){
 	u8 avai_slot= 0xFF;
 	if(fl_queueREQcRSP_find(_cb,_timeout_ms,&avai_slot) == -1 && avai_slot < QUEUE_RSP_SLOT_MAX){
 		G_QUEUE_REQ_CALL_RSP[avai_slot].timeout = (s32)_timeout_ms;
@@ -127,9 +127,17 @@ int fl_queue_REQnRSP_TimeoutStart(void){
 					if (REQ_BUF.retry > 0) {
 						REQ_BUF.retry--;
 #ifdef MASTER_CORE
+						u8 mac[6];
+						if (fl_master_SlaveMAC_get(REQ_BUF.rsp_check.slaveID,mac) != -1) {
+							if (-1 != fl_api_master_req(mac,REQ_BUF.rsp_check.hdr_cmdid,REQ_BUF.req_payload.payload,REQ_BUF.req_payload.len,
+											REQ_BUF.rsp_cb,(u32) REQ_BUF.timeout_set / 1000,REQ_BUF.retry)) {
+								LOGA(API,"Retry;%d\r\n",REQ_BUF.retry);
+								continue;
+							}
+						}
 #else
 						if(-1!=fl_api_slave_req(REQ_BUF.rsp_check.hdr_cmdid,REQ_BUF.req_payload.payload,REQ_BUF.req_payload.len,REQ_BUF.rsp_cb,
-								(u32)REQ_BUF.timeout_set/1000,REQ_BUF.retry)){
+										(u32)REQ_BUF.timeout_set/1000,REQ_BUF.retry)) {
 							LOGA(API,"Retry;%d\r\n",REQ_BUF.retry);
 							continue;
 						}
@@ -179,7 +187,7 @@ void fl_queue_REQcRSP_ScanRec(fl_pack_t _pack,void *_id)
 			if (G_QUEUE_REQ_CALL_RSP[i].rsp_check.hdr_cmdid != 0 && G_QUEUE_REQ_CALL_RSP[i].rsp_check.slaveID != 0xFF) {
 				if (G_QUEUE_REQ_CALL_RSP[i].rsp_check.hdr_cmdid == packet.frame.hdr
 					&& G_QUEUE_REQ_CALL_RSP[i].rsp_check.slaveID == packet.frame.slaveID.id_u8) {
-					LOGA(API,"Master RSP:%d/%d\r\n",packet.frame.hdr,packet.frame.slaveID.id_u8);
+					LOGA(API,"RSP:%d/%d\r\n",packet.frame.hdr,packet.frame.slaveID.id_u8);
 					G_QUEUE_REQ_CALL_RSP[i].rsp_cb((void*)&G_QUEUE_REQ_CALL_RSP[i],(void*)&_pack); //timeout
 					//clear event
 					_queue_REQcRSP_clear(&G_QUEUE_REQ_CALL_RSP[i]);

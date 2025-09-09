@@ -38,6 +38,7 @@ typedef enum {
 	NWK_HDR_55 = 0x55, // REQ from slave
 	// master -> req -> slave -> rsp
 	NWK_HDR_F5_INFO = 0xF5, //get data information real-time
+	NWK_HDR_F6_SENDMESS = 0xF6, //send mess to slave
 	NWK_HDR_ASSIGN = 0xFC,	//Use to assign SlaveID to slave
 	NWK_HDR_HEARTBEAT = 0xFD,
 	NWK_HDR_COLLECT = 0xFE, //Use to collect slave (master and slaves)
@@ -96,6 +97,10 @@ typedef union {
 	} data;
 	u8 bytes[22];
 }__attribute__((packed)) tbs_device_counter_t;
+//typedef struct {
+//	u8 len;
+//	u8 message[22];
+//}__attribute__((packed)) tbs_counter_lcd_t;
 //For POWER-METER DEVICEs
 /*
  * | Frequency | Voltage | Current 1 | Current 2 | Current 3 | Power 1 | Power 2 | Power 3 | Energy 1 | Energy 2 | Energy 3 | Reserve | (sum 176 bits)
@@ -220,6 +225,9 @@ typedef struct {
 	fl_slave_profiles_t profile;
 	//pointer data of device
 	u8 *data;
+#ifdef COUNTER_DEVICE
+	u8 *lcd_mess[COUNTER_LCD_MESS_MAX];
+#endif
 #else
 	//data of dev
 	u8 data[POWER_METER_STRUCT_BYTESIZE+1];
@@ -287,8 +295,10 @@ fl_pack_t fl_master_packet_GetInfo_build(u8 *_slave_mac_arr, u8 _slave_num);
 void fl_master_nodelist_AddRefesh(fl_nodeinnetwork_t _node);
 s16 fl_master_SlaveID_find(u8 _id);
 u8 fl_master_SlaveID_get(u8* _mac);
+s8 fl_master_SlaveMAC_get(u8 _slaveid,u8* mac);
 void fl_nwk_master_nodelist_load(void);
 void fl_queue_REQcRSP_ScanRec(fl_pack_t _pack);
+s8 fl_api_master_req(u8* _mac_slave,u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry);
 #else
 extern volatile u8 NWK_DEBUG_STT; // it will be assigned into end-point byte (dbg :1bit);
 void fl_nwk_slave_init(void);
@@ -302,7 +312,7 @@ void fl_queue_REQcRSP_ScanRec(fl_pack_t _pack,void *_id);
 int fl_nwk_slave_reconnect(void);
 s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry);
 #endif
-s8 fl_queueREQcRSP_add(u8 cmdid,u8 slaveid,u8* _payloadreq,u8 _len,fl_rsp_callback_fnc *_cb, u32 _timeout_ms,u8 _retry);
+s8 fl_queueREQcRSP_add(u8 slaveid,u8 cmdid,u8* _payloadreq,u8 _len,fl_rsp_callback_fnc *_cb, u32 _timeout_ms,u8 _retry);
 int fl_queue_REQnRSP_TimeoutStart(void);
 void fl_adv_setting_update(void);
 int fl_adv_sendFIFO_add(fl_pack_t _pack);

@@ -61,7 +61,7 @@ fl_data_container_t G_DATA_CONTAINER = { .data = g_data_array, .head_index = 0, 
 fl_pack_t g_sending_array[QUEUE_SENDING_SIZE];
 fl_data_container_t G_QUEUE_SENDING = { .data = g_sending_array, .head_index = 0, .tail_index = 0, .mask = QUEUE_SENDING_SIZE - 1, .count = 0 };
 
-fl_hdr_nwk_type_e FL_NWK_HDR[]={NWK_HDR_RECONNECT,NWK_HDR_55,NWK_HDR_F5_INFO,NWK_HDR_ASSIGN,NWK_HDR_HEARTBEAT,NWK_HDR_COLLECT};
+fl_hdr_nwk_type_e FL_NWK_HDR[]={NWK_HDR_RECONNECT,NWK_HDR_55,NWK_HDR_F5_INFO,NWK_HDR_F6_SENDMESS,NWK_HDR_ASSIGN,NWK_HDR_HEARTBEAT,NWK_HDR_COLLECT};
 #define FL_NWK_HDR_SIZE	(sizeof(FL_NWK_HDR)/sizeof(FL_NWK_HDR[0]))
 
 /******************************************************************************/

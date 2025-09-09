@@ -64,6 +64,8 @@ tbs_device_counter_t G_COUNTER_DEV = { .data = {
 												.err_product = 5
 												}
 									};
+//use to store display message
+u8 G_COUNTER_LCD[COUNTER_LCD_MESS_MAX][22];
 #endif
 #ifdef POWER_METER_DEVICE
 
@@ -102,6 +104,20 @@ void test_powermeter(void) {
 /******************************************************************************/
 /******************************************************************************/
 #ifdef COUNTER_DEVICE
+void Counter_LCD_Print(void){
+	static u32 crc32 = 0;
+	u32 crc32_curr = fl_db_crc32((u8*)G_COUNTER_LCD,SIZEU8(G_COUNTER_LCD[0])*COUNTER_LCD_MESS_MAX);
+	if (crc32 != crc32_curr) {
+		LOG_P(PERI,"========================\r\n");
+		for (u8 i = 0; i < COUNTER_LCD_MESS_MAX; i++) {
+			if (G_COUNTER_LCD[i][0] != 0)
+				LOGA(PERI,"[%d]%s\r\n",i,(char* )G_COUNTER_LCD[i]);
+		}
+		LOG_P(PERI,"========================\r\n");
+		crc32=crc32_curr;
+	}
+}
+
 /* TEST CASE  EVENT */
 typedef struct {
 	u32 lifetime;
@@ -147,9 +163,12 @@ int TEST_Counter_Event(void){
 /* END TEST*/
 
 void TBS_Counter_init(void){
+
 	memcpy(G_COUNTER_DEV.data.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_COUNTER_DEV.data.mac));
 	G_COUNTER_DEV.data.type = TBS_COUNTER;
 	G_COUNTER_DEV.data.timetamp = fl_rtc_get();
+	//passing lcd message
+
 	//todo:Init Butt,lcd,7segs,.....
 	TEST_EVENT.lifetime = fl_rtc_get();
 	blt_soft_timer_add(&TEST_Counter_Event,5000*1000);
@@ -162,6 +181,7 @@ void TBS_Counter_Run(void){
 //	G_COUNTER_DEV.data.bt_rst = RAND(0,1);
 	G_COUNTER_DEV.data.pass_product = RAND(1,1020);
 	G_COUNTER_DEV.data.err_product = RAND(1,500);
+	Counter_LCD_Print();
 }
 #endif
 #ifdef POWER_METER_DEVICE

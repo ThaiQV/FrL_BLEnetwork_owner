@@ -47,6 +47,8 @@ typedef enum {
 	GF_CMD_GET_LIST_RESPONSE = 0x04,
 	GF_CMD_PAIRING_REQUEST = 0x05,
 	GF_CMD_PAIRING_RESPONSE = 0x05,
+	GF_CMD_SENDMESS_REQUEST = 0x06,
+	GF_CMD_SENDMESS_RESPONSE = 0x06,
 	GF_CMD_TIMESTAMP_REQUEST = 0x08,
 	GF_CMD_TIMESTAMP_RESPONSE = 0x08,
 	GF_CMD_RSTFACTORY_REQUEST = 0x0A,
@@ -74,6 +76,7 @@ typedef union {
 	fl_wf_report_frame_t frame;
 	u8 bytes[SIZEU8(fl_wf_report_frame_t)];
 }__attribute__((packed)) fl_wf_report_u;
+
 /******************************************************************************/
 /******************************************************************************/
 /***                       Functions declare                   		         **/
@@ -90,6 +93,8 @@ void PAIRING_REQUEST(u8* _pdata, RspFunc rspfnc);
 void PAIRING_RESPONSE(u8* _pdata){};
 void TIMETAMP_REQUEST(u8* _pdata, RspFunc rspfnc);
 void TIMETAMP_RESPONSE(u8* _pdata);
+void SENDMESS_REQUEST(u8* _pdata, RspFunc rspfnc);
+void SENDMESS_RESPONSE(u8* _pdata);
 void RSTFACTORY_REQUEST(u8* _pdata, RspFunc rspfnc);
 void RSTFACTORY_RESPONSE(u8* _pdata);
 
@@ -99,6 +104,7 @@ fl_wifiprotocol_proc_t G_WIFI_CON[] = {
 			{ { GF_CMD_REPORT_REQUEST, REPORT_REQUEST }, { GF_CMD_REPORT_RESPONSE, REPORT_RESPONSE } },
 			{ { GF_CMD_GET_LIST_REQUEST, GETLIST_REQUEST },{GF_CMD_GET_LIST_RESPONSE, GETLIST_RESPONSE } },
 			{ { GF_CMD_PAIRING_REQUEST, PAIRING_REQUEST }, {GF_CMD_PAIRING_RESPONSE, PAIRING_RESPONSE } },
+			{ { GF_CMD_SENDMESS_REQUEST, SENDMESS_REQUEST }, {GF_CMD_SENDMESS_RESPONSE, SENDMESS_RESPONSE } },
 			{ { GF_CMD_TIMESTAMP_REQUEST, TIMETAMP_REQUEST }, {GF_CMD_TIMESTAMP_RESPONSE, TIMETAMP_RESPONSE } },
 			{ { GF_CMD_RSTFACTORY_REQUEST, RSTFACTORY_REQUEST }, {GF_CMD_RSTFACTORY_RESPONSE, RSTFACTORY_RESPONSE } },
 			};
@@ -324,6 +330,47 @@ void TIMETAMP_RESPONSE(u8* _pdata) {
 	u8 payload_len = wfdata.len_data + SIZEU8(wfdata.cmd)+SIZEU8(wfdata.crc8)+SIZEU8(wfdata.len_data);
 	fl_ble_send_wifi((u8*)&wfdata,payload_len);
 }
+
+
+void _slave_rsp_callback(void *_data,void* _data2){
+	fl_rsp_container_t *data =  (fl_rsp_container_t*)_data;
+	LOGA(API,"Timeout:%d\r\n",data->timeout);
+	LOGA(API,"cmdID  :%0X\r\n",data->rsp_check.hdr_cmdid);
+	LOGA(API,"SlaveID:%0X\r\n",data->rsp_check.slaveID);
+	//rsp data
+	if(data->timeout >= 0){
+		fl_pack_t *packet = (fl_pack_t *)_data2;
+		P_PRINTFHEX_A(API,packet->data_arr,packet->length,"RSP: ");
+	}
+}
+
+void SENDMESS_REQUEST(u8* _pdata, RspFunc rspfnc){
+	fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[1];
+	LOGA(MCU,"LEN:0x%02X\r\n",data->len_data);
+	LOGA(MCU,"cmdID:0x%02X\r\n",data->cmd);
+	LOGA(MCU,"CRC8:0x%02X\r\n",data->crc8);
+	P_PRINTFHEX_A(MCU,data->data,data->len_data,"Data:");
+	u8 crc8_cal = fl_crc8(data->data,data->len_data);
+	if (crc8_cal != data->crc8) {
+		ERR(MCU,"ERR >> CRC8:0x%02X | 0x%02X\r\n",data->crc8,crc8_cal);
+		return;
+	}
+	u8 mac[6];
+	memcpy(mac,data->data,SIZEU8(mac));
+	u8 message[22]; //max payload adv
+	memset(message,0,SIZEU8(message));
+	u8 len_mess = (data->len_data - SIZEU8(mac) > SIZEU8(message))? SIZEU8(message):data->len_data - SIZEU8(mac);
+	memcpy(message,&data->data[SIZEU8(mac)],len_mess);
+	fl_api_master_req(mac,NWK_HDR_F6_SENDMESS,message,len_mess,&_slave_rsp_callback,200,1);
+	if (rspfnc != 0) {
+		//don't rsp
+	}
+}
+
+void SENDMESS_RESPONSE(u8* _pdata){
+
+}
+
 void RSTFACTORY_REQUEST(u8* _pdata, RspFunc rspfnc){
 	fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[1];
 	LOGA(MCU,"LEN:0x%02X\r\n",data->len_data);
