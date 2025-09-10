@@ -163,12 +163,13 @@ int TEST_Counter_Event(void){
 /* END TEST*/
 
 void TBS_Counter_init(void){
-
 	memcpy(G_COUNTER_DEV.data.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_COUNTER_DEV.data.mac));
 	G_COUNTER_DEV.data.type = TBS_COUNTER;
 	G_COUNTER_DEV.data.timetamp = fl_rtc_get();
 	//passing lcd message
-
+	for (u8 var = 0; var < COUNTER_LCD_MESS_MAX; ++var) {
+		memset(G_COUNTER_LCD[var],0,SIZEU8(G_COUNTER_LCD[var]));
+	}
 	//todo:Init Butt,lcd,7segs,.....
 	TEST_EVENT.lifetime = fl_rtc_get();
 	blt_soft_timer_add(&TEST_Counter_Event,5000*1000);
