@@ -33,10 +33,7 @@
 #endif
 
 #define WDT_RST_INTERVAL				5000		//ms
-#define WDT_UART_RST_INTERVAL			30*1000		//ms
-volatile u8 FLAG_IRQ_UART_COMM_WIFI = 0; //use to check communication of the wifi <-> ble
-#define SET_FLAG_COMM_WIFI(x)			(FLAG_IRQ_UART_COMM_WIFI = x)
-#define GET_FLAG_COMM_WIFI				FLAG_IRQ_UART_COMM_WIFI
+
 /**
  * @brief      uart1 irq code for application
  * @param[in]  none
@@ -48,14 +45,20 @@ void uart1_recieve_irq(void) {
 	if (uart_get_irq_status(UART1,UART_TXDONE)) {
 		FLAG_uart_dma_send = 0;
 		uart_clr_tx_done(UART1);
-		SET_FLAG_COMM_WIFI(1);
 	}
-	if (uart_get_irq_status(UART1,UART_RXDONE)){ //A0-SOC can't use RX-DONE status,so this interrupt can noly used in A1-SOC.
+	else if (uart_get_irq_status(UART1,UART_RXDONE)){ //A0-SOC can't use RX-DONE status,so this interrupt can noly used in A1-SOC.
+//		ERR(APP,"UART UART_RXDONE  !!\r\n");
 		/************************cll rx_irq****************************/
 		fl_input_serial_rec();
 		uart_clr_irq_status(UART1,UART_CLR_RX);
 		//uart_clr_irq_mask(UART1,UART_ERR_IRQ_MASK|UART_RXDONE_MASK|UART_RX_IRQ_MASK);
-		SET_FLAG_COMM_WIFI(1);
+	}
+	else if(uart_get_irq_status(UART1,UART_RX_ERR)){
+		ERR(APP,"UART FAIL !!\r\n");
+		uart_clr_irq_status(UART1,UART_CLR_RX);
+	}
+	else{
+		ERR(APP,"UART IRQ  !!\r\n");
 	}
 #endif
 }

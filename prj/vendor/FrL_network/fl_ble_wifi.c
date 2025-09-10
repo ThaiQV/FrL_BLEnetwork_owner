@@ -332,16 +332,32 @@ void TIMETAMP_RESPONSE(u8* _pdata) {
 }
 
 
-void _slave_rsp_callback(void *_data,void* _data2){
+void _SENDMESS_slave_rsp_callback(void *_data,void* _data2){
 	fl_rsp_container_t *data =  (fl_rsp_container_t*)_data;
-	LOGA(API,"Timeout:%d\r\n",data->timeout);
-	LOGA(API,"cmdID  :%0X\r\n",data->rsp_check.hdr_cmdid);
-	LOGA(API,"SlaveID:%0X\r\n",data->rsp_check.slaveID);
 	//rsp data
-	if(data->timeout >= 0){
+	if(data->timeout > 0){
+		LOGA(API,"RTT:%d ms\r\n",(data->timeout_set - data->timeout)/1000);
 		fl_pack_t *packet = (fl_pack_t *)_data2;
 		P_PRINTFHEX_A(API,packet->data_arr,packet->length,"RSP: ");
+		//Rsp to WIFI
+		u8 mac[6];
+		if (fl_master_SlaveMAC_get(data->rsp_check.slaveID,mac) != -1) {
+			fl_datawifi2ble_t wfdata;
+			wfdata.cmd = G_WIFI_CON[_wf_CMD_find(GF_CMD_GET_LIST_REQUEST)].rsp.cmd;
+			memset(wfdata.data,0,SIZEU8(wfdata.data));
+			memcpy(wfdata.data,mac,SIZEU8(mac));
+			wfdata.len_data = SIZEU8(mac);
+			wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
+			u8 payload_len = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
+			fl_ble_send_wifi((u8*) &wfdata,payload_len);
+		}
 	}
+	else{
+		LOGA(API,"RTT: TIMEOUT (%d ms)\r\n",(data->timeout_set)/1000);
+	}
+	LOGA(API,"cmdID  :%0X\r\n",data->rsp_check.hdr_cmdid);
+	LOGA(API,"SlaveID:%0X\r\n",data->rsp_check.slaveID);
+	LOGA(API,"SeqTT  :%d\r\n",data->rsp_check.seqTimetamp);
 }
 
 void SENDMESS_REQUEST(u8* _pdata, RspFunc rspfnc){
@@ -361,9 +377,9 @@ void SENDMESS_REQUEST(u8* _pdata, RspFunc rspfnc){
 	memset(message,0,SIZEU8(message));
 	u8 len_mess = (data->len_data - SIZEU8(mac) > SIZEU8(message))? SIZEU8(message):data->len_data - SIZEU8(mac);
 	memcpy(message,&data->data[SIZEU8(mac)],len_mess);
-	fl_api_master_req(mac,NWK_HDR_F6_SENDMESS,message,len_mess,&_slave_rsp_callback,200,1);
+	fl_api_master_req(mac,NWK_HDR_F6_SENDMESS,message,len_mess,&_SENDMESS_slave_rsp_callback,200,1);
 	if (rspfnc != 0) {
-		//don't rsp
+		//don't reponse in here => wait slave rsp or timeout
 	}
 }
 

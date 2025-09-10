@@ -421,6 +421,7 @@ void fl_adv_init(void) {
 	fl_db_init();
 #ifdef MASTER_CORE
 	extern fl_master_config_t G_MASTER_INFO;
+	fl_input_external_init();
 	//fl_adv_sendtest();
 	fl_nwk_master_init();
 

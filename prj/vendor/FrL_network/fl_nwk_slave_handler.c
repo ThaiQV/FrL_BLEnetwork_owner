@@ -223,14 +223,20 @@ void _nwk_slave_syncFromPack(fl_dataframe_format_t *packet){
 	NWK_REPEAT_MODE = packet->endpoint.repeat_mode;
 	//add repeat_cnt
 	NWK_REPEAT_LEVEL = packet->endpoint.rep_settings;
+
 	//Sync mastertime origin
-	SYNC_ORIGIN_MASTER(master_timetamp,packet->milltamp);
-	LOGA(INF,"ORIGINAL MASTER-TIME:%d\r\n",ORIGINAL_MASTER_TIME.milstep);
+	if (packet->hdr == NWK_HDR_HEARTBEAT) {
+		SYNC_ORIGIN_MASTER(master_timetamp,packet->milltamp);
+		LOGA(INF,"ORIGINAL MASTER-TIME:%d\r\n",ORIGINAL_MASTER_TIME.milstep);
+	}
 	//Sync network status
 	//if(packet->slaveID.id_u8 == G_INFORMATION.slaveID.id_u8)
 	{
-		G_INFORMATION.active=true;
-		blt_soft_timer_restart(&_isOnline_check,0);
+		G_INFORMATION.active = true;
+		if (blt_soft_timer_find(&_isOnline_check) == -1) {
+			blt_soft_timer_add(&_isOnline_check,RECHECKING_NETWOK_TIME * 1000);
+		} else
+			blt_soft_timer_restart(&_isOnline_check,0);
 	}
 }
 
