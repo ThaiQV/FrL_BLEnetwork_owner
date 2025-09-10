@@ -52,12 +52,13 @@ static inline u8 IsREQHDR(fl_hdr_nwk_type_e cmdid) {
 	return 0;
 }
 
-static inline fl_timetamp_withstep_t GenerateTimetampField(void){
+fl_timetamp_withstep_t GenerateTimetampField(void){
 	fl_timetamp_withstep_t cur_timetamp = fl_rtc_getWithMilliStep();
-	u32 mill_sys = fl_rtc_timetamp2milltampStep(cur_timetamp)+ 30;
+	u32 mill_sys = fl_rtc_timetamp2milltampStep(cur_timetamp);
 	u32 origin_master = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
 	if(mill_sys < origin_master){
 		cur_timetamp = ORIGINAL_MASTER_TIME;
+		cur_timetamp.milstep++;
 	}
 	return cur_timetamp;
 }
@@ -236,8 +237,9 @@ void _nwk_slave_syncFromPack(fl_dataframe_format_t *packet){
 s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry) {
 	//register timeout cb
 	if (_cb != 0 && _timeout_ms*1000 >= 2*QUEUQ_REQcRSP_INTERVAL) {
-		if(fl_req_slave_packet_createNsend(_cmdid,_data,_len)){
-			return fl_queueREQcRSP_add(G_INFORMATION.slaveID.id_u8,_cmdid,_data,_len,&_cb,_timeout_ms*1000,_retry);
+		u32 seq_timetamp=fl_req_slave_packet_createNsend(_cmdid,_data,_len);
+		if(seq_timetamp){
+			return fl_queueREQcRSP_add(G_INFORMATION.slaveID.id_u8,_cmdid,seq_timetamp,_data,_len,&_cb,_timeout_ms*1000,_retry);
 		}
 	} else if(_cb == 0 && _timeout_ms ==0){
 		return (fl_req_slave_packet_createNsend(_cmdid,_data,_len) == 0?-1:0); // none rsp
@@ -253,10 +255,10 @@ s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 
  * 				  _data : pointer to data
  * 				  _len  : size data
  *
- * @return	  	: 0: fail, 1: success
+ * @return	  	: 0: fail otherwise seq_timetamp
  *
  ***************************************************/
-bool fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
+u32 fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 	/*****************************************************************/
 	/* | HDR | Timetamp | Mill_time | SlaveID | payload | crc8 | Ep | */
 	/* | 1B  |   4Bs    |    1B     |    1B   |   20Bs  |  1B  | 1B | -> .master = FL_FROM_SLAVE_ACK / FL_FROM_SLAVE */
@@ -333,12 +335,12 @@ bool fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 	//copy to data struct
 	rslt.length = SIZEU8(req_pack.bytes) - 1; //skip rssi
 	memcpy(rslt.data_arr,req_pack.bytes,rslt.length );
-
 	P_PRINTFHEX_A(INF,rslt.data_arr,rslt.length,"REQ %X ",_cmdid);
-
 	//Send ADV
 	fl_adv_sendFIFO_add(rslt);
-	return true;
+	fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(rslt);
+	u32 seq_timetamp = fl_rtc_timetamp2milltampStep(timetamp_inpack);
+	return seq_timetamp;
 }
 /***************************************************
  * @brief 		: build packet response via the freelux protocol
@@ -620,45 +622,7 @@ bool fl_nwk_slave_checkHDR(u8 _hdr) {
 	}
 	return false;
 }
-/***************************************************
- * @brief 		: parse data array to get timetamp
- *
- * @param[in] 	: pointer pack
- *
- * @return	  	: 1 if success, 0 otherwise
- *
- ***************************************************/
-u32 fl_adv_timetampInPack(fl_pack_t _pack) {
-	fl_data_frame_u data_parsed;
-	if (_pack.length > 5) {
-		memcpy(data_parsed.bytes,_pack.data_arr,_pack.length);
-		if (fl_nwk_slave_checkHDR(data_parsed.frame.hdr)) {
-			return MAKE_U32(data_parsed.frame.timetamp[3],data_parsed.frame.timetamp[2],data_parsed.frame.timetamp[1],data_parsed.frame.timetamp[0]);
-		}
-	}
-	return 0;
-}
-/***************************************************
- * @brief 		: parse data array to get timetampmillStep
- *
- * @param[in] 	: pointer pack
- *
- * @return	  	: 1 if success, 0 otherwise
- *
- ***************************************************/
-fl_timetamp_withstep_t fl_adv_timetampStepInPack(fl_pack_t _pack) {
-	fl_timetamp_withstep_t rslt = {.timetamp = 0, .milstep =0} ;
-	fl_data_frame_u data_parsed;
-	if (_pack.length > 5) {
-		memcpy(data_parsed.bytes,_pack.data_arr,_pack.length);
-		if (fl_nwk_slave_checkHDR(data_parsed.frame.hdr)) {
-			rslt.timetamp = MAKE_U32(data_parsed.frame.timetamp[3],data_parsed.frame.timetamp[2],data_parsed.frame.timetamp[1],data_parsed.frame.timetamp[0]);
-			rslt.milstep = data_parsed.frame.milltamp;
-			return rslt;
-		}
-	}
-	return rslt;
-}
+
 /***************************************************
  * @brief 		:excute features (join-network, reset factory,...)
  *

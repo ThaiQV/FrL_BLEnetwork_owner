@@ -264,7 +264,7 @@ fl_pack_t fl_master_packet_assignSlaveID_build(u8* _mac) {
  * @return	  	: fl_pack_t
  *
  ***************************************************/
-fl_pack_t fl_master_packet_RSP_55_build(u8 slaveID) {
+fl_pack_t fl_master_packet_RSP_55_build(u8 slaveID,u8* _seqtimetamp) {
 	extern fl_adv_settings_t G_ADV_SETTINGS;
 	fl_pack_t packet_built;
 
@@ -284,8 +284,10 @@ fl_pack_t fl_master_packet_RSP_55_build(u8 slaveID) {
 
 	//Create payload
 	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
-	u8 ack[2] = { 'O', 'K' };
-	memcpy(packet.frame.payload,ack,SIZEU8(ack));
+
+	//u8 ack[2] = { 'O', 'K' };
+	//fl_timetamp_withstep_t *ack_seqtimetamp = (fl_timetamp_withstep_t *)_seqtimetamp;
+	memcpy(packet.frame.payload,(u8*)_seqtimetamp,SIZEU8(fl_timetamp_withstep_t));
 	//crc
 	packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
 	//assign slaveID
@@ -425,10 +427,10 @@ s8 fl_master_SlaveMAC_get(u8 _slaveid,u8* mac){
  * 				  _data : pointer to data
  * 				  _len  : size data
  *
- * @return	  	: 0: fail, 1: success
+ * @return	  	: 0: fail, otherwise seqtimetamp
  *
  ***************************************************/
-bool fl_req_master_packet_createNsend(u8* _slave_mac,u8 _cmdid,u8* _data, u8 _len){
+u32 fl_req_master_packet_createNsend(u8* _slave_mac,u8 _cmdid,u8* _data, u8 _len){
 	/*****************************************************************/
 	/* | HDR | Timetamp | Mill_time | SlaveID | payload | crc8 | Ep | */
 	/* | 1B  |   4Bs    |    1B     |    1B   |   22Bs  |  1B  | 1B | -> .master = FL_FROM_SLAVE_ACK / FL_FROM_SLAVE */
@@ -486,13 +488,18 @@ bool fl_req_master_packet_createNsend(u8* _slave_mac,u8 _cmdid,u8* _data, u8 _le
 	P_PRINTFHEX_A(INF,rslt.data_arr,rslt.length,"REQ %X ",_cmdid);
 	//Send ADV
 	fl_adv_sendFIFO_add(rslt);
-	return true;
+	//seqtimetamp
+	fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(rslt);
+	u32 seq_timetamp = fl_rtc_timetamp2milltampStep(timetamp_inpack);
+	return seq_timetamp;
 }
+//* master dont support retry*//
 s8 fl_api_master_req(u8* _mac_slave,u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry) {
 	//register timeout cb
 	if (_cb != 0 && _timeout_ms*1000 >= 2*QUEUQ_REQcRSP_INTERVAL) {
-		if(fl_req_master_packet_createNsend(_mac_slave,_cmdid,_data,_len)){
-			return fl_queueREQcRSP_add(fl_master_Node_find(_mac_slave),_cmdid,_data,_len,&_cb,_timeout_ms*1000,_retry);
+		u32 seq_timetamp = fl_req_master_packet_createNsend(_mac_slave,_cmdid,_data,_len);
+		if(seq_timetamp){
+			return fl_queueREQcRSP_add(fl_master_Node_find(_mac_slave),_cmdid,seq_timetamp,_data,_len,&_cb,_timeout_ms*1000,0);
 		}
 	} else if(_cb == 0 && _timeout_ms ==0){
 		return (fl_req_master_packet_createNsend(_mac_slave,_cmdid,_data,_len) == 0?-1:0); // none rsp
@@ -652,7 +659,10 @@ int fl_master_ProccesRSP_cbk(void) {
 //							G_NODE_LIST.sla_info[node_indx].mac[4],G_NODE_LIST.sla_info[node_indx].mac[5],packet.frame.endpoint.repeat_cnt,cnt_inpack);
 					_master_updateDB_for_Node(node_indx,&packet);
 					//Send rsp to slave
-					fl_adv_sendFIFO_add(fl_master_packet_RSP_55_build(slave_id));
+					u8 seq_timetamp[5];
+					memcpy(seq_timetamp,packet.frame.timetamp,SIZEU8(packet.frame.timetamp));
+					seq_timetamp[SIZEU8(packet.frame.timetamp)]=packet.frame.milltamp;
+					fl_adv_sendFIFO_add(fl_master_packet_RSP_55_build(slave_id,seq_timetamp));
 					//send to WIFI
 					fl_ble2wifi_EVENT_SEND(G_NODE_LIST.sla_info[node_indx].mac);
 				} else {

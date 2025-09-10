@@ -101,10 +101,16 @@ fl_timetamp_withstep_t fl_rtc_getWithMilliStep(void) {
 	fl_timetamp_withstep_t rlst;
 	rlst.timetamp = RTC_OFFSET_TIME + clock_get_32k_tick() / RTC_DIV_PPM;
 	u32 mill = 1000*(clock_get_32k_tick() % RTC_DIV_PPM)/RTC_DIV_PPM;
-
 	rlst.milstep = (uint8_t)((mill * 256) / 1000);  // scale 0–999 to 0–255
-
 	return rlst;
+}
+
+u32 fl_rtc_timetampmillstep_convert(u8 *_array_timetampmill)
+{
+	fl_timetamp_withstep_t rslt;
+	rslt.timetamp = MAKE_U32(_array_timetampmill[3],_array_timetampmill[2],_array_timetampmill[1],_array_timetampmill[0]);
+	rslt.milstep = _array_timetampmill[4];
+	return fl_rtc_timetamp2milltampStep(rslt);
 }
 
 u32 fl_rtc_timetamp2milltampStep(fl_timetamp_withstep_t _timetamp_step){

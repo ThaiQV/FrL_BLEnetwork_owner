@@ -37,6 +37,7 @@ void _queue_REQcRSP_clear(fl_rsp_container_t *_mem){
 	_mem->timeout_set=0;
 	_mem->retry = 0;
 	_mem->rsp_cb = 0;
+	_mem->rsp_check.seqTimetamp = 0;
 	_mem->rsp_check.hdr_cmdid = 0;
 	_mem->rsp_check.slaveID = 0xFF;
 	memset(_mem->req_payload.payload,0,SIZEU8(_mem->req_payload.payload));
@@ -71,11 +72,12 @@ u8 fl_queueREQcRSP_sort(void){
 	return (avai_slot >= QUEUE_RSP_SLOT_MAX?avai_slot=QUEUE_RSP_SLOT_MAX:avai_slot );
 }
 
-s8 fl_queueREQcRSP_find(fl_rsp_callback_fnc *_cb,u32 _timeout_ms, u8 *o_avaislot){
+s8 fl_queueREQcRSP_find(fl_rsp_callback_fnc *_cb,u32 _SeqTimetamp,u32 _timeout_ms, u8 *o_avaislot){
 	u8 indx = 0;
 	*o_avaislot=fl_queueREQcRSP_sort();
 	for (indx = 0; indx < QUEUE_RSP_SLOT_MAX; ++indx) {
-		if(*G_QUEUE_REQ_CALL_RSP[indx].rsp_cb == *_cb && G_QUEUE_REQ_CALL_RSP[indx].timeout == (s32)_timeout_ms)
+		if(*G_QUEUE_REQ_CALL_RSP[indx].rsp_cb == *_cb && G_QUEUE_REQ_CALL_RSP[indx].timeout == (s32)_timeout_ms
+				&& G_QUEUE_REQ_CALL_RSP[indx].rsp_check.seqTimetamp == _SeqTimetamp)
 		{
 			*o_avaislot = 0xFF;
 			return indx;
@@ -84,12 +86,13 @@ s8 fl_queueREQcRSP_find(fl_rsp_callback_fnc *_cb,u32 _timeout_ms, u8 *o_avaislot
 	return -1;
 }
 
-s8 fl_queueREQcRSP_add(u8 slaveid,u8 cmdid,u8* _payloadreq,u8 _len,fl_rsp_callback_fnc *_cb, u32 _timeout_ms,u8 _retry){
+s8 fl_queueREQcRSP_add(u8 slaveid,u8 cmdid,u32 _SeqTimetamp,u8* _payloadreq,u8 _len,fl_rsp_callback_fnc *_cb, u32 _timeout_ms,u8 _retry){
 	u8 avai_slot= 0xFF;
-	if(fl_queueREQcRSP_find(_cb,_timeout_ms,&avai_slot) == -1 && avai_slot < QUEUE_RSP_SLOT_MAX){
+	if(fl_queueREQcRSP_find(_cb,_SeqTimetamp,_timeout_ms,&avai_slot) == -1 && avai_slot < QUEUE_RSP_SLOT_MAX){
 		G_QUEUE_REQ_CALL_RSP[avai_slot].timeout = (s32)_timeout_ms;
 		G_QUEUE_REQ_CALL_RSP[avai_slot].timeout_set = (s32)_timeout_ms;
 		G_QUEUE_REQ_CALL_RSP[avai_slot].rsp_cb = *_cb;
+		G_QUEUE_REQ_CALL_RSP[avai_slot].rsp_check.seqTimetamp = _SeqTimetamp;
 		G_QUEUE_REQ_CALL_RSP[avai_slot].rsp_check.hdr_cmdid = cmdid;
 		G_QUEUE_REQ_CALL_RSP[avai_slot].rsp_check.slaveID = slaveid;
 		G_QUEUE_REQ_CALL_RSP[avai_slot].retry = _retry;
@@ -173,10 +176,17 @@ void fl_queue_REQcRSP_ScanRec(fl_pack_t _pack,void *_id)
 		ERR(API,"Packet parse fail!!!\r\n");
 		return;
 	}else{
-#ifndef MASTER_CORE
+
+		u32 seq_timetamp = 0;
+#ifdef MASTER_CORE
+		fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(_pack);
+		seq_timetamp =fl_rtc_timetamp2milltampStep(timetamp_inpack);
+#else
 		if(_myID->slaveID.id_u8 != packet.frame.slaveID.id_u8 || _myID->slaveID.id_u8==0xFF){//not me
 			return;
 		}
+		//get seq_timetamp in rsp
+		seq_timetamp = fl_rtc_timetampmillstep_convert(&packet.frame.payload[0]);
 		//Synchronize debug log
 		NWK_DEBUG_STT = packet.frame.endpoint.dbg;
 		DEBUG_TURN(NWK_DEBUG_STT);
@@ -186,8 +196,11 @@ void fl_queue_REQcRSP_ScanRec(fl_pack_t _pack,void *_id)
 		for(u8 i =0;i < avai_slot;i++){
 			if (G_QUEUE_REQ_CALL_RSP[i].rsp_check.hdr_cmdid != 0 && G_QUEUE_REQ_CALL_RSP[i].rsp_check.slaveID != 0xFF) {
 				if (G_QUEUE_REQ_CALL_RSP[i].rsp_check.hdr_cmdid == packet.frame.hdr
-					&& G_QUEUE_REQ_CALL_RSP[i].rsp_check.slaveID == packet.frame.slaveID.id_u8) {
-					LOGA(API,"RSP:%d/%d\r\n",packet.frame.hdr,packet.frame.slaveID.id_u8);
+					&& G_QUEUE_REQ_CALL_RSP[i].rsp_check.slaveID == packet.frame.slaveID.id_u8
+					&& G_QUEUE_REQ_CALL_RSP[i].rsp_check.seqTimetamp==seq_timetamp
+					)
+				{
+					LOGA(API,"RSP(%d|%d):%d/%d\r\n",G_QUEUE_REQ_CALL_RSP[i].rsp_check.seqTimetamp,seq_timetamp,packet.frame.hdr,packet.frame.slaveID.id_u8);
 					G_QUEUE_REQ_CALL_RSP[i].rsp_cb((void*)&G_QUEUE_REQ_CALL_RSP[i],(void*)&_pack); //timeout
 					//clear event
 					_queue_REQcRSP_clear(&G_QUEUE_REQ_CALL_RSP[i]);
@@ -206,15 +219,22 @@ void fl_queue_REQcRSP_ScanRec(fl_pack_t _pack,void *_id)
 /***                           Private definitions                           **/
 /******************************************************************************/
 /******************************************************************************/
-
-
+fl_hdr_nwk_type_e G_NWK_HDR[] = {NWK_HDR_F6_SENDMESS,NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN,NWK_HDR_55,NWK_HDR_RECONNECT }; // register cmdid RSP
+#define NWK_HDR_SIZE (sizeof(G_NWK_HDR)/sizeof(G_NWK_HDR[0]))
 /******************************************************************************/
 /******************************************************************************/
 /***                       Functions declare                   		         **/
 /******************************************************************************/
 /******************************************************************************/
 
-
+static inline u8 IsNWKHDR(fl_hdr_nwk_type_e cmdid) {
+	for (u8 i = 0; i < NWK_HDR_SIZE; i++) {
+		if (cmdid == G_NWK_HDR[i]) {
+			return 1;
+		}
+	}
+	return 0;
+}
 
 /******************************************************************************/
 /******************************************************************************/
@@ -229,3 +249,42 @@ void fl_queue_REQcRSP_ScanRec(fl_pack_t _pack,void *_id)
 /***                      Processing functions 					             **/
 /******************************************************************************/
 /******************************************************************************/
+/***************************************************
+ * @brief 		: parse data array to get timetamp
+ *
+ * @param[in] 	: pointer pack
+ *
+ * @return	  	: 1 if success, 0 otherwise
+ *
+ ***************************************************/
+u32 fl_adv_timetampInPack(fl_pack_t _pack) {
+	fl_data_frame_u data_parsed;
+	if (_pack.length > 5) {
+		memcpy(data_parsed.bytes,_pack.data_arr,_pack.length);
+		if (IsNWKHDR(data_parsed.frame.hdr)) {
+			return MAKE_U32(data_parsed.frame.timetamp[3],data_parsed.frame.timetamp[2],data_parsed.frame.timetamp[1],data_parsed.frame.timetamp[0]);
+		}
+	}
+	return 0;
+}
+/***************************************************
+ * @brief 		: parse data array to get timetampmillStep
+ *
+ * @param[in] 	: pointer pack
+ *
+ * @return	  	: 1 if success, 0 otherwise
+ *
+ ***************************************************/
+fl_timetamp_withstep_t fl_adv_timetampStepInPack(fl_pack_t _pack) {
+	fl_timetamp_withstep_t rslt = {.timetamp = 0, .milstep =0} ;
+	fl_data_frame_u data_parsed;
+	if (_pack.length > 5) {
+		memcpy(data_parsed.bytes,_pack.data_arr,_pack.length);
+		if (IsNWKHDR(data_parsed.frame.hdr)) {
+			rslt.timetamp = MAKE_U32(data_parsed.frame.timetamp[3],data_parsed.frame.timetamp[2],data_parsed.frame.timetamp[1],data_parsed.frame.timetamp[0]);
+			rslt.milstep = data_parsed.frame.milltamp;
+			return rslt;
+		}
+	}
+	return rslt;
+}
