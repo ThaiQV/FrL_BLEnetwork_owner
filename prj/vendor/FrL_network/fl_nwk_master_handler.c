@@ -835,8 +835,9 @@ void fl_nwk_master_heartbeat_init(void){
 }
 void fl_nwk_master_heartbeat_run(void) {
 //	LOGA(INF,"Restart HearBeat:%d ms\r\n",PERIOD_HEARTBEAT);
-//	blt_soft_timer_restart(&fl_send_heartbeat,PERIOD_HEARTBEAT * 1000);
-	blt_soft_timer_restart(&fl_send_heartbeat,0);
+	if (blt_soft_timer_find(&fl_send_heartbeat)==-1) {
+		blt_soft_timer_add(&fl_send_heartbeat,PERIOD_HEARTBEAT * 1000);
+	} else blt_soft_timer_restart(&fl_send_heartbeat,0);
 }
 /***************************************************
  * @brief 		: collection slave (install mode)

@@ -135,27 +135,6 @@ void PING_RSP(u8* _pdata) {
 
 }
 
-void REPORT_REQUEST(u8* _pdata, RspFunc rspfnc) {
-	extern fl_slaves_list_t G_NODE_LIST;
-	fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[1];
-	LOGA(MCU,"LEN:0x%02X\r\n",data->len_data);
-	LOGA(MCU,"cmdID:0x%02X\r\n",data->cmd);
-	LOGA(MCU,"CRC8:0x%02X\r\n",data->crc8);
-	P_PRINTFHEX_A(MCU,data->data,data->len_data,"Data:");
-	u8 crc8_cal = fl_crc8(data->data,data->len_data);
-	if (crc8_cal != data->crc8) {
-		ERR(MCU,"ERR >> CRC8:0x%02X | 0x%02X\r\n",data->crc8,crc8_cal);
-		return;
-	}
-	if (rspfnc != 0) {
-		rspfnc(_pdata);
-		fl_wf_report_u report_fmt;
-		memcpy(report_fmt.bytes,data->data,data->len_data);
-		if (IS_MAC_INVALID(report_fmt.frame.mac,0xFF) && G_NODE_LIST.slot_inused != 0xFF) {
-			fl_wifi2ble_Excute(W2B_START_NWK);
-		}
-	}
-}
 static void _getnsend_data_report(u8 var, u8 rspcmd) {
 	extern fl_slaves_list_t G_NODE_LIST;
 	//for COUTER DEVICEs
@@ -200,6 +179,27 @@ static void _getnsend_data_report(u8 var, u8 rspcmd) {
 			P_PRINTFHEX_A(MCU,payload,len_payload,"PW Meter struct(%d):",len_payload);
 			/*Send to WIFI*/
 			fl_ble_send_wifi(payload,len_payload);
+		}
+	}
+}
+void REPORT_REQUEST(u8* _pdata, RspFunc rspfnc) {
+	extern fl_slaves_list_t G_NODE_LIST;
+	fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[1];
+	LOGA(MCU,"LEN:0x%02X\r\n",data->len_data);
+	LOGA(MCU,"cmdID:0x%02X\r\n",data->cmd);
+	LOGA(MCU,"CRC8:0x%02X\r\n",data->crc8);
+	P_PRINTFHEX_A(MCU,data->data,data->len_data,"Data:");
+	u8 crc8_cal = fl_crc8(data->data,data->len_data);
+	if (crc8_cal != data->crc8) {
+		ERR(MCU,"ERR >> CRC8:0x%02X | 0x%02X\r\n",data->crc8,crc8_cal);
+		return;
+	}
+	if (rspfnc != 0) {
+		rspfnc(_pdata);
+		fl_wf_report_u report_fmt;
+		memcpy(report_fmt.bytes,data->data,data->len_data);
+		if (IS_MAC_INVALID(report_fmt.frame.mac,0xFF) && G_NODE_LIST.slot_inused != 0xFF) {
+			fl_wifi2ble_Excute(W2B_START_NWK);
 		}
 	}
 }

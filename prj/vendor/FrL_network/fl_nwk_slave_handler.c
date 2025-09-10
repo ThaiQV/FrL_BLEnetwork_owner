@@ -58,8 +58,8 @@ fl_timetamp_withstep_t GenerateTimetampField(void){
 	u32 origin_master = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
 	if(mill_sys < origin_master){
 		cur_timetamp = ORIGINAL_MASTER_TIME;
-		cur_timetamp.milstep++;
 	}
+	cur_timetamp.milstep++;
 	return cur_timetamp;
 }
 
