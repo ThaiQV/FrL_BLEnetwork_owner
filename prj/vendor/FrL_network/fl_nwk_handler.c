@@ -87,10 +87,11 @@ s8 fl_queueREQcRSP_find(fl_rsp_callback_fnc *_cb,u32 _SeqTimetamp,u32 _timeout_m
 }
 
 s8 fl_queueREQcRSP_add(u8 slaveid,u8 cmdid,u32 _SeqTimetamp,u8* _payloadreq,u8 _len,fl_rsp_callback_fnc *_cb, u32 _timeout_ms,u8 _retry){
+	extern fl_adv_settings_t G_ADV_SETTINGS;
 	u8 avai_slot= 0xFF;
 	if(fl_queueREQcRSP_find(_cb,_SeqTimetamp,_timeout_ms,&avai_slot) == -1 && avai_slot < QUEUE_RSP_SLOT_MAX){
-		G_QUEUE_REQ_CALL_RSP[avai_slot].timeout = (s32)_timeout_ms;
-		G_QUEUE_REQ_CALL_RSP[avai_slot].timeout_set = (s32)_timeout_ms;
+		G_QUEUE_REQ_CALL_RSP[avai_slot].timeout = (s32)_timeout_ms + 2*G_ADV_SETTINGS.adv_duration;
+		G_QUEUE_REQ_CALL_RSP[avai_slot].timeout_set = (s32)_timeout_ms + 2*G_ADV_SETTINGS.adv_duration;
 		G_QUEUE_REQ_CALL_RSP[avai_slot].rsp_cb = *_cb;
 		G_QUEUE_REQ_CALL_RSP[avai_slot].rsp_check.seqTimetamp = _SeqTimetamp;
 		G_QUEUE_REQ_CALL_RSP[avai_slot].rsp_check.hdr_cmdid = cmdid;
@@ -142,7 +143,7 @@ int fl_queue_REQnRSP_TimeoutStart(void){
 #else
 						if(-1!=fl_api_slave_req(REQ_BUF.rsp_check.hdr_cmdid,REQ_BUF.req_payload.payload,REQ_BUF.req_payload.len,REQ_BUF.rsp_cb,
 										(u32)REQ_BUF.timeout_set/1000,REQ_BUF.retry)) {
-							LOGA(API,"Retry;%d\r\n",REQ_BUF.retry);
+							LOGA(API,"[%d/%d]SlaveID(%d)->Retry:%d\r\n",i,avai_slot,REQ_BUF.rsp_check.slaveID,REQ_BUF.retry);
 							continue;
 						}
 #endif
