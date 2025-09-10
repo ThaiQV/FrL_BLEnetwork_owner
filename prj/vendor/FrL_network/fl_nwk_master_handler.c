@@ -448,12 +448,14 @@ u32 fl_req_master_packet_createNsend(u8* _slave_mac,u8 _cmdid,u8* _data, u8 _len
 		ERR(API,"SlaveID NOT FOUND!!\r\n");
 		return false;
 	}
+	//generate seqtimetamp
+	fl_timetamp_withstep_t timetampStep = fl_rtc_getWithMilliStep();
+//	timetampStep.milstep++;
 	fl_data_frame_u req_pack;
 	switch (cmdid) {
 		case NWK_HDR_F6_SENDMESS: {
 			req_pack.frame.hdr = cmdid;
-			fl_timetamp_withstep_t timetampStep = fl_rtc_getWithMilliStep();
-		//	u32 timetamp = fl_rtc_get();
+
 			req_pack.frame.timetamp[0] = U32_BYTE0(timetampStep.timetamp);
 			req_pack.frame.timetamp[1] = U32_BYTE1(timetampStep.timetamp);
 			req_pack.frame.timetamp[2] = U32_BYTE2(timetampStep.timetamp);
@@ -493,13 +495,13 @@ u32 fl_req_master_packet_createNsend(u8* _slave_mac,u8 _cmdid,u8* _data, u8 _len
 	u32 seq_timetamp = fl_rtc_timetamp2milltampStep(timetamp_inpack);
 	return seq_timetamp;
 }
-//* master dont support retry*//
+
 s8 fl_api_master_req(u8* _mac_slave,u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry) {
 	//register timeout cb
 	if (_cb != 0 && _timeout_ms*1000 >= 2*QUEUQ_REQcRSP_INTERVAL) {
 		u32 seq_timetamp = fl_req_master_packet_createNsend(_mac_slave,_cmdid,_data,_len);
 		if(seq_timetamp){
-			return fl_queueREQcRSP_add(fl_master_Node_find(_mac_slave),_cmdid,seq_timetamp,_data,_len,&_cb,_timeout_ms*1000,0);
+			return fl_queueREQcRSP_add(fl_master_Node_find(_mac_slave),_cmdid,seq_timetamp,_data,_len,&_cb,_timeout_ms*1000,_retry);
 		}
 	} else if(_cb == 0 && _timeout_ms ==0){
 		return (fl_req_master_packet_createNsend(_mac_slave,_cmdid,_data,_len) == 0?-1:0); // none rsp
