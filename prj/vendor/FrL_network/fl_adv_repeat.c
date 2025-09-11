@@ -50,7 +50,7 @@ fl_pack_t fl_repeat_packet_build(fl_pack_t _pack) {
 	extern u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
 	fl_packet_parse(_pack,&packet.frame);
 
-	if(packet.frame.endpoint.repeat_mode) packet.frame.endpoint.repeat_cnt -= 1;
+	if(packet.frame.endpoint.repeat_mode &&  packet.frame.endpoint.repeat_cnt > 0) packet.frame.endpoint.repeat_cnt -= 1;
 
 	pack_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
 	memcpy(pack_built.data_arr,packet.bytes,pack_built.length);

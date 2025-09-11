@@ -32,7 +32,7 @@ fl_slave_getinfo_t G_SLA_INFO; //for cmdlines
 extern fl_slaves_list_t G_NODE_LIST;
 //For getting automatic information
 #define GETINFO_1_TIMES_MAX			20
-#define GETINFO_FREQUENCY			10 //ms
+#define GETINFO_FREQUENCY			20 //ms
 #define GETINFO_FIRST_DUTY			25*1000//s
 typedef struct {
 	fl_nodeinnetwork_t* id[GETINFO_1_TIMES_MAX];
@@ -216,7 +216,7 @@ int _getInfo_autorun(void) {
 	//P_INFO("**Online :%d/%d\r\n",G_SLA_INFO_RSP.rslt.num_onl,G_SLA_INFO_RSP.total_slaves);
 	if (G_SLA_INFO_RSP.rslt.num_onl < G_SLA_INFO_RSP.total_slaves) {
 		G_SLA_INFO_RSP.rslt.num_off = G_SLA_INFO_RSP.total_slaves - G_SLA_INFO_RSP.rslt.num_onl;
-		P_INFO("**Offline:%d/%d\r\n",G_SLA_INFO_RSP.rslt.num_off,G_SLA_INFO_RSP.settings.total_slaves);
+
 		for (idx_get = 0; idx_get < G_SLA_INFO_RSP.rslt.num_off; ++idx_get) {
 			P_INFO("[%d]Mac:0x%02X%02X%02X%02X%02X%02X\r\n",G_SLA_INFO_RSP.rslt.offline[idx_get]->slaveID.id_u8,
 					G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[0],G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[1],G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[2],
@@ -243,6 +243,7 @@ int _getInfo_autorun(void) {
 //					G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[2],G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[3],
 //					G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[4],G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[5]);
 //		}
+		P_INFO("**Offline:%d/%d\r\n",G_SLA_INFO_RSP.rslt.num_off,G_SLA_INFO_RSP.settings.total_slaves);
 	}
 	else{
 		P_INFO("**Online:%d/%d\r\n",G_SLA_INFO_RSP.settings.total_slaves-G_SLA_INFO_RSP.rslt.num_off,G_SLA_INFO_RSP.settings.total_slaves);
@@ -472,6 +473,7 @@ void CMD_GETINFOSLAVE(u8* _data) {
 	int slave_num = sscanf((char*) _data,"info %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd",&slaveID[0],
 			&slaveID[1],&slaveID[2],&slaveID[3],&slaveID[4],&slaveID[5],&slaveID[6],&slaveID[7],&slaveID[8],&slaveID[9],&slaveID[10],&slaveID[11],
 			&slaveID[12],&slaveID[13],&slaveID[14],&slaveID[15],&slaveID[16],&slaveID[17],&slaveID[18],&slaveID[19]);
+/*
 //	int slave_num = sscanf((char*) _data,
 //	    "info %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu",
 //	    &slaveID[0], &slaveID[1], &slaveID[2], &slaveID[3], &slaveID[4], &slaveID[5], &slaveID[6], &slaveID[7],
@@ -483,6 +485,7 @@ void CMD_GETINFOSLAVE(u8* _data) {
 //	    &slaveID[0], &slaveID[1], &slaveID[2], &slaveID[3], &slaveID[4], &slaveID[5], &slaveID[6], &slaveID[7],
 //	    &slaveID[8], &slaveID[9], &slaveID[10], &slaveID[11], &slaveID[12], &slaveID[13], &slaveID[14], &slaveID[15],
 //	    &slaveID[16], &slaveID[17], &slaveID[18], &slaveID[19]);
+*/
 
 	//p get info 255 <Period get again> <num slave for each> <num virtual slave> <timeout rsp>
 	if(G_NODE_LIST.slot_inused == 0xFF) return;

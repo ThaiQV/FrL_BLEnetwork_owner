@@ -501,7 +501,7 @@ s8 fl_api_master_req(u8* _mac_slave,u8 _cmdid, u8* _data, u8 _len, fl_rsp_callba
 	if (_cb != 0 && _timeout_ms*1000 >= 2*QUEUQ_REQcRSP_INTERVAL) {
 		u32 seq_timetamp = fl_req_master_packet_createNsend(_mac_slave,_cmdid,_data,_len);
 		if(seq_timetamp){
-			return fl_queueREQcRSP_add(fl_master_Node_find(_mac_slave),_cmdid,seq_timetamp,_data,_len,&_cb,_timeout_ms*1000,_retry);
+			return fl_queueREQcRSP_add(fl_master_Node_find(_mac_slave),_cmdid,seq_timetamp,_data,_len,&_cb,_timeout_ms,_retry);
 		}
 	} else if(_cb == 0 && _timeout_ms ==0){
 		return (fl_req_master_packet_createNsend(_mac_slave,_cmdid,_data,_len) == 0?-1:0); // none rsp

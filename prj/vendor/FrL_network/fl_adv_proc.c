@@ -293,10 +293,11 @@ bool _align_QUEUE_SENDING(fl_pack_t _pack){
 int fl_adv_sendFIFO_add(fl_pack_t _pack) {
 	if (FL_QUEUE_FIND(&G_QUEUE_SENDING,&_pack,_pack.length /* - 1 skip rssi*/) == -1) {
 		if (FL_QUEUE_ADD(&G_QUEUE_SENDING,&_pack) < 0) {
-			ERR(BLE,"Err <QUEUE ADD ADV SENDING>!!\r\n");
+			ERR(BLE,"Err FULL <QUEUE ADD ADV SENDING>!!\r\n");
 			return -1;
 		} else {
 //			P_PRINTFHEX_A(BLE,_pack.data_arr,_pack.length,"%s(%d):","QUEUE ADV",_pack.length);
+			LOGA(BLE,"QUEUE SEND ADD: %d/%d (cnt:%d)\r\n",G_QUEUE_SENDING.head_index,G_QUEUE_SENDING.tail_index,G_QUEUE_SENDING.count);
 			return G_QUEUE_SENDING.tail_index;
 		}
 	}
@@ -311,13 +312,13 @@ int fl_adv_sendFIFO_add(fl_pack_t _pack) {
  * @return	  	:
  *
  ***************************************************/
-
 void fl_adv_sendFIFO_run(void) {
 	fl_pack_t data_in_queue;
 	if (!F_SENDING_STATE) {
 
 #ifdef MASTER_CORE
 		if (FL_QUEUE_GET(&G_QUEUE_SENDING,&data_in_queue)) {
+			LOGA(BLE,"QUEUE SEND REMOVE: %d/%d (cnt:%d)\r\n",G_QUEUE_SENDING.head_index,G_QUEUE_SENDING.tail_index,G_QUEUE_SENDING.count);
 //			fl_nwk_master_heartbeat_run();
 #else
 		while (FL_QUEUE_GET_LOOP(&G_QUEUE_SENDING,&data_in_queue)) {
@@ -421,7 +422,7 @@ void fl_adv_init(void) {
 	fl_db_init();
 #ifdef MASTER_CORE
 	extern fl_master_config_t G_MASTER_INFO;
-	fl_input_external_init();
+//	fl_input_external_init();
 	//fl_adv_sendtest();
 	fl_nwk_master_init();
 
@@ -431,7 +432,7 @@ void fl_adv_init(void) {
 	extern volatile u8 MASTER_INSTALL_STATE;
 	FL_NWK_COLLECTION_MODE = &MASTER_INSTALL_STATE;
 #else
-	fl_input_external_init();
+//	fl_input_external_init();
 	extern fl_nodeinnetwork_t G_INFORMATION;
 	fl_nwk_slave_init();
 	fl_repeater_init();
