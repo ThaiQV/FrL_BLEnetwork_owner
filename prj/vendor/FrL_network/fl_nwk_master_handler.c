@@ -120,6 +120,7 @@ void fl_master_nodelist_AddRefesh(fl_nodeinnetwork_t _node) {
  *
  ***************************************************/
 fl_pack_t fl_master_packet_heartbeat_build(void) {
+	extern u8 GETINFO_FLAG_EVENTTEST;
 	fl_pack_t packet_built;
 	fl_data_frame_u packet;
 	memset(packet.bytes,0,SIZEU8(packet.bytes));
@@ -136,6 +137,7 @@ fl_pack_t fl_master_packet_heartbeat_build(void) {
 	packet.frame.milltamp = timetampStep.milstep;
 	packet.frame.slaveID.id_u8 = 0xFF; // all grps + all members
 	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
+	packet.frame.payload[0]=GETINFO_FLAG_EVENTTEST;
 	//crc
 	packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
 
@@ -327,7 +329,7 @@ fl_pack_t fl_master_packet_GetInfo_build(u8 *_slave_mac_arr, u8 _slave_num) {
 	/* F5|timetamp|slaveID 1|slaveID 2.......|CRC|TTL */
 	/* 1B|  4Bs   |  1Bs  	|     18Bs  	 |1B |1B  */
 	memset(packet.bytes,0,SIZEU8(packet.bytes));
-	packet.frame.hdr = NWK_HDR_F5_INFO; //testing
+	packet.frame.hdr = NWK_HDR_F5_INFO;
 
 	fl_timetamp_withstep_t timetampStep = fl_rtc_getWithMilliStep();
 //	u32 timetamp = fl_rtc_get();
@@ -748,7 +750,7 @@ void fl_nwk_master_init(void) {
 	G_MASTER_INFO.nwk.chn[2] = master_profile.nwk.chn[2];
 	memcpy(G_MASTER_INFO.nwk.private_key,master_profile.nwk.private_key,SIZEU8(master_profile.nwk.private_key));
 	blt_soft_timer_add(_nwk_master_backup,2 * 1000 * 1000);
-	fl_nwk_master_heartbeat_init();
+//	fl_nwk_master_heartbeat_init();
 }
 /***************************************************
  * @brief 		: init nodelist
@@ -839,7 +841,7 @@ void fl_nwk_master_heartbeat_run(void) {
 //	LOGA(INF,"Restart HearBeat:%d ms\r\n",PERIOD_HEARTBEAT);
 	if (blt_soft_timer_find(&fl_send_heartbeat)==-1) {
 		blt_soft_timer_add(&fl_send_heartbeat,PERIOD_HEARTBEAT * 1000);
-	} else blt_soft_timer_restart(&fl_send_heartbeat,0);
+	} else blt_soft_timer_restart(&fl_send_heartbeat,PERIOD_HEARTBEAT * 1000);
 }
 /***************************************************
  * @brief 		: collection slave (install mode)

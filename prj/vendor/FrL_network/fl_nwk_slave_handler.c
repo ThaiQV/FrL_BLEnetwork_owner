@@ -21,6 +21,7 @@
 #include "test_api.h"
 #include "../TBS_dev/TBS_dev_config.h"
 #ifndef MASTER_CORE
+u8 GETINFO_FLAG_EVENTTEST = 0;
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -225,7 +226,8 @@ void _nwk_slave_syncFromPack(fl_dataframe_format_t *packet){
 	NWK_REPEAT_LEVEL = packet->endpoint.rep_settings;
 
 	//Sync mastertime origin
-	if (packet->hdr == NWK_HDR_HEARTBEAT) {
+	//if (packet->hdr == NWK_HDR_HEARTBEAT)
+	{
 		SYNC_ORIGIN_MASTER(master_timetamp,packet->milltamp);
 		LOGA(INF,"ORIGINAL MASTER-TIME:%d\r\n",ORIGINAL_MASTER_TIME.milstep);
 	}
@@ -378,6 +380,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 	switch ((fl_hdr_nwk_type_e) packet.frame.hdr) {
 		case NWK_HDR_HEARTBEAT:
 			_nwk_slave_syncFromPack(&packet.frame);
+			GETINFO_FLAG_EVENTTEST = packet.frame.payload[0];
 			if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
 				//Process rsp
 				memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
@@ -394,10 +397,10 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 			}
 		break;
 		case NWK_HDR_F5_INFO: {
-			_nwk_slave_syncFromPack(&packet.frame);
+//			_nwk_slave_syncFromPack(&packet.frame);
 			if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK && IsJoinedNetwork()) {
 				//Process rsp
-				s8 memid_idx = plog_IndexOf(packet.frame.payload,(u8*)&G_INFORMATION.slaveID.id_u8,1,sizeof(packet.frame.payload));
+				s8 memid_idx = plog_IndexOf(packet.frame.payload,(u8*)&G_INFORMATION.slaveID.id_u8,1,sizeof(packet.frame.payload)-1); //skip lastbyte int the payload
 				u32 master_timetamp; //, slave_timetamp;
 				master_timetamp = MAKE_U32(packet.frame.timetamp[3],packet.frame.timetamp[2],packet.frame.timetamp[1],packet.frame.timetamp[0]);
 				datetime_t cur_dt;
@@ -405,9 +408,11 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 				u8 _payload[POWER_METER_STRUCT_BYTESIZE];
 				memset(_payload,0xFF,SIZEU8(_payload));
 				//u8 len_payload=0;
-				LOGA(APP,"(%d)SlaveID:%X | inPack:%X\r\n",memid_idx,G_INFORMATION.slaveID.id_u8,packet.frame.payload[memid_idx]);
+//				GETINFO_FLAG_EVENTTEST = packet.frame.payload[sizeof(packet.frame.payload)-1];
+				LOGA(APP,"(%d)SlaveID:%X | inPack:%X | TestEvent:%d\r\n",memid_idx,G_INFORMATION.slaveID.id_u8,packet.frame.payload[memid_idx],GETINFO_FLAG_EVENTTEST);
 				packet.frame.endpoint.dbg = NWK_DEBUG_STT;
 				u8 indx_data = 0;
+
 				if (memid_idx != -1) {
 #ifdef COUNTER_DEVICE
 					tbs_device_counter_t *counter_data = (tbs_device_counter_t*)G_INFORMATION.data;
@@ -441,7 +446,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 		}
 		break;
 		case NWK_HDR_F6_SENDMESS: {
-			_nwk_slave_syncFromPack(&packet.frame);
+//			_nwk_slave_syncFromPack(&packet.frame);
 			if (IsJoinedNetwork()) {
 				//check packet_slaveid
 				if(packet.frame.slaveID.id_u8 == G_INFORMATION.slaveID.id_u8){
@@ -469,7 +474,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 		break;
 		/*============================================================================================*/
 		case NWK_HDR_COLLECT: {
-			_nwk_slave_syncFromPack(&packet.frame);
+//			_nwk_slave_syncFromPack(&packet.frame);
 			if (IsJoinedNetwork() == 0) {
 				if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
 					//get master's mac
@@ -492,7 +497,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 		break;
 		case NWK_HDR_ASSIGN:
 		{
-			_nwk_slave_syncFromPack(&packet.frame);
+//			_nwk_slave_syncFromPack(&packet.frame);
 			//Process rsp
 			s8 mymac_idx = plog_IndexOf(packet.frame.payload,G_INFORMATION.mac,SIZEU8(G_INFORMATION.mac),sizeof(packet.frame.payload));
 			if (mymac_idx != -1) {

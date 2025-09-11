@@ -149,8 +149,9 @@ void TEST_rsp_callback(void *_data,void* _data2){
 	P_INFO("==============================\r\n");
 }
 int TEST_Counter_Event(void){
+	extern u8 GETINFO_FLAG_EVENTTEST;
 	u32 period = RAND(1,30);
-	if (IsJoinedNetwork() && IsOnline()) {
+	if (IsJoinedNetwork() && IsOnline() && GETINFO_FLAG_EVENTTEST ==1) {
 		G_COUNTER_DEV.data.bt_call = RAND(0,1);
 		G_COUNTER_DEV.data.bt_endcall = G_COUNTER_DEV.data.bt_call ? 0 : 1;
 		G_COUNTER_DEV.data.bt_rst = G_COUNTER_DEV.data.bt_call ? 0 : RAND(0,1);
