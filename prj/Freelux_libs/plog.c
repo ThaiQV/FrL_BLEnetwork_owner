@@ -202,6 +202,15 @@ void PLOG_DEVICE_PROFILE(fl_version_t _bootloader, fl_version_t _fw,fl_version_t
 			"*****************************************\n";
 	P_INFO(device_info, _bootloader.major, _bootloader.minor, _bootloader.patch,
 			_fw.major, _fw.minor, _fw.patch, _hw.major, _hw.minor, _hw.patch);
+	P_INFO("Startup");
+	u8 wait=0;
+	extern void delay_ms(unsigned int millisec);
+	while(wait<10){
+		P_INFO(".");
+		delay_ms(300);
+		wait++;
+	}
+	P_INFO("ok\r\n");
 }
 /****************************************************************************************************
  * @brief 		platform initialization function

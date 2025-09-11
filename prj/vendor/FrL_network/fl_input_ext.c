@@ -25,13 +25,13 @@
 /***                                Global Parameters                        **/
 /******************************************************************************/
 /******************************************************************************/
-#define FL_IO_SCAN_INTERVAL	20 //ms
+#define FL_IO_SCAN_INTERVAL				20 //ms
 
-#define FL_IO_READ(x)		gpio_get_level(x)
-#define FL_IO_WRITE(x,y)	gpio_set_level(x,y)
+#define FL_IO_READ(x)					gpio_get_level(x)
+#define FL_IO_WRITE(x,y)				gpio_set_level(x,y)
 
-#define PRESSnHOLD_DUTY				FL_IO_SCAN_INTERVAL*50  //ms->s
-#define PRESSnRELEASE_DUTY			FL_IO_SCAN_INTERVAL*2  	//ms
+#define PRESSnHOLD_DUTY					FL_IO_SCAN_INTERVAL*50  //ms->s
+#define PRESSnRELEASE_DUTY				FL_IO_SCAN_INTERVAL*2  	//ms
 
 typedef bool (*FucRead)(gpio_pin_e);
 
@@ -245,16 +245,17 @@ void fl_input_serial_init(uart_num_e uart_num, uart_tx_pin_e tx_pin, uart_rx_pin
 	uart_set_rx_timeout(G_INPUT_EXT.serial.uart_num,bwpc,12,UART_BW_MUL1);
 	uart_init(G_INPUT_EXT.serial.uart_num,div,bwpc,UART_PARITY_NONE,UART_STOP_BIT_ONE);
 
-	uart_clr_irq_mask(G_INPUT_EXT.serial.uart_num,UART_RX_IRQ_MASK | UART_TX_IRQ_MASK | UART_TXDONE_MASK | UART_RXDONE_MASK);
-	core_interrupt_enable();
+	uart_clr_irq_mask(G_INPUT_EXT.serial.uart_num,UART_ERR_IRQ_MASK|UART_RX_IRQ_MASK | UART_TX_IRQ_MASK | UART_TXDONE_MASK | UART_RXDONE_MASK);
+
 
 	uart_set_tx_dma_config(G_INPUT_EXT.serial.uart_num,G_INPUT_EXT.serial.dma_tx_chn);
 	uart_set_rx_dma_config(G_INPUT_EXT.serial.uart_num,G_INPUT_EXT.serial.dma_rx_chn);
 
 	uart_clr_tx_done(G_INPUT_EXT.serial.uart_num);
-	uart_set_irq_mask(G_INPUT_EXT.serial.uart_num,UART_RXDONE_MASK);
-	uart_set_irq_mask(G_INPUT_EXT.serial.uart_num,UART_TXDONE_MASK);
+//	uart_set_irq_mask(G_INPUT_EXT.serial.uart_num,UART_RXDONE_MASK);
+	uart_set_irq_mask(G_INPUT_EXT.serial.uart_num,UART_ERR_IRQ_MASK|UART_RX_IRQ_MASK | UART_TXDONE_MASK | UART_RXDONE_MASK);
 
+	core_interrupt_enable();
 	irq_source_e irq_src;
 	if (G_INPUT_EXT.serial.uart_num == UART0)
 	irq_src = IRQ19_UART0;
