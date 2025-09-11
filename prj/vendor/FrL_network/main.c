@@ -42,23 +42,41 @@
 void uart1_recieve_irq(void) {
 #ifdef MASTER_CORE
 	extern unsigned char FLAG_uart_dma_send;
+	unsigned int irq_flags = uart_get_irq_status(UART1,0xFFFFFFFF);
+//	char bit_flag[9]; // 8 bit + 1 end
+//	for (int i = 7; i >= 0; i--) {
+//		bit_flag[7 - i] = ((irq_flags >> i) & 0x1) ? '1' : '0';
+//	}
+//	bit_flag[8] = '\0'; //
+//	ERR(APP,"UART IRQ Flags (0x%02X): %s\r\n",irq_flags & 0xFF,bit_flag);
+//
+//	if (irq_flags & UART_ERR_IRQ_MASK) {
+//		ERR(APP,"UART Error IRQ\r\n");
+//	}
+//
+//	if (irq_flags & UART_RXDONE_MASK) {
+//		ERR(APP,"RX DONE\r\n");
+//	}
+	if (irq_flags & UART_RXBUF_IRQ_STATUS) {
+//		ERR(APP,"RX FIFO FULL\r\n");
+		fl_input_serial_rec();
+		uart_clr_irq_status(UART1, UART_CLR_RX);
+		uart_clr_irq_mask(UART1,UART_RXBUF_IRQ_STATUS);
+	}
 	if (uart_get_irq_status(UART1,UART_TXDONE)) {
 		FLAG_uart_dma_send = 0;
 		uart_clr_tx_done(UART1);
 	}
-	else if (uart_get_irq_status(UART1,UART_RXDONE)){ //A0-SOC can't use RX-DONE status,so this interrupt can noly used in A1-SOC.
+	if (uart_get_irq_status(UART1,UART_RXDONE)){ //A0-SOC can't use RX-DONE status,so this interrupt can noly used in A1-SOC.
 //		ERR(APP,"UART UART_RXDONE  !!\r\n");
 		/************************cll rx_irq****************************/
 		fl_input_serial_rec();
 		uart_clr_irq_status(UART1,UART_CLR_RX);
 		//uart_clr_irq_mask(UART1,UART_ERR_IRQ_MASK|UART_RXDONE_MASK|UART_RX_IRQ_MASK);
 	}
-	else if(uart_get_irq_status(UART1,UART_RX_ERR)){
+	if(uart_get_irq_status(UART1,UART_RX_ERR)){
 		ERR(APP,"UART FAIL !!\r\n");
 		uart_clr_irq_status(UART1,UART_CLR_RX);
-	}
-	else{
-		ERR(APP,"UART IRQ  !!\r\n");
 	}
 #endif
 }
@@ -69,7 +87,7 @@ void uart1_recieve_irq(void) {
  * @return     none
  */
 void uart0_recieve_irq(void) {
-	LOGA(DRV,"UART0 Rec:%c\r\n",uart_read_byte(UART0));
+//	LOGA(DRV,"UART0 Rec:%c\r\n",uart_read_byte(UART0));
 }
 #endif
 /**
@@ -91,9 +109,9 @@ void rf_irq_handler(void) {
  * @return      none
  */
 _attribute_ram_code_ void gpio_irq_handler(void){
-	LOG_P(APP,"GPIO irq....\r\n");
-	gpio_clr_irq_mask(GPIO_IRQ_MASK_GPIO);
-	gpio_clr_irq_status(FLD_GPIO_IRQ_CLR);
+//	LOG_P(APP,"GPIO irq....\r\n");
+//	gpio_clr_irq_mask(GPIO_IRQ_MASK_GPIO);
+//	gpio_clr_irq_status(FLD_GPIO_IRQ_CLR);
 }
 /**
  * @brief		BLE SDK UART0 interrupt handler.
@@ -175,9 +193,8 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 	;
 #endif
 	PLOG_DEVICE_PROFILE(_bootloader,_fw,_hw);
-
 	//OFF ALL LOG
-//	PLOG_Stop(ALL);
+	PLOG_Stop(ALL);
 
 	if (!deepRetWakeUp) {  //read flash size
 #if (BATT_CHECK_ENABLE)
