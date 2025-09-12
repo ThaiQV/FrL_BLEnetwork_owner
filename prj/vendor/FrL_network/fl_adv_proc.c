@@ -446,7 +446,7 @@ void fl_adv_init(void) {
 	FL_NWK_COLLECTION_MODE = &G_INFORMATION.profile.run_stt.join_nwk;
 #endif
 	// Init REQ call RSP
-	fl_queue_REQnRSP_TimeoutStart();
+	fl_queue_REQnRSP_TimeoutInit();
 	//
 	rf_set_power_level_index(MY_RF_POWER_INDEX);
 	blc_ll_setAdvCustomedChannel(*G_ADV_SETTINGS.nwk_chn.chn1,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3);

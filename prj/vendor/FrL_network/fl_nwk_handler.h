@@ -236,8 +236,8 @@ typedef struct {
 
 typedef struct {
 	fl_rsp_callback_fnc rsp_cb;
-	s32 timeout; //use to count-down
-	s32 timeout_set; //use to retry
+	u32 timeout; //use to count-down
+	u32 timeout_set; //use to retry
 	u8 retry;
 	struct {
 		u32 seqTimetamp;
@@ -248,7 +248,7 @@ typedef struct {
 		u8 payload[22];
 		u8 len;
 	} req_payload;
-}__attribute__((packed)) fl_rsp_container_t;
+}fl_rsp_container_t;
 
 #ifdef MASTER_CORE
 #define MAX_NODES 	200
@@ -287,6 +287,13 @@ inline u8 fl_crc8(u8* _pdata, u8 _len) {
 							else   { PLOG_Stop(ALL);  }\
 						} while(0)
 
+static inline uint32_t swap_endian32(uint32_t val) {
+    return ((val >> 24) & 0x000000FF) |
+           ((val >> 8)  & 0x0000FF00) |
+           ((val << 8)  & 0x00FF0000) |
+           ((val << 24) & 0xFF000000);
+}
+
 #ifdef MASTER_CORE
 void fl_nwk_master_init(void);
 void fl_nwk_master_run(fl_pack_t *_pack_handle);
@@ -314,7 +321,7 @@ s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 
 u32 fl_adv_timetampInPack(fl_pack_t _pack);
 fl_timetamp_withstep_t fl_adv_timetampStepInPack(fl_pack_t _pack);
 s8 fl_queueREQcRSP_add(u8 slaveid,u8 cmdid,u32 _SeqTimetamp,u8* _payloadreq,u8 _len,fl_rsp_callback_fnc *_cb, u32 _timeout_ms,u8 _retry);
-int fl_queue_REQnRSP_TimeoutStart(void);
+void fl_queue_REQnRSP_TimeoutInit(void);
 void fl_adv_setting_update(void);
 int fl_adv_sendFIFO_add(fl_pack_t _pack);
 

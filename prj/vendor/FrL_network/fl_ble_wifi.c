@@ -355,8 +355,8 @@ void _SENDMESS_slave_rsp_callback(void *_data,void* _data2){
 	else{
 		LOGA(API,"RTT: TIMEOUT (%d ms)\r\n",(data->timeout_set)/1000);
 	}
-	LOGA(API,"cmdID  :%0X\r\n",data->rsp_check.hdr_cmdid);
-	LOGA(API,"SlaveID:%0X\r\n",data->rsp_check.slaveID);
+	LOGA(API,"cmdID  :%02X\r\n",data->rsp_check.hdr_cmdid);
+	LOGA(API,"SlaveID:%d\r\n",data->rsp_check.slaveID);
 	LOGA(API,"SeqTT  :%d\r\n",data->rsp_check.seqTimetamp);
 }
 
