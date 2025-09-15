@@ -159,23 +159,10 @@ int blt_soft_timer_delete(blt_timer_callback_t func) {
  * @return	  	:false or true
  *
  ***************************************************/
-bool blt_soft_timer_restart(blt_timer_callback_t func, u32 interval_us){
-	s8 indx = -1;
-	indx=blt_soft_timer_find(func);
-	u32 interval_new=0;
-	if( indx != -1){
-		if(interval_us == 0) {
-			interval_new = blt_timer.timer[indx].interval/SYSTEM_TIMER_TICK_1US;
-		}
-		else{
-			interval_new = interval_us;
-		}
-//		LOGA(DRV,"soft-timer restart(%d):%d\r\n",indx,interval_new);
-		blt_soft_timer_delete(func);
-		blt_soft_timer_add(func,interval_new);
-		return true;
-	}
-	return false;
+bool blt_soft_timer_restart(blt_timer_callback_t func, u32 interval_us) {
+	blt_soft_timer_delete(func);
+	blt_soft_timer_add(func,interval_us);
+	return true;
 }
 /**
  * @brief		This function is used to manage software timer tasks

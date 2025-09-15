@@ -72,11 +72,11 @@ u8 fl_queueREQcRSP_sort(void){
 	return (avai_slot >= QUEUE_RSP_SLOT_MAX?avai_slot=QUEUE_RSP_SLOT_MAX:avai_slot );
 }
 
-s8 fl_queueREQcRSP_find(fl_rsp_callback_fnc *_cb,u32 _SeqTimetamp,u32 _timeout_ms, u8 *o_avaislot){
+s8 fl_queueREQcRSP_find(fl_rsp_callback_fnc *_cb,u32 _SeqTimetamp/*,u32 _timeout_ms*/, u8 *o_avaislot){
 	u8 indx = 0;
 	*o_avaislot=fl_queueREQcRSP_sort();
 	for (indx = 0; indx < QUEUE_RSP_SLOT_MAX; ++indx) {
-		if(*G_QUEUE_REQ_CALL_RSP[indx].rsp_cb == *_cb && G_QUEUE_REQ_CALL_RSP[indx].timeout == (s32)_timeout_ms
+		if(*G_QUEUE_REQ_CALL_RSP[indx].rsp_cb == *_cb /* && G_QUEUE_REQ_CALL_RSP[indx].timeout_set == _timeout_ms*1000*/
 				&& G_QUEUE_REQ_CALL_RSP[indx].rsp_check.seqTimetamp == _SeqTimetamp)
 		{
 			*o_avaislot = 0xFF;
@@ -89,9 +89,9 @@ s8 fl_queueREQcRSP_find(fl_rsp_callback_fnc *_cb,u32 _SeqTimetamp,u32 _timeout_m
 s8 fl_queueREQcRSP_add(u8 slaveid,u8 cmdid,u32 _SeqTimetamp,u8* _payloadreq,u8 _len,fl_rsp_callback_fnc *_cb, u32 _timeout_ms,u8 _retry){
 	extern fl_adv_settings_t G_ADV_SETTINGS;
 	u8 avai_slot= 0xFF;
-	if(fl_queueREQcRSP_find(_cb,_SeqTimetamp,_timeout_ms,&avai_slot) == -1 && avai_slot < QUEUE_RSP_SLOT_MAX){
-		G_QUEUE_REQ_CALL_RSP[avai_slot].timeout = (s32)(_timeout_ms + 8*G_ADV_SETTINGS.adv_duration)*1000;
-		G_QUEUE_REQ_CALL_RSP[avai_slot].timeout_set = (s32)(_timeout_ms + 8*G_ADV_SETTINGS.adv_duration)*1000;
+	if(fl_queueREQcRSP_find(_cb,_SeqTimetamp,&avai_slot) == -1 && avai_slot < QUEUE_RSP_SLOT_MAX){
+		G_QUEUE_REQ_CALL_RSP[avai_slot].timeout = (_timeout_ms!=0?(_timeout_ms + 8*G_ADV_SETTINGS.adv_duration):16*G_ADV_SETTINGS.adv_duration)*1000;
+		G_QUEUE_REQ_CALL_RSP[avai_slot].timeout_set = G_QUEUE_REQ_CALL_RSP[avai_slot].timeout;
 		G_QUEUE_REQ_CALL_RSP[avai_slot].rsp_cb = *_cb;
 		G_QUEUE_REQ_CALL_RSP[avai_slot].rsp_check.seqTimetamp = _SeqTimetamp;
 		G_QUEUE_REQ_CALL_RSP[avai_slot].rsp_check.hdr_cmdid = cmdid;
@@ -99,10 +99,10 @@ s8 fl_queueREQcRSP_add(u8 slaveid,u8 cmdid,u32 _SeqTimetamp,u8* _payloadreq,u8 _
 		G_QUEUE_REQ_CALL_RSP[avai_slot].retry = _retry;
 		G_QUEUE_REQ_CALL_RSP[avai_slot].req_payload.len = _len;
 		memcpy(G_QUEUE_REQ_CALL_RSP[avai_slot].req_payload.payload,_payloadreq,_len);
-//		LOGA(API,"queueREQcRSP Add [%d]SeqTimetamp(%d):%d ms|retry: %d \r\n",avai_slot,_SeqTimetamp,_timeout_ms/1000,_retry);
+		LOGA(API,"queueREQcRSP Add [%d]SeqTimetamp(%u):%d ms|retry: %d \r\n",avai_slot,_SeqTimetamp,_timeout_ms,_retry);
 		return avai_slot;
 	}
-	ERR(API,"queueREQcRSP Add [%d]SeqTimetamp(%d):%d ms|retry: %d \r\n",avai_slot,_SeqTimetamp,_timeout_ms/1000,_retry);
+	ERR(API,"queueREQcRSP Add [%d]SeqTimetamp(%u):%d ms|retry: %d \r\n",avai_slot,_SeqTimetamp,_timeout_ms,_retry);
 	return -1;
 }
 /***************************************************
@@ -113,18 +113,24 @@ s8 fl_queueREQcRSP_add(u8 slaveid,u8 cmdid,u32 _SeqTimetamp,u8* _payloadreq,u8 _
  * @return	  	:none
  *
  ***************************************************/
+
 int fl_queue_REQnRSP_TimeoutStart(void){
-	if(blt_soft_timer_find(&fl_queue_REQnRSP_TimeoutStart)==-1){
-		LOGA(INF,"REQcRSP initialization (%d ms)!!\r\n",QUEUQ_REQcRSP_INTERVAL);
-		blt_soft_timer_add(&fl_queue_REQnRSP_TimeoutStart,QUEUQ_REQcRSP_INTERVAL);
-		fl_queueREQcRSP_clear(G_QUEUE_REQ_CALL_RSP);
-	}else{
+//	if(blt_soft_timer_find(&fl_queue_REQnRSP_TimeoutStart)==-1){
+//		LOGA(INF,"REQcRSP initialization (%d ms)!!\r\n",QUEUQ_REQcRSP_INTERVAL);
+//		blt_soft_timer_add(&fl_queue_REQnRSP_TimeoutStart,QUEUQ_REQcRSP_INTERVAL);
+//		fl_queueREQcRSP_clear(G_QUEUE_REQ_CALL_RSP);
+//	}else
+	{
 		u8 avai_slot = fl_queueREQcRSP_sort();
 		for(u8 i =0;i < avai_slot;i++){
 			//check timeout
-			if(G_QUEUE_REQ_CALL_RSP[i].timeout > 0 && G_QUEUE_REQ_CALL_RSP[i].rsp_cb != 0){
-				G_QUEUE_REQ_CALL_RSP[i].timeout -= (s32)QUEUQ_REQcRSP_INTERVAL;
-				if(G_QUEUE_REQ_CALL_RSP[i].timeout <= 0){
+			if (G_QUEUE_REQ_CALL_RSP[i].timeout >= 0 && G_QUEUE_REQ_CALL_RSP[i].rsp_cb != 0) {
+				if (G_QUEUE_REQ_CALL_RSP[i].timeout <= QUEUQ_REQcRSP_INTERVAL) {
+					G_QUEUE_REQ_CALL_RSP[i].timeout=0; //Timeout expired
+				} else {
+					G_QUEUE_REQ_CALL_RSP[i].timeout -= QUEUQ_REQcRSP_INTERVAL;
+				}
+				if (G_QUEUE_REQ_CALL_RSP[i].timeout <= 0){
 					fl_rsp_container_t REQ_BUF = G_QUEUE_REQ_CALL_RSP[i];
 					//clear event
 					_queue_REQcRSP_clear(&G_QUEUE_REQ_CALL_RSP[i]);
@@ -135,14 +141,14 @@ int fl_queue_REQnRSP_TimeoutStart(void){
 						u8 mac[6];
 						if (fl_master_SlaveMAC_get(REQ_BUF.rsp_check.slaveID,mac) != -1) {
 							if (-1 != fl_api_master_req(mac,REQ_BUF.rsp_check.hdr_cmdid,REQ_BUF.req_payload.payload,REQ_BUF.req_payload.len,
-											REQ_BUF.rsp_cb,(u32) REQ_BUF.timeout_set / 1000,REQ_BUF.retry)) {
+											REQ_BUF.rsp_cb,REQ_BUF.timeout_set / 1000,REQ_BUF.retry)) {
 								LOGA(API,"[%d/%d]SlaveID(%d)->Retry:%d\r\n",i,avai_slot,REQ_BUF.rsp_check.slaveID,REQ_BUF.retry);
 								continue;
 							}
 						}
 #else
 						if(-1!=fl_api_slave_req(REQ_BUF.rsp_check.hdr_cmdid,REQ_BUF.req_payload.payload,REQ_BUF.req_payload.len,REQ_BUF.rsp_cb,
-										(u32)REQ_BUF.timeout_set/1000,REQ_BUF.retry)) {
+										REQ_BUF.timeout_set/1000,REQ_BUF.retry)) {
 							LOGA(API,"[%d/%d]SlaveID(%d)->Retry:%d\r\n",i,avai_slot,REQ_BUF.rsp_check.slaveID,REQ_BUF.retry);
 							continue;
 						}
@@ -155,6 +161,13 @@ int fl_queue_REQnRSP_TimeoutStart(void){
 		}
 	}
 	return 0;
+}
+void fl_queue_REQnRSP_TimeoutInit(void) {
+	if (blt_soft_timer_find(&fl_queue_REQnRSP_TimeoutStart) == -1) {
+		LOGA(INF,"REQcRSP initialization (%d ms)!!\r\n",QUEUQ_REQcRSP_INTERVAL);
+		blt_soft_timer_add(&fl_queue_REQnRSP_TimeoutStart,QUEUQ_REQcRSP_INTERVAL);
+		fl_queueREQcRSP_clear(G_QUEUE_REQ_CALL_RSP);
+	}
 }
 /***************************************************
  * @brief 		:scan pack rec from master

@@ -24,6 +24,11 @@
 #include "fl_ble_wifi.h"
 
 #ifdef MASTER_CORE
+extern _attribute_data_retention_ volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME;
+#define SYNC_ORIGIN_MASTER(x,y) 			do{	\
+												ORIGINAL_MASTER_TIME.timetamp = x;\
+												ORIGINAL_MASTER_TIME.milstep = y;\
+											}while(0) //Sync original time-master req
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -120,6 +125,7 @@ void fl_master_nodelist_AddRefesh(fl_nodeinnetwork_t _node) {
  *
  ***************************************************/
 fl_pack_t fl_master_packet_heartbeat_build(void) {
+	extern u8 GETINFO_FLAG_EVENTTEST;
 	fl_pack_t packet_built;
 	fl_data_frame_u packet;
 	memset(packet.bytes,0,SIZEU8(packet.bytes));
@@ -134,8 +140,13 @@ fl_pack_t fl_master_packet_heartbeat_build(void) {
 
 	//Add new mill-step
 	packet.frame.milltamp = timetampStep.milstep;
+	//TODO: IMPORTANT SYNCHRONIZATION TIMESTAMP
+	LOGA(APP,"Master Synchronzation Timetamp:%d(%d)\r\n",timetampStep.timetamp,timetampStep.milstep);
+	SYNC_ORIGIN_MASTER(timetampStep.timetamp,timetampStep.milstep);
+
 	packet.frame.slaveID.id_u8 = 0xFF; // all grps + all members
 	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
+	packet.frame.payload[0]=GETINFO_FLAG_EVENTTEST;
 	//crc
 	packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
 
@@ -327,7 +338,7 @@ fl_pack_t fl_master_packet_GetInfo_build(u8 *_slave_mac_arr, u8 _slave_num) {
 	/* F5|timetamp|slaveID 1|slaveID 2.......|CRC|TTL */
 	/* 1B|  4Bs   |  1Bs  	|     18Bs  	 |1B |1B  */
 	memset(packet.bytes,0,SIZEU8(packet.bytes));
-	packet.frame.hdr = NWK_HDR_F5_INFO; //testing
+	packet.frame.hdr = NWK_HDR_F5_INFO;
 
 	fl_timetamp_withstep_t timetampStep = fl_rtc_getWithMilliStep();
 //	u32 timetamp = fl_rtc_get();
@@ -441,16 +452,16 @@ u32 fl_req_master_packet_createNsend(u8* _slave_mac,u8 _cmdid,u8* _data, u8 _len
 	fl_hdr_nwk_type_e cmdid = (fl_hdr_nwk_type_e)_cmdid;
 	if(!IsREQHDR(cmdid)){
 		ERR(API,"REQ CMD ID hasn't been registered!!\r\n");
-		return false;
+		return 0;
 	}
 	s8 slaveID = fl_master_Node_find(_slave_mac);
 	if(slaveID == -1){
 		ERR(API,"SlaveID NOT FOUND!!\r\n");
-		return false;
+		return 0;
 	}
 	//generate seqtimetamp
 	fl_timetamp_withstep_t timetampStep = fl_rtc_getWithMilliStep();
-//	timetampStep.milstep++;
+	timetampStep.milstep++;
 	fl_data_frame_u req_pack;
 	switch (cmdid) {
 		case NWK_HDR_F6_SENDMESS: {
@@ -482,6 +493,7 @@ u32 fl_req_master_packet_createNsend(u8* _slave_mac,u8 _cmdid,u8* _data, u8 _len
 		}
 		break;
 		default:
+			return 0;
 		break;
 	}
 	//copy to data struct
@@ -489,10 +501,15 @@ u32 fl_req_master_packet_createNsend(u8* _slave_mac,u8 _cmdid,u8* _data, u8 _len
 	memcpy(rslt.data_arr,req_pack.bytes,rslt.length );
 	P_PRINTFHEX_A(INF,rslt.data_arr,rslt.length,"REQ %X ",_cmdid);
 	//Send ADV
-	fl_adv_sendFIFO_add(rslt);
-	//seqtimetamp
-	fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(rslt);
-	u32 seq_timetamp = fl_rtc_timetamp2milltampStep(timetamp_inpack);
+	s8 add_rslt = fl_adv_sendFIFO_add(rslt);
+	u32 seq_timetamp = 0;
+	if(add_rslt!=-1){
+		//seqtimetamp
+		fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(rslt);
+		seq_timetamp = fl_rtc_timetamp2milltampStep(timetamp_inpack);
+		LOGA(API,"API REQ Synchronization TimeTamp:%d(%d)\r\n",timetamp_inpack.timetamp,timetamp_inpack.milstep);
+		SYNC_ORIGIN_MASTER(timetamp_inpack.timetamp,timetamp_inpack.milstep);
+	}
 	return seq_timetamp;
 }
 
@@ -536,7 +553,7 @@ int fl_send_collection_req(void) {
  *
  ***************************************************/
 int fl_send_heartbeat(void) {
-	if(G_NODE_LIST.slot_inused == 0xFF){return -1;}
+	if(G_NODE_LIST.slot_inused == 0xFF){return 0;}
 	datetime_t cur_dt;
 	u32 cur_timetamp = fl_rtc_get();
 	fl_rtc_timestamp_to_datetime(cur_timetamp,&cur_dt);
@@ -544,6 +561,7 @@ int fl_send_heartbeat(void) {
 	LOGA(APP,"[%02d/%02d/%02d-%02d:%02d:%02d] HeartBeat Sync(%d ms)\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second,
 			PERIOD_HEARTBEAT);
 	fl_pack_t packet_built = fl_master_packet_heartbeat_build();
+
 	fl_adv_sendFIFO_add(packet_built);
 	return 0; //
 }
@@ -833,13 +851,11 @@ void fl_nwk_master_nodelist_load(void) {
  *
  ***************************************************/
 void fl_nwk_master_heartbeat_init(void){
+	fl_send_heartbeat();
 	blt_soft_timer_add(&fl_send_heartbeat,PERIOD_HEARTBEAT * 1000);
 }
 void fl_nwk_master_heartbeat_run(void) {
-//	LOGA(INF,"Restart HearBeat:%d ms\r\n",PERIOD_HEARTBEAT);
-	if (blt_soft_timer_find(&fl_send_heartbeat)==-1) {
-		blt_soft_timer_add(&fl_send_heartbeat,PERIOD_HEARTBEAT * 1000);
-	} else blt_soft_timer_restart(&fl_send_heartbeat,0);
+	blt_soft_timer_restart(&fl_send_heartbeat,PERIOD_HEARTBEAT * 1000);
 }
 /***************************************************
  * @brief 		: collection slave (install mode)

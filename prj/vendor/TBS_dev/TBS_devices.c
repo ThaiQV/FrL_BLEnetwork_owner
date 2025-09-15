@@ -123,6 +123,7 @@ typedef struct {
 	u32 lifetime;
 	u16 req_num;
 	u16 rsp_num;
+	u32 rtt;
 } test_sendevent_t;
 
 test_sendevent_t TEST_EVENT ={0,0,0};
@@ -141,20 +142,23 @@ void TEST_rsp_callback(void *_data,void* _data2){
 	}else{
 //		P_INFO("Master RSP: NON-RSP \r\n");
 	}
-	u32 lifetime = fl_rtc_get() - TEST_EVENT.lifetime;
+	u32 lifetime = (clock_time() - TEST_EVENT.lifetime)/SYSTEM_TIMER_TICK_1S;
 	P_INFO("==============================\r\n");
 	P_INFO("* LifeTime:%dh%dm%ds\r\n",lifetime / 3600,(lifetime % 3600) / 60,lifetime % 60);
+	P_INFO("* RTT     :%d ms\r\n",data->timeout>0?((clock_time()-TEST_EVENT.rtt)/SYSTEM_TIMER_TICK_1MS):0);
 	P_INFO("* REQUEST :%d\r\n",TEST_EVENT.req_num);
 	P_INFO("* RESPONSE:%d\r\n",TEST_EVENT.rsp_num);
 	P_INFO("==============================\r\n");
 }
 int TEST_Counter_Event(void){
+	extern u8 GETINFO_FLAG_EVENTTEST; // for testing
 	u32 period = RAND(1,30);
-	if (IsJoinedNetwork() && IsOnline()) {
+	if (IsJoinedNetwork() && IsOnline() && GETINFO_FLAG_EVENTTEST ==1) {
 		G_COUNTER_DEV.data.bt_call = RAND(0,1);
 		G_COUNTER_DEV.data.bt_endcall = G_COUNTER_DEV.data.bt_call ? 0 : 1;
 		G_COUNTER_DEV.data.bt_rst = G_COUNTER_DEV.data.bt_call ? 0 : RAND(0,1);
-		fl_api_slave_req(NWK_HDR_55,G_COUNTER_DEV.bytes,SIZEU8(G_COUNTER_DEV.bytes),&TEST_rsp_callback,100,1);
+		fl_api_slave_req(NWK_HDR_55,G_COUNTER_DEV.bytes,SIZEU8(G_COUNTER_DEV.bytes),&TEST_rsp_callback,0,1);
+		TEST_EVENT.rtt = clock_time();
 		TEST_EVENT.req_num++;
 		P_INFO("TEST EVNET after:%d s\r\n",period);
 	}
@@ -171,7 +175,7 @@ void TBS_Counter_init(void){
 		memset(G_COUNTER_LCD[var],0,SIZEU8(G_COUNTER_LCD[var]));
 	}
 	//todo:Init Butt,lcd,7segs,.....
-	TEST_EVENT.lifetime = fl_rtc_get();
+	TEST_EVENT.lifetime = clock_time();
 	blt_soft_timer_add(&TEST_Counter_Event,5000*1000);
 }
 void TBS_Counter_Run(void){

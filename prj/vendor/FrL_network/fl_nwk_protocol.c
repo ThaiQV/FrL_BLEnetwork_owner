@@ -34,6 +34,7 @@ extern fl_slaves_list_t G_NODE_LIST;
 #define GETINFO_1_TIMES_MAX			20
 #define GETINFO_FREQUENCY			20 //ms
 #define GETINFO_FIRST_DUTY			25*1000//s
+u8 GETINFO_FLAG_EVENTTEST = 0;
 typedef struct {
 	fl_nodeinnetwork_t* id[GETINFO_1_TIMES_MAX];
 	u8 num_retrieved; // number of slaves retrieved out
@@ -489,7 +490,7 @@ void CMD_GETINFOSLAVE(u8* _data) {
 
 	//p get info 255 <Period get again> <num slave for each> <num virtual slave> <timeout rsp>
 	if(G_NODE_LIST.slot_inused == 0xFF) return;
-	if (slave_num == 6 && slaveID[0] == 0xFF) {
+	if (slave_num >= 6 && slaveID[0] == 0xFF) {
 		CLEAR_INFO_RSP();
 		G_SLA_INFO_RSP.settings.time_interval = slaveID[1];
 
@@ -509,7 +510,12 @@ void CMD_GETINFOSLAVE(u8* _data) {
 		G_ADV_SETTINGS.time_wait_rsp = G_SLA_INFO_RSP.settings.timeout_rsp;
 		G_ADV_SETTINGS.retry_times = G_SLA_INFO_RSP.settings.num_retry;
 
-		LOGA(DRV,"GET ALL INFO AUTORUN (interval:%d s|NumOfTimes:%d |Total:%d |Timeout:%d ms|Retry:%d)!!\r\n",G_SLA_INFO_RSP.settings.time_interval,
+		//TEST SIMULATE creating event from slaves
+		GETINFO_FLAG_EVENTTEST = slave_num>6?slaveID[6]:0;
+
+		LOGA(DRV,"GET ALL INFO AUTORUN (Test:%d|interval:%d s|NumOfTimes:%d |Total:%d |Timeout:%d ms|Retry:%d)!!\r\n",
+				GETINFO_FLAG_EVENTTEST,
+				G_SLA_INFO_RSP.settings.time_interval,
 				G_SLA_INFO_RSP.settings.num_1_times,
 				G_SLA_INFO_RSP.settings.total_slaves,
 				G_ADV_SETTINGS.time_wait_rsp,
@@ -517,7 +523,7 @@ void CMD_GETINFOSLAVE(u8* _data) {
 		//create timer checking to manage response
 		//Clear and re-start
 		blt_soft_timer_delete(&_getInfo_autorun);
-		blt_soft_timer_add(&_getInfo_autorun,(FIRST_PROTOCOL_START == 0 ? 1000 : GETINFO_FIRST_DUTY) * 1000); //ms
+		blt_soft_timer_add(&_getInfo_autorun,((FIRST_PROTOCOL_START == 0 || G_SLA_INFO_RSP.settings.time_interval != 0) ? 1000 : GETINFO_FIRST_DUTY) * 1000); //ms
 	} else if (slave_num >= 1) {
 		//Clear and re-start
 		blt_soft_timer_delete(&_getInfo_autorun);
