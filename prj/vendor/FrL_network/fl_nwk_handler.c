@@ -76,7 +76,7 @@ s8 fl_queueREQcRSP_find(fl_rsp_callback_fnc *_cb,u32 _SeqTimetamp,u32 _timeout_m
 	u8 indx = 0;
 	*o_avaislot=fl_queueREQcRSP_sort();
 	for (indx = 0; indx < QUEUE_RSP_SLOT_MAX; ++indx) {
-		if(*G_QUEUE_REQ_CALL_RSP[indx].rsp_cb == *_cb && G_QUEUE_REQ_CALL_RSP[indx].timeout_set == _timeout_ms
+		if(*G_QUEUE_REQ_CALL_RSP[indx].rsp_cb == *_cb /* && G_QUEUE_REQ_CALL_RSP[indx].timeout_set == _timeout_ms*1000*/
 				&& G_QUEUE_REQ_CALL_RSP[indx].rsp_check.seqTimetamp == _SeqTimetamp)
 		{
 			*o_avaislot = 0xFF;

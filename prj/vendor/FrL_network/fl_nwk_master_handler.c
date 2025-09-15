@@ -538,7 +538,7 @@ int fl_send_collection_req(void) {
  *
  ***************************************************/
 int fl_send_heartbeat(void) {
-	if(G_NODE_LIST.slot_inused == 0xFF){return -1;}
+	if(G_NODE_LIST.slot_inused == 0xFF){return 0;}
 	datetime_t cur_dt;
 	u32 cur_timetamp = fl_rtc_get();
 	fl_rtc_timestamp_to_datetime(cur_timetamp,&cur_dt);
@@ -750,7 +750,7 @@ void fl_nwk_master_init(void) {
 	G_MASTER_INFO.nwk.chn[2] = master_profile.nwk.chn[2];
 	memcpy(G_MASTER_INFO.nwk.private_key,master_profile.nwk.private_key,SIZEU8(master_profile.nwk.private_key));
 	blt_soft_timer_add(_nwk_master_backup,2 * 1000 * 1000);
-//	fl_nwk_master_heartbeat_init();
+	fl_nwk_master_heartbeat_init();
 }
 /***************************************************
  * @brief 		: init nodelist
