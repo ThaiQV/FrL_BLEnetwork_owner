@@ -30,12 +30,10 @@ volatile u8* FL_NWK_COLLECTION_MODE; //
 /***                                Global Parameters                        **/
 /******************************************************************************/
 /******************************************************************************/
-#ifdef MASTER_CORE
-#define SEND_TIMEOUT_MS		50 //ms
-#else
+
 #define SEND_TIMEOUT_MS		50 //ms
 extern _attribute_data_retention_ volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME;
-#endif
+
 volatile u8 F_SENDING_STATE = 0;
 
 fl_adv_settings_t G_ADV_SETTINGS = {
@@ -231,56 +229,6 @@ void fl_durationADV_timeout_proccess(u8 e, u8 *p, int n) {
 /***                      Processing functions 					             **/
 /******************************************************************************/
 /******************************************************************************/
-#ifndef MASTER_CORE
-/***************************************************
- * @brief 		:Align QUEUE SENDING
- *
- * @param[in] 	:none
- *
- * @return	  	:none
- *
- ***************************************************/
-bool _align_QUEUE_SENDING(fl_pack_t _pack){
-	typedef struct {
-		fl_pack_t two_pack[2];
-		u8 origin_indx;
-		u8 loop_times;
-	}manage_sending_loop_t;
-
-	static manage_sending_loop_t man_loop={.origin_indx = 0xFF,.loop_times = 1, .two_pack = {{.length = 0},{.length =0}}};
-	//update pack_arr
-	man_loop.two_pack[0] = man_loop.two_pack[1];
-	man_loop.two_pack[1] = _pack;
-	//find orginal index
-	u32  timetamp_in_pack = fl_rtc_timetamp2milltampStep(fl_adv_timetampStepInPack(man_loop.two_pack[1]));
-	u32  timetamp_in_pre_pack = fl_rtc_timetamp2milltampStep(fl_adv_timetampStepInPack(man_loop.two_pack[0]));
-
-	if(timetamp_in_pack && timetamp_in_pre_pack){ //  parse success
-		//check master original of the previous with currently
-		if(timetamp_in_pack > timetamp_in_pre_pack && timetamp_in_pack >= fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME)){
-//			man_loop.origin_indx = idx_inQUEUE;
-			man_loop.loop_times = (man_loop.loop_times > NWK_REPEAT_LEVEL) ? 1 : man_loop.loop_times + 1;
-		}
-		//Check loop_times to skip packet with ttl < loop_times
-		fl_dataframe_format_t data_parsed;
-		man_loop.two_pack[1].length+=1;
-		u8 rslt_parser=fl_packet_parse(man_loop.two_pack[1],&data_parsed);
-//		LOGA(BLE,"LoopTimes:%d|(%d)TTL:%d\r\n",man_loop.loop_times,rslt_parser,data_parsed.endpoint.repeat_cnt);
-//		LOGA(BLE,"[0].len:%d | [1].len:%d\r\n",man_loop.two_pack[0].length,man_loop.two_pack[1].length);
-		if (rslt_parser) {
-//			LOGA(BLE,"LoopTimes:%d|(%d)TTL:%d\r\n",man_loop.loop_times,rslt_parser,data_parsed.endpoint.repeat_cnt);
-			return (data_parsed.endpoint.repeat_cnt <= man_loop.loop_times);
-		}
-	}
-	else{
-		if (_pack.length != 0) {
-			man_loop.two_pack[0] = _pack;
-			man_loop.two_pack[1] = _pack;
-		}
-	}
-	return false;
-}
-#endif
 
 /***************************************************
  * @brief 		: add data payload adv into queue fifo
@@ -291,7 +239,11 @@ bool _align_QUEUE_SENDING(fl_pack_t _pack){
  *
  ***************************************************/
 int fl_adv_sendFIFO_add(fl_pack_t _pack) {
-	if (FL_QUEUE_FIND(&G_QUEUE_SENDING,&_pack,_pack.length /* - 1 skip rssi*/) == -1) {
+	u8 master_send_skip_LSB = 0;
+#ifdef MASTER_CORE
+	master_send_skip_LSB = 1;
+#endif
+	if (FL_QUEUE_FIND(&G_QUEUE_SENDING,&_pack,_pack.length - master_send_skip_LSB /* - 1 skip LSB (master)*/) == -1) {
 		if (FL_QUEUE_ADD(&G_QUEUE_SENDING,&_pack) < 0) {
 			ERR(BLE,"Err FULL <QUEUE ADD ADV SENDING>!!\r\n");
 			return -1;
@@ -315,12 +267,10 @@ int fl_adv_sendFIFO_add(fl_pack_t _pack) {
 void fl_adv_sendFIFO_run(void) {
 	fl_pack_t data_in_queue;
 	if (!F_SENDING_STATE) {
-
-#ifdef MASTER_CORE
-		if (FL_QUEUE_GET(&G_QUEUE_SENDING,&data_in_queue)) {
-			LOGA(BLE,"QUEUE SEND REMOVE: %d/%d (cnt:%d)\r\n",G_QUEUE_SENDING.head_index,G_QUEUE_SENDING.tail_index,G_QUEUE_SENDING.count);
-//			fl_nwk_master_heartbeat_run();
-#else
+//#ifdef MASTER_CORE
+//		if (FL_QUEUE_GET(&G_QUEUE_SENDING,&data_in_queue)) {
+//			LOGA(BLE,"QUEUE SEND REMOVE: %d/%d (cnt:%d)\r\n",G_QUEUE_SENDING.head_index,G_QUEUE_SENDING.tail_index,G_QUEUE_SENDING.count);
+//#else
 		u8 loop_check = 0;
 		while (FL_QUEUE_GET_LOOP(&G_QUEUE_SENDING,&data_in_queue)) {
 			fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(data_in_queue);
@@ -338,7 +288,7 @@ void fl_adv_sendFIFO_run(void) {
 //			P_PRINTFHEX_A(BLE,data_in_queue.data_arr,data_in_queue.length,"[%d]TTL(%d):",G_QUEUE_SENDING.head_index,
 //					data_in_queue.data_arr[data_in_queue.length - 1] & 0x03);
 
-#endif
+//#endif
 //			LOGA(APP,"ADV FIFO(%d):%d/%d\r\n",G_QUEUE_SENDING.count,G_QUEUE_SENDING.head_index,G_QUEUE_SENDING.tail_index);
 			F_SENDING_STATE = 1;
 //			P_PRINTFHEX_A(INF,data_in_queue.data_arr,data_in_queue.length,"Raw Data(len:%d):",data_in_queue.length);
@@ -435,7 +385,7 @@ void fl_adv_init(void) {
 	extern volatile u8 MASTER_INSTALL_STATE;
 	FL_NWK_COLLECTION_MODE = &MASTER_INSTALL_STATE;
 #else
-//	fl_input_external_init();
+
 	extern fl_nodeinnetwork_t G_INFORMATION;
 	fl_nwk_slave_init();
 	fl_repeater_init();
@@ -595,6 +545,21 @@ bool fl_adv_IsFromMe(fl_pack_t data_in_queue) {
 	}
 	return false;
 }
+bool fl_adv_MasterToMe(fl_pack_t data_in_queue) {
+	extern fl_nodeinnetwork_t G_INFORMATION;
+	fl_dataframe_format_t data_parsed;
+	if (fl_packet_parse(data_in_queue,&data_parsed)) {
+		if((data_parsed.endpoint.master == FL_FROM_MASTER|| data_parsed.endpoint.master == FL_FROM_MASTER_ACK)
+				&& (
+						(data_parsed.slaveID.id_u8 == G_INFORMATION.slaveID.id_u8 && G_INFORMATION.slaveID.id_u8 != 0xFF)
+						|| (data_parsed.slaveID.id_u8 == 0xFF ||  G_INFORMATION.slaveID.id_u8 == 0xFF)
+					)
+			){
+			return true;
+		}
+	}
+	return false;
+}
 #endif
 /***************************************************
  * @brief 		: build packet adv via the freelux protocol
@@ -670,7 +635,9 @@ void fl_adv_run(void) {
 				fl_repeat_run(&data_in_queue);
 			}
 			//Todo: Handle FORM MASTER REQ
-			if (fl_adv_IsFromMaster(data_in_queue)) {
+			//if (fl_adv_IsFromMaster(data_in_queue))
+			if(fl_adv_MasterToMe(data_in_queue))
+			{
 				fl_nwk_slave_run(&data_in_queue);
 			}
 #endif

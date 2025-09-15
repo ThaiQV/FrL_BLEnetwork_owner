@@ -20,8 +20,7 @@
 //Test api
 #include "test_api.h"
 #include "../TBS_dev/TBS_dev_config.h"
-#ifndef MASTER_CORE
-u8 GETINFO_FLAG_EVENTTEST = 0;
+
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -30,11 +29,12 @@ u8 GETINFO_FLAG_EVENTTEST = 0;
 /*---------------- Synchronization Master RTC --------------------------*/
 volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME = {.timetamp = 0,.milstep = 0};
 
+#ifndef MASTER_CORE
 #define SYNC_ORIGIN_MASTER(x,y) 			do{	\
 												ORIGINAL_MASTER_TIME.timetamp = x;\
 												ORIGINAL_MASTER_TIME.milstep = y;\
 											}while(0) //Sync original time-master req
-
+u8 GETINFO_FLAG_EVENTTEST = 0;
 #define JOIN_NETWORK_TIME 			30*1000 	//ms
 #define RECHECKING_NETWOK_TIME 		30*1000 	//ms - 1mins
 
@@ -137,7 +137,7 @@ int _nwk_slave_backup(void){
 
 void fl_nwk_slave_init(void) {
 	DEBUG_TURN(NWK_DEBUG_STT);
-
+//	fl_input_external_init();
 	FL_QUEUE_CLEAR(&G_HANDLE_CONTAINER,PACK_HANDLE_SIZE);
 	//Generate information
 	G_INFORMATION.active = false;
@@ -234,7 +234,10 @@ void _nwk_slave_syncFromPack(fl_dataframe_format_t *packet){
 	//Sync network status
 	//if(packet->slaveID.id_u8 == G_INFORMATION.slaveID.id_u8)
 	{
-		G_INFORMATION.active = true;
+		if(G_INFORMATION.active == false){
+			ERR(INF,"Device -> Online\r\n");
+		}
+			G_INFORMATION.active = true;
 		if (blt_soft_timer_find(&_isOnline_check) == -1) {
 			blt_soft_timer_add(&_isOnline_check,RECHECKING_NETWOK_TIME * 1000);
 		} else
@@ -244,7 +247,7 @@ void _nwk_slave_syncFromPack(fl_dataframe_format_t *packet){
 
 s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry) {
 	//register timeout cb
-	if (_cb != 0 && _timeout_ms*1000 >= 2*QUEUQ_REQcRSP_INTERVAL) {
+	if (_cb != 0 &&( _timeout_ms*1000 >= 2*QUEUQ_REQcRSP_INTERVAL || _timeout_ms==0)) {
 		u32 seq_timetamp=fl_req_slave_packet_createNsend(_cmdid,_data,_len);
 		if(seq_timetamp){
 			return fl_queueREQcRSP_add(G_INFORMATION.slaveID.id_u8,_cmdid,seq_timetamp,_data,_len,&_cb,_timeout_ms,_retry);
@@ -377,6 +380,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 		return packet_built;
 	}
 	LOGA(INF,"(%d|%x)HDR_REQ ID: %02X - ACK:%d\r\n",IsJoinedNetwork(),G_INFORMATION.slaveID.id_u8,packet.frame.hdr,packet.frame.endpoint.master);
+
 	switch ((fl_hdr_nwk_type_e) packet.frame.hdr) {
 		case NWK_HDR_HEARTBEAT:
 			_nwk_slave_syncFromPack(&packet.frame);

@@ -343,7 +343,7 @@ void _SENDMESS_slave_rsp_callback(void *_data,void* _data2){
 		u8 mac[6];
 		if (fl_master_SlaveMAC_get(data->rsp_check.slaveID,mac) != -1) {
 			fl_datawifi2ble_t wfdata;
-			wfdata.cmd = G_WIFI_CON[_wf_CMD_find(GF_CMD_GET_LIST_REQUEST)].rsp.cmd;
+			wfdata.cmd = G_WIFI_CON[_wf_CMD_find(GF_CMD_SENDMESS_REQUEST)].rsp.cmd;
 			memset(wfdata.data,0,SIZEU8(wfdata.data));
 			memcpy(wfdata.data,mac,SIZEU8(mac));
 			wfdata.len_data = SIZEU8(mac);
