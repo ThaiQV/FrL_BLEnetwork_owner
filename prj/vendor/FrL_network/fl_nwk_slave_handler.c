@@ -238,7 +238,7 @@ void _nwk_slave_syncFromPack(fl_dataframe_format_t *packet){
 		if (blt_soft_timer_find(&_isOnline_check) == -1) {
 			blt_soft_timer_add(&_isOnline_check,RECHECKING_NETWOK_TIME * 1000);
 		} else
-			blt_soft_timer_restart(&_isOnline_check,0);
+			blt_soft_timer_restart(&_isOnline_check,RECHECKING_NETWOK_TIME * 1000);
 	}
 }
 

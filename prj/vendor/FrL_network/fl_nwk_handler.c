@@ -99,10 +99,10 @@ s8 fl_queueREQcRSP_add(u8 slaveid,u8 cmdid,u32 _SeqTimetamp,u8* _payloadreq,u8 _
 		G_QUEUE_REQ_CALL_RSP[avai_slot].retry = _retry;
 		G_QUEUE_REQ_CALL_RSP[avai_slot].req_payload.len = _len;
 		memcpy(G_QUEUE_REQ_CALL_RSP[avai_slot].req_payload.payload,_payloadreq,_len);
-		LOGA(API,"queueREQcRSP Add [%d]SeqTimetamp(%d):%d ms|retry: %d \r\n",avai_slot,swap_endian32(_SeqTimetamp),_timeout_ms,_retry);
+		LOGA(API,"queueREQcRSP Add [%d]SeqTimetamp(%u):%d ms|retry: %d \r\n",avai_slot,_SeqTimetamp,_timeout_ms,_retry);
 		return avai_slot;
 	}
-	ERR(API,"queueREQcRSP Add [%d]SeqTimetamp(%d):%d ms|retry: %d \r\n",avai_slot,swap_endian32(_SeqTimetamp),_timeout_ms,_retry);
+	ERR(API,"queueREQcRSP Add [%d]SeqTimetamp(%u):%d ms|retry: %d \r\n",avai_slot,_SeqTimetamp,_timeout_ms,_retry);
 	return -1;
 }
 /***************************************************

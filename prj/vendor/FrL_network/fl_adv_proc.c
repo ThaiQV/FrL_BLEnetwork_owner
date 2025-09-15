@@ -319,7 +319,7 @@ void fl_adv_sendFIFO_run(void) {
 #ifdef MASTER_CORE
 		if (FL_QUEUE_GET(&G_QUEUE_SENDING,&data_in_queue)) {
 			LOGA(BLE,"QUEUE SEND REMOVE: %d/%d (cnt:%d)\r\n",G_QUEUE_SENDING.head_index,G_QUEUE_SENDING.tail_index,G_QUEUE_SENDING.count);
-			fl_nwk_master_heartbeat_run();
+//			fl_nwk_master_heartbeat_run();
 #else
 		u8 loop_check = 0;
 		while (FL_QUEUE_GET_LOOP(&G_QUEUE_SENDING,&data_in_queue)) {
