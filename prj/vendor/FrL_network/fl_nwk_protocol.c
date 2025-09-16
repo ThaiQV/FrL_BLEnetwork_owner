@@ -34,6 +34,9 @@ extern fl_slaves_list_t G_NODE_LIST;
 #define GETINFO_1_TIMES_MAX			20
 #define GETINFO_FREQUENCY			20 //ms
 #define GETINFO_FIRST_DUTY			25*1000//s
+
+#define GETALL_TIMEOUT_1_NODE		70 //70ms
+#define GETALL_NUMOF1TIMES			8
 u8 GETINFO_FLAG_EVENTTEST = 0;
 typedef struct {
 	fl_nodeinnetwork_t* id[GETINFO_1_TIMES_MAX];
@@ -91,6 +94,7 @@ void CMD_CHANNELCONFIG(u8* _data);
 void CMD_GETSLALIST(u8* _data);
 void CMD_GETINFOSLAVE(u8* _data);
 void CMD_GETADVSETTING(u8* _data);
+void CMD_GETALLNODES(u8* _data);
 
 fl_cmdlines_t G_CMDSET[] = { { { 'u', 't', 'c' }, 3, CMD_SETUTC }, 			// p set utc yymmddhhmmss
 		{ { 'i', 'n', 's', 't', 'a', 'l', 'l' }, 7, CMD_INSTALLMODE },		// p install on/off
@@ -103,10 +107,10 @@ fl_cmdlines_t G_CMDSET[] = { { { 'u', 't', 'c' }, 3, CMD_SETUTC }, 			// p set u
 		{ { 'c', 'h', 'n' }, 3, CMD_CHANNELCONFIG },						// p set chn <chn1> <chn2> <chn3>
 		};
 
-fl_cmdlines_t G_CMDGET[] = { { { 's', 'l', 'a', 'l', 'i', 's', 't' }, 7, CMD_GETSLALIST },		// p get list
-		{ { 'i', 'n', 'f', 'o' }, 4, CMD_GETINFOSLAVE },					// p get <id8> <id8> .... : max = 16 id
-		{ { 'a', 'd', 'v', 'c', 'o', 'n', 'f', 'i', 'g' }, 9, CMD_GETADVSETTING },					// p get scan : use to get scanner adv settings
-		// p get info <mac_u32>
+fl_cmdlines_t G_CMDGET[] = { { { 's', 'l', 'a', 'l', 'i', 's', 't' }, 7, CMD_GETSLALIST },	// p get list
+		{ { 'i', 'n', 'f', 'o' }, 4, CMD_GETINFOSLAVE },									// p get <id8> <id8> .... : max = 16 id
+		{ { 'a', 'd', 'v', 'c', 'o', 'n', 'f', 'i', 'g' }, 9, CMD_GETADVSETTING },			// p get scan : use to get scanner adv settings
+		{ { 'a', 'l', 'l' }, 3, CMD_GETALLNODES },							//p get all <timeout>: @Important cmd for running Frl Network
 		};
 
 
@@ -456,6 +460,7 @@ void CMD_GETSLALIST(u8* _data) {
 	void _master_nodelist_printf(fl_slaves_list_t *_node, u8 _size);
 	_master_nodelist_printf(&G_NODE_LIST,G_NODE_LIST.slot_inused);
 }
+
 void CMD_GETADVSETTING(u8* _data) {
 	extern fl_adv_settings_t G_ADV_SETTINGS;
 	extern volatile u8 NWK_REPEAT_MODE;
@@ -468,6 +473,83 @@ void CMD_GETADVSETTING(u8* _data) {
 	LOGA(DRV,"REPEAT mode :%d(%d)\r\n",NWK_REPEAT_MODE,NWK_REPEAT_LEVEL);
 	LOG_P(DRV,"************************\r\n");
 }
+
+typedef struct {
+	fl_slaves_list_t *pAllNodes;
+	u16 timeout;
+	u8 tail_nodes;
+	u8 online;
+	u32 rtt;
+} fl_getall_nodes_t;
+fl_getall_nodes_t p_ALLNODES;
+
+int _GETALLNODES(void) {
+/*
+ * Max RTT for max 200 nodes = 10s
+ * => max RTT 1 node = 70ms
+ * => max RTT for 8 nodes = 70*8 = 560 ms
+ * */
+#define MAX_TIMEOUT_FOR_8_NODES (70)
+
+	u8 slave_num = 0;
+	u8 slaveID[GETALL_NUMOF1TIMES];
+	memset(slaveID,0xFF,SIZEU8(slaveID));
+
+	if (p_ALLNODES.timeout == 0) {
+		P_INFO("GET ALL TIMEOUT: %d ms\r\n",p_ALLNODES.timeout);
+		P_INFO("**Online :%d/%d\r\n",p_ALLNODES.online,p_ALLNODES.pAllNodes->slot_inused);
+		return -1;
+	}else{
+		if(p_ALLNODES.timeout<=MAX_TIMEOUT_FOR_8_NODES) p_ALLNODES.timeout=0;
+		else p_ALLNODES.timeout-=MAX_TIMEOUT_FOR_8_NODES; //timeout base seconds
+		p_ALLNODES.online=0;
+		for (u8 i = 0;i<p_ALLNODES.tail_nodes;i++){
+			if(p_ALLNODES.pAllNodes->sla_info[i].active == false){
+				if (slave_num<SIZEU8(slaveID)) {
+					slaveID[slave_num] = i; //index of the node
+					slave_num++;
+				}
+				else break;
+			}
+			else {
+				p_ALLNODES.online++;
+				if (p_ALLNODES.online >= p_ALLNODES.pAllNodes->slot_inused) {
+					P_INFO("GET ALL RTT: %d ms\r\n",(clock_time()- p_ALLNODES.rtt)/SYSTEM_TIMER_TICK_1MS);
+					return -1;
+				}
+			}
+		}
+		//update tail
+		u8 new_tail = slaveID[slave_num-1] + GETALL_NUMOF1TIMES;
+		p_ALLNODES.tail_nodes = new_tail>p_ALLNODES.pAllNodes->slot_inused?p_ALLNODES.pAllNodes->slot_inused:new_tail;
+		LOGA(DRV,"Tail:%d,Total:%d\r\n",p_ALLNODES.tail_nodes,p_ALLNODES.pAllNodes->slot_inused);
+		P_PRINTFHEX_A(DRV,slaveID,slave_num,"SlaveID(%d):",slave_num);
+		fl_pack_t info_pack = fl_master_packet_GetInfo_build(slaveID,slave_num);
+		P_PRINTFHEX_A(DRV,info_pack.data_arr,info_pack.length,"%s(%d):","Info Pack",info_pack.length);
+		fl_adv_sendFIFO_add(info_pack);
+	}
+	return MAX_TIMEOUT_FOR_8_NODES*1000; //return softtimer with us
+}
+
+void CMD_GETALLNODES(u8* _data) {
+	u16 timeout = 0;
+	//p get all <timeout_s>
+	int rslt = sscanf((char*) _data,"all %hd",&timeout);
+	if (rslt ==1 && G_NODE_LIST.slot_inused != 0xFF && blt_soft_timer_find(&_GETALLNODES) == -1) {
+		P_INFO("Get %d nodes (timeout:%d s)\r\n",G_NODE_LIST.slot_inused,timeout);
+		p_ALLNODES.pAllNodes = &G_NODE_LIST;
+		p_ALLNODES.timeout = (timeout==0?10:timeout)*1000; //default 10s
+		p_ALLNODES.tail_nodes = G_NODE_LIST.slot_inused<GETALL_NUMOF1TIMES?G_NODE_LIST.slot_inused:GETALL_NUMOF1TIMES;
+		//clear all previous status of the all
+		for (u8 var = 0; var < G_NODE_LIST.slot_inused; ++var) {
+			G_NODE_LIST.sla_info[var].active = false;
+		}
+		fl_send_heartbeat();
+		p_ALLNODES.rtt = clock_time();
+		blt_soft_timer_restart(&_GETALLNODES,GETALL_TIMEOUT_1_NODE*1000);
+	}
+}
+
 void CMD_GETINFOSLAVE(u8* _data) {
 	extern fl_adv_settings_t G_ADV_SETTINGS ;
 	u8 slaveID[GETINFO_1_TIMES_MAX]; //Max 20 slaves
@@ -576,12 +658,12 @@ void fl_nwk_protcol_ExtCall(type_debug_t _type, u8 *_data){
 }
 
 void fl_nwk_protocol_InitnRun(void){
-	extern fl_adv_settings_t G_ADV_SETTINGS ;
-	char cmd_fmt[50];
-	memset((u8*)cmd_fmt,0,SIZEU8(cmd_fmt));
-	sprintf(cmd_fmt,"p get info %d %d %d %d %d %d",255,0,8,G_NODE_LIST.slot_inused,G_ADV_SETTINGS.time_wait_rsp,G_ADV_SETTINGS.retry_times);
-	_Passing_CmdLine(GETCMD,(u8*)cmd_fmt);
-	FIRST_PROTOCOL_START =1; //don't change
+//	extern fl_adv_settings_t G_ADV_SETTINGS ;
+//	char cmd_fmt[50];
+//	memset((u8*)cmd_fmt,0,SIZEU8(cmd_fmt));
+//	sprintf(cmd_fmt,"p get info %d %d %d %d %d %d",255,0,8,G_NODE_LIST.slot_inused,G_ADV_SETTINGS.time_wait_rsp,G_ADV_SETTINGS.retry_times);
+//	_Passing_CmdLine(GETCMD,(u8*)cmd_fmt);
+//	FIRST_PROTOCOL_START =1; //don't change
 }
 
 #endif

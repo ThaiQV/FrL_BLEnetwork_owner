@@ -281,8 +281,10 @@ void fl_adv_sendFIFO_run(void) {
 //				LOGA(APP,"timetamp:%d | %d \r\n",inpack,origin_pack);
 //				P_PRINTFHEX_A(APP,data_in_queue.data_arr,data_in_queue.length,"[%d]TTL(%d):",G_QUEUE_SENDING.head_index,
 //						data_in_queue.data_arr[data_in_queue.length - 1] & 0x03);
-				if(loop_check<G_QUEUE_SENDING.mask)continue;
-				else return;
+				if (loop_check < G_QUEUE_SENDING.mask)
+					continue;
+				else
+					return;
 			}
 			//For debuging
 //			P_PRINTFHEX_A(BLE,data_in_queue.data_arr,data_in_queue.length,"[%d]TTL(%d):",G_QUEUE_SENDING.head_index,
@@ -293,6 +295,16 @@ void fl_adv_sendFIFO_run(void) {
 			F_SENDING_STATE = 1;
 //			P_PRINTFHEX_A(INF,data_in_queue.data_arr,data_in_queue.length,"Raw Data(len:%d):",data_in_queue.length);
 			fl_adv_send(data_in_queue.data_arr,data_in_queue.length,G_ADV_SETTINGS.adv_duration);
+#ifdef MASTER_CORE
+			fl_dataframe_format_t check_heartbeat;
+			if (fl_packet_parse(data_in_queue,&check_heartbeat)) {
+				//skip heartbeat packet and rsp packet
+				//Only restart timer if the packet is REQ from the master (with ACK)
+				if (check_heartbeat.hdr != NWK_HDR_HEARTBEAT && check_heartbeat.endpoint.master == FL_FROM_MASTER_ACK){
+					fl_nwk_master_heartbeat_run();
+				}
+			}
+#endif
 			return;
 		}
 	}
@@ -385,7 +397,6 @@ void fl_adv_init(void) {
 	extern volatile u8 MASTER_INSTALL_STATE;
 	FL_NWK_COLLECTION_MODE = &MASTER_INSTALL_STATE;
 #else
-
 	extern fl_nodeinnetwork_t G_INFORMATION;
 	fl_nwk_slave_init();
 	fl_repeater_init();
@@ -464,7 +475,6 @@ void fl_adv_collection_channel_deinit(void){
 	blc_ll_setScanEnable(1,0);
 	bls_ll_setAdvEnable(BLC_ADV_ENABLE);  //adv enable
 	FL_QUEUE_CLEAR(&G_DATA_CONTAINER,IN_DATA_SIZE);
-
 	P_INFO("Collection Deinit(%d):%d |%d |%d\r\n",bls_ll_setAdvEnable(BLC_ADV_ENABLE),*G_ADV_SETTINGS.nwk_chn.chn1,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3)
 }
 
@@ -574,10 +584,8 @@ fl_pack_t fl_packet_build(u8 *payload, u8 _len) {
 	fl_data_frame_u packet;
 	memset(packet.bytes,0,SIZEU8(packet.bytes));
 	packet.frame.hdr = NWK_HDR_COLLECT; //testing
-
 //	clock_time
 	u32 timetamp = fl_rtc_get();
-
 	packet.frame.timetamp[0] = U32_BYTE0(timetamp);
 	packet.frame.timetamp[1] = U32_BYTE1(timetamp);
 	packet.frame.timetamp[2] = U32_BYTE2(timetamp);
@@ -588,11 +596,9 @@ fl_pack_t fl_packet_build(u8 *payload, u8 _len) {
 //	static u8 rep_level = 0;
 	packet.frame.endpoint.ep_u8 = 0;
 	packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
-
 	pack_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
 	memcpy(pack_built.data_arr,packet.bytes,pack_built.length);
 	return pack_built;
-
 }
 void fl_packet_printf(fl_dataframe_format_t _pack) {
 	LOGA(BLE,"HDR:%02X\r\n",_pack.hdr);
@@ -624,7 +630,6 @@ void fl_adv_run(void) {
 //		LOGA(APP,"QUEUE GET : (%d)%d-%d\r\n",G_DATA_CONTAINER.count,G_DATA_CONTAINER.head_index,G_DATA_CONTAINER.tail_index);
 		fl_dataframe_format_t data_parsed;
 		if (fl_packet_parse(data_in_queue,&data_parsed)) {
-
 //			fl_packet_printf(data_parsed);
 #ifdef MASTER_CORE
 			fl_nwk_master_run(&data_in_queue); //process reponse from the slaves

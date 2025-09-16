@@ -99,7 +99,7 @@ s8 fl_queueREQcRSP_add(u8 slaveid,u8 cmdid,u32 _SeqTimetamp,u8* _payloadreq,u8 _
 		G_QUEUE_REQ_CALL_RSP[avai_slot].retry = _retry;
 		G_QUEUE_REQ_CALL_RSP[avai_slot].req_payload.len = _len;
 		memcpy(G_QUEUE_REQ_CALL_RSP[avai_slot].req_payload.payload,_payloadreq,_len);
-		LOGA(API,"queueREQcRSP Add [%d]SeqTimetamp(%u):%d ms|retry: %d \r\n",avai_slot,_SeqTimetamp,_timeout_ms,_retry);
+//		LOGA(API,"queueREQcRSP Add [%d]SeqTimetamp(%u):%d ms|retry: %d \r\n",avai_slot,_SeqTimetamp,_timeout_ms,_retry);
 		return avai_slot;
 	}
 	ERR(API,"queueREQcRSP Add [%d]SeqTimetamp(%u):%d ms|retry: %d \r\n",avai_slot,_SeqTimetamp,_timeout_ms,_retry);
@@ -140,21 +140,21 @@ int fl_queue_REQnRSP_TimeoutStart(void){
 #ifdef MASTER_CORE
 						u8 mac[6];
 						if (fl_master_SlaveMAC_get(REQ_BUF.rsp_check.slaveID,mac) != -1) {
-							if (-1 != fl_api_master_req(mac,REQ_BUF.rsp_check.hdr_cmdid,REQ_BUF.req_payload.payload,REQ_BUF.req_payload.len,
+							if (-1!= fl_api_master_req(mac,REQ_BUF.rsp_check.hdr_cmdid,REQ_BUF.req_payload.payload,REQ_BUF.req_payload.len,
 											REQ_BUF.rsp_cb,REQ_BUF.timeout_set / 1000,REQ_BUF.retry)) {
-								LOGA(API,"[%d/%d]SlaveID(%d)->Retry:%d\r\n",i,avai_slot,REQ_BUF.rsp_check.slaveID,REQ_BUF.retry);
+//								LOGA(API,"[%d/%d]SlaveID(%d)->Retry:%d\r\n",i,avai_slot,REQ_BUF.rsp_check.slaveID,REQ_BUF.retry);
 								continue;
 							}
 						}
 #else
-						if(-1!=fl_api_slave_req(REQ_BUF.rsp_check.hdr_cmdid,REQ_BUF.req_payload.payload,REQ_BUF.req_payload.len,REQ_BUF.rsp_cb,
-										REQ_BUF.timeout_set/1000,REQ_BUF.retry)) {
-							LOGA(API,"[%d/%d]SlaveID(%d)->Retry:%d\r\n",i,avai_slot,REQ_BUF.rsp_check.slaveID,REQ_BUF.retry);
+						if(-1!=fl_api_slave_req(REQ_BUF.rsp_check.hdr_cmdid,REQ_BUF.req_payload.payload,REQ_BUF.req_payload.len,
+											REQ_BUF.rsp_cb,REQ_BUF.timeout_set/1000,REQ_BUF.retry)) {
+//							LOGA(API,"[%d/%d]SlaveID(%d)->Retry:%d\r\n",i,avai_slot,REQ_BUF.rsp_check.slaveID,REQ_BUF.retry);
 							continue;
 						}
 #endif
 					}
-					LOGA(API,"%d/%d TIMEOUT!!! \r\n",G_QUEUE_REQ_CALL_RSP[i].rsp_check.hdr_cmdid,G_QUEUE_REQ_CALL_RSP[i].rsp_check.slaveID);
+//					LOGA(API,"%d/%d TIMEOUT!!! \r\n",G_QUEUE_REQ_CALL_RSP[i].rsp_check.hdr_cmdid,G_QUEUE_REQ_CALL_RSP[i].rsp_check.slaveID);
 					REQ_BUF.rsp_cb((void*) &REQ_BUF,0); //timeout
 				}
 			}

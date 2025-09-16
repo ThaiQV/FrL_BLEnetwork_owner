@@ -298,6 +298,7 @@ static inline uint32_t swap_endian32(uint32_t val) {
 void fl_nwk_master_init(void);
 void fl_nwk_master_run(fl_pack_t *_pack_handle);
 void fl_nwk_master_process(void);
+int fl_send_heartbeat(void);
 void fl_nwk_master_heartbeat_run(void);
 fl_pack_t fl_master_packet_GetInfo_build(u8 *_slave_mac_arr, u8 _slave_num);
 void fl_master_nodelist_AddRefesh(fl_nodeinnetwork_t _node);

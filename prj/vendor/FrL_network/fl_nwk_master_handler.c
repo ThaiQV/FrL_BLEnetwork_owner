@@ -41,6 +41,7 @@ fl_pack_t g_handle_master_array[PACK_HANDLE_MASTER_SIZE];
 fl_data_container_t G_HANDLE_MASTER_CONTAINER = {.data = g_handle_master_array, .head_index = 0, .tail_index = 0, .mask = PACK_HANDLE_MASTER_SIZE - 1, .count = 0 };
 
 fl_slaves_list_t G_NODE_LIST = { .slot_inused = 0xFF };
+fl_slaves_list_t G_OFFLINE_LIST = { .slot_inused = 0xFF };
 fl_master_config_t G_MASTER_INFO = { .nwk = { .chn = { 10, 11, 12 }, .collect_chn = { 0, 1, 2 } } };
 
 volatile u8 MASTER_INSTALL_STATE = 0;
@@ -327,13 +328,13 @@ fl_pack_t fl_master_packet_GetInfo_build(u8 *_slave_mac_arr, u8 _slave_num) {
 	fl_data_frame_u packet;
 
 	//clear lastest time rec
-	for (int var = 0; var < _slave_num; ++var) {
-		s16 idx = fl_master_SlaveID_find(_slave_mac_arr[var]);
-		if (idx != -1) {
-			G_NODE_LIST.sla_info[idx].timelife = clock_time();
-			G_NODE_LIST.sla_info[idx].active = false;
-		}
-	}
+//	for (int var = 0; var < _slave_num; ++var) {
+//		s16 idx = fl_master_SlaveID_find(_slave_mac_arr[var]);
+//		if (idx != -1) {
+//			G_NODE_LIST.sla_info[idx].timelife = clock_time();
+//			G_NODE_LIST.sla_info[idx].active = false;
+//		}
+//	}
 
 	/* F5|timetamp|slaveID 1|slaveID 2.......|CRC|TTL */
 	/* 1B|  4Bs   |  1Bs  	|     18Bs  	 |1B |1B  */
@@ -557,6 +558,7 @@ int fl_send_heartbeat(void) {
 	datetime_t cur_dt;
 	u32 cur_timetamp = fl_rtc_get();
 	fl_rtc_timestamp_to_datetime(cur_timetamp,&cur_dt);
+
 //	fl_master_node_printf();
 	LOGA(APP,"[%02d/%02d/%02d-%02d:%02d:%02d] HeartBeat Sync(%d ms)\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second,
 			PERIOD_HEARTBEAT);
