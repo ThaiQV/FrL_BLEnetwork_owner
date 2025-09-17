@@ -283,8 +283,9 @@ void fl_adv_sendFIFO_run(void) {
 //						data_in_queue.data_arr[data_in_queue.length - 1] & 0x03);
 				if (loop_check < G_QUEUE_SENDING.mask)
 					continue;
-				else
+				else{
 					return;
+				}
 			}
 			//For debuging
 //			P_PRINTFHEX_A(BLE,data_in_queue.data_arr,data_in_queue.length,"[%d]TTL(%d):",G_QUEUE_SENDING.head_index,

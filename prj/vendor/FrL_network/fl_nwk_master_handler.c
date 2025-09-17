@@ -79,13 +79,13 @@ void fl_nwk_master_heartbeat_init(void);
 
 void _master_nodelist_printf(fl_slaves_list_t *_node, u8 _size) {
 	if (_size < 0xFF && _size > 0) {
-		LOG_P(FLA,"******** NODELIST ********\r\n");
+		P_INFO("******** NODELIST ********\r\n");
 		for (u8 var = 0; var < _size; ++var) {
-			LOGA(FLA,"[%d]Mac:0x%02X%02X%02X%02X%02X%02X-%d\r\n",_node->sla_info[var].slaveID.id_u8,_node->sla_info[var].mac[0],
+			P_INFO("[%d]Mac:0x%02X%02X%02X%02X%02X%02X-%d\r\n",_node->sla_info[var].slaveID.id_u8,_node->sla_info[var].mac[0],
 					_node->sla_info[var].mac[1],_node->sla_info[var].mac[2],_node->sla_info[var].mac[3],_node->sla_info[var].mac[4],
 					_node->sla_info[var].mac[5],_node->sla_info[var].dev_type);
 		}
-		LOG_P(FLA,"******** END *************\r\n");
+		P_INFO("******** END *************\r\n");
 	}
 }
 
@@ -368,6 +368,18 @@ fl_pack_t fl_master_packet_GetInfo_build(u8 *_slave_mac_arr, u8 _slave_num) {
 	packet_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
 	memcpy(packet_built.data_arr,packet.bytes,packet_built.length);
 	return packet_built;
+}
+s8 fl_master_packet_F5_CreateNSend(u8 *_slave_mac_arr, u8 _slave_num) {
+	fl_pack_t info_pack = fl_master_packet_GetInfo_build(_slave_mac_arr,_slave_num);
+	P_PRINTFHEX_A(INF,info_pack.data_arr,info_pack.length,"%s(%d):","Info Pack",info_pack.length);
+	//Send ADV
+	s8 add_rslt = fl_adv_sendFIFO_add(info_pack);
+	if (add_rslt != -1) {
+		//seqtimetamp
+		//fl_timetamp_withstep_t timetamp_inpack = fl_adv_timetampStepInPack(info_pack);
+		//SYNC_ORIGIN_MASTER(timetamp_inpack.timetamp,timetamp_inpack.milstep);
+	}
+	return add_rslt;
 }
 /******************************************************************************/
 /******************************************************************************/

@@ -35,7 +35,8 @@ extern fl_slaves_list_t G_NODE_LIST;
 #define GETINFO_FREQUENCY			20 //ms
 #define GETINFO_FIRST_DUTY			25*1000//s
 
-#define GETALL_TIMEOUT_1_NODE		70 //70ms
+extern fl_adv_settings_t G_ADV_SETTINGS;
+#define GETALL_TIMEOUT_1_NODE		(2*G_ADV_SETTINGS.adv_duration)//ms
 #define GETALL_NUMOF1TIMES			8
 u8 GETINFO_FLAG_EVENTTEST = 0;
 typedef struct {
@@ -465,18 +466,19 @@ void CMD_GETADVSETTING(u8* _data) {
 	extern fl_adv_settings_t G_ADV_SETTINGS;
 	extern volatile u8 NWK_REPEAT_MODE;
 	extern volatile u8 NWK_REPEAT_LEVEL;
-	LOG_P(DRV,"***** ADV Settings *****\r\n");
-	LOGA(DRV,"ADV interval:%d-%d|%d\r\n",(u8 )(G_ADV_SETTINGS.adv_interval_min * 0.625),(u8 )(G_ADV_SETTINGS.adv_interval_max * 0.625),
+	P_INFO("***** ADV Settings *****\r\n");
+	P_INFO("ADV interval:%d-%d|%d\r\n",(u8 )(G_ADV_SETTINGS.adv_interval_min * 0.625),(u8 )(G_ADV_SETTINGS.adv_interval_max * 0.625),
 			G_ADV_SETTINGS.adv_duration);
-	LOGA(DRV,"ADV scanner :%d-%d\r\n",(u8 )(G_ADV_SETTINGS.scan_window * 0.625),(u8 )(G_ADV_SETTINGS.scan_window * 0.625));
-	LOGA(DRV,"Channels    : %d |%d |%d \r\n",*G_ADV_SETTINGS.nwk_chn.chn1,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3);
-	LOGA(DRV,"REPEAT mode :%d(%d)\r\n",NWK_REPEAT_MODE,NWK_REPEAT_LEVEL);
-	LOG_P(DRV,"************************\r\n");
+	P_INFO("ADV scanner :%d-%d\r\n",(u8 )(G_ADV_SETTINGS.scan_window * 0.625),(u8 )(G_ADV_SETTINGS.scan_window * 0.625));
+	P_INFO("Channels    :%d |%d |%d \r\n",*G_ADV_SETTINGS.nwk_chn.chn1,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3);
+	P_INFO("REPEAT mode :%d(%d)\r\n",NWK_REPEAT_MODE,NWK_REPEAT_LEVEL);
+	P_INFO("************************\r\n");
 }
 
 typedef struct {
 	fl_slaves_list_t *pAllNodes;
 	u16 timeout;
+	u8 head_nodes;
 	u8 tail_nodes;
 	u8 online;
 	u32 rtt;
@@ -484,51 +486,85 @@ typedef struct {
 fl_getall_nodes_t p_ALLNODES;
 
 int _GETALLNODES(void) {
-/*
- * Max RTT for max 200 nodes = 10s
- * => max RTT 1 node = 70ms
- * => max RTT for 8 nodes = 70*8 = 560 ms
- * */
-#define MAX_TIMEOUT_FOR_8_NODES (70)
-
+	/*
+	 * Max RTT for max 200 nodes = 10s
+	 * => max RTT 1 node = 70ms
+	 * => max RTT for 8 nodes = 70*8 = 560 ms
+	 * */
+//	extern fl_adv_settings_t G_ADV_SETTINGS;
+//#define MAX_TIMEOUT_FOR_8_NODES (G_ADV_SETTINGS.adv_duration)
 	u8 slave_num = 0;
 	u8 slaveID[GETALL_NUMOF1TIMES];
-	memset(slaveID,0xFF,SIZEU8(slaveID));
+	//last slaveID array
+	static u8 pre_slaveID[GETALL_NUMOF1TIMES];
+	//req retry
+	static u8 retry = 0;
 
+	memset(slaveID,0xFF,SIZEU8(slaveID));
+	if (p_ALLNODES.timeout <= GETALL_TIMEOUT_1_NODE)
+		p_ALLNODES.timeout = 0;
+	else
+		p_ALLNODES.timeout -= GETALL_TIMEOUT_1_NODE; //timeout base seconds
+	//Check rsp
+	for (u8 i = p_ALLNODES.head_nodes; i < p_ALLNODES.tail_nodes; i++) {
+		if (p_ALLNODES.pAllNodes->sla_info[i].active == false) {
+			if (slave_num < SIZEU8(slaveID)) {
+				slaveID[slave_num] = p_ALLNODES.pAllNodes->sla_info[i].slaveID.id_u8; //index of the node
+				slave_num++;
+			} else
+				break;
+		}
+	}
+	//check online rsp
+	p_ALLNODES.online = 0;
+	for (u8 onl = 0; onl < p_ALLNODES.pAllNodes->slot_inused; onl++) {
+		if (p_ALLNODES.pAllNodes->sla_info[onl].active == true) {
+			p_ALLNODES.online++;
+			if (p_ALLNODES.online >= p_ALLNODES.pAllNodes->slot_inused) {
+				P_INFO("GET ALL RTT: %d ms\r\n",(clock_time()- p_ALLNODES.rtt)/SYSTEM_TIMER_TICK_1MS);
+				memset(pre_slaveID,0xFF,SIZEU8(pre_slaveID));
+				retry = 0;
+				return -1;
+			}
+		}
+	}
+
+	//check timeout
 	if (p_ALLNODES.timeout == 0) {
 		P_INFO("GET ALL TIMEOUT: %d ms\r\n",p_ALLNODES.timeout);
 		P_INFO("**Online :%d/%d\r\n",p_ALLNODES.online,p_ALLNODES.pAllNodes->slot_inused);
+		memset(pre_slaveID,0xFF,SIZEU8(pre_slaveID));
+		retry=0;
 		return -1;
-	}else{
-		if(p_ALLNODES.timeout<=MAX_TIMEOUT_FOR_8_NODES) p_ALLNODES.timeout=0;
-		else p_ALLNODES.timeout-=MAX_TIMEOUT_FOR_8_NODES; //timeout base seconds
-		p_ALLNODES.online=0;
-		for (u8 i = 0;i<p_ALLNODES.tail_nodes;i++){
-			if(p_ALLNODES.pAllNodes->sla_info[i].active == false){
-				if (slave_num<SIZEU8(slaveID)) {
-					slaveID[slave_num] = i; //index of the node
-					slave_num++;
-				}
-				else break;
-			}
-			else {
-				p_ALLNODES.online++;
-				if (p_ALLNODES.online >= p_ALLNODES.pAllNodes->slot_inused) {
-					P_INFO("GET ALL RTT: %d ms\r\n",(clock_time()- p_ALLNODES.rtt)/SYSTEM_TIMER_TICK_1MS);
-					return -1;
-				}
-			}
-		}
-		//update tail
-		u8 new_tail = slaveID[slave_num-1] + GETALL_NUMOF1TIMES;
-		p_ALLNODES.tail_nodes = new_tail>p_ALLNODES.pAllNodes->slot_inused?p_ALLNODES.pAllNodes->slot_inused:new_tail;
+	}
+
+	if(memcmp(pre_slaveID,slaveID,SIZEU8(slaveID)) != 0){
+		memcpy(pre_slaveID,slaveID,SIZEU8(slaveID));
+		//update tail and send req
+		u8 new_tail = slaveID[slave_num - 1] + GETALL_NUMOF1TIMES;
+		p_ALLNODES.tail_nodes = new_tail > p_ALLNODES.pAllNodes->slot_inused ? p_ALLNODES.pAllNodes->slot_inused : new_tail;
 		LOGA(DRV,"Tail:%d,Total:%d\r\n",p_ALLNODES.tail_nodes,p_ALLNODES.pAllNodes->slot_inused);
 		P_PRINTFHEX_A(DRV,slaveID,slave_num,"SlaveID(%d):",slave_num);
-		fl_pack_t info_pack = fl_master_packet_GetInfo_build(slaveID,slave_num);
-		P_PRINTFHEX_A(DRV,info_pack.data_arr,info_pack.length,"%s(%d):","Info Pack",info_pack.length);
-		fl_adv_sendFIFO_add(info_pack);
+		//Send ADV
+		fl_send_heartbeat();
+		s8 add_rslt = fl_master_packet_F5_CreateNSend(slaveID,slave_num);
+		if (add_rslt == -1)
+		{
+			ERR(DRV,"GET ALL ERR !!!! \r\n");
+			memset(pre_slaveID,0xFF,SIZEU8(pre_slaveID));
+			retry = 0;
+			return -1;
+		}
+	}else
+	{
+//		retry++;
+//		if(retry > 5){
+//			p_ALLNODES.head_nodes++;
+//			retry=0;
+//			fl_send_heartbeat();
+//		}
 	}
-	return MAX_TIMEOUT_FOR_8_NODES*1000; //return softtimer with us
+	return 0;		//GETALL_TIMEOUT_1_NODE*1000; //return softtimer with us
 }
 
 void CMD_GETALLNODES(u8* _data) {
@@ -540,6 +576,7 @@ void CMD_GETALLNODES(u8* _data) {
 		p_ALLNODES.pAllNodes = &G_NODE_LIST;
 		p_ALLNODES.timeout = (timeout==0?10:timeout)*1000; //default 10s
 		p_ALLNODES.tail_nodes = G_NODE_LIST.slot_inused<GETALL_NUMOF1TIMES?G_NODE_LIST.slot_inused:GETALL_NUMOF1TIMES;
+		p_ALLNODES.head_nodes = 0;
 		//clear all previous status of the all
 		for (u8 var = 0; var < G_NODE_LIST.slot_inused; ++var) {
 			G_NODE_LIST.sla_info[var].active = false;
