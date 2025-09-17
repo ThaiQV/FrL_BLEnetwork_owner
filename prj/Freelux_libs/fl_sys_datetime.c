@@ -105,6 +105,8 @@ fl_timetamp_withstep_t fl_rtc_getWithMilliStep(void) {
 	return rlst;
 }
 
+
+
 u32 fl_rtc_timetampmillstep_convert(u8 *_array_timetampmill)
 {
 	fl_timetamp_withstep_t rslt;

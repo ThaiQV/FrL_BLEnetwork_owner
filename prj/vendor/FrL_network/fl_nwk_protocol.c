@@ -36,7 +36,7 @@ extern fl_slaves_list_t G_NODE_LIST;
 #define GETINFO_FIRST_DUTY			25*1000//s
 
 extern fl_adv_settings_t G_ADV_SETTINGS;
-#define GETALL_TIMEOUT_1_NODE		(2*G_ADV_SETTINGS.adv_duration)//ms
+#define GETALL_TIMEOUT_1_NODE		(G_ADV_SETTINGS.adv_duration)//ms
 #define GETALL_NUMOF1TIMES			8
 u8 GETINFO_FLAG_EVENTTEST = 0;
 typedef struct {
@@ -485,6 +485,25 @@ typedef struct {
 } fl_getall_nodes_t;
 fl_getall_nodes_t p_ALLNODES;
 
+//Check and create new req
+
+u8 _count_diff_elements(uint8_t a[], uint8_t b[], u8 size) {
+    int count = 0;
+    for (int i = 0; i < size; i++) {
+        bool found = false;
+        for (int j = 0; j < size; j++) {
+            if (b[i] == a[j]) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            count++;
+        }
+    }
+    return count;
+}
+
 int _GETALLNODES(void) {
 	/*
 	 * Max RTT for max 200 nodes = 10s
@@ -493,6 +512,7 @@ int _GETALLNODES(void) {
 	 * */
 //	extern fl_adv_settings_t G_ADV_SETTINGS;
 //#define MAX_TIMEOUT_FOR_8_NODES (G_ADV_SETTINGS.adv_duration)
+
 	u8 slave_num = 0;
 	u8 slaveID[GETALL_NUMOF1TIMES];
 	//last slaveID array
@@ -505,8 +525,8 @@ int _GETALLNODES(void) {
 		p_ALLNODES.timeout = 0;
 	else
 		p_ALLNODES.timeout -= GETALL_TIMEOUT_1_NODE; //timeout base seconds
-	//Check rsp
-	for (u8 i = p_ALLNODES.head_nodes; i < p_ALLNODES.tail_nodes; i++) {
+	//count rsp from the slaves
+	for (u8 i = p_ALLNODES.head_nodes; i < p_ALLNODES.pAllNodes->slot_inused; i++) {
 		if (p_ALLNODES.pAllNodes->sla_info[i].active == false) {
 			if (slave_num < SIZEU8(slaveID)) {
 				slaveID[slave_num] = p_ALLNODES.pAllNodes->sla_info[i].slaveID.id_u8; //index of the node
@@ -515,7 +535,8 @@ int _GETALLNODES(void) {
 				break;
 		}
 	}
-	//check online rsp
+
+	//check online rsp and update offline list if the slave don't rsp after 3 req
 	p_ALLNODES.online = 0;
 	for (u8 onl = 0; onl < p_ALLNODES.pAllNodes->slot_inused; onl++) {
 		if (p_ALLNODES.pAllNodes->sla_info[onl].active == true) {
@@ -526,28 +547,33 @@ int _GETALLNODES(void) {
 				retry = 0;
 				return -1;
 			}
+		}else{
+
 		}
 	}
 
 	//check timeout
 	if (p_ALLNODES.timeout == 0) {
-		P_INFO("GET ALL TIMEOUT: %d ms\r\n",p_ALLNODES.timeout);
+		P_INFO("GET ALL TIMEOUT: %d ms\r\n",(clock_time()- p_ALLNODES.rtt)/SYSTEM_TIMER_TICK_1MS);
+		//P_INFO("**RTT    : %d ms\r\n",(clock_time()- p_ALLNODES.rtt)/SYSTEM_TIMER_TICK_1MS);
 		P_INFO("**Online :%d/%d\r\n",p_ALLNODES.online,p_ALLNODES.pAllNodes->slot_inused);
 		memset(pre_slaveID,0xFF,SIZEU8(pre_slaveID));
 		retry=0;
 		return -1;
 	}
-
-	if(memcmp(pre_slaveID,slaveID,SIZEU8(slaveID)) != 0){
-		memcpy(pre_slaveID,slaveID,SIZEU8(slaveID));
+	//check new req with the new slaveID
+	u8 diff = _count_diff_elements(pre_slaveID,slaveID,SIZEU8(slaveID));
+//	if(memcmp(pre_slaveID,slaveID,SIZEU8(slaveID)) != 0 && slave_num!=0){
+	if (diff >= 3 && slave_num != 0) {
 		//update tail and send req
 		u8 new_tail = slaveID[slave_num - 1] + GETALL_NUMOF1TIMES;
 		p_ALLNODES.tail_nodes = new_tail > p_ALLNODES.pAllNodes->slot_inused ? p_ALLNODES.pAllNodes->slot_inused : new_tail;
-		LOGA(DRV,"Tail:%d,Total:%d\r\n",p_ALLNODES.tail_nodes,p_ALLNODES.pAllNodes->slot_inused);
-		P_PRINTFHEX_A(DRV,slaveID,slave_num,"SlaveID(%d):",slave_num);
 		//Send ADV
-		fl_send_heartbeat();
+		if(diff>=3)fl_send_heartbeat();
+		memcpy(pre_slaveID,slaveID,SIZEU8(slaveID));
 		s8 add_rslt = fl_master_packet_F5_CreateNSend(slaveID,slave_num);
+		LOGA(DRV,"Tail:%d,Total:%d,Diff:%d,Curr_num:%d\r\n",p_ALLNODES.tail_nodes,p_ALLNODES.pAllNodes->slot_inused,diff,slave_num);
+		P_PRINTFHEX_A(DRV,slaveID,slave_num,"SlaveID(%d):",slave_num);
 		if (add_rslt == -1)
 		{
 			ERR(DRV,"GET ALL ERR !!!! \r\n");
@@ -558,21 +584,24 @@ int _GETALLNODES(void) {
 	}else
 	{
 //		retry++;
-//		if(retry > 5){
+//		if(retry > 3){
 //			p_ALLNODES.head_nodes++;
 //			retry=0;
-//			fl_send_heartbeat();
+////			fl_send_heartbeat();
 //		}
 	}
-	return 0;		//GETALL_TIMEOUT_1_NODE*1000; //return softtimer with us
+	return 0;
 }
 
 void CMD_GETALLNODES(u8* _data) {
 	u16 timeout = 0;
-	//p get all <timeout_s>
-	int rslt = sscanf((char*) _data,"all %hd",&timeout);
-	if (rslt ==1 && G_NODE_LIST.slot_inused != 0xFF && blt_soft_timer_find(&_GETALLNODES) == -1) {
-		P_INFO("Get %d nodes (timeout:%d s)\r\n",G_NODE_LIST.slot_inused,timeout);
+	u16 test_event = 0;
+	//p get all <timeout_s> <event_test>
+	int rslt = sscanf((char*) _data,"all %hd %hd",&timeout,&test_event);
+	if (rslt >=1 && G_NODE_LIST.slot_inused != 0xFF && blt_soft_timer_find(&_GETALLNODES) == -1) {
+		//TEST SIMULATE creating event from slaves
+		GETINFO_FLAG_EVENTTEST = (rslt==2?test_event:0);
+		P_INFO("Get %d nodes (timeout:%d s)|EventTest:%d\r\n",G_NODE_LIST.slot_inused,timeout,GETINFO_FLAG_EVENTTEST);
 		p_ALLNODES.pAllNodes = &G_NODE_LIST;
 		p_ALLNODES.timeout = (timeout==0?10:timeout)*1000; //default 10s
 		p_ALLNODES.tail_nodes = G_NODE_LIST.slot_inused<GETALL_NUMOF1TIMES?G_NODE_LIST.slot_inused:GETALL_NUMOF1TIMES;
@@ -581,7 +610,7 @@ void CMD_GETALLNODES(u8* _data) {
 		for (u8 var = 0; var < G_NODE_LIST.slot_inused; ++var) {
 			G_NODE_LIST.sla_info[var].active = false;
 		}
-		fl_send_heartbeat();
+//		fl_send_heartbeat();
 		p_ALLNODES.rtt = clock_time();
 		blt_soft_timer_restart(&_GETALLNODES,GETALL_TIMEOUT_1_NODE*1000);
 	}

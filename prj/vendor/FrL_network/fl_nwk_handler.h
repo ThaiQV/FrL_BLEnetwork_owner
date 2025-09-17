@@ -295,6 +295,7 @@ static inline uint32_t swap_endian32(uint32_t val) {
 }
 
 #ifdef MASTER_CORE
+void fl_master_SYNC_ORIGINAL_TIMETAMP(fl_timetamp_withstep_t _new_origin);
 void fl_nwk_master_init(void);
 void fl_nwk_master_run(fl_pack_t *_pack_handle);
 void fl_nwk_master_process(void);

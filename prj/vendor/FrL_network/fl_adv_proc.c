@@ -267,44 +267,40 @@ int fl_adv_sendFIFO_add(fl_pack_t _pack) {
 void fl_adv_sendFIFO_run(void) {
 	fl_pack_t data_in_queue;
 	if (!F_SENDING_STATE) {
-//#ifdef MASTER_CORE
-//		if (FL_QUEUE_GET(&G_QUEUE_SENDING,&data_in_queue)) {
-//			LOGA(BLE,"QUEUE SEND REMOVE: %d/%d (cnt:%d)\r\n",G_QUEUE_SENDING.head_index,G_QUEUE_SENDING.tail_index,G_QUEUE_SENDING.count);
-//#else
 		u8 loop_check = 0;
 		while (FL_QUEUE_GET_LOOP(&G_QUEUE_SENDING,&data_in_queue)) {
 			fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(data_in_queue);
 			u32 inpack = fl_rtc_timetamp2milltampStep(timetamp_inpack);
 			u32 origin_pack = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
 			loop_check++;
-			if ( inpack < origin_pack){
-//				LOGA(APP,"timetamp:%d | %d \r\n",inpack,origin_pack);
-//				P_PRINTFHEX_A(APP,data_in_queue.data_arr,data_in_queue.length,"[%d]TTL(%d):",G_QUEUE_SENDING.head_index,
-//						data_in_queue.data_arr[data_in_queue.length - 1] & 0x03);
+#ifdef MASTER_CORE
+			if ( inpack < origin_pack)
+#else
+			if ( inpack < origin_pack) //Slave not equal
+#endif
+			{
 				if (loop_check < G_QUEUE_SENDING.mask)
 					continue;
 				else{
 					return;
 				}
 			}
-			//For debuging
-//			P_PRINTFHEX_A(BLE,data_in_queue.data_arr,data_in_queue.length,"[%d]TTL(%d):",G_QUEUE_SENDING.head_index,
-//					data_in_queue.data_arr[data_in_queue.length - 1] & 0x03);
-
-//#endif
-//			LOGA(APP,"ADV FIFO(%d):%d/%d\r\n",G_QUEUE_SENDING.count,G_QUEUE_SENDING.head_index,G_QUEUE_SENDING.tail_index);
 			F_SENDING_STATE = 1;
-//			P_PRINTFHEX_A(INF,data_in_queue.data_arr,data_in_queue.length,"Raw Data(len:%d):",data_in_queue.length);
 			fl_adv_send(data_in_queue.data_arr,data_in_queue.length,G_ADV_SETTINGS.adv_duration);
 #ifdef MASTER_CORE
-			fl_dataframe_format_t check_heartbeat;
-			if (fl_packet_parse(data_in_queue,&check_heartbeat)) {
-				//skip heartbeat packet and rsp packet
-				//Only restart timer if the packet is REQ from the master (with ACK)
-				if (check_heartbeat.hdr != NWK_HDR_HEARTBEAT && check_heartbeat.endpoint.master == FL_FROM_MASTER_ACK){
-					fl_nwk_master_heartbeat_run();
-				}
+			fl_data_frame_u check_heartbeat;
+			memcpy(check_heartbeat.bytes,data_in_queue.data_arr,data_in_queue.length);
+			//skip heartbeat packet and rsp packet
+			//Only restart timer if the packet is REQ from the master (with ACK)
+//			if (check_heartbeat.frame.hdr != NWK_HDR_HEARTBEAT && check_heartbeat.frame.endpoint.master == FL_FROM_MASTER_ACK) {
+//				fl_nwk_master_heartbeat_run();
+//			}
+			//TODO: IMPORTANT SYNCHRONIZATION TIMESTAMP
+			if (check_heartbeat.frame.hdr == NWK_HDR_HEARTBEAT) {
+				fl_master_SYNC_ORIGINAL_TIMETAMP(timetamp_inpack);
 			}
+//			LOGA(APP,"ADV Send HDR:0x%02X\r\n",check_heartbeat.frame.hdr);
+//			P_PRINTFHEX_A(APP,data_in_queue.data_arr,data_in_queue.length,"Raw Data(len:%d):",data_in_queue.length);
 #endif
 			return;
 		}

@@ -141,9 +141,10 @@ fl_pack_t fl_master_packet_heartbeat_build(void) {
 
 	//Add new mill-step
 	packet.frame.milltamp = timetampStep.milstep;
-	//TODO: IMPORTANT SYNCHRONIZATION TIMESTAMP
-	LOGA(APP,"Master Synchronzation Timetamp:%d(%d)\r\n",timetampStep.timetamp,timetampStep.milstep);
-	SYNC_ORIGIN_MASTER(timetampStep.timetamp,timetampStep.milstep);
+
+//	//TODO: IMPORTANT SYNCHRONIZATION TIMESTAMP
+//	LOGA(APP,"Master Synchronzation Timetamp:%d(%d)\r\n",timetampStep.timetamp,timetampStep.milstep);
+//	SYNC_ORIGIN_MASTER(timetampStep.timetamp,timetampStep.milstep);
 
 	packet.frame.slaveID.id_u8 = 0xFF; // all grps + all members
 	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
@@ -349,7 +350,7 @@ fl_pack_t fl_master_packet_GetInfo_build(u8 *_slave_mac_arr, u8 _slave_num) {
 	packet.frame.timetamp[3] = U32_BYTE3(timetampStep.timetamp);
 
 	//Add new mill-step
-	packet.frame.milltamp = timetampStep.milstep;
+	packet.frame.milltamp = timetampStep.milstep+1;
 
 	packet.frame.slaveID.id_u8 = 0xFF;
 
@@ -386,6 +387,11 @@ s8 fl_master_packet_F5_CreateNSend(u8 *_slave_mac_arr, u8 _slave_num) {
 /***                       Functions declare                   		         **/
 /******************************************************************************/
 /******************************************************************************/
+
+void fl_master_SYNC_ORIGINAL_TIMETAMP(fl_timetamp_withstep_t _new_origin){
+	SYNC_ORIGIN_MASTER(_new_origin.timetamp,_new_origin.milstep);
+	LOGA(APP,"Master Synchronzation Timetamp:%d(%d)\r\n",ORIGINAL_MASTER_TIME.timetamp,ORIGINAL_MASTER_TIME.milstep);
+}
 
 //FOR TESTIING
 void fl_master_StatusNodePrintf(void) {
@@ -567,13 +573,13 @@ int fl_send_collection_req(void) {
  ***************************************************/
 int fl_send_heartbeat(void) {
 	if(G_NODE_LIST.slot_inused == 0xFF){return 0;}
-	datetime_t cur_dt;
-	u32 cur_timetamp = fl_rtc_get();
-	fl_rtc_timestamp_to_datetime(cur_timetamp,&cur_dt);
+//	datetime_t cur_dt;
+//	u32 cur_timetamp = fl_rtc_get();
+//	fl_rtc_timestamp_to_datetime(cur_timetamp,&cur_dt);
 
 //	fl_master_node_printf();
-	LOGA(APP,"[%02d/%02d/%02d-%02d:%02d:%02d] HeartBeat Sync(%d ms)\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second,
-			PERIOD_HEARTBEAT);
+//	LOGA(APP,"[%02d/%02d/%02d-%02d:%02d:%02d] HeartBeat Sync(%d ms)\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second,
+//			PERIOD_HEARTBEAT);
 	fl_pack_t packet_built = fl_master_packet_heartbeat_build();
 
 	fl_adv_sendFIFO_add(packet_built);
