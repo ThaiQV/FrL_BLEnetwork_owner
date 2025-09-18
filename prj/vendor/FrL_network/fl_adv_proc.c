@@ -273,11 +273,7 @@ void fl_adv_sendFIFO_run(void) {
 			u32 inpack = fl_rtc_timetamp2milltampStep(timetamp_inpack);
 			u32 origin_pack = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
 			loop_check++;
-#ifdef MASTER_CORE
 			if ( inpack < origin_pack)
-#else
-			if ( inpack < origin_pack) //Slave not equal
-#endif
 			{
 				if (loop_check < G_QUEUE_SENDING.mask)
 					continue;

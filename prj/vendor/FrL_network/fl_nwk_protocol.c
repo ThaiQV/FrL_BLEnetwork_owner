@@ -549,6 +549,7 @@ int _GETALLNODES(void) {
 			}
 		}else{
 
+
 		}
 	}
 
@@ -723,6 +724,14 @@ void fl_nwk_protcol_ExtCall(type_debug_t _type, u8 *_data){
 	_Passing_CmdLine(_type,_data);
 }
 
+int nwk_run(void) {
+	char cmd_fmt[50];
+	memset((u8*) cmd_fmt,0,SIZEU8(cmd_fmt));
+	sprintf(cmd_fmt,"p get all %d",0);
+	_Passing_CmdLine(GETCMD,(u8*) cmd_fmt);
+	return 0;
+}
+
 void fl_nwk_protocol_InitnRun(void){
 //	extern fl_adv_settings_t G_ADV_SETTINGS ;
 //	char cmd_fmt[50];
@@ -730,6 +739,7 @@ void fl_nwk_protocol_InitnRun(void){
 //	sprintf(cmd_fmt,"p get info %d %d %d %d %d %d",255,0,8,G_NODE_LIST.slot_inused,G_ADV_SETTINGS.time_wait_rsp,G_ADV_SETTINGS.retry_times);
 //	_Passing_CmdLine(GETCMD,(u8*)cmd_fmt);
 //	FIRST_PROTOCOL_START =1; //don't change
+	blt_soft_timer_add(&nwk_run,50*1000*1000); //30s
 }
 
 #endif
