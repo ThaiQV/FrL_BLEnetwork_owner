@@ -41,7 +41,7 @@ fl_pack_t g_handle_master_array[PACK_HANDLE_MASTER_SIZE];
 fl_data_container_t G_HANDLE_MASTER_CONTAINER = {.data = g_handle_master_array, .head_index = 0, .tail_index = 0, .mask = PACK_HANDLE_MASTER_SIZE - 1, .count = 0 };
 
 fl_slaves_list_t G_NODE_LIST = { .slot_inused = 0xFF };
-fl_slaves_list_t G_OFFLINE_LIST = { .slot_inused = 0xFF };
+//fl_slaves_list_t G_OFFLINE_LIST = { .slot_inused = 0xFF };
 fl_master_config_t G_MASTER_INFO = { .nwk = { .chn = { 10, 11, 12 }, .collect_chn = { 0, 1, 2 } } };
 
 volatile u8 MASTER_INSTALL_STATE = 0;
@@ -114,6 +114,7 @@ void fl_master_nodelist_AddRefesh(fl_nodeinnetwork_t _node) {
 		G_NODE_LIST.sla_info[slot_ins].slaveID.id_u8 = slot_ins;
 //		G_NODE_LIST.slot_inused++;
 		LOGA(FLA,"Update Node [%d]slaveID:%d\r\n",slot_ins,G_NODE_LIST.sla_info[slot_ins].slaveID.id_u8);
+		fl_nwk_master_nodelist_store();
 	}
 }
 
@@ -133,7 +134,16 @@ fl_pack_t fl_master_packet_heartbeat_build(void) {
 	packet.frame.hdr = NWK_HDR_HEARTBEAT;
 
 	fl_timetamp_withstep_t timetampStep = fl_rtc_getWithMilliStep();
-//	u32 timetamp = fl_rtc_get();
+//	Recheck with ORIGINAL_TIMETAMP
+	u32 inpack = fl_rtc_timetamp2milltampStep(timetampStep);
+	u32 origin_pack = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
+	if(inpack <= origin_pack){
+		LOGA(APP,"Last:%d-%d\r\n",timetampStep.timetamp,timetampStep.milstep);
+		delay_ms(5);
+		timetampStep = fl_rtc_getWithMilliStep();
+		LOGA(APP,"New:%d-%d\r\n",timetampStep.timetamp,timetampStep.milstep);
+	}
+	//LOGA(APP,"HB New:%d-%d\r\n",timetampStep.timetamp,timetampStep.milstep);
 	packet.frame.timetamp[0] = U32_BYTE0(timetampStep.timetamp);
 	packet.frame.timetamp[1] = U32_BYTE1(timetampStep.timetamp);
 	packet.frame.timetamp[2] = U32_BYTE2(timetampStep.timetamp);
@@ -350,7 +360,7 @@ fl_pack_t fl_master_packet_GetInfo_build(u8 *_slave_mac_arr, u8 _slave_num) {
 	packet.frame.timetamp[3] = U32_BYTE3(timetampStep.timetamp);
 
 	//Add new mill-step
-	packet.frame.milltamp = timetampStep.milstep+1;
+	packet.frame.milltamp = timetampStep.milstep;
 
 	packet.frame.slaveID.id_u8 = 0xFF;
 
@@ -370,15 +380,15 @@ fl_pack_t fl_master_packet_GetInfo_build(u8 *_slave_mac_arr, u8 _slave_num) {
 	memcpy(packet_built.data_arr,packet.bytes,packet_built.length);
 	return packet_built;
 }
+
 s8 fl_master_packet_F5_CreateNSend(u8 *_slave_mac_arr, u8 _slave_num) {
+	fl_send_heartbeat();
 	fl_pack_t info_pack = fl_master_packet_GetInfo_build(_slave_mac_arr,_slave_num);
 	P_PRINTFHEX_A(INF,info_pack.data_arr,info_pack.length,"%s(%d):","Info Pack",info_pack.length);
 	//Send ADV
 	s8 add_rslt = fl_adv_sendFIFO_add(info_pack);
 	if (add_rslt != -1) {
-		//seqtimetamp
-		//fl_timetamp_withstep_t timetamp_inpack = fl_adv_timetampStepInPack(info_pack);
-		//SYNC_ORIGIN_MASTER(timetamp_inpack.timetamp,timetamp_inpack.milstep);
+		fl_nwk_master_heartbeat_run();
 	}
 	return add_rslt;
 }
@@ -387,12 +397,12 @@ s8 fl_master_packet_F5_CreateNSend(u8 *_slave_mac_arr, u8 _slave_num) {
 /***                       Functions declare                   		         **/
 /******************************************************************************/
 /******************************************************************************/
-
-void fl_master_SYNC_ORIGINAL_TIMETAMP(fl_timetamp_withstep_t _new_origin){
-	SYNC_ORIGIN_MASTER(_new_origin.timetamp,_new_origin.milstep);
-	LOGA(APP,"Master Synchronzation Timetamp:%d(%d)\r\n",ORIGINAL_MASTER_TIME.timetamp,ORIGINAL_MASTER_TIME.milstep);
+void fl_master_SYNC_ORIGINAL_TIMETAMP(fl_timetamp_withstep_t _new_origin) {
+	if (ORIGINAL_MASTER_TIME.timetamp != _new_origin.timetamp && ORIGINAL_MASTER_TIME.milstep != _new_origin.milstep) {
+		SYNC_ORIGIN_MASTER(_new_origin.timetamp,_new_origin.milstep);
+		LOGA(APP,"Master Synchronzation Timetamp:%d(%d)\r\n",ORIGINAL_MASTER_TIME.timetamp,ORIGINAL_MASTER_TIME.milstep);
+	}
 }
-
 //FOR TESTIING
 void fl_master_StatusNodePrintf(void) {
 	u8 online_cnt = 0;
@@ -520,14 +530,16 @@ u32 fl_req_master_packet_createNsend(u8* _slave_mac,u8 _cmdid,u8* _data, u8 _len
 	memcpy(rslt.data_arr,req_pack.bytes,rslt.length );
 	P_PRINTFHEX_A(INF,rslt.data_arr,rslt.length,"REQ %X ",_cmdid);
 	//Send ADV
+	fl_send_heartbeat();
 	s8 add_rslt = fl_adv_sendFIFO_add(rslt);
 	u32 seq_timetamp = 0;
 	if(add_rslt!=-1){
 		//seqtimetamp
 		fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(rslt);
 		seq_timetamp = fl_rtc_timetamp2milltampStep(timetamp_inpack);
-		LOGA(API,"API REQ Synchronization TimeTamp:%d(%d)\r\n",timetamp_inpack.timetamp,timetamp_inpack.milstep);
-		SYNC_ORIGIN_MASTER(timetamp_inpack.timetamp,timetamp_inpack.milstep);
+//		LOGA(API,"API REQ Synchronization TimeTamp:%d(%d)\r\n",timetamp_inpack.timetamp,timetamp_inpack.milstep);
+//		SYNC_ORIGIN_MASTER(timetamp_inpack.timetamp,timetamp_inpack.milstep);
+		fl_nwk_master_heartbeat_run();
 	}
 	return seq_timetamp;
 }

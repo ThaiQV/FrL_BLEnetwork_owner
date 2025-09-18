@@ -142,7 +142,7 @@ void TEST_rsp_callback(void *_data,void* _data2){
 	}else{
 //		P_INFO("Master RSP: NON-RSP \r\n");
 	}
-	u32 lifetime = (fl_rtc_get() - TEST_EVENT.lifetime)/SYSTEM_TIMER_TICK_1S;
+	u32 lifetime = (fl_rtc_get() - TEST_EVENT.lifetime);
 	P_INFO("==============================\r\n");
 	P_INFO("* LifeTime:%dh%dm%ds\r\n",lifetime / 3600,(lifetime % 3600) / 60,lifetime % 60);
 	P_INFO("* RTT     :%d ms\r\n",data->timeout>0?((clock_time()-TEST_EVENT.rtt)/SYSTEM_TIMER_TICK_1MS):0);

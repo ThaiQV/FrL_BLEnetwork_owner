@@ -475,18 +475,24 @@ void CMD_GETADVSETTING(u8* _data) {
 	P_INFO("************************\r\n");
 }
 
+#define MAX_NODES 	200
 typedef struct {
-	fl_slaves_list_t *pAllNodes;
+	u8 numOfOnl;
+	fl_nodeinnetwork_t *sla_info[MAX_NODES];
+}__attribute__((packed)) fl_getall_list_t;
+
+typedef struct {
+	fl_getall_list_t sort_list;
 	u16 timeout;
 	u8 head_nodes;
-	u8 tail_nodes;
+//	u8 tail_nodes;
 	u8 online;
 	u32 rtt;
 } fl_getall_nodes_t;
+
 fl_getall_nodes_t p_ALLNODES;
 
 //Check and create new req
-
 u8 _count_diff_elements(uint8_t a[], uint8_t b[], u8 size) {
     int count = 0;
     for (int i = 0; i < size; i++) {
@@ -518,7 +524,6 @@ int _GETALLNODES(void) {
 	//last slaveID array
 	static u8 pre_slaveID[GETALL_NUMOF1TIMES];
 	//req retry
-	static u8 retry = 0;
 
 	memset(slaveID,0xFF,SIZEU8(slaveID));
 	if (p_ALLNODES.timeout <= GETALL_TIMEOUT_1_NODE)
@@ -526,30 +531,20 @@ int _GETALLNODES(void) {
 	else
 		p_ALLNODES.timeout -= GETALL_TIMEOUT_1_NODE; //timeout base seconds
 	//count rsp from the slaves
-	for (u8 i = p_ALLNODES.head_nodes; i < p_ALLNODES.pAllNodes->slot_inused; i++) {
-		if (p_ALLNODES.pAllNodes->sla_info[i].active == false) {
-			if (slave_num < SIZEU8(slaveID)) {
-				slaveID[slave_num] = p_ALLNODES.pAllNodes->sla_info[i].slaveID.id_u8; //index of the node
-				slave_num++;
-			} else
-				break;
-		}
-	}
-
-	//check online rsp and update offline list if the slave don't rsp after 3 req
 	p_ALLNODES.online = 0;
-	for (u8 onl = 0; onl < p_ALLNODES.pAllNodes->slot_inused; onl++) {
-		if (p_ALLNODES.pAllNodes->sla_info[onl].active == true) {
+	for (u8 i = 0; i < p_ALLNODES.sort_list.numOfOnl; i++) {
+		if (p_ALLNODES.sort_list.sla_info[i]->active == true) {
 			p_ALLNODES.online++;
-			if (p_ALLNODES.online >= p_ALLNODES.pAllNodes->slot_inused) {
-				P_INFO("GET ALL RTT: %d ms\r\n",(clock_time()- p_ALLNODES.rtt)/SYSTEM_TIMER_TICK_1MS);
+			if (p_ALLNODES.online >= p_ALLNODES.sort_list.numOfOnl) {
+				P_INFO("GET ALL RTT(%d/%d): %d ms\r\n",p_ALLNODES.sort_list.numOfOnl,G_NODE_LIST.slot_inused,(clock_time()- p_ALLNODES.rtt)/SYSTEM_TIMER_TICK_1MS);
 				memset(pre_slaveID,0xFF,SIZEU8(pre_slaveID));
-				retry = 0;
 				return -1;
 			}
-		}else{
-
-
+		} else {
+			if (slave_num < SIZEU8(slaveID)) {
+				slaveID[slave_num] = p_ALLNODES.sort_list.sla_info[i]->slaveID.id_u8; //index of the node
+				slave_num++;
+			}
 		}
 	}
 
@@ -557,39 +552,31 @@ int _GETALLNODES(void) {
 	if (p_ALLNODES.timeout == 0) {
 		P_INFO("GET ALL TIMEOUT: %d ms\r\n",(clock_time()- p_ALLNODES.rtt)/SYSTEM_TIMER_TICK_1MS);
 		//P_INFO("**RTT    : %d ms\r\n",(clock_time()- p_ALLNODES.rtt)/SYSTEM_TIMER_TICK_1MS);
-		P_INFO("**Online :%d/%d\r\n",p_ALLNODES.online,p_ALLNODES.pAllNodes->slot_inused);
+		P_INFO("**Online :%d/%d\r\n",p_ALLNODES.online,p_ALLNODES.sort_list.numOfOnl);
 		memset(pre_slaveID,0xFF,SIZEU8(pre_slaveID));
-		retry=0;
 		return -1;
 	}
 	//check new req with the new slaveID
 	u8 diff = _count_diff_elements(pre_slaveID,slaveID,SIZEU8(slaveID));
-//	if(memcmp(pre_slaveID,slaveID,SIZEU8(slaveID)) != 0 && slave_num!=0){
-	if (diff >= 3 && slave_num != 0) {
+	if ((diff >= 3 )&& slave_num > 0) {
 		//update tail and send req
-		u8 new_tail = slaveID[slave_num - 1] + GETALL_NUMOF1TIMES;
-		p_ALLNODES.tail_nodes = new_tail > p_ALLNODES.pAllNodes->slot_inused ? p_ALLNODES.pAllNodes->slot_inused : new_tail;
-		//Send ADV
-		if(diff>=3)fl_send_heartbeat();
+//		u8 new_tail = slaveID[slave_num - 1] + GETALL_NUMOF1TIMES;
+//		p_ALLNODES.tail_nodes = new_tail > p_ALLNODES.sort_list.numOfOnl ? p_ALLNODES.sort_list.numOfOnl : new_tail;
 		memcpy(pre_slaveID,slaveID,SIZEU8(slaveID));
-		s8 add_rslt = fl_master_packet_F5_CreateNSend(slaveID,slave_num);
-		LOGA(DRV,"Tail:%d,Total:%d,Diff:%d,Curr_num:%d\r\n",p_ALLNODES.tail_nodes,p_ALLNODES.pAllNodes->slot_inused,diff,slave_num);
+		LOGA(DRV,"Total:%d,Diff:%d,Curr_num:%d,head:%d\r\n",p_ALLNODES.sort_list.numOfOnl,
+				diff,slave_num,p_ALLNODES.head_nodes);
 		P_PRINTFHEX_A(DRV,slaveID,slave_num,"SlaveID(%d):",slave_num);
+		//Send ADV
+		s8 add_rslt = fl_master_packet_F5_CreateNSend(slaveID,slave_num);
 		if (add_rslt == -1)
 		{
 			ERR(DRV,"GET ALL ERR !!!! \r\n");
 			memset(pre_slaveID,0xFF,SIZEU8(pre_slaveID));
-			retry = 0;
 			return -1;
 		}
 	}else
 	{
-//		retry++;
-//		if(retry > 3){
-//			p_ALLNODES.head_nodes++;
-//			retry=0;
-////			fl_send_heartbeat();
-//		}
+
 	}
 	return 0;
 }
@@ -601,18 +588,41 @@ void CMD_GETALLNODES(u8* _data) {
 	int rslt = sscanf((char*) _data,"all %hd %hd",&timeout,&test_event);
 	if (rslt >=1 && G_NODE_LIST.slot_inused != 0xFF && blt_soft_timer_find(&_GETALLNODES) == -1) {
 		//TEST SIMULATE creating event from slaves
-		GETINFO_FLAG_EVENTTEST = (rslt==2?test_event:0);
-		P_INFO("Get %d nodes (timeout:%d s)|EventTest:%d\r\n",G_NODE_LIST.slot_inused,timeout,GETINFO_FLAG_EVENTTEST);
-		p_ALLNODES.pAllNodes = &G_NODE_LIST;
-		p_ALLNODES.timeout = (timeout==0?10:timeout)*1000; //default 10s
-		p_ALLNODES.tail_nodes = G_NODE_LIST.slot_inused<GETALL_NUMOF1TIMES?G_NODE_LIST.slot_inused:GETALL_NUMOF1TIMES;
+		GETINFO_FLAG_EVENTTEST = (rslt==2?test_event:GETINFO_FLAG_EVENTTEST);
+		//p_ALLNODES.pAllNodes = &G_NODE_LIST;
+//		p_ALLNODES.tail_nodes = G_NODE_LIST.slot_inused<GETALL_NUMOF1TIMES?G_NODE_LIST.slot_inused:GETALL_NUMOF1TIMES;
 		p_ALLNODES.head_nodes = 0;
+		// sort online to top list
+		p_ALLNODES.sort_list.numOfOnl =G_NODE_LIST.slot_inused;
+		u8 onl_msb_indx =0;
+		u8 off_lsb_indx = p_ALLNODES.sort_list.numOfOnl -1;
+		for (u8 indx = 0; indx < G_NODE_LIST.slot_inused; ++indx) {
+			if(G_NODE_LIST.sla_info[indx].active == true){
+				p_ALLNODES.sort_list.sla_info[onl_msb_indx++]=&G_NODE_LIST.sla_info[indx];
+			}
+			else{
+				p_ALLNODES.sort_list.sla_info[off_lsb_indx--]=&G_NODE_LIST.sla_info[indx];
+			}
+		}
+		//DEGBUG
+//		for (u8 k = 0; k < p_ALLNODES.sort_list.numOfOnl; ++k) {
+//			LOGA(DRV,"[%d]0x%02X%02X%02X%02X%02X%02X-%d\r\n",p_ALLNODES.sort_list.sla_info[k]->slaveID.id_u8,
+//					p_ALLNODES.sort_list.sla_info[k]->mac[0],p_ALLNODES.sort_list.sla_info[k]->mac[1],p_ALLNODES.sort_list.sla_info[k]->mac[2],
+//					p_ALLNODES.sort_list.sla_info[k]->mac[3],p_ALLNODES.sort_list.sla_info[k]->mac[4],p_ALLNODES.sort_list.sla_info[k]->mac[5],
+//					p_ALLNODES.sort_list.sla_info[k]->active);
+//		}
+		//Update num of online slave => onlt get online
+		p_ALLNODES.sort_list.numOfOnl = onl_msb_indx;
+		if(p_ALLNODES.sort_list.numOfOnl==0) return;
+		//Register timeout
+		p_ALLNODES.timeout = timeout==0?p_ALLNODES.sort_list.numOfOnl*4*GETALL_TIMEOUT_1_NODE:timeout*1000; //default num*durationADV
+		p_ALLNODES.timeout = (p_ALLNODES.timeout>20*1000)?20*1000:p_ALLNODES.timeout;
 		//clear all previous status of the all
 		for (u8 var = 0; var < G_NODE_LIST.slot_inused; ++var) {
 			G_NODE_LIST.sla_info[var].active = false;
 		}
-//		fl_send_heartbeat();
 		p_ALLNODES.rtt = clock_time();
+		P_INFO("Get %d/%d nodes (timeout:%d ms)(%d)\r\n",p_ALLNODES.sort_list.numOfOnl,G_NODE_LIST.slot_inused,p_ALLNODES.timeout,GETINFO_FLAG_EVENTTEST);
 		blt_soft_timer_restart(&_GETALLNODES,GETALL_TIMEOUT_1_NODE*1000);
 	}
 }
@@ -739,7 +749,7 @@ void fl_nwk_protocol_InitnRun(void){
 //	sprintf(cmd_fmt,"p get info %d %d %d %d %d %d",255,0,8,G_NODE_LIST.slot_inused,G_ADV_SETTINGS.time_wait_rsp,G_ADV_SETTINGS.retry_times);
 //	_Passing_CmdLine(GETCMD,(u8*)cmd_fmt);
 //	FIRST_PROTOCOL_START =1; //don't change
-	blt_soft_timer_add(&nwk_run,50*1000*1000); //30s
+//	blt_soft_timer_add(&nwk_run,50*1000*1000); //30s
 }
 
 #endif
