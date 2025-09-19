@@ -41,6 +41,7 @@ fl_pack_t g_handle_master_array[PACK_HANDLE_MASTER_SIZE];
 fl_data_container_t G_HANDLE_MASTER_CONTAINER = {.data = g_handle_master_array, .head_index = 0, .tail_index = 0, .mask = PACK_HANDLE_MASTER_SIZE - 1, .count = 0 };
 
 fl_slaves_list_t G_NODE_LIST = { .slot_inused = 0xFF };
+//fl_slaves_list_t G_OFFLINE_LIST = { .slot_inused = 0xFF };
 fl_master_config_t G_MASTER_INFO = { .nwk = { .chn = { 10, 11, 12 }, .collect_chn = { 0, 1, 2 } } };
 
 volatile u8 MASTER_INSTALL_STATE = 0;
@@ -78,13 +79,13 @@ void fl_nwk_master_heartbeat_init(void);
 
 void _master_nodelist_printf(fl_slaves_list_t *_node, u8 _size) {
 	if (_size < 0xFF && _size > 0) {
-		LOG_P(FLA,"******** NODELIST ********\r\n");
+		P_INFO("******** NODELIST ********\r\n");
 		for (u8 var = 0; var < _size; ++var) {
-			LOGA(FLA,"[%d]Mac:0x%02X%02X%02X%02X%02X%02X-%d\r\n",_node->sla_info[var].slaveID.id_u8,_node->sla_info[var].mac[0],
+			P_INFO("[%d]Mac:0x%02X%02X%02X%02X%02X%02X-%d\r\n",_node->sla_info[var].slaveID.id_u8,_node->sla_info[var].mac[0],
 					_node->sla_info[var].mac[1],_node->sla_info[var].mac[2],_node->sla_info[var].mac[3],_node->sla_info[var].mac[4],
 					_node->sla_info[var].mac[5],_node->sla_info[var].dev_type);
 		}
-		LOG_P(FLA,"******** END *************\r\n");
+		P_INFO("******** END *************\r\n");
 	}
 }
 
@@ -113,6 +114,7 @@ void fl_master_nodelist_AddRefesh(fl_nodeinnetwork_t _node) {
 		G_NODE_LIST.sla_info[slot_ins].slaveID.id_u8 = slot_ins;
 //		G_NODE_LIST.slot_inused++;
 		LOGA(FLA,"Update Node [%d]slaveID:%d\r\n",slot_ins,G_NODE_LIST.sla_info[slot_ins].slaveID.id_u8);
+		fl_nwk_master_nodelist_store();
 	}
 }
 
@@ -132,7 +134,16 @@ fl_pack_t fl_master_packet_heartbeat_build(void) {
 	packet.frame.hdr = NWK_HDR_HEARTBEAT;
 
 	fl_timetamp_withstep_t timetampStep = fl_rtc_getWithMilliStep();
-//	u32 timetamp = fl_rtc_get();
+//	Recheck with ORIGINAL_TIMETAMP
+	u32 inpack = fl_rtc_timetamp2milltampStep(timetampStep);
+	u32 origin_pack = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
+	if(inpack <= origin_pack){
+		LOGA(APP,"Last:%d-%d\r\n",timetampStep.timetamp,timetampStep.milstep);
+		delay_ms(5);
+		timetampStep = fl_rtc_getWithMilliStep();
+		LOGA(APP,"New:%d-%d\r\n",timetampStep.timetamp,timetampStep.milstep);
+	}
+	LOGA(APP,"HB New:%d-%d\r\n",timetampStep.timetamp,timetampStep.milstep);
 	packet.frame.timetamp[0] = U32_BYTE0(timetampStep.timetamp);
 	packet.frame.timetamp[1] = U32_BYTE1(timetampStep.timetamp);
 	packet.frame.timetamp[2] = U32_BYTE2(timetampStep.timetamp);
@@ -140,9 +151,10 @@ fl_pack_t fl_master_packet_heartbeat_build(void) {
 
 	//Add new mill-step
 	packet.frame.milltamp = timetampStep.milstep;
-	//TODO: IMPORTANT SYNCHRONIZATION TIMESTAMP
-	LOGA(APP,"Master Synchronzation Timetamp:%d(%d)\r\n",timetampStep.timetamp,timetampStep.milstep);
-	SYNC_ORIGIN_MASTER(timetampStep.timetamp,timetampStep.milstep);
+
+//	//TODO: IMPORTANT SYNCHRONIZATION TIMESTAMP
+//	LOGA(APP,"Master Synchronzation Timetamp:%d(%d)\r\n",timetampStep.timetamp,timetampStep.milstep);
+//	SYNC_ORIGIN_MASTER(timetampStep.timetamp,timetampStep.milstep);
 
 	packet.frame.slaveID.id_u8 = 0xFF; // all grps + all members
 	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
@@ -327,13 +339,13 @@ fl_pack_t fl_master_packet_GetInfo_build(u8 *_slave_mac_arr, u8 _slave_num) {
 	fl_data_frame_u packet;
 
 	//clear lastest time rec
-	for (int var = 0; var < _slave_num; ++var) {
-		s16 idx = fl_master_SlaveID_find(_slave_mac_arr[var]);
-		if (idx != -1) {
-			G_NODE_LIST.sla_info[idx].timelife = clock_time();
-			G_NODE_LIST.sla_info[idx].active = false;
-		}
-	}
+//	for (int var = 0; var < _slave_num; ++var) {
+//		s16 idx = fl_master_SlaveID_find(_slave_mac_arr[var]);
+//		if (idx != -1) {
+//			G_NODE_LIST.sla_info[idx].timelife = clock_time();
+//			G_NODE_LIST.sla_info[idx].active = false;
+//		}
+//	}
 
 	/* F5|timetamp|slaveID 1|slaveID 2.......|CRC|TTL */
 	/* 1B|  4Bs   |  1Bs  	|     18Bs  	 |1B |1B  */
@@ -368,12 +380,31 @@ fl_pack_t fl_master_packet_GetInfo_build(u8 *_slave_mac_arr, u8 _slave_num) {
 	memcpy(packet_built.data_arr,packet.bytes,packet_built.length);
 	return packet_built;
 }
+
+s8 fl_master_packet_F5_CreateNSend(u8 *_slave_mac_arr, u8 _slave_num) {
+	fl_send_heartbeat();
+	fl_pack_t info_pack = fl_master_packet_GetInfo_build(_slave_mac_arr,_slave_num);
+	P_PRINTFHEX_A(INF,info_pack.data_arr,info_pack.length,"%s(%d):","Info Pack",info_pack.length);
+	//Send ADV
+	s8 add_rslt = fl_adv_sendFIFO_add(info_pack);
+	if (add_rslt != -1) {
+		fl_nwk_master_heartbeat_run();
+	}
+	return add_rslt;
+}
 /******************************************************************************/
 /******************************************************************************/
 /***                       Functions declare                   		         **/
 /******************************************************************************/
 /******************************************************************************/
-
+void fl_master_SYNC_ORIGINAL_TIMETAMP(fl_timetamp_withstep_t _new_origin) {
+	u32 origin = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
+	u32 new_origin = fl_rtc_timetamp2milltampStep(_new_origin);
+	if (origin < new_origin) {
+		SYNC_ORIGIN_MASTER(_new_origin.timetamp,_new_origin.milstep);
+		LOGA(APP,"Master Synchronzation Timetamp:%d(%d)\r\n",ORIGINAL_MASTER_TIME.timetamp,ORIGINAL_MASTER_TIME.milstep);
+	}
+}
 //FOR TESTIING
 void fl_master_StatusNodePrintf(void) {
 	u8 online_cnt = 0;
@@ -501,14 +532,16 @@ u32 fl_req_master_packet_createNsend(u8* _slave_mac,u8 _cmdid,u8* _data, u8 _len
 	memcpy(rslt.data_arr,req_pack.bytes,rslt.length );
 	P_PRINTFHEX_A(INF,rslt.data_arr,rslt.length,"REQ %X ",_cmdid);
 	//Send ADV
+	fl_send_heartbeat();
 	s8 add_rslt = fl_adv_sendFIFO_add(rslt);
 	u32 seq_timetamp = 0;
 	if(add_rslt!=-1){
 		//seqtimetamp
 		fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(rslt);
 		seq_timetamp = fl_rtc_timetamp2milltampStep(timetamp_inpack);
-		LOGA(API,"API REQ Synchronization TimeTamp:%d(%d)\r\n",timetamp_inpack.timetamp,timetamp_inpack.milstep);
-		SYNC_ORIGIN_MASTER(timetamp_inpack.timetamp,timetamp_inpack.milstep);
+//		LOGA(API,"API REQ Synchronization TimeTamp:%d(%d)\r\n",timetamp_inpack.timetamp,timetamp_inpack.milstep);
+//		SYNC_ORIGIN_MASTER(timetamp_inpack.timetamp,timetamp_inpack.milstep);
+		fl_nwk_master_heartbeat_run();
 	}
 	return seq_timetamp;
 }
@@ -554,12 +587,13 @@ int fl_send_collection_req(void) {
  ***************************************************/
 int fl_send_heartbeat(void) {
 	if(G_NODE_LIST.slot_inused == 0xFF){return 0;}
-	datetime_t cur_dt;
-	u32 cur_timetamp = fl_rtc_get();
-	fl_rtc_timestamp_to_datetime(cur_timetamp,&cur_dt);
+//	datetime_t cur_dt;
+//	u32 cur_timetamp = fl_rtc_get();
+//	fl_rtc_timestamp_to_datetime(cur_timetamp,&cur_dt);
+
 //	fl_master_node_printf();
-	LOGA(APP,"[%02d/%02d/%02d-%02d:%02d:%02d] HeartBeat Sync(%d ms)\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second,
-			PERIOD_HEARTBEAT);
+//	LOGA(APP,"[%02d/%02d/%02d-%02d:%02d:%02d] HeartBeat Sync(%d ms)\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second,
+//			PERIOD_HEARTBEAT);
 	fl_pack_t packet_built = fl_master_packet_heartbeat_build();
 
 	fl_adv_sendFIFO_add(packet_built);
@@ -634,16 +668,18 @@ static void _master_updateDB_for_Node(u8 node_indx ,fl_data_frame_u *packet)  {
 
 int fl_master_ProccesRSP_cbk(void) {
 	fl_pack_t data_in_queue;
-	if (FL_QUEUE_GET(&G_HANDLE_MASTER_CONTAINER,&data_in_queue)) {
+	u16 numofrsp = 0;
+	if ((numofrsp=FL_QUEUE_GET(&G_HANDLE_MASTER_CONTAINER,&data_in_queue))) {
+
 		fl_data_frame_u packet;
 		extern u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
 
 		if(!fl_packet_parse(data_in_queue,&packet.frame)) return -1;
-
 		if(!MASTER_INSTALL_STATE && G_NODE_LIST.slot_inused == 0xFF){return -1;}
-
+		//LOGA(APP,"NumOfRSP:%d\r\n",numofrsp);
 		LOGA(INF,"HDR_RSP ID: %02X\r\n",packet.frame.hdr);
 		P_PRINTFHEX_A(INF,packet.frame.payload,SIZEU8(packet.frame.payload),"%d:",packet.frame.slaveID.id_u8);
+		//Todo:Process RSP with API REQ registered
 		fl_queue_REQcRSP_ScanRec(data_in_queue);
 
 		switch ((fl_hdr_nwk_type_e) packet.frame.hdr) {

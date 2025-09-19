@@ -96,8 +96,9 @@ u16 FL_QUEUE_GET(fl_data_container_t *pCont, fl_pack_t *pdata) {
 	*pdata = pCont->data[pCont->head_index];
 //	memcpy(pdata,pCont->data[pCont->head_index].data_arr,sizeof(fl_pack_t)/sizeof(u8));
 	pCont->head_index = ((pCont->head_index + 1) & pCont->mask);
+	u16 numofcount = pCont->count;
 	pCont->count--;
-	return 1;
+	return numofcount;
 }
 /**
  * Returns the pack in a queue container.(FIFO)
@@ -106,9 +107,9 @@ u16 FL_QUEUE_GET(fl_data_container_t *pCont, fl_pack_t *pdata) {
  * @return 1 if data was returned; 0 otherwise.
  */
 u16 FL_QUEUE_GET_LOOP(fl_data_container_t *pCont, fl_pack_t *pdata) {
-	if(pCont->data[pCont->head_index].length  < 2){
-		return 0;
-	}
+//	if(pCont->data[pCont->head_index].length  < 2){
+//		return 0;
+//	}
 	*pdata = pCont->data[pCont->head_index];
 //	memcpy(pdata,pCont->data[pCont->head_index].data_arr,sizeof(fl_pack_t)/sizeof(u8));
 	pCont->head_index = ((pCont->head_index + 1) & pCont->mask);

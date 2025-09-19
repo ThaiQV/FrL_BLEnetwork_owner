@@ -181,8 +181,8 @@ static int tx_to_uart_cb(void) {
 		if (uart_send_dma(G_INPUT_EXT.serial.uart_num,(u8 *) (&FL_TXDATA.data),FL_TXDATA.len)) {
 			my_fifo_pop(&fl_tx_fifo);
 			FLAG_uart_dma_send = 1;
-			LOGA(DRV,"lenData:%d\r\n",FL_TXDATA.len);
-			P_PRINTFHEX_A(DRV,FL_TXDATA.data,FL_TXDATA.len,"%s(%d):","Tx",FL_TXDATA.len);
+//			LOGA(DRV,"lenData:%d\r\n",FL_TXDATA.len);
+//			P_PRINTFHEX_A(DRV,FL_TXDATA.data,FL_TXDATA.len,"%s(%d):","Tx",FL_TXDATA.len);
 		}
 	}
 	return 0;

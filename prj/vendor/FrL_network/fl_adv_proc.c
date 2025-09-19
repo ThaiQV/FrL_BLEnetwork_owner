@@ -267,32 +267,39 @@ int fl_adv_sendFIFO_add(fl_pack_t _pack) {
 void fl_adv_sendFIFO_run(void) {
 	fl_pack_t data_in_queue;
 	if (!F_SENDING_STATE) {
-//#ifdef MASTER_CORE
-//		if (FL_QUEUE_GET(&G_QUEUE_SENDING,&data_in_queue)) {
-//			LOGA(BLE,"QUEUE SEND REMOVE: %d/%d (cnt:%d)\r\n",G_QUEUE_SENDING.head_index,G_QUEUE_SENDING.tail_index,G_QUEUE_SENDING.count);
-//#else
 		u8 loop_check = 0;
 		while (FL_QUEUE_GET_LOOP(&G_QUEUE_SENDING,&data_in_queue)) {
 			fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(data_in_queue);
 			u32 inpack = fl_rtc_timetamp2milltampStep(timetamp_inpack);
 			u32 origin_pack = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
 			loop_check++;
-			if ( inpack < origin_pack){
-//				LOGA(APP,"timetamp:%d | %d \r\n",inpack,origin_pack);
-//				P_PRINTFHEX_A(APP,data_in_queue.data_arr,data_in_queue.length,"[%d]TTL(%d):",G_QUEUE_SENDING.head_index,
-//						data_in_queue.data_arr[data_in_queue.length - 1] & 0x03);
-				if(loop_check<G_QUEUE_SENDING.mask)continue;
-				else return;
+			if ( inpack < origin_pack)
+			{
+				if (loop_check <= G_QUEUE_SENDING.mask)
+					continue;
+				else{
+					ERR(INF,"NULL ADV SENDING!! \r\n");
+					return;
+				}
 			}
-			//For debuging
-//			P_PRINTFHEX_A(BLE,data_in_queue.data_arr,data_in_queue.length,"[%d]TTL(%d):",G_QUEUE_SENDING.head_index,
-//					data_in_queue.data_arr[data_in_queue.length - 1] & 0x03);
-
-//#endif
-//			LOGA(APP,"ADV FIFO(%d):%d/%d\r\n",G_QUEUE_SENDING.count,G_QUEUE_SENDING.head_index,G_QUEUE_SENDING.tail_index);
 			F_SENDING_STATE = 1;
-//			P_PRINTFHEX_A(INF,data_in_queue.data_arr,data_in_queue.length,"Raw Data(len:%d):",data_in_queue.length);
+			if (G_QUEUE_SENDING.count > 0) {
+				LOGA(APP,"Num of adv in SENDING QUEUE :%d\r\n",G_QUEUE_SENDING.count);
+			}
 			fl_adv_send(data_in_queue.data_arr,data_in_queue.length,G_ADV_SETTINGS.adv_duration);
+			fl_data_frame_u check_heartbeat;
+			memcpy(check_heartbeat.bytes,data_in_queue.data_arr,data_in_queue.length);
+			if (check_heartbeat.frame.hdr == NWK_HDR_HEARTBEAT) {
+				u32 origin = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
+				u32 new_origin = fl_rtc_timetamp2milltampStep(timetamp_inpack);
+				if (origin < new_origin) {
+					LOGA(APP,"Master Synchronzation Timetamp:%d(%d)\r\n",ORIGINAL_MASTER_TIME.timetamp,ORIGINAL_MASTER_TIME.milstep);
+				}
+#ifdef MASTER_CORE
+				//TODO: IMPORTANT SYNCHRONIZATION TIMESTAMP
+				fl_master_SYNC_ORIGINAL_TIMETAMP(timetamp_inpack);
+#endif
+			}
 			return;
 		}
 	}
@@ -385,7 +392,6 @@ void fl_adv_init(void) {
 	extern volatile u8 MASTER_INSTALL_STATE;
 	FL_NWK_COLLECTION_MODE = &MASTER_INSTALL_STATE;
 #else
-
 	extern fl_nodeinnetwork_t G_INFORMATION;
 	fl_nwk_slave_init();
 	fl_repeater_init();
@@ -464,7 +470,6 @@ void fl_adv_collection_channel_deinit(void){
 	blc_ll_setScanEnable(1,0);
 	bls_ll_setAdvEnable(BLC_ADV_ENABLE);  //adv enable
 	FL_QUEUE_CLEAR(&G_DATA_CONTAINER,IN_DATA_SIZE);
-
 	P_INFO("Collection Deinit(%d):%d |%d |%d\r\n",bls_ll_setAdvEnable(BLC_ADV_ENABLE),*G_ADV_SETTINGS.nwk_chn.chn1,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3)
 }
 
@@ -574,10 +579,8 @@ fl_pack_t fl_packet_build(u8 *payload, u8 _len) {
 	fl_data_frame_u packet;
 	memset(packet.bytes,0,SIZEU8(packet.bytes));
 	packet.frame.hdr = NWK_HDR_COLLECT; //testing
-
 //	clock_time
 	u32 timetamp = fl_rtc_get();
-
 	packet.frame.timetamp[0] = U32_BYTE0(timetamp);
 	packet.frame.timetamp[1] = U32_BYTE1(timetamp);
 	packet.frame.timetamp[2] = U32_BYTE2(timetamp);
@@ -588,11 +591,9 @@ fl_pack_t fl_packet_build(u8 *payload, u8 _len) {
 //	static u8 rep_level = 0;
 	packet.frame.endpoint.ep_u8 = 0;
 	packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
-
 	pack_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
 	memcpy(pack_built.data_arr,packet.bytes,pack_built.length);
 	return pack_built;
-
 }
 void fl_packet_printf(fl_dataframe_format_t _pack) {
 	LOGA(BLE,"HDR:%02X\r\n",_pack.hdr);
@@ -624,7 +625,6 @@ void fl_adv_run(void) {
 //		LOGA(APP,"QUEUE GET : (%d)%d-%d\r\n",G_DATA_CONTAINER.count,G_DATA_CONTAINER.head_index,G_DATA_CONTAINER.tail_index);
 		fl_dataframe_format_t data_parsed;
 		if (fl_packet_parse(data_in_queue,&data_parsed)) {
-
 //			fl_packet_printf(data_parsed);
 #ifdef MASTER_CORE
 			fl_nwk_master_run(&data_in_queue); //process reponse from the slaves
