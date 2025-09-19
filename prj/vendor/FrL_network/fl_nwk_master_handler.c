@@ -143,7 +143,7 @@ fl_pack_t fl_master_packet_heartbeat_build(void) {
 		timetampStep = fl_rtc_getWithMilliStep();
 		LOGA(APP,"New:%d-%d\r\n",timetampStep.timetamp,timetampStep.milstep);
 	}
-	//LOGA(APP,"HB New:%d-%d\r\n",timetampStep.timetamp,timetampStep.milstep);
+	LOGA(APP,"HB New:%d-%d\r\n",timetampStep.timetamp,timetampStep.milstep);
 	packet.frame.timetamp[0] = U32_BYTE0(timetampStep.timetamp);
 	packet.frame.timetamp[1] = U32_BYTE1(timetampStep.timetamp);
 	packet.frame.timetamp[2] = U32_BYTE2(timetampStep.timetamp);
@@ -398,7 +398,10 @@ s8 fl_master_packet_F5_CreateNSend(u8 *_slave_mac_arr, u8 _slave_num) {
 /******************************************************************************/
 /******************************************************************************/
 void fl_master_SYNC_ORIGINAL_TIMETAMP(fl_timetamp_withstep_t _new_origin) {
-	if (ORIGINAL_MASTER_TIME.timetamp != _new_origin.timetamp && ORIGINAL_MASTER_TIME.milstep != _new_origin.milstep) {
+	//if (ORIGINAL_MASTER_TIME.timetamp != _new_origin.timetamp && ORIGINAL_MASTER_TIME.milstep != _new_origin.milstep)
+	u32 origin = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
+	u32 new_origin = fl_rtc_timetamp2milltampStep(_new_origin);
+	if (origin < new_origin) {
 		SYNC_ORIGIN_MASTER(_new_origin.timetamp,_new_origin.milstep);
 		LOGA(APP,"Master Synchronzation Timetamp:%d(%d)\r\n",ORIGINAL_MASTER_TIME.timetamp,ORIGINAL_MASTER_TIME.milstep);
 	}
