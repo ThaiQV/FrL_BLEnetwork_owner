@@ -537,8 +537,7 @@ int _GETALLNODES(void) {
 			p_ALLNODES.online++;
 			if (p_ALLNODES.online >= p_ALLNODES.sort_list.numOfOnl) {
 				P_INFO("GET ALL RTT(%d/%d): %d ms\r\n",p_ALLNODES.sort_list.numOfOnl,G_NODE_LIST.slot_inused,(clock_time()- p_ALLNODES.rtt)/SYSTEM_TIMER_TICK_1MS);
-				memset(pre_slaveID,0xFE,SIZEU8(pre_slaveID));
-				return -1;
+				goto EXIT_GETALL;
 			}
 		} else {
 			if (slave_num < SIZEU8(slaveID)) {
@@ -553,8 +552,7 @@ int _GETALLNODES(void) {
 		P_INFO("GET ALL TIMEOUT: %d ms\r\n",(clock_time()- p_ALLNODES.rtt)/SYSTEM_TIMER_TICK_1MS);
 		//P_INFO("**RTT    : %d ms\r\n",(clock_time()- p_ALLNODES.rtt)/SYSTEM_TIMER_TICK_1MS);
 		P_INFO("**Online :%d/%d\r\n",p_ALLNODES.online,p_ALLNODES.sort_list.numOfOnl);
-		memset(pre_slaveID,0xFE,SIZEU8(pre_slaveID));
-		return -1;
+		goto EXIT_GETALL;
 	}
 	//check new req with the new slaveID
 	u8 diff = _count_diff_elements(pre_slaveID,slaveID,SIZEU8(slaveID));
@@ -571,14 +569,14 @@ int _GETALLNODES(void) {
 		if (add_rslt == -1)
 		{
 			ERR(DRV,"GET ALL ERR !!!! \r\n");
-			memset(pre_slaveID,0xFE,SIZEU8(pre_slaveID));
-			return -1;
+			goto EXIT_GETALL;
 		}
-	}else
-	{
-
 	}
 	return 0;
+	EXIT_GETALL:
+	fl_send_heartbeat();
+	memset(pre_slaveID,0xFE,SIZEU8(pre_slaveID));
+	return -1;
 }
 
 void CMD_GETALLNODES(u8* _data) {

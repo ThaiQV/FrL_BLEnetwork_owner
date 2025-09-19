@@ -280,6 +280,53 @@ fl_pack_t fl_master_packet_assignSlaveID_build(u8* _mac) {
 	return packet_built;
 }
 /***************************************************
+ * @brief 		: build packet RSP 55 to rsp all of slave
+ *
+ * @param[in] 	: none
+ *
+ * @return	  	: fl_pack_t
+ *
+ ***************************************************/
+fl_pack_t fl_master_packet_RSP_55Com_build(u8* _slaveID,u8 _numslave,u8* _seqtimetamp,u8 _deltaTT) {
+	fl_pack_t packet_built;
+
+	fl_data_frame_u packet;
+	memset(packet.bytes,0,SIZEU8(packet.bytes));
+	packet.frame.hdr = NWK_HDR_55;
+
+	fl_timetamp_withstep_t timetampStep = fl_rtc_getWithMilliStep();
+//	u32 timetamp = fl_rtc_get();
+	packet.frame.timetamp[0] = U32_BYTE0(timetampStep.timetamp);
+	packet.frame.timetamp[1] = U32_BYTE1(timetampStep.timetamp);
+	packet.frame.timetamp[2] = U32_BYTE2(timetampStep.timetamp);
+	packet.frame.timetamp[3] = U32_BYTE3(timetampStep.timetamp);
+
+	//Add new mill-step
+	packet.frame.milltamp = timetampStep.milstep;
+
+	//Create payload
+	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
+
+	memcpy(packet.frame.payload,(u8*)_seqtimetamp,SIZEU8(fl_timetamp_withstep_t));
+	packet.frame.payload[SIZEU8(u32)] = _deltaTT;
+	memcpy(&packet.frame.payload[SIZEU8(u32)+sizeof(_deltaTT)],_slaveID,_numslave);
+
+	//crc
+	packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
+	//assign slaveID
+	packet.frame.slaveID.id_u8 = 0xFF;
+
+	packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
+	packet.frame.endpoint.master = FL_FROM_MASTER; //non-ack
+	packet.frame.endpoint.dbg = NWK_DEBUG_STT;
+	packet.frame.endpoint.rep_settings = NWK_REPEAT_LEVEL;
+	packet.frame.endpoint.repeat_mode = NWK_REPEAT_MODE;
+
+	packet_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
+	memcpy(packet_built.data_arr,packet.bytes,packet_built.length);
+	return packet_built;
+}
+/***************************************************
  * @brief 		: build packet RSP 55 to rsp SlaveID
  *
  * @param[in] 	: none
@@ -707,20 +754,22 @@ int fl_master_ProccesRSP_cbk(void) {
 				u8 slave_id = packet.frame.slaveID.id_u8;
 				u8 node_indx = fl_master_SlaveID_find(slave_id);
 				if (node_indx != -1) {
+					if (packet.frame.endpoint.master == FL_FROM_SLAVE_ACK) {
 //					G_NODE_LIST.sla_info[node_indx].active = true;
 //					G_NODE_LIST.sla_info[node_indx].timelife = (clock_time() - G_NODE_LIST.sla_info[node_indx].timelife);
 //					u32 cnt_inpack = MAKE_U32(packet.frame.payload[3],packet.frame.payload[2],packet.frame.payload[1],packet.frame.payload[0]);
 //					LOGA(INF,"CMD_55(%d)0x%02X%02X%02X%02X%02X%02X(%d):%d\r\n",slave_id,G_NODE_LIST.sla_info[node_indx].mac[0],
 //							G_NODE_LIST.sla_info[node_indx].mac[1],G_NODE_LIST.sla_info[node_indx].mac[2],G_NODE_LIST.sla_info[node_indx].mac[3],
 //							G_NODE_LIST.sla_info[node_indx].mac[4],G_NODE_LIST.sla_info[node_indx].mac[5],packet.frame.endpoint.repeat_cnt,cnt_inpack);
-					_master_updateDB_for_Node(node_indx,&packet);
-					//Send rsp to slave
-					u8 seq_timetamp[5];
-					memcpy(seq_timetamp,packet.frame.timetamp,SIZEU8(packet.frame.timetamp));
-					seq_timetamp[SIZEU8(packet.frame.timetamp)]=packet.frame.milltamp;
-					fl_adv_sendFIFO_add(fl_master_packet_RSP_55_build(slave_id,seq_timetamp));
-					//send to WIFI
-					fl_ble2wifi_EVENT_SEND(G_NODE_LIST.sla_info[node_indx].mac);
+						_master_updateDB_for_Node(node_indx,&packet);
+						//Send rsp to slave
+						u8 seq_timetamp[5];
+						memcpy(seq_timetamp,packet.frame.timetamp,SIZEU8(packet.frame.timetamp));
+						seq_timetamp[SIZEU8(packet.frame.timetamp)] = packet.frame.milltamp;
+						fl_adv_sendFIFO_add(fl_master_packet_RSP_55_build(slave_id,seq_timetamp));
+						//send to WIFI
+						fl_ble2wifi_EVENT_SEND(G_NODE_LIST.sla_info[node_indx].mac);
+					}
 				} else {
 					ERR(INF,"ID not foud:%02X\r\n",slave_id);
 					return -1;
