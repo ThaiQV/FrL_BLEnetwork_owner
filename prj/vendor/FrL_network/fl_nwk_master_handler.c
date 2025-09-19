@@ -398,7 +398,6 @@ s8 fl_master_packet_F5_CreateNSend(u8 *_slave_mac_arr, u8 _slave_num) {
 /******************************************************************************/
 /******************************************************************************/
 void fl_master_SYNC_ORIGINAL_TIMETAMP(fl_timetamp_withstep_t _new_origin) {
-	//if (ORIGINAL_MASTER_TIME.timetamp != _new_origin.timetamp && ORIGINAL_MASTER_TIME.milstep != _new_origin.milstep)
 	u32 origin = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
 	u32 new_origin = fl_rtc_timetamp2milltampStep(_new_origin);
 	if (origin < new_origin) {
@@ -669,16 +668,18 @@ static void _master_updateDB_for_Node(u8 node_indx ,fl_data_frame_u *packet)  {
 
 int fl_master_ProccesRSP_cbk(void) {
 	fl_pack_t data_in_queue;
-	if (FL_QUEUE_GET(&G_HANDLE_MASTER_CONTAINER,&data_in_queue)) {
+	u16 numofrsp = 0;
+	if ((numofrsp=FL_QUEUE_GET(&G_HANDLE_MASTER_CONTAINER,&data_in_queue))) {
+
 		fl_data_frame_u packet;
 		extern u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
 
 		if(!fl_packet_parse(data_in_queue,&packet.frame)) return -1;
-
 		if(!MASTER_INSTALL_STATE && G_NODE_LIST.slot_inused == 0xFF){return -1;}
-
+		//LOGA(APP,"NumOfRSP:%d\r\n",numofrsp);
 		LOGA(INF,"HDR_RSP ID: %02X\r\n",packet.frame.hdr);
 		P_PRINTFHEX_A(INF,packet.frame.payload,SIZEU8(packet.frame.payload),"%d:",packet.frame.slaveID.id_u8);
+		//Todo:Process RSP with API REQ registered
 		fl_queue_REQcRSP_ScanRec(data_in_queue);
 
 		switch ((fl_hdr_nwk_type_e) packet.frame.hdr) {

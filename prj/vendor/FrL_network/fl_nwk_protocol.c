@@ -537,7 +537,7 @@ int _GETALLNODES(void) {
 			p_ALLNODES.online++;
 			if (p_ALLNODES.online >= p_ALLNODES.sort_list.numOfOnl) {
 				P_INFO("GET ALL RTT(%d/%d): %d ms\r\n",p_ALLNODES.sort_list.numOfOnl,G_NODE_LIST.slot_inused,(clock_time()- p_ALLNODES.rtt)/SYSTEM_TIMER_TICK_1MS);
-				memset(pre_slaveID,0xFF,SIZEU8(pre_slaveID));
+				memset(pre_slaveID,0xFE,SIZEU8(pre_slaveID));
 				return -1;
 			}
 		} else {
@@ -553,7 +553,7 @@ int _GETALLNODES(void) {
 		P_INFO("GET ALL TIMEOUT: %d ms\r\n",(clock_time()- p_ALLNODES.rtt)/SYSTEM_TIMER_TICK_1MS);
 		//P_INFO("**RTT    : %d ms\r\n",(clock_time()- p_ALLNODES.rtt)/SYSTEM_TIMER_TICK_1MS);
 		P_INFO("**Online :%d/%d\r\n",p_ALLNODES.online,p_ALLNODES.sort_list.numOfOnl);
-		memset(pre_slaveID,0xFF,SIZEU8(pre_slaveID));
+		memset(pre_slaveID,0xFE,SIZEU8(pre_slaveID));
 		return -1;
 	}
 	//check new req with the new slaveID
@@ -571,7 +571,7 @@ int _GETALLNODES(void) {
 		if (add_rslt == -1)
 		{
 			ERR(DRV,"GET ALL ERR !!!! \r\n");
-			memset(pre_slaveID,0xFF,SIZEU8(pre_slaveID));
+			memset(pre_slaveID,0xFE,SIZEU8(pre_slaveID));
 			return -1;
 		}
 	}else
@@ -615,7 +615,7 @@ void CMD_GETALLNODES(u8* _data) {
 		p_ALLNODES.sort_list.numOfOnl = onl_msb_indx;
 		if(p_ALLNODES.sort_list.numOfOnl==0) return;
 		//Register timeout
-		p_ALLNODES.timeout = timeout==0?p_ALLNODES.sort_list.numOfOnl*4*GETALL_TIMEOUT_1_NODE:timeout*1000; //default num*durationADV
+		p_ALLNODES.timeout = timeout==0?p_ALLNODES.sort_list.numOfOnl*8*GETALL_TIMEOUT_1_NODE:timeout*1000; //default num*durationADV
 		p_ALLNODES.timeout = (p_ALLNODES.timeout>20*1000)?20*1000:p_ALLNODES.timeout;
 		//clear all previous status of the all
 		for (u8 var = 0; var < G_NODE_LIST.slot_inused; ++var) {

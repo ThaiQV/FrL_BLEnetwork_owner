@@ -275,29 +275,31 @@ void fl_adv_sendFIFO_run(void) {
 			loop_check++;
 			if ( inpack < origin_pack)
 			{
-				if (loop_check < G_QUEUE_SENDING.mask)
+				if (loop_check <= G_QUEUE_SENDING.mask)
 					continue;
 				else{
+					ERR(INF,"NULL ADV SENDING!! \r\n");
 					return;
 				}
 			}
 			F_SENDING_STATE = 1;
+			if (G_QUEUE_SENDING.count > 0) {
+				LOGA(APP,"Num of adv in SENDING QUEUE :%d\r\n",G_QUEUE_SENDING.count);
+			}
 			fl_adv_send(data_in_queue.data_arr,data_in_queue.length,G_ADV_SETTINGS.adv_duration);
-#ifdef MASTER_CORE
 			fl_data_frame_u check_heartbeat;
 			memcpy(check_heartbeat.bytes,data_in_queue.data_arr,data_in_queue.length);
-			//skip heartbeat packet and rsp packet
-			//Only restart timer if the packet is REQ from the master (with ACK)
-//			if (check_heartbeat.frame.hdr != NWK_HDR_HEARTBEAT && check_heartbeat.frame.endpoint.master == FL_FROM_MASTER_ACK) {
-//				fl_nwk_master_heartbeat_run();
-//			}
-			//TODO: IMPORTANT SYNCHRONIZATION TIMESTAMP
 			if (check_heartbeat.frame.hdr == NWK_HDR_HEARTBEAT) {
+				u32 origin = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
+				u32 new_origin = fl_rtc_timetamp2milltampStep(timetamp_inpack);
+				if (origin < new_origin) {
+					LOGA(APP,"Master Synchronzation Timetamp:%d(%d)\r\n",ORIGINAL_MASTER_TIME.timetamp,ORIGINAL_MASTER_TIME.milstep);
+				}
+#ifdef MASTER_CORE
+				//TODO: IMPORTANT SYNCHRONIZATION TIMESTAMP
 				fl_master_SYNC_ORIGINAL_TIMETAMP(timetamp_inpack);
-			}
-//			LOGA(APP,"ADV Send HDR:0x%02X\r\n",check_heartbeat.frame.hdr);
-//			P_PRINTFHEX_A(APP,data_in_queue.data_arr,data_in_queue.length,"Raw Data(len:%d):",data_in_queue.length);
 #endif
+			}
 			return;
 		}
 	}
