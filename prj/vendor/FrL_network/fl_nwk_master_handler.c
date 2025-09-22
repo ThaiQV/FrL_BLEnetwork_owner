@@ -135,15 +135,15 @@ fl_pack_t fl_master_packet_heartbeat_build(void) {
 
 	fl_timetamp_withstep_t timetampStep = fl_rtc_getWithMilliStep();
 //	Recheck with ORIGINAL_TIMETAMP
-	u32 inpack = fl_rtc_timetamp2milltampStep(timetampStep);
-	u32 origin_pack = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
-	if(inpack <= origin_pack){
-		LOGA(APP,"Last:%d-%d\r\n",timetampStep.timetamp,timetampStep.milstep);
-		delay_ms(5);
-		timetampStep = fl_rtc_getWithMilliStep();
-		LOGA(APP,"New:%d-%d\r\n",timetampStep.timetamp,timetampStep.milstep);
-	}
-	LOGA(APP,"HB New:%d-%d\r\n",timetampStep.timetamp,timetampStep.milstep);
+//	u32 inpack = fl_rtc_timetamp2milltampStep(timetampStep);
+//	u32 origin_pack = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
+//	if(inpack <= origin_pack){
+//		LOGA(APP,"Last:%d-%d\r\n",timetampStep.timetamp,timetampStep.milstep);
+//		delay_ms(5);
+//		timetampStep = fl_rtc_getWithMilliStep();
+//		LOGA(APP,"New:%d-%d\r\n",timetampStep.timetamp,timetampStep.milstep);
+//	}
+//	LOGA(APP,"HB New:%d-%d\r\n",timetampStep.timetamp,timetampStep.milstep);
 	packet.frame.timetamp[0] = U32_BYTE0(timetampStep.timetamp);
 	packet.frame.timetamp[1] = U32_BYTE1(timetampStep.timetamp);
 	packet.frame.timetamp[2] = U32_BYTE2(timetampStep.timetamp);
@@ -287,7 +287,7 @@ fl_pack_t fl_master_packet_assignSlaveID_build(u8* _mac) {
  * @return	  	: fl_pack_t
  *
  ***************************************************/
-fl_pack_t fl_master_packet_RSP_55Com_build(u8* _slaveID,u8 _numslave,u8* _seqtimetamp,u8 _deltaTT) {
+fl_pack_t fl_master_packet_RSP_55Com_build(u8* _slaveID,u8 _numslave,u8* _seqtimetamp,u16 _deltaTT) {
 	fl_pack_t packet_built;
 
 	fl_data_frame_u packet;
@@ -308,8 +308,9 @@ fl_pack_t fl_master_packet_RSP_55Com_build(u8* _slaveID,u8 _numslave,u8* _seqtim
 	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
 
 	memcpy(packet.frame.payload,(u8*)_seqtimetamp,SIZEU8(fl_timetamp_withstep_t));
-	packet.frame.payload[SIZEU8(u32)] = _deltaTT;
-	memcpy(&packet.frame.payload[SIZEU8(u32)+sizeof(_deltaTT)],_slaveID,_numslave);
+	packet.frame.payload[SIZEU8(fl_timetamp_withstep_t)] = U16_HI(_deltaTT);
+	packet.frame.payload[SIZEU8(fl_timetamp_withstep_t)+1] = U16_LO(_deltaTT);
+	memcpy(&packet.frame.payload[SIZEU8(fl_timetamp_withstep_t)+SIZEU8(_deltaTT)],_slaveID,_numslave);
 
 	//crc
 	packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));

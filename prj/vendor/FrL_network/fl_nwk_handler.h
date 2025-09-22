@@ -282,10 +282,10 @@ inline u8 fl_crc8(u8* _pdata, u8 _len) {
 	return (u8) (crc % 256);
 }
 
-#define DEBUG_TURN(x) do { \
+#define DEBUG_TURN(x) /*do { \
 							if (x) { PLOG_Start(ALL); } \
 							else   { PLOG_Stop(ALL);  }\
-						} while(0)
+						} while(0)*/
 
 static inline uint32_t swap_endian32(uint32_t val) {
     return ((val >> 24) & 0x000000FF) |
@@ -295,7 +295,7 @@ static inline uint32_t swap_endian32(uint32_t val) {
 }
 
 #ifdef MASTER_CORE
-fl_pack_t fl_master_packet_RSP_55Com_build(u8* _slaveID,u8 _numslave,u8* _seqtimetamp,u8 _deltaTT);
+fl_pack_t fl_master_packet_RSP_55Com_build(u8* _slaveID,u8 _numslave,u8* _seqtimetamp,u16 _deltaTT);
 void fl_master_SYNC_ORIGINAL_TIMETAMP(fl_timetamp_withstep_t _new_origin);
 void fl_nwk_master_init(void);
 void fl_nwk_master_run(fl_pack_t *_pack_handle);
@@ -309,7 +309,7 @@ s16 fl_master_SlaveID_find(u8 _id);
 u8 fl_master_SlaveID_get(u8* _mac);
 s8 fl_master_SlaveMAC_get(u8 _slaveid,u8* mac);
 void fl_nwk_master_nodelist_load(void);
-void fl_queue_REQcRSP_ScanRec(fl_pack_t _pack);
+s8 fl_queue_REQcRSP_ScanRec(fl_pack_t _pack);
 s8 fl_api_master_req(u8* _mac_slave,u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry);
 #else
 extern volatile u8 NWK_DEBUG_STT; // it will be assigned into end-point byte (dbg :1bit);
@@ -318,7 +318,7 @@ void fl_nwk_slave_run(fl_pack_t *_pack_handle);
 void fl_nwk_slave_process(void);
 bool fl_nwk_slave_checkHDR(u8 _hdr);
 u32 fl_req_slave_packet_createNsend(u8 _cmdid, u8* _data, u8 _len);
-void fl_queue_REQcRSP_ScanRec(fl_pack_t _pack,void *_id);
+s8 fl_queue_REQcRSP_ScanRec(fl_pack_t _pack,void *_id);
 int fl_nwk_slave_reconnect(void);
 s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry);
 #endif
