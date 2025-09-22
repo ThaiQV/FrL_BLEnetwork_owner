@@ -89,7 +89,7 @@ volatile u8  NWK_REPEAT_LEVEL = 3;
 /***                           Private definitions                           **/
 /******************************************************************************/
 /******************************************************************************/
-
+int fl_nwk_joinnwk_timeout(void) ;
 /******************************************************************************/
 /******************************************************************************/
 /***                       Functions declare                   		         **/
@@ -136,9 +136,9 @@ int _nwk_slave_backup(void){
 }
 
 void fl_nwk_slave_init(void) {
-	PLOG_Start(APP);
-	PLOG_Start(API);
-	PLOG_Start(INF);
+//	PLOG_Start(APP);
+//	PLOG_Start(API);
+//	PLOG_Start(INF);
 
 	DEBUG_TURN(NWK_DEBUG_STT);
 	fl_input_external_init();
@@ -487,6 +487,8 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 					packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
 				}
 			} else {
+				//Joined network -> exit collection mode if the master stopped broadcast Collection packet[
+				blt_soft_timer_restart(fl_nwk_joinnwk_timeout,3*1000*1000); //exit after 3s
 				//Non-rsp
 				packet_built.length = 0;
 				return packet_built;
@@ -573,13 +575,14 @@ int fl_slave_ProccesRSP_cbk(void) {
  *
  ***************************************************/
 int fl_nwk_joinnwk_timeout(void) {
-	ERR(INF,"Join-network timeout and re-scan!!!\r\n");
 	if (IsJoinedNetwork()) {
 		G_INFORMATION.profile.run_stt.join_nwk = 0;
 		fl_adv_collection_channel_deinit();
 		return -1;
-	} else
+	} else {
+		ERR(INF,"Join-network timeout and re-scan!!!\r\n");
 		return 0;
+	}
 }
 void fl_nwk_slave_joinnwk_exc(void) {
 	if (G_INFORMATION.profile.run_stt.join_nwk) {
