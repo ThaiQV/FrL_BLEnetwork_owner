@@ -262,7 +262,7 @@ void firmware_check(void)
 	DFU_PRINTF("OTA FW Ver: %x.%x.%x\n",header_ota_fw.major,header_ota_fw.minor,header_ota_fw.patch);
 	DFU_PRINTF("Size: %x\n",header_ota_fw.size);
 
-	// Read header of ORIGINAL FW in ex-flash
+	// Read header of original FW in ex-flash
 	W25XXX_Read((uint8_t *)&header_original_fw,ORIGINAL_FW_HEADER,sizeof(fw_header_t));
 	DFU_PRINTF("Original FW ver: %x.%x.%x\n",header_original_fw.major,header_original_fw.minor,header_original_fw.patch);
 	DFU_PRINTF("Size: %x\n",header_original_fw.size);
