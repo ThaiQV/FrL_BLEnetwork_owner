@@ -21,6 +21,7 @@
 #include "fl_nwk_protocol.h"
 
 //Public Key for the freelux network
+u8 MASTER_CLEARNETWORK[18] = {'F','R','E','E','L','U','X','M','A','S','T','E','R','C','L','E','A','R'};
 unsigned char FL_NWK_PB_KEY[16] = "freeluxnetw0rk25";
 const u32 ORIGINAL_TIME_TRUST = 1735689600; //00:00:00 UTC - 1/1/2025
 unsigned char FL_NWK_USE_KEY[16]; //this key used to encrypt -> decrypt
@@ -172,6 +173,22 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 				incomming_data.length = pa->len + 1; //add rssi byte
 				//memcpy(incomming_data.data_arr,pa->data,incomming_data.length);
 //				incomming_data.data_arr[0] = pa->data[0];
+
+#ifndef MASTER_CORE
+				//IMPORTANT DELETE NETWORK
+//				if(MASTER_DELETE_NETWORK_FLAG)
+				{
+					u8 delete_network[32];
+					fl_nwk_decrypt16(FL_NWK_PB_KEY,pa->data,incomming_data.length,delete_network);
+					if (-1 != plog_IndexOf(delete_network,MASTER_CLEARNETWORK,SIZEU8(MASTER_CLEARNETWORK),incomming_data.length)) {
+						extern int REBOOT_DEV(void);
+						ERR(APP,"DETELE NETWORK!!!!\r\n");
+						fl_db_clearAll();
+						delay_ms(1000);
+						REBOOT_DEV();
+					}
+				}
+#endif
 				//Add decrypt
 				NWK_MYKEY();
 				if(!fl_nwk_decrypt16(FL_NWK_USE_KEY,pa->data,incomming_data.length,incomming_data.data_arr)) return 0;
@@ -354,6 +371,14 @@ void fl_adv_sendFIFO_run(void) {
 #endif
 		u8 loop_check = 0;
 		while (FL_QUEUE_GET_LOOP(&G_QUEUE_SENDING,&data_in_queue)) {
+			//IMPORTAN SEND DELETE NETWORK
+			if(-1 != plog_IndexOf(data_in_queue.data_arr,MASTER_CLEARNETWORK,SIZEU8(MASTER_CLEARNETWORK),data_in_queue.length)) {
+				ERR(APP,"SEND DELETE NETWORK!!!\r\n");
+				F_SENDING_STATE = 1;
+				fl_adv_send(data_in_queue.data_arr,data_in_queue.length,G_ADV_SETTINGS.adv_duration);
+				return;
+			}
+			/*====================*/
 			fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(data_in_queue);
 			u32 inpack = fl_rtc_timetamp2milltampStep(timetamp_inpack);
 			u32 origin_pack = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
@@ -367,8 +392,8 @@ void fl_adv_sendFIFO_run(void) {
 					return;
 				}
 			}
-			F_SENDING_STATE = 1;
 
+			F_SENDING_STATE = 1;
 			fl_adv_send(data_in_queue.data_arr,data_in_queue.length,G_ADV_SETTINGS.adv_duration);
 #ifdef MASTER_CORE
 			//for testing
@@ -418,6 +443,14 @@ void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms) {
 		memset(encrypted,0,SIZEU8(encrypted));
 		NWK_MYKEY();
 		fl_nwk_encrypt16(FL_NWK_USE_KEY,_data,_size,encrypted);
+		/*todo: IMPORTANT FOR CLEAR ALL NETWORK*/
+		extern u8 MASTER_CLEARNETWORK[18];
+		if(-1 != plog_IndexOf(_data,MASTER_CLEARNETWORK,SIZEU8(MASTER_CLEARNETWORK),_size)){
+			ERR(APP,"DELETE NETWORK!!!!!\r\n");
+			memset(encrypted,0,SIZEU8(encrypted));
+			fl_nwk_encrypt16(FL_NWK_PB_KEY,_data,_size,encrypted);
+		}
+		/**/
 		bls_ll_setAdvData(encrypted,_size);
 		bls_ll_setAdvDuration(_timeout_ms * 1000,1); // ms->us
 		bls_app_registerEventCallback(BLT_EV_FLAG_ADV_DURATION_TIMEOUT,&fl_durationADV_timeout_proccess);

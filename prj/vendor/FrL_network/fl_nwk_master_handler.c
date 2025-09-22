@@ -24,6 +24,7 @@
 #include "fl_ble_wifi.h"
 
 #ifdef MASTER_CORE
+
 extern _attribute_data_retention_ volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME;
 #define SYNC_ORIGIN_MASTER(x,y) 			do{	\
 												ORIGINAL_MASTER_TIME.timetamp = x;\
@@ -151,14 +152,10 @@ fl_pack_t fl_master_packet_heartbeat_build(void) {
 
 	//Add new mill-step
 	packet.frame.milltamp = timetampStep.milstep;
-
-//	//TODO: IMPORTANT SYNCHRONIZATION TIMESTAMP
-//	LOGA(APP,"Master Synchronzation Timetamp:%d(%d)\r\n",timetampStep.timetamp,timetampStep.milstep);
-//	SYNC_ORIGIN_MASTER(timetampStep.timetamp,timetampStep.milstep);
-
 	packet.frame.slaveID.id_u8 = 0xFF; // all grps + all members
 	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
 	packet.frame.payload[0]=GETINFO_FLAG_EVENTTEST;
+
 	//crc
 	packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
 
@@ -634,7 +631,7 @@ int fl_send_collection_req(void) {
  *
  ***************************************************/
 int fl_send_heartbeat(void) {
-	if(G_NODE_LIST.slot_inused == 0xFF){return 0;}
+	//if(G_NODE_LIST.slot_inused == 0xFF){return 0;}
 //	datetime_t cur_dt;
 //	u32 cur_timetamp = fl_rtc_get();
 //	fl_rtc_timestamp_to_datetime(cur_timetamp,&cur_dt);
@@ -643,7 +640,6 @@ int fl_send_heartbeat(void) {
 //	LOGA(APP,"[%02d/%02d/%02d-%02d:%02d:%02d] HeartBeat Sync(%d ms)\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second,
 //			PERIOD_HEARTBEAT);
 	fl_pack_t packet_built = fl_master_packet_heartbeat_build();
-
 	fl_adv_sendFIFO_add(packet_built);
 	return 0; //
 }
@@ -926,6 +922,25 @@ void fl_nwk_master_nodelist_load(void) {
 			G_NODE_LIST.sla_info[var].data[size_mac + 4] = G_NODE_LIST.sla_info[var].dev_type;
 		}
 	}
+}
+/***************************************************
+ * @brief 		:CLEAR ALL NETWORK
+ *
+ * @param[in] 	:none
+ *
+ * @return	  	:none
+ *
+ ***************************************************/
+
+void fl_nwk_master_CLEARALL_NETWORK(void) {
+	extern u8 MASTER_CLEARNETWORK[18] ;
+	fl_pack_t packet_built;
+	fl_data_frame_u packet;
+	memset(packet.bytes,0,SIZEU8(packet.bytes));
+	memcpy(packet.bytes,MASTER_CLEARNETWORK,SIZEU8(MASTER_CLEARNETWORK));
+	packet_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
+	memcpy(packet_built.data_arr,packet.bytes,packet_built.length);
+	fl_adv_sendFIFO_add(packet_built);
 }
 
 /***************************************************

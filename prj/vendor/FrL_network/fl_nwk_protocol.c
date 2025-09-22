@@ -428,14 +428,20 @@ void CMD_ADVSCAN(u8* _data) {
 	}
 	ERR(DRV,"ERR Scanner settings (%d)\r\n",rslt);
 }
+int _DELETE_NETWORK(void)
+{
+	extern void fl_nwk_master_CLEARALL_NETWORK(void);
+	fl_nwk_master_CLEARALL_NETWORK();
+	return -1;
+}
 void CMD_CLEARDB(u8* _data) {
 	//p get clear slalist
 	u8 nodelist_c[8] = { 's', 'l', 'a', 'l', 'i', 's', 't' };
 	int rslt = plog_IndexOf(_data,nodelist_c,sizeof(nodelist_c),CMDLINE_MAXLEN);
 	if (rslt != -1) {
 		LOG_P(DRV,"Clear NODELIST DB\r\n");
-		fl_db_nodelist_clearAll();
-		REBOOT_DEV();
+		//blt_soft_timer_add(&_DELETE_NETWORK,2*1000*1000);
+		_DELETE_NETWORK();
 	}
 }
 void CMD_CHANNELCONFIG(u8* _data) {

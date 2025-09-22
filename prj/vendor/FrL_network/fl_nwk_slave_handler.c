@@ -136,9 +136,9 @@ int _nwk_slave_backup(void){
 }
 
 void fl_nwk_slave_init(void) {
-//	PLOG_Start(APP);
-//	PLOG_Start(API);
-//	PLOG_Start(INF);
+	PLOG_Start(APP);
+	PLOG_Start(API);
+	PLOG_Start(INF);
 
 	DEBUG_TURN(NWK_DEBUG_STT);
 	fl_input_external_init();
@@ -407,11 +407,10 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 				u8 _payload[POWER_METER_STRUCT_BYTESIZE];
 				memset(_payload,0xFF,SIZEU8(_payload));
 				//u8 len_payload=0;
-//				GETINFO_FLAG_EVENTTEST = packet.frame.payload[sizeof(packet.frame.payload)-1];
+
 				LOGA(APP,"(%d)SlaveID:%X | inPack:%X | TestEvent:%d\r\n",memid_idx,G_INFORMATION.slaveID.id_u8,packet.frame.payload[memid_idx],GETINFO_FLAG_EVENTTEST);
 				packet.frame.endpoint.dbg = NWK_DEBUG_STT;
 				u8 indx_data = 0;
-
 				if (memid_idx != -1) {
 #ifdef COUNTER_DEVICE
 					tbs_device_counter_t *counter_data = (tbs_device_counter_t*)G_INFORMATION.data;
