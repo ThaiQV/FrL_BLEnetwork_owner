@@ -92,6 +92,8 @@ typedef union {
 		u8 bt_rst;
 		u32 pass_product;
 		u32 err_product;
+		//add new mode and indx
+		u8 mode;
 	//reserve
 	//u8 rsv[11];
 	} data;
@@ -282,10 +284,10 @@ inline u8 fl_crc8(u8* _pdata, u8 _len) {
 	return (u8) (crc % 256);
 }
 
-#define DEBUG_TURN(x) /*do { \
+#define DEBUG_TURN(x) do { \
 							if (x) { PLOG_Start(ALL); } \
 							else   { PLOG_Stop(ALL);  }\
-						} while(0)*/
+						} while(0)
 
 static inline uint32_t swap_endian32(uint32_t val) {
     return ((val >> 24) & 0x000000FF) |

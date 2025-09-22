@@ -136,8 +136,8 @@ int _nwk_slave_backup(void){
 }
 
 void fl_nwk_slave_init(void) {
-	PLOG_Start(APP);
-	PLOG_Start(API);
+//	PLOG_Start(APP);
+//	PLOG_Start(API);
 //	PLOG_Start(INF);
 
 	DEBUG_TURN(NWK_DEBUG_STT);

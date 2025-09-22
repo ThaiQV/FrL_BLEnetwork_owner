@@ -139,8 +139,8 @@ static void _getnsend_data_report(u8 var, u8 rspcmd) {
 	extern fl_slaves_list_t G_NODE_LIST;
 	//for COUTER DEVICEs
 	/* COUNTER DEVICE
-	 * |Call butt|End call butt|Reset button|Pass product|Error product|Reserve| (sum 22 bytes)
-	 * |   1B	 |      1B     |     1B     |    4Bs     |     4Bs     |  11Bs |
+	 * |Call butt|End call butt|Reset button|Pass product|Error product|  Mode |Reserve| (sum 22 bytes)
+	 * |   1B	 |      1B     |     1B     |    4Bs     |     4Bs     |  1B   |  10Bs |
 	 * */
 	u8 payload[BLE_WIFI_MAXLEN];
 	memset(payload,0xFF,SIZEU8(payload));
