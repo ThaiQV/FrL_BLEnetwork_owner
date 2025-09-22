@@ -140,11 +140,13 @@ int fl_queue_REQnRSP_TimeoutStart(void){
 #ifdef MASTER_CORE
 						u8 mac[6];
 						if (fl_master_SlaveMAC_get(REQ_BUF.rsp_check.slaveID,mac) != -1) {
-							if (-1!= fl_api_master_req(mac,REQ_BUF.rsp_check.hdr_cmdid,REQ_BUF.req_payload.payload,REQ_BUF.req_payload.len,
-											REQ_BUF.rsp_cb,REQ_BUF.timeout_set / 1000,REQ_BUF.retry)) {
-//								LOGA(API,"[%d/%d]SlaveID(%d)->Retry:%d\r\n",i,avai_slot,REQ_BUF.rsp_check.slaveID,REQ_BUF.retry);
-								continue;
-							}
+//							if (-1!= fl_api_master_req(mac,REQ_BUF.rsp_check.hdr_cmdid,REQ_BUF.req_payload.payload,REQ_BUF.req_payload.len,
+//											REQ_BUF.rsp_cb,REQ_BUF.timeout_set / 1000,REQ_BUF.retry)) {
+////								LOGA(API,"[%d/%d]SlaveID(%d)->Retry:%d\r\n",i,avai_slot,REQ_BUF.rsp_check.slaveID,REQ_BUF.retry);
+//								continue;
+//							}
+							G_QUEUE_REQ_CALL_RSP[i].timeout = G_QUEUE_REQ_CALL_RSP[i].timeout_set; //refesh timeout for next retry;
+							G_QUEUE_REQ_CALL_RSP[i].retry --;
 						}
 #else
 //						if(-1!=fl_api_slave_req(REQ_BUF.rsp_check.hdr_cmdid,REQ_BUF.req_payload.payload,REQ_BUF.req_payload.len,
