@@ -259,7 +259,8 @@ int fl_adv_sendFIFO_add(fl_pack_t _pack) {
 #ifdef MASTER_CORE
 
 void fl_master_adv_createRSPCommon(void) {
-	u8 SlaveID[22-5-1]; //22 bytes paloay - 4 bytes timetamps - delta timetamps
+	u8 SlaveID[22-5-2]; //22 bytes paloay - 4 bytes timetamps - delta timetamps
+	u32 timetamp_com[22-5-2]; // for testing list
 	u8 numSlave=0;
 	u8 timetamp_min_u8[SIZEU8(fl_timetamp_withstep_t)];
 	u32 timetamp_min = 0;
@@ -278,8 +279,10 @@ void fl_master_adv_createRSPCommon(void) {
 
 			p_55RSP[numSlave] = &G_QUEUE_SENDING.data[var];
 			SlaveID[numSlave] = check_rspcom.frame.slaveID.id_u8;
+			timetamp_com[numSlave] = inpack;
 			if(timetamp_min==0){
 				timetamp_min=inpack;
+				timetamp_max = inpack;
 				memcpy(timetamp_min_u8,check_rspcom.frame.payload,SIZEU8(fl_timetamp_withstep_t));
 			}else{
 				if(inpack<=timetamp_min){
@@ -297,15 +300,15 @@ void fl_master_adv_createRSPCommon(void) {
 	if (numSlave < 2)
 		return;
 	//For testing
-//	LOGA(APP,"ORIGIN:%d\r\n",ORIGINAL_MASTER_TIME.timetamp);
+	LOGA(APP,"ORIGIN:%d\r\n",ORIGINAL_MASTER_TIME.timetamp);
 	P_PRINTFHEX_A(APP,SlaveID,numSlave,"SlaveID(%d):",numSlave);
 	LOGA(APP,"TimeTamp_min  :%d\r\n",timetamp_min);
-
-	u16 delta = (timetamp_max>timetamp_min)?(u16)(timetamp_max-timetamp_min):0;
-
+	u16 delta = (timetamp_max > timetamp_min) ? (u16) (timetamp_max - timetamp_min) : 0;
 	LOGA(APP,"TimeTamp_max  :%d\r\n",timetamp_max);
 	LOGA(APP,"TimeTamp_delta:%d\r\n",delta);
-
+	for (u8 i = 0; i < numSlave; i++) {
+		LOGA(APP,"TimeTamp:%d\r\n",timetamp_com[i]);
+	}
 	//Clear RSP55 old and update G_SENDING_QUEUE.count
 	for(u8 i = 0;i<numSlave;i++){
 		memset(p_55RSP[i]->data_arr,0,SIZEU8(p_55RSP[i]->data_arr));
@@ -320,12 +323,7 @@ void fl_master_adv_createRSPCommon(void) {
 //	origin[2] = U32_BYTE2(ORIGINAL_MASTER_TIME.timetamp);
 //	origin[3] = U32_BYTE3(ORIGINAL_MASTER_TIME.timetamp);
 //	origin[4] = ORIGINAL_MASTER_TIME.milstep;
-//	P_PRINTFHEX_A(APP,origin,SIZEU8(fl_timetamp_withstep_t),"ORIGIN:");
-//	for (u8 i = 0; i < numSlave; i++) {
-////		P_PRINTFHEX_A(APP,timetamp_com[i],SIZEU8(fl_timetamp_withstep_t),"TimeTamp:");
-//		LOGA(APP,"TimeTamp:%d\r\n",timetamp_com[i]);
-//	}
-//	fl_master_packet_RSP_55Com_build(SlaveID,numSlave,)
+
 }
 #endif
 /***************************************************

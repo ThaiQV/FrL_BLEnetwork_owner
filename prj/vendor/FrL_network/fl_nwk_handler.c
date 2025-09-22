@@ -216,7 +216,7 @@ s8 fl_queue_REQcRSP_ScanRec(fl_pack_t _pack,void *_id)
 			if (G_QUEUE_REQ_CALL_RSP[i].rsp_check.hdr_cmdid != 0 && G_QUEUE_REQ_CALL_RSP[i].rsp_check.hdr_cmdid == packet.frame.hdr) {
 #ifdef MASTER_CORE
 				if (G_QUEUE_REQ_CALL_RSP[i].rsp_check.slaveID == packet.frame.slaveID.id_u8
-					&& G_QUEUE_REQ_CALL_RSP[i].rsp_check.seqTimetamp==seq_timetamp)
+					&& G_QUEUE_REQ_CALL_RSP[i].rsp_check.seqTimetamp==seq_timetamp){
 #else
 				u16 timetamp_delta = MAKE_U16(packet.frame.payload[SIZEU8(fl_timetamp_withstep_t)],packet.frame.payload[SIZEU8(fl_timetamp_withstep_t)+1]);
 				u8 slaveID_rsp[SIZEU8(packet.frame.payload)-SIZEU8(fl_timetamp_withstep_t)- SIZEU8(timetamp_delta)]; // 22 - 5 - 1
@@ -224,7 +224,7 @@ s8 fl_queue_REQcRSP_ScanRec(fl_pack_t _pack,void *_id)
 				memcpy(slaveID_rsp,&packet.frame.payload[SIZEU8(fl_timetamp_withstep_t)+SIZEU8(timetamp_delta)],SIZEU8(slaveID_rsp));
 				u8 my_slaveID_inrspcom = plog_IndexOf(slaveID_rsp,&G_QUEUE_REQ_CALL_RSP[i].rsp_check.slaveID,1,SIZEU8(slaveID_rsp));
 
-				P_PRINTFHEX_A(APP,slaveID_rsp,SIZEU8(slaveID_rsp),"SlaveID(%d):",SIZEU8(slaveID_rsp));
+				P_PRINTFHEX_A(API,slaveID_rsp,SIZEU8(slaveID_rsp),"SlaveID(%d):",SIZEU8(slaveID_rsp));
 				LOGA(API,"REQ Timetmap  :%d\r\n",G_QUEUE_REQ_CALL_RSP[i].rsp_check.seqTimetamp);
 				LOGA(API,"TimeTamp_Seq  :%d\r\n",seq_timetamp);
 				LOGA(API,"TimeTamp_delta:%d\r\n",timetamp_delta);
@@ -235,9 +235,10 @@ s8 fl_queue_REQcRSP_ScanRec(fl_pack_t _pack,void *_id)
 					|| (G_QUEUE_REQ_CALL_RSP[i].rsp_check.slaveID == packet.frame.slaveID.id_u8
 							&& G_QUEUE_REQ_CALL_RSP[i].rsp_check.seqTimetamp==seq_timetamp)
 					)
-#endif
+
 				{
 					_myID->active = true;
+#endif
 					rslt = i;
 					LOGA(API,"RSP(%d|%d):%d/%d\r\n",G_QUEUE_REQ_CALL_RSP[i].rsp_check.seqTimetamp,seq_timetamp,packet.frame.hdr,packet.frame.slaveID.id_u8);
 					G_QUEUE_REQ_CALL_RSP[i].rsp_cb((void*)&G_QUEUE_REQ_CALL_RSP[i],(void*)&_pack); //timeout
