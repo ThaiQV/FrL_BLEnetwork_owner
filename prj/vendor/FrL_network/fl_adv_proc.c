@@ -270,34 +270,43 @@ void fl_master_adv_createRSPCommon(void) {
 
 	fl_pack_t *p_55RSP[SIZEU8(SlaveID)];
 	for (u8 var = 0; var < G_QUEUE_SENDING.mask + 1; ++var) {
+
 		fl_timetamp_withstep_t timetamp_inpack = fl_adv_timetampStepInPack(G_QUEUE_SENDING.data[var]);
 		u32 inpack = fl_rtc_timetamp2milltampStep(timetamp_inpack);
 		memset(check_rspcom.bytes,0,SIZEU8(check_rspcom.bytes));
 		memcpy(check_rspcom.bytes,G_QUEUE_SENDING.data[var].data_arr,G_QUEUE_SENDING.data[var].length);
-		if (inpack >= origin_pack && check_rspcom.frame.endpoint.master == FL_FROM_MASTER
-				&& check_rspcom.frame.hdr == NWK_HDR_55 && check_rspcom.frame.slaveID.id_u8 != 0xFF) {
+
+		if (inpack >= origin_pack && check_rspcom.frame.endpoint.master == FL_FROM_MASTER && check_rspcom.frame.hdr == NWK_HDR_55
+				&& check_rspcom.frame.slaveID.id_u8 != 0xFF) {
+			//get timetamp_seq in the payload of the rsp
+			fl_timetamp_withstep_t timetamp_str;
+			timetamp_str.timetamp = MAKE_U32(check_rspcom.frame.payload[3],check_rspcom.frame.payload[2],check_rspcom.frame.payload[1],
+					check_rspcom.frame.payload[0]);
+			timetamp_str.milstep = check_rspcom.frame.payload[4];
+			u32 timetamp_rsp = fl_rtc_timetamp2milltampStep(timetamp_str);
 
 			p_55RSP[numSlave] = &G_QUEUE_SENDING.data[var];
 			SlaveID[numSlave] = check_rspcom.frame.slaveID.id_u8;
-			timetamp_com[numSlave] = inpack;
+			timetamp_com[numSlave] = timetamp_rsp;
+
 			if(timetamp_min==0){
-				timetamp_min=inpack;
-				timetamp_max = inpack;
+				timetamp_min=timetamp_rsp;
+				timetamp_max = timetamp_rsp;
 				memcpy(timetamp_min_u8,check_rspcom.frame.payload,SIZEU8(fl_timetamp_withstep_t));
 			}else{
 				if(inpack<=timetamp_min){
-					timetamp_min = inpack;
-					memcpy(timetamp_min_u8,check_rspcom.frame.timetamp,SIZEU8(fl_timetamp_withstep_t));
+					timetamp_min = timetamp_rsp;
+					memcpy(timetamp_min_u8,check_rspcom.frame.payload,SIZEU8(fl_timetamp_withstep_t));
 				}
-				if(inpack>timetamp_max){
-					timetamp_max = inpack;
+				if(timetamp_rsp>timetamp_max){
+					timetamp_max = timetamp_rsp;
 				}
 			}
 			if(numSlave < SIZEU8(SlaveID))numSlave++;
 			else break;
 		}
 	}
-	if (numSlave < 2)
+	if (numSlave < 3)
 		return;
 	//For testing
 	LOGA(APP,"ORIGIN:%d\r\n",ORIGINAL_MASTER_TIME.timetamp);
