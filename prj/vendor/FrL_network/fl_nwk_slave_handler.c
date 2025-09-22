@@ -89,7 +89,7 @@ volatile u8  NWK_REPEAT_LEVEL = 3;
 /***                           Private definitions                           **/
 /******************************************************************************/
 /******************************************************************************/
-
+int fl_nwk_joinnwk_timeout(void) ;
 /******************************************************************************/
 /******************************************************************************/
 /***                       Functions declare                   		         **/
@@ -407,11 +407,10 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 				u8 _payload[POWER_METER_STRUCT_BYTESIZE];
 				memset(_payload,0xFF,SIZEU8(_payload));
 				//u8 len_payload=0;
-//				GETINFO_FLAG_EVENTTEST = packet.frame.payload[sizeof(packet.frame.payload)-1];
+
 				LOGA(APP,"(%d)SlaveID:%X | inPack:%X | TestEvent:%d\r\n",memid_idx,G_INFORMATION.slaveID.id_u8,packet.frame.payload[memid_idx],GETINFO_FLAG_EVENTTEST);
 				packet.frame.endpoint.dbg = NWK_DEBUG_STT;
 				u8 indx_data = 0;
-
 				if (memid_idx != -1) {
 #ifdef COUNTER_DEVICE
 					tbs_device_counter_t *counter_data = (tbs_device_counter_t*)G_INFORMATION.data;
@@ -488,6 +487,8 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 					packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
 				}
 			} else {
+				//Joined network -> exit collection mode if the master stopped broadcast Collection packet[
+				blt_soft_timer_restart(fl_nwk_joinnwk_timeout,3*1000*1000); //exit after 3s
 				//Non-rsp
 				packet_built.length = 0;
 				return packet_built;
@@ -574,13 +575,14 @@ int fl_slave_ProccesRSP_cbk(void) {
  *
  ***************************************************/
 int fl_nwk_joinnwk_timeout(void) {
-	ERR(INF,"Join-network timeout and re-scan!!!\r\n");
 	if (IsJoinedNetwork()) {
 		G_INFORMATION.profile.run_stt.join_nwk = 0;
 		fl_adv_collection_channel_deinit();
 		return -1;
-	} else
+	} else {
+		ERR(INF,"Join-network timeout and re-scan!!!\r\n");
 		return 0;
+	}
 }
 void fl_nwk_slave_joinnwk_exc(void) {
 	if (G_INFORMATION.profile.run_stt.join_nwk) {

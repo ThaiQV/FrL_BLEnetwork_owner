@@ -87,12 +87,16 @@ int TEST_slave_sendREQ(void) {
 u8 TEST_Buttons(fl_exButton_states_e _state, void *_data) {
 	u32 *time_tick = (u32*)_data;
 	static u32 test_pack_cnt = 0;
-	u8 test_u8[4];
+	u8 test_u8[22];
 	test_pack_cnt++;
 	test_u8[0] = U32_BYTE0(test_pack_cnt);
 	test_u8[1] = U32_BYTE1(test_pack_cnt);
 	test_u8[2] = U32_BYTE2(test_pack_cnt);
 	test_u8[3] = U32_BYTE3(test_pack_cnt);
+#ifdef COUNTER_DEVICE
+	extern tbs_device_counter_t G_COUNTER_DEV ;
+	memcpy(test_u8,G_COUNTER_DEV.bytes,SIZEU8(G_COUNTER_DEV.bytes));
+#endif
 	if (IsJoinedNetwork() && IsOnline()){
 		fl_api_slave_req(NWK_HDR_55,test_u8,SIZEU8(test_u8),&_rsp_callback,800,0);
 		LOGA(PERI,"BUTT Calling %s (%d ms):%d\r\n",_state == BUTT_STATE_PRESSnHOLD ? "Press & hold" : "Press & Release",

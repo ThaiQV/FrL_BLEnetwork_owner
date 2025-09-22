@@ -62,8 +62,8 @@ tbs_device_counter_t G_COUNTER_DEV = { .data = {
 												.bt_endcall = 0,
 												.bt_rst = 0,
 												.pass_product = 100,
-												.err_product = 5,
-												.mode = 0
+												.err_product = 100,
+												.mode = 1
 												}
 									};
 //use to store display message
@@ -177,8 +177,8 @@ void TBS_Counter_init(void){
 		memset(G_COUNTER_LCD[var],0,SIZEU8(G_COUNTER_LCD[var]));
 	}
 	//todo:Init Butt,lcd,7segs,.....
-	TEST_EVENT.lifetime = fl_rtc_get();
-	blt_soft_timer_add(&TEST_Counter_Event,5000*1000);
+	//TEST_EVENT.lifetime = fl_rtc_get();
+	//blt_soft_timer_add(&TEST_Counter_Event,5000*1000);
 }
 void TBS_Counter_Run(void){
 	G_COUNTER_DEV.data.timetamp = fl_rtc_get();
@@ -186,8 +186,9 @@ void TBS_Counter_Run(void){
 //	G_COUNTER_DEV.data.bt_call = RAND(0,1);
 //	G_COUNTER_DEV.data.bt_endcall = G_COUNTER_DEV.data.bt_call?0:1;
 //	G_COUNTER_DEV.data.bt_rst = RAND(0,1);
-	G_COUNTER_DEV.data.pass_product = RAND(1,1020);
-	G_COUNTER_DEV.data.err_product = RAND(1,500);
+//	G_COUNTER_DEV.data.pass_product = RAND(1,1020);
+//	G_COUNTER_DEV.data.err_product = RAND(1,500);
+//	G_COUNTER_DEV.data.mode = 1;
 	Counter_LCD_Print();
 }
 #endif

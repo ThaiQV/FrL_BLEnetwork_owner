@@ -90,12 +90,18 @@ typedef union {
 		u8 bt_call;
 		u8 bt_endcall;
 		u8 bt_rst;
-		u32 pass_product;
-		u32 err_product;
+		u16 pass_product;
+		u16 err_product;
 		//add new mode and indx
 		u8 mode;
-	//reserve
-	//u8 rsv[11];
+		//previous_status
+//		u16 pre_pass_product;
+//		u16 pre_err_product;
+//		u8 pre_mode;
+		//add new index of packet
+//		u16 index;
+		//reverse
+//		u8 reverse[7];
 	} data;
 	u8 bytes[22];
 }__attribute__((packed)) tbs_device_counter_t;
@@ -125,7 +131,7 @@ typedef struct {
 		u32 energy1;       // 24 bits
 		u32 energy2;       // 24 bits
 		u32 energy3;       // 24 bits
-	//u16 reserve;     // 16 bits
+		u16 reserve;     // 16 bits
 	} data;
 }__attribute__((packed)) tbs_device_powermeter_t;
 
