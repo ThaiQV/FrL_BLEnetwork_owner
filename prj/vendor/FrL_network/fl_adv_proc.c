@@ -256,6 +256,85 @@ int fl_adv_sendFIFO_add(fl_pack_t _pack) {
 	ERR(BLE,"Err <QUEUE ALREADY ADV SENDING>!!\r\n");
 	return -1;
 }
+#ifdef MASTER_CORE
+
+void fl_master_adv_createRSPCommon(void) {
+	u8 SlaveID[22-5-2]; //22 bytes paloay - 4 bytes timetamps - delta timetamps
+	u32 timetamp_com[22-5-2]; // for testing list
+	u8 numSlave=0;
+	u8 timetamp_min_u8[SIZEU8(fl_timetamp_withstep_t)];
+	u32 timetamp_min = 0;
+	u32 timetamp_max = 0;
+	u32 origin_pack = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
+	fl_data_frame_u check_rspcom;
+
+	fl_pack_t *p_55RSP[SIZEU8(SlaveID)];
+	for (u8 var = 0; var < G_QUEUE_SENDING.mask + 1; ++var) {
+
+		fl_timetamp_withstep_t timetamp_inpack = fl_adv_timetampStepInPack(G_QUEUE_SENDING.data[var]);
+		u32 inpack = fl_rtc_timetamp2milltampStep(timetamp_inpack);
+		memset(check_rspcom.bytes,0,SIZEU8(check_rspcom.bytes));
+		memcpy(check_rspcom.bytes,G_QUEUE_SENDING.data[var].data_arr,G_QUEUE_SENDING.data[var].length);
+
+		if (inpack >= origin_pack && check_rspcom.frame.endpoint.master == FL_FROM_MASTER && check_rspcom.frame.hdr == NWK_HDR_55
+				&& check_rspcom.frame.slaveID.id_u8 != 0xFF) {
+			//get timetamp_seq in the payload of the rsp
+			fl_timetamp_withstep_t timetamp_str;
+			timetamp_str.timetamp = MAKE_U32(check_rspcom.frame.payload[3],check_rspcom.frame.payload[2],check_rspcom.frame.payload[1],
+					check_rspcom.frame.payload[0]);
+			timetamp_str.milstep = check_rspcom.frame.payload[4];
+			u32 timetamp_rsp = fl_rtc_timetamp2milltampStep(timetamp_str);
+
+			p_55RSP[numSlave] = &G_QUEUE_SENDING.data[var];
+			SlaveID[numSlave] = check_rspcom.frame.slaveID.id_u8;
+			timetamp_com[numSlave] = timetamp_rsp;
+
+			if(timetamp_min==0){
+				timetamp_min=timetamp_rsp;
+				timetamp_max = timetamp_rsp;
+				memcpy(timetamp_min_u8,check_rspcom.frame.payload,SIZEU8(fl_timetamp_withstep_t));
+			}else{
+				if(inpack<=timetamp_min){
+					timetamp_min = timetamp_rsp;
+					memcpy(timetamp_min_u8,check_rspcom.frame.payload,SIZEU8(fl_timetamp_withstep_t));
+				}
+				if(timetamp_rsp>timetamp_max){
+					timetamp_max = timetamp_rsp;
+				}
+			}
+			if(numSlave < SIZEU8(SlaveID))numSlave++;
+			else break;
+		}
+	}
+	if (numSlave < 3)
+		return;
+	//For testing
+	LOGA(APP,"ORIGIN:%d\r\n",ORIGINAL_MASTER_TIME.timetamp);
+	P_PRINTFHEX_A(APP,SlaveID,numSlave,"SlaveID(%d):",numSlave);
+	LOGA(APP,"TimeTamp_min  :%d\r\n",timetamp_min);
+	u16 delta = (timetamp_max > timetamp_min) ? (u16) (timetamp_max - timetamp_min) : 0;
+	LOGA(APP,"TimeTamp_max  :%d\r\n",timetamp_max);
+	LOGA(APP,"TimeTamp_delta:%d\r\n",delta);
+	for (u8 i = 0; i < numSlave; i++) {
+		LOGA(APP,"TimeTamp:%d\r\n",timetamp_com[i]);
+	}
+	//Clear RSP55 old and update G_SENDING_QUEUE.count
+	for(u8 i = 0;i<numSlave;i++){
+		memset(p_55RSP[i]->data_arr,0,SIZEU8(p_55RSP[i]->data_arr));
+		p_55RSP[i]->length = 0;
+	}
+	fl_pack_t RSP_55_Com = fl_master_packet_RSP_55Com_build(SlaveID,numSlave,timetamp_min_u8,delta);
+	P_PRINTFHEX_A(APP,RSP_55_Com.data_arr,RSP_55_Com.length,"RSP_55_Com(%d):",numSlave);
+	fl_adv_sendFIFO_add(RSP_55_Com);
+//	u8 origin[SIZEU8(fl_timetamp_withstep_t)];
+//	origin[0] = U32_BYTE0(ORIGINAL_MASTER_TIME.timetamp);
+//	origin[1] = U32_BYTE1(ORIGINAL_MASTER_TIME.timetamp);
+//	origin[2] = U32_BYTE2(ORIGINAL_MASTER_TIME.timetamp);
+//	origin[3] = U32_BYTE3(ORIGINAL_MASTER_TIME.timetamp);
+//	origin[4] = ORIGINAL_MASTER_TIME.milstep;
+
+}
+#endif
 /***************************************************
  * @brief 		: run and send adv from the queue
  *
@@ -266,7 +345,13 @@ int fl_adv_sendFIFO_add(fl_pack_t _pack) {
  ***************************************************/
 void fl_adv_sendFIFO_run(void) {
 	fl_pack_t data_in_queue;
+//	static u8 check_hb_slot = 0;
+//	u16 cur_slot = 0;
 	if (!F_SENDING_STATE) {
+
+#ifdef MASTER_CORE
+		fl_master_adv_createRSPCommon();
+#endif
 		u8 loop_check = 0;
 		while (FL_QUEUE_GET_LOOP(&G_QUEUE_SENDING,&data_in_queue)) {
 			fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(data_in_queue);
@@ -278,28 +363,32 @@ void fl_adv_sendFIFO_run(void) {
 				if (loop_check <= G_QUEUE_SENDING.mask)
 					continue;
 				else{
-					ERR(INF,"NULL ADV SENDING!! \r\n");
+//					ERR(INF,"NULL ADV SENDING!! \r\n");
 					return;
 				}
 			}
 			F_SENDING_STATE = 1;
-			if (G_QUEUE_SENDING.count > 0) {
-				LOGA(APP,"Num of adv in SENDING QUEUE :%d\r\n",G_QUEUE_SENDING.count);
-			}
+
 			fl_adv_send(data_in_queue.data_arr,data_in_queue.length,G_ADV_SETTINGS.adv_duration);
+#ifdef MASTER_CORE
+			//for testing
+//			u16 cur_slot = ((G_QUEUE_SENDING.head_index - 1) &G_QUEUE_SENDING.mask);
 			fl_data_frame_u check_heartbeat;
 			memcpy(check_heartbeat.bytes,data_in_queue.data_arr,data_in_queue.length);
 			if (check_heartbeat.frame.hdr == NWK_HDR_HEARTBEAT) {
+//				check_hb_slot = cur_slot;
 				u32 origin = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
 				u32 new_origin = fl_rtc_timetamp2milltampStep(timetamp_inpack);
 				if (origin < new_origin) {
 					LOGA(APP,"Master Synchronzation Timetamp:%d(%d)\r\n",ORIGINAL_MASTER_TIME.timetamp,ORIGINAL_MASTER_TIME.milstep);
 				}
-#ifdef MASTER_CORE
 				//TODO: IMPORTANT SYNCHRONIZATION TIMESTAMP
 				fl_master_SYNC_ORIGINAL_TIMETAMP(timetamp_inpack);
-#endif
 			}
+#endif
+//			if (cur_slot != check_hb_slot) {
+//				LOGA(APP,"slot of adv in SENDING QUEUE :%d|%d\r\n",cur_slot , check_hb_slot);
+//			}
 			return;
 		}
 	}

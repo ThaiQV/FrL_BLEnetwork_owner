@@ -22,13 +22,14 @@ void tbs_counter_printf(void* _p){
 	tbs_device_counter_t *data = (tbs_device_counter_t*)_p;
 	LOGA(INF,"MAC:0x%02X%02X%02X%02X%02X%02X\r\n",data->data.mac[0],data->data.mac[1],data->data.mac[2],
 			data->data.mac[3],data->data.mac[4],data->data.mac[5]);
-	LOGA(INF,"Timetamp:%d\r\n",data->data.timetamp);
-	LOGA(INF,"Type:%d\r\n",data->data.type);
-	LOGA(INF,"BT_Call:%d\r\n",data->data.bt_call);
+	LOGA(INF,"Timetamp  :%d\r\n",data->data.timetamp);
+	LOGA(INF,"Type      :%d\r\n",data->data.type);
+	LOGA(INF,"BT_Call   :%d\r\n",data->data.bt_call);
 	LOGA(INF,"BT_EndCall:%d\r\n",data->data.bt_endcall);
-	LOGA(INF,"BT_Rst:%d\r\n",data->data.bt_rst);
-	LOGA(INF,"BT_Pass:%d\r\n",data->data.pass_product);
-	LOGA(INF,"BT_Err:%d\r\n",data->data.err_product);
+	LOGA(INF,"BT_Rst    :%d\r\n",data->data.bt_rst);
+	LOGA(INF,"BT_Pass   :%d\r\n",data->data.pass_product);
+	LOGA(INF,"BT_Err    :%d\r\n",data->data.err_product);
+	LOGA(INF,"Mode      :%d\r\n",data->data.mode);
 //	P_PRINTFHEX_A(INF,data->bytes,SIZEU8(data->bytes),"Raw:");
 }
 
@@ -61,7 +62,8 @@ tbs_device_counter_t G_COUNTER_DEV = { .data = {
 												.bt_endcall = 0,
 												.bt_rst = 0,
 												.pass_product = 100,
-												.err_product = 5
+												.err_product = 5,
+												.mode = 0
 												}
 									};
 //use to store display message
@@ -146,8 +148,8 @@ void TEST_rsp_callback(void *_data,void* _data2){
 	P_INFO("==============================\r\n");
 	P_INFO("* LifeTime:%dh%dm%ds\r\n",lifetime / 3600,(lifetime % 3600) / 60,lifetime % 60);
 	P_INFO("* RTT     :%d ms\r\n",data->timeout>0?((clock_time()-TEST_EVENT.rtt)/SYSTEM_TIMER_TICK_1MS):0);
-	P_INFO("* REQUEST :%d\r\n",TEST_EVENT.req_num);
-	P_INFO("* RESPONSE:%d\r\n",TEST_EVENT.rsp_num);
+	P_INFO("* REQ/RSP :%d/%d\r\n",TEST_EVENT.req_num,TEST_EVENT.rsp_num);
+	P_INFO("* LOSS    :%d\r\n",abs(TEST_EVENT.req_num-TEST_EVENT.rsp_num));
 	P_INFO("==============================\r\n");
 }
 int TEST_Counter_Event(void){

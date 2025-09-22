@@ -81,7 +81,7 @@ extern u8 G_COUNTER_LCD[COUNTER_LCD_MESS_MAX][22];
 tbs_device_powermeter_t G_POWER_METER;
 #endif
 //flag debug of the network
-volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into end-point byte (dbg :1bit)
+volatile u8 NWK_DEBUG_STT = 1; // it will be assigned into end-point byte (dbg :1bit)
 volatile u8 NWK_REPEAT_MODE = 0; // 1: level | 0 : non-level
 volatile u8  NWK_REPEAT_LEVEL = 3;
 /******************************************************************************/
@@ -103,9 +103,9 @@ bool IsOnline(void){
 	return G_INFORMATION.active;
 }
 int _isOnline_check(void) {
-	ERR(INF,"Device -> offline\r\n");
+//	ERR(INF,"Device -> offline\r\n");
 	G_INFORMATION.active = false;
-	return 0;
+	return -1;
 }
 
 int _nwk_slave_backup(void){
@@ -136,6 +136,10 @@ int _nwk_slave_backup(void){
 }
 
 void fl_nwk_slave_init(void) {
+//	PLOG_Start(APP);
+//	PLOG_Start(API);
+//	PLOG_Start(INF);
+
 	DEBUG_TURN(NWK_DEBUG_STT);
 	fl_input_external_init();
 	FL_QUEUE_CLEAR(&G_HANDLE_CONTAINER,PACK_HANDLE_SIZE);
@@ -143,12 +147,10 @@ void fl_nwk_slave_init(void) {
 	G_INFORMATION.active = false;
 	G_INFORMATION.timelife = 0;
 	memcpy(G_INFORMATION.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_INFORMATION.mac));
-
 	//Load from db
 	fl_slave_profiles_t my_profile = fl_db_slaveprofile_init();
 	G_INFORMATION.slaveID.id_u8 = my_profile.slaveid;
 	G_INFORMATION.profile = my_profile;
-
 //	//Test join network + factory
 	if (G_INFORMATION.slaveID.id_u8 == 0xFF && G_INFORMATION.profile.slaveid==G_INFORMATION.slaveID.id_u8)
 	{
@@ -194,9 +196,8 @@ void fl_nwk_slave_init(void) {
 	//Interval checking network
 //	fl_nwk_slave_reconnect();
 	//Checking online
-	blt_soft_timer_add(&_isOnline_check,RECHECKING_NETWOK_TIME*1000);
+//	blt_soft_timer_add(&_isOnline_check,RECHECKING_NETWOK_TIME*1000);
 	G_INFORMATION.active = false;
-
 	//test random send req
 //	TEST_slave_sendREQ();
 }
@@ -234,14 +235,8 @@ void _nwk_slave_syncFromPack(fl_dataframe_format_t *packet){
 	//Sync network status
 	//if(packet->slaveID.id_u8 == G_INFORMATION.slaveID.id_u8)
 	{
-		if(G_INFORMATION.active == false){
-			ERR(INF,"Device -> Online\r\n");
-		}
-			G_INFORMATION.active = true;
-		if (blt_soft_timer_find(&_isOnline_check) == -1) {
-			blt_soft_timer_add(&_isOnline_check,RECHECKING_NETWOK_TIME * 1000);
-		} else
-			blt_soft_timer_restart(&_isOnline_check,RECHECKING_NETWOK_TIME * 1000);
+		G_INFORMATION.active = true;
+		blt_soft_timer_restart(&_isOnline_check,RECHECKING_NETWOK_TIME * 1000);
 	}
 }
 
@@ -553,7 +548,11 @@ int fl_slave_ProccesRSP_cbk(void) {
 	fl_pack_t data_in_queue;
 	if (FL_QUEUE_GET(&G_HANDLE_CONTAINER,&data_in_queue)) {
 		//Scan req call rsp
-		fl_queue_REQcRSP_ScanRec(data_in_queue,&G_INFORMATION);
+		if(-1!=fl_queue_REQcRSP_ScanRec(data_in_queue,&G_INFORMATION))
+		{
+			LOGA(API,"Refesh online status (%d ms)\r\n",RECHECKING_NETWOK_TIME);
+			blt_soft_timer_restart(&_isOnline_check,RECHECKING_NETWOK_TIME * 1000);
+		}
 		//process rsp of the protocol
 		fl_pack_t packet_build;
 		packet_build = fl_rsp_slave_packet_build(data_in_queue);
@@ -651,6 +650,12 @@ void fl_nwk_slave_process(void){
 	fl_nwk_slave_joinnwk_exc();
 	//todo TBS_device process
 	TBS_Device_Run();
+	//For debuging
+	static bool debug_on_offline = false;
+	if(debug_on_offline != G_INFORMATION.active){
+		debug_on_offline = G_INFORMATION.active;
+		ERR(INF,"Device -> %s\r\n",debug_on_offline==true?"Online":"Offline");
+	}
 }
 /***************************************************
  * @brief 		:Main functions to process income packet
