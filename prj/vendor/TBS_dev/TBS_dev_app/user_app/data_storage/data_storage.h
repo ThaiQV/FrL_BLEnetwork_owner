@@ -13,12 +13,11 @@
 typedef struct {
 	union {
 		struct {
-			uint8_t  is_online;
 			uint16_t product_pass;
 			uint16_t product_error;
 		};
 
-		uint8_t data[5];
+		uint8_t data[4];
 	};
 }data_save_t;
 
@@ -29,8 +28,15 @@ typedef struct {
 	uint16_t product_error;
 } data_storage_share_data_t;
 
-void user_datastorage_app_init(void);
-void user_datastorage_app_task(void);
+typedef struct 
+{
+	uint16_t product_pass;
+	uint16_t product_error;
+} read_data_t;
+
+void hw_storage_init(void);
+read_data_t read_data(uint32_t timestamp);
+
 
 #endif /* COUNTER_DEVICE*/
 #endif /* MASTER_CORE*/

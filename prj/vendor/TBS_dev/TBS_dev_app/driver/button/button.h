@@ -230,6 +230,7 @@ typedef struct {
     // Hold levels
     button_hold_level_t hold_levels[MAX_HOLD_LEVELS];  ///< Hold level configurations
     uint8_t hold_level_count;   ///< Number of configured hold levels
+    uint8_t hold_level_index;
 
     // Multi-click levels
     button_multiclick_t multiclick_levels[MAX_MULTI_CLICK]; ///< Multi-click configurations
@@ -365,9 +366,9 @@ bool button_set_hold_callbacks(uint8_t button_id,
  * @param button_id Button ID
  * @param hold_time_ms Hold time in milliseconds
  * @param callback Callback function when hold level is reached
- * @return true if successful, false otherwise (max levels reached)
+ * @return index(>=0) successful, -1 is false (max levels reached)
  */
-bool button_add_hold_level(uint8_t button_id,
+uint8_t button_add_hold_level(uint8_t button_id,
                           uint32_t hold_time_ms,
                           void (*callback)(uint8_t, uint32_t));
 

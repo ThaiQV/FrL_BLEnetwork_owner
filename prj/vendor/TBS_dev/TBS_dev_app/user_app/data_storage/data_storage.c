@@ -15,65 +15,98 @@
 #include "Freelux_libs/storage_weekly_data.h"
 #include "Freelux_libs/fl_ble_wifi_protocol.h"
 
+extern get_data_t get_data;
+
+// SubApp context structure
+typedef struct {
+	bool is_actic;
+	bool is_timetemp;
+	data_save_t data_save;
+} data_storage_context_t;
+
+// Static context instance
+static data_storage_context_t data_storage_ctx = {0};
+
+// Forward declarations
+static subapp_result_t data_storage_app_init(subapp_t* self);
+static subapp_result_t data_storage_app_loop(subapp_t* self);
+static subapp_result_t data_storage_app_deinit(subapp_t* self);
+static void data_storage_app_event_handler(const event_t* event, void* user_data);
+
+subapp_t data_storage_app = {
+        .name = "data_storage", 
+        .context = &data_storage_ctx, 
+        .state = SUBAPP_STATE_IDLE, 
+        .init = data_storage_app_init, 
+        .loop = data_storage_app_loop, 
+        .deinit = data_storage_app_deinit, 
+        .on_event = NULL, 
+        .pause = NULL, 
+        .resume = NULL, 
+        .is_registered = false, 
+        .event_mask = 0 
+    };
+
 static data_save_t pre_data_save;
-data_storage_share_data_t data_storage_data;
 
-void user_datastorage_app_init(void)
+static subapp_result_t data_storage_app_init(subapp_t* self)
 {
-//	ble_wifi_protocol_init();
-	nvm_init();
-	storage_init();
-	//read data save;
-//	data_storage_data.timestamp = fl_rtc_get();
-	storage_get_data(data_storage_data.timestamp, pre_data_save.data, sizeof(data_save_t));
-
-	ULOGA("read data: timestamp: %d, ", data_storage_data.timestamp);
-//	for(int i = 0; i < sizeof(pre_data_save); i++)
-	{
-		printf("is_online: %d, pass: %d, err: %d\n", pre_data_save.is_online, pre_data_save.product_pass, pre_data_save.product_error);
-	}
-
-	if(pre_data_save.is_online == 0xff)
-	{
-		pre_data_save.is_online = 0;
-		pre_data_save.product_error = 0;
-		pre_data_save.product_pass = 0;
-	}
-
-	data_storage_data.product_pass = pre_data_save.product_pass;
-	data_storage_data.product_error = pre_data_save.product_error;
-
-	storage_put_data(data_storage_data.timestamp, pre_data_save.data, sizeof(data_save_t));
-
-	storage_get_data(data_storage_data.timestamp, pre_data_save.data, sizeof(data_save_t));
-
-	ULOGA("read data: timestamp: %d, ", data_storage_data.timestamp);
-//	for(int i = 0; i < sizeof(pre_data_save); i++)
-	{
-		printf("is_online: %d, pass: %d, err: %d\n", pre_data_save.is_online, pre_data_save.product_pass, pre_data_save.product_error);
-	}
-
-
+	hw_storage_init();
+//	storage_get_data(data_storage_data.timestamp, pre_data_save.data, sizeof(data_save_t));
+//	data_storage_ctx.data_save.product_pass = get_data.pass_product();
+//	data_storage_ctx.data_save.product_error = get_data.err_product();
+//	printf("%d %d\n", data_storage_ctx.data_save.product_pass, data_storage_ctx.data_save.product_error);
+//	printf("%d %d\n", pre_data_save.product_pass, pre_data_save.product_error);
+	return SUBAPP_OK;
 }
 
-void user_datastorage_app_task(void)
+static subapp_result_t data_storage_app_loop(subapp_t* self)
 {
 	static uint64_t datastorageTimeTick = 0;
 	if(get_system_time_ms() - datastorageTimeTick > TIME_DTATSTORAGE_TASK_MS){
 		datastorageTimeTick = get_system_time_ms()  ; //10ms
 	}
 	else{
-		return ;
+		return SUBAPP_OK;
 	}
 
-	pre_data_save.is_online = data_storage_data.is_online;
-	pre_data_save.product_pass = data_storage_data.product_pass;
-	pre_data_save.product_error = data_storage_data.product_error;
+	pre_data_save.product_pass = get_data.pass_product();
+	pre_data_save.product_error = get_data.err_product();
 
-	storage_put_data(data_storage_data.timestamp, pre_data_save.data, sizeof(data_save_t));
-	ULOGA("save data: timestamp %d %d %d %d\n", data_storage_data.timestamp, pre_data_save.is_online, pre_data_save.product_pass, pre_data_save.product_error);
-	storage_get_data(data_storage_data.timestamp, pre_data_save.data, sizeof(data_save_t));
-	ULOGA("read data: timestamp %d %d %d %d\n", data_storage_data.timestamp, pre_data_save.is_online, pre_data_save.product_pass, pre_data_save.product_error);
+	uint32_t timetemp1 = get_data.timetamp();
+
+	storage_put_data(timetemp1, pre_data_save.data, sizeof(data_save_t));
+	printf("save data: timestamp %d %d %d\n", timetemp1, pre_data_save.product_pass, pre_data_save.product_error);
+	// storage_get_data(timetemp1, pre_data_save.data, sizeof(data_save_t));
+	// printf("read data: timestamp %d %d %d\n", timetemp1, pre_data_save.product_pass, pre_data_save.product_error);
+
+	return SUBAPP_OK;
+}
+
+static subapp_result_t data_storage_app_deinit(subapp_t* self)
+{
+	return SUBAPP_OK;
+}
+
+static void data_storage_app_event_handler(const event_t* event, void* user_data)
+{
+
+}
+
+void hw_storage_init(void)
+{
+	nvm_init();
+	storage_init();
+}
+
+read_data_t read_data(uint32_t timestamp)
+{
+	data_save_t result;
+	read_data_t ret;
+	storage_get_data(get_data.timetamp(), result.data, sizeof(data_save_t));
+	ret.product_error = (result.product_error == 0xffff) ? 0 : result.product_error;
+	ret.product_pass  = (result.product_pass  == 0xffff) ? 0 : result.product_pass;
+	return ret;
 }
 
 #endif /* COUNTER_DEVICE*/
