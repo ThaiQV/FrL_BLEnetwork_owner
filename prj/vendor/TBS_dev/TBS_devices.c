@@ -18,17 +18,19 @@
 /***                                Global Parameters                        **/
 /******************************************************************************/
 /******************************************************************************/
+
 void tbs_counter_printf(void* _p){
 	tbs_device_counter_t *data = (tbs_device_counter_t*)_p;
 	LOGA(INF,"MAC:0x%02X%02X%02X%02X%02X%02X\r\n",data->data.mac[0],data->data.mac[1],data->data.mac[2],
 			data->data.mac[3],data->data.mac[4],data->data.mac[5]);
-	LOGA(INF,"Timetamp:%d\r\n",data->data.timetamp);
-	LOGA(INF,"Type:%d\r\n",data->data.type);
-	LOGA(INF,"BT_Call:%d\r\n",data->data.bt_call);
+	LOGA(INF,"Timetamp  :%d\r\n",data->data.timetamp);
+	LOGA(INF,"Type      :%d\r\n",data->data.type);
+	LOGA(INF,"BT_Call   :%d\r\n",data->data.bt_call);
 	LOGA(INF,"BT_EndCall:%d\r\n",data->data.bt_endcall);
-	LOGA(INF,"BT_Rst:%d\r\n",data->data.bt_rst);
-	LOGA(INF,"BT_Pass:%d\r\n",data->data.pass_product);
-	LOGA(INF,"BT_Err:%d\r\n",data->data.err_product);
+	LOGA(INF,"BT_Rst    :%d\r\n",data->data.bt_rst);
+	LOGA(INF,"BT_Pass   :%d\r\n",data->data.pass_product);
+	LOGA(INF,"BT_Err    :%d\r\n",data->data.err_product);
+	LOGA(INF,"Mode      :%d\r\n",data->data.mode);
 //	P_PRINTFHEX_A(INF,data->bytes,SIZEU8(data->bytes),"Raw:");
 }
 
@@ -61,7 +63,8 @@ tbs_device_counter_t G_COUNTER_DEV = { .data = {
 												.bt_endcall = 0,
 												.bt_rst = 0,
 												.pass_product = 100,
-												.err_product = 5
+												.err_product = 100,
+												.mode = 1
 												}
 									};
 //use to store display message
@@ -123,6 +126,7 @@ typedef struct {
 	u32 lifetime;
 	u16 req_num;
 	u16 rsp_num;
+	u32 rtt;
 } test_sendevent_t;
 
 test_sendevent_t TEST_EVENT ={0,0,0};
@@ -141,20 +145,24 @@ void TEST_rsp_callback(void *_data,void* _data2){
 	}else{
 //		P_INFO("Master RSP: NON-RSP \r\n");
 	}
-	u32 lifetime = fl_rtc_get() - TEST_EVENT.lifetime;
+	u32 lifetime = (fl_rtc_get() - TEST_EVENT.lifetime);
 	P_INFO("==============================\r\n");
 	P_INFO("* LifeTime:%dh%dm%ds\r\n",lifetime / 3600,(lifetime % 3600) / 60,lifetime % 60);
-	P_INFO("* REQUEST :%d\r\n",TEST_EVENT.req_num);
-	P_INFO("* RESPONSE:%d\r\n",TEST_EVENT.rsp_num);
+	P_INFO("* RTT     :%d ms\r\n",data->timeout>0?((clock_time()-TEST_EVENT.rtt)/SYSTEM_TIMER_TICK_1MS):0);
+	P_INFO("* REQ/RSP :%d/%d\r\n",TEST_EVENT.req_num,TEST_EVENT.rsp_num);
+	P_INFO("* LOSS    :%d\r\n",abs(TEST_EVENT.req_num-TEST_EVENT.rsp_num));
 	P_INFO("==============================\r\n");
 }
+
 int TEST_Counter_Event(void){
+	extern u8 GETINFO_FLAG_EVENTTEST; // for testing
 	u32 period = RAND(1,30);
-	if (IsJoinedNetwork() && IsOnline()) {
+	if (IsJoinedNetwork() && IsOnline() && GETINFO_FLAG_EVENTTEST ==1) {
 		G_COUNTER_DEV.data.bt_call = RAND(0,1);
 		G_COUNTER_DEV.data.bt_endcall = G_COUNTER_DEV.data.bt_call ? 0 : 1;
 		G_COUNTER_DEV.data.bt_rst = G_COUNTER_DEV.data.bt_call ? 0 : RAND(0,1);
-		fl_api_slave_req(NWK_HDR_55,G_COUNTER_DEV.bytes,SIZEU8(G_COUNTER_DEV.bytes),&TEST_rsp_callback,100,1);
+		fl_api_slave_req(NWK_HDR_55,G_COUNTER_DEV.bytes,SIZEU8(G_COUNTER_DEV.bytes),&TEST_rsp_callback,0,1);
+		TEST_EVENT.rtt = clock_time();
 		TEST_EVENT.req_num++;
 		P_INFO("TEST EVNET after:%d s\r\n",period);
 	}
@@ -171,8 +179,8 @@ void TBS_Counter_init(void){
 		memset(G_COUNTER_LCD[var],0,SIZEU8(G_COUNTER_LCD[var]));
 	}
 	//todo:Init Butt,lcd,7segs,.....
-	TEST_EVENT.lifetime = fl_rtc_get();
-	blt_soft_timer_add(&TEST_Counter_Event,5000*1000);
+	//TEST_EVENT.lifetime = fl_rtc_get();
+	//blt_soft_timer_add(&TEST_Counter_Event,5000*1000);
 }
 void TBS_Counter_Run(void){
 	G_COUNTER_DEV.data.timetamp = fl_rtc_get();
@@ -180,8 +188,9 @@ void TBS_Counter_Run(void){
 //	G_COUNTER_DEV.data.bt_call = RAND(0,1);
 //	G_COUNTER_DEV.data.bt_endcall = G_COUNTER_DEV.data.bt_call?0:1;
 //	G_COUNTER_DEV.data.bt_rst = RAND(0,1);
-	G_COUNTER_DEV.data.pass_product = RAND(1,1020);
-	G_COUNTER_DEV.data.err_product = RAND(1,500);
+//	G_COUNTER_DEV.data.pass_product = RAND(1,1020);
+//	G_COUNTER_DEV.data.err_product = RAND(1,500);
+//	G_COUNTER_DEV.data.mode = 1;
 	Counter_LCD_Print();
 }
 #endif

@@ -18,8 +18,8 @@
  * @brief	callback function for rsp
  */
 typedef void (*fl_rsp_callback_fnc)(void*, void*);
-#define QUEUE_RSP_SLOT_MAX		10
-#define QUEUQ_REQcRSP_INTERVAL  20*1000 //ms
+#define QUEUE_RSP_SLOT_MAX			10
+#define QUEUQ_REQcRSP_INTERVAL  	20*1000 //ms
 
 #define RAND(min, max)				((rand() % ((max) - (min) + 1)) + (min))
 #define RAND_INT(min, max)  		((rand() % ((min) + (max) + 1)) - (min))
@@ -317,5 +317,4 @@ s8 fl_queueREQcRSP_add(u8 slaveid,u8 cmdid,u32 _SeqTimetamp,u8* _payloadreq,u8 _
 int fl_queue_REQnRSP_TimeoutStart(void);
 void fl_adv_setting_update(void);
 int fl_adv_sendFIFO_add(fl_pack_t _pack);
-
 #endif /* VENDOR_FRL_NETWORK_FL_NWK_HANDLER_H_ */
