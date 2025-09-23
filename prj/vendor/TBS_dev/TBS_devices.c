@@ -18,12 +18,10 @@
 /***                                Global Parameters                        **/
 /******************************************************************************/
 /******************************************************************************/
-
 void tbs_counter_printf(void* _p){
 	tbs_device_counter_t *data = (tbs_device_counter_t*)_p;
 	LOGA(INF,"COUNTER STRUCT SIZE :%d\%d\r\n",SIZEU8(tbs_device_counter_t),SIZEU8(data->data));
-	LOGA(INF,"MAC:0x%02X%02X%02X%02X%02X%02X\r\n",data->mac[0],data->mac[1],data->mac[2],
-			data->mac[3],data->mac[4],data->mac[5]);
+	LOGA(INF,"MAC:0x%02X%02X%02X%02X%02X%02X\r\n",data->mac[0],data->mac[1],data->mac[2],data->mac[3],data->mac[4],data->mac[5]);
 	LOGA(INF,"Timetamp  :%d\r\n",data->timetamp);
 	LOGA(INF,"Type      :%d\r\n",data->type);
 	LOGA(INF,"Index     :%d\r\n",data->data.index);
@@ -45,20 +43,20 @@ void tbs_power_meter_printf(void* _p) {
 	LOGA(INF,"Timetamp  :%d\r\n",dev->timetamp);
 	LOGA(INF,"Type      :%d\r\n",dev->type);
 	LOGA(INF,"Index     :%d\r\n",dev->data.index);
-	LOGA(INF,"Frequency :%u\n",dev->data.frequency);
-	LOGA(INF,"Voltage   :%u\n",dev->data.voltage);
-	LOGA(INF,"Current1  :%u\n",dev->data.current1);
-	LOGA(INF,"Current2  :%u\n",dev->data.current2);
-	LOGA(INF,"Current3  :%u\n",dev->data.current3);
-	LOGA(INF,"Power1    :%u\n",dev->data.power1);
-	LOGA(INF,"Power2    :%u\n",dev->data.power2);
-	LOGA(INF,"Power3    :%u\n",dev->data.power3);
-	LOGA(INF,"Time1     :%u\n",dev->data.time1);
-	LOGA(INF,"Time2     :%u\n",dev->data.time2);
-	LOGA(INF,"Time3     :%u\n",dev->data.time3);
-	LOGA(INF,"Energy1   :%u\n",dev->data.energy1);
-	LOGA(INF,"Energy2   :%u\n",dev->data.energy2);
-	LOGA(INF,"Energy3   :%u\n", dev->data.energy3);
+	LOGA(INF,"Frequency :%u\r\n",dev->data.frequency);
+	LOGA(INF,"Voltage   :%u\r\n",dev->data.voltage);
+	LOGA(INF,"Current1  :%u\r\n",dev->data.current1);
+	LOGA(INF,"Current2  :%u\r\n",dev->data.current2);
+	LOGA(INF,"Current3  :%u\r\n",dev->data.current3);
+	LOGA(INF,"Power1    :%u\r\n",dev->data.power1);
+	LOGA(INF,"Power2    :%u\r\n",dev->data.power2);
+	LOGA(INF,"Power3    :%u\r\n",dev->data.power3);
+	LOGA(INF,"Time1     :%u\r\n",dev->data.time1);
+	LOGA(INF,"Time2     :%u\r\n",dev->data.time2);
+	LOGA(INF,"Time3     :%u\r\n",dev->data.time3);
+	LOGA(INF,"Energy1   :%u\r\n",dev->data.energy1);
+	LOGA(INF,"Energy2   :%u\r\n",dev->data.energy2);
+	LOGA(INF,"Energy3   :%u\r\n",dev->data.energy3);
 }
 
 #ifdef COUNTER_DEVICE
@@ -66,13 +64,16 @@ void tbs_power_meter_printf(void* _p) {
 tbs_device_counter_t G_COUNTER_DEV = {  .timetamp = 0,
 										.type = TBS_COUNTER,
 										.data = {
-												.index=0,
-												.bt_call = 0,
-												.bt_endcall = 0,
-												.bt_rst = 0,
-												.pass_product = 100,
-												.err_product = 100,
-												.mode = 1
+												.index=1,
+												.bt_call = 2,
+												.bt_endcall = 3,
+												.bt_rst = 4,
+												.pass_product = 5,
+												.err_product = 6,
+												.mode = 1,
+												.pre_pass_product = 7,
+												.pre_err_product=8,
+												.pre_mode =0
 												}
 									};
 //use to store display message
