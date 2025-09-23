@@ -256,6 +256,7 @@ typedef struct {
 		u8 payload[22];
 		u8 len;
 	} req_payload;
+	fl_pack_t *p_REQ[QUEUE_RSP_SLOT_MAX];
 }fl_rsp_container_t;
 
 #ifdef MASTER_CORE
