@@ -11,6 +11,59 @@
 #ifdef COUNTER_DEVICE
 
 #include "../../user_lib.h"
+#include <stdio.h>
+
+extern get_data_t get_data;
+
+typedef enum {
+	LCD_PRINT_OFF,
+	LCD_PRINT_STARTUP,
+	LCD_PRINT_NONE,
+	LCD_PRINT_MESS,
+	LCD_PRINT_ERR,
+	LCD_PRINT_CALL,
+	LCD_PRINT_ENDCALL,
+	LCD_PRINT_MAC,
+	LCD_PRINT_MODE,
+} lcd_print_type_t;
+
+// SubApp context structure
+typedef struct {
+	struct {
+    	char line1[16];
+    	char line2[16];
+    } display;
+    uint8_t row0_mess_num;
+    uint8_t row1_mess_num;
+    uint32_t time_off;
+    bool enable;            ///< Data validity flag
+    bool startup;
+    lcd_print_type_t print_type;
+} lcd_context_t;
+
+// Static context instance
+static lcd_context_t lcd_ctx = {0};
+
+// Forward declarations
+static subapp_result_t lcd_app_init(subapp_t* self);
+static subapp_result_t lcd_app_loop(subapp_t* self);
+static subapp_result_t lcd_app_deinit(subapp_t* self);
+static void lcd_app_event_handler(const event_t* event, void* user_data);
+
+
+subapp_t lcd_app = {
+        .name = "lcd", 
+        .context = &lcd_ctx, 
+        .state = SUBAPP_STATE_IDLE, 
+        .init = lcd_app_init, 
+        .loop = lcd_app_loop, 
+        .deinit = lcd_app_deinit,
+        .on_event = NULL,
+        .pause = NULL, 
+        .resume = NULL, 
+        .is_registered = false, 
+        .event_mask = 0 
+    };
 
 LCD_Pin_TypeDef lcd_pin_map = {
 	    .RS = &(PortPin_Map){ .tca_port = TCA9555_PORT_0, .tca_pin = TCA9555_PIN_0 },
@@ -24,6 +77,7 @@ LCD_Pin_TypeDef lcd_pin_map = {
 };
 
 extern tca9555_handle_t tca9555_handle;
+extern u8 G_COUNTER_LCD[COUNTER_LCD_MESS_MAX][22];
 
 void lcd_pin_init()
 {
@@ -72,9 +126,91 @@ lcd16x2_config_t lcd_config = {
 
 lcd16x2_handle_t lcd_handle;
 
-lcd_shared_data_t lcd_data;
+uint32_t lcd_app_get_tick(void)
+{
+	return get_system_time_ms();
+}
 
-uint8_t user_lcd_app_init(void)
+lcd_app_handle_t app_handle;
+
+void my_timeout_callback(uint8_t row) {
+	ULOGA("my_timeout_callback \n");
+	for(int i = 0; i < 10; i++)
+	{
+	switch (lcd_ctx.print_type)
+	{
+		case LCD_PRINT_STARTUP:
+			lcd_ctx.startup = 0;
+			lcd_ctx.print_type = LCD_PRINT_NONE;
+			EVENT_PUBLISH_SIMPLE(EVENT_DATA_START_DONE, EVENT_PRIORITY_HIGH);
+			continue;
+
+		case LCD_PRINT_CALL:
+			lcd_app_set_message(&app_handle, 0, "    Calling   ", 0);
+			lcd_app_clear_row(&app_handle, 1);
+			lcd_ctx.time_off = 0;
+			
+			break;
+
+		case LCD_PRINT_ENDCALL:
+			lcd_ctx.print_type = LCD_PRINT_NONE;
+			continue;
+
+		case LCD_PRINT_MESS:
+			lcd_ctx.print_type = LCD_PRINT_NONE;
+			continue;
+		
+		case LCD_PRINT_ERR:
+			lcd_ctx.print_type = LCD_PRINT_NONE;
+			continue;
+
+		case LCD_PRINT_MODE:
+			lcd_ctx.print_type = LCD_PRINT_NONE;
+			continue;
+
+		case LCD_PRINT_NONE:
+			if (get_data.is_call())
+			{
+				lcd_ctx.print_type = LCD_PRINT_CALL;
+				continue;
+			}
+			else
+			{
+				lcd_ctx.print_type = LCD_PRINT_OFF;
+				lcd_app_clear_all(&app_handle);
+				lcd_app_set_message(&app_handle, 1, "      ", 15000); //  1, timeout 15s
+			}
+			
+			break;
+
+		default:
+			lcd_ctx.enable = false;
+			lcd_off();
+			break;
+		}
+		break;
+	}
+}
+
+lcd_app_config_t app_config = {
+    .timeout_callback = my_timeout_callback,
+    .get_tick = lcd_app_get_tick,
+    .default_timeout_ms = 5000,
+    .default_scroll_delay_ms = 500,
+	.default_scroll_start_delay_ms = 1500,
+};
+
+void lcd_on(void)
+{
+	gpio_set_level(GPIO_PC0, 1);
+}
+void lcd_off(void)
+{
+	gpio_set_level(GPIO_PC0, 0);
+}
+
+
+static subapp_result_t lcd_app_init(subapp_t* self)
 {
 	gpio_function_en(GPIO_PC0);
 	gpio_set_output(GPIO_PC0, 1); 			//enable output
@@ -84,71 +220,159 @@ uint8_t user_lcd_app_init(void)
 
 	lcd16x2_error_t result = lcd16x2_init(&lcd_handle, &lcd_config);
 	lcd16x2_clear(&lcd_handle);
-	lcd_data.enable = 1;
 
-	lcd16x2_set_cursor(&lcd_handle, 0, 0);
-	lcd16x2_printf(&lcd_handle, "TBS com         ");
-	lcd16x2_set_cursor(&lcd_handle, 1, 0);
-	lcd16x2_printf(&lcd_handle, "      Couter    ");
+	lcd_app_init_drv(&app_handle, &lcd_handle, &app_config);
 
-	return result;
+	lcd_app_set_message(&app_handle, 0, "   TBS GROUP   ", 30000); //  0, timeout 10s
+	lcd_app_set_message(&app_handle, 1, "Chung Suc Kien Tao Tuong Lai", 13000); //  1, timeout 15s
+
+	uint32_t app_lcd_evt_table[] = get_lcd_event();
+
+	for(int i = 0; i < (sizeof(app_lcd_evt_table)/sizeof(app_lcd_evt_table[0])); i++)
+	{
+		char name[32];
+		snprintf(name, sizeof(name), "app_lcd_evt_table[%d]", i);
+		event_bus_subscribe(app_lcd_evt_table[i], lcd_app_event_handler, NULL, name);
+	}
+
+	lcd_ctx.startup = 1;
+	lcd_ctx.print_type = LCD_PRINT_STARTUP;
+	lcd_ctx.enable =1;
+	lcd_ctx.row0_mess_num = 0;
+	lcd_ctx.row1_mess_num = 1;
+
+	return SUBAPP_OK;
 }
 
-void user_lcd_app_task(void)
+static subapp_result_t lcd_app_loop(subapp_t* self)
 {
 	static uint64_t lcdTimeTick = 0;
 	if(get_system_time_ms() - lcdTimeTick > TIME_BUTTON_TASK_MS){
 		lcdTimeTick = get_system_time_ms()  ; //10ms
 	}
 	else{
-		return ;
+		return SUBAPP_OK;
 	}
 
-	if(lcd_data.enable)
+
+	// if(get_system_time_ms() >= lcd_ctx.time_off && lcd_ctx.time_off != 0){
+	// 	lcd_ctx.enable = false;
+	// 	lcd_ctx.time_off = 0;
+	// }
+
+
+	if(lcd_ctx.enable == false)
 	{
-		lcd16x2_set_cursor(&lcd_handle, 0, 0);
-		lcd16x2_print_string(&lcd_handle, lcd_data.display.line1);
-		lcd16x2_set_cursor(&lcd_handle, 1, 0);
-		lcd16x2_print_string(&lcd_handle, lcd_data.display.line2);
+		return SUBAPP_OK;
 	}
+	else
+	{
+		lcd_on();
+		lcd_app_update(&app_handle);
+	}
+
+	return SUBAPP_OK;
 }
 
-void user_lcd_app_test(void)
+static subapp_result_t lcd_app_deinit(subapp_t* self)
+
 {
-	lcd16x2_init(&lcd_handle, &lcd_config);
-
-	lcd16x2_clear(&lcd_handle);
-	lcd16x2_print_string(&lcd_handle, "Hello World!");
-	lcd16x2_set_cursor(&lcd_handle, 1, 0);  // Row 1, Column 0
-	lcd16x2_printf(&lcd_handle, "Count: %d", 123);
-
-	// 4. Custom character
-	lcd16x2_custom_char_t heart = {
-	    .pattern = {
-	        0b00000,
-	        0b01010,
-	        0b11111,
-	        0b11111,
-	        0b11111,
-	        0b01110,
-	        0b00100,
-	        0b00000
-	    }
-	};
-	lcd16x2_create_custom_char(&lcd_handle, 0, &heart);
-	lcd16x2_print_custom_char(&lcd_handle, 0);  // Print heart character
-
-//	while(1)
-//	{
-//		delay_ms(5000);
-//		lcd16x2_clear(&lcd_handle);
-//		for(int i = 0; i < 7; i++)
-//		{
-//			delay_ms(5000);
-//			lcd16x2_print_custom_char(&lcd_handle, i);  // Print heart character
-//		}
-//	}
+	return SUBAPP_OK;
 }
+
+static void lcd_app_event_handler(const event_t* event, void* user_data)
+{
+	switch (event->type)
+	{
+        case EVENT_LCD_PRINT_MESS:
+            printf("Handle EVENT_LCD_PRINT_MESS\n");
+			lcd_ctx.enable = 1;
+			lcd_ctx.print_type = LCD_PRINT_MESS;
+			// lcd_ctx.time_off = get_system_time_ms() + 15000;
+			lcd_app_clear_all(&app_handle);
+			lcd_app_set_message(&app_handle, 0, G_COUNTER_LCD[lcd_ctx.row0_mess_num], 30000); //  0, timeout 10s
+			lcd_app_set_message(&app_handle, 1, G_COUNTER_LCD[lcd_ctx.row1_mess_num], 15000); //  1, timeout 15s
+			lcd_ctx.row0_mess_num = (lcd_ctx.row0_mess_num +1) % 10;
+			lcd_ctx.row1_mess_num = (lcd_ctx.row1_mess_num +1) % 10;
+			
+            // TODO: turn LED to indicate network online
+            break;
+
+		case EVENT_DATA_PASS_PRODUCT_UP:
+			if(lcd_ctx.print_type != LCD_PRINT_ERR)
+			{
+				break;
+			}
+		case EVENT_DATA_ERR_PRODUCT_CHANGE:
+		case EVENT_DATA_PASS_PRODUCT_DOWN:
+        case EVENT_LCD_PRINT_COUNT_PRODUCT:
+            printf("Handle EVENT_LCD_PRINT_COUNT_PRODUCT\n");
+			lcd_ctx.enable = 1;
+			lcd_ctx.print_type = LCD_PRINT_ERR;
+			sprintf(lcd_ctx.display.line1, "pass %4d", get_data.pass_product());
+			sprintf(lcd_ctx.display.line2, "err  %4d", get_data.err_product());
+			lcd_app_set_message(&app_handle, 0, lcd_ctx.display.line1, 30000); //  0, timeout 10s
+			lcd_app_set_message(&app_handle, 1, lcd_ctx.display.line2, 15000); //  0, timeout 10s
+			
+            // TODO: turn LED to indicate network offline
+            break;
+		
+		case EVENT_DATA_CALL:
+            printf("Handle EVENT_DATA_CALL\n");
+			lcd_ctx.enable = 1;
+			lcd_ctx.print_type = LCD_PRINT_CALL;
+			lcd_ctx.time_off = 0;
+			lcd_app_set_message(&app_handle, 0, "    Calling   ", 0);
+			lcd_app_clear_row(&app_handle, 1);
+
+            // TODO: blink LED for call state
+			break;
+
+		case EVENT_DATA_ENDCALL:
+            printf("Handle EVENT_DATA_ENDCALL\n");
+			lcd_ctx.enable = 1;
+			lcd_ctx.print_type = LCD_PRINT_ENDCALL;
+			lcd_app_set_message(&app_handle, 0, "  End Calling  ", 15000); //  0, timeout 10s
+			lcd_app_clear_row(&app_handle, 1);
+
+            // TODO: blink LED for call state
+			break;
+
+		case EVENT_LCD_PRINT_MAC:
+			printf("Handle EVENT_LCD_PRINT_MAC\n");
+			lcd_ctx.enable = 1;
+			lcd_ctx.print_type = LCD_PRINT_ENDCALL;
+			char line0[16];
+			char line1[16];
+			sprintf(line0, "MAC: %02X %02X %02X", get_data.mac()[0], get_data.mac()[1], get_data.mac()[2] );
+			sprintf(line1, "     %02X %02X %02X", get_data.mac()[3], get_data.mac()[4], get_data.mac()[5] );
+			lcd_app_set_message(&app_handle, 0, line0, 15000); //  0, timeout 10s
+			lcd_app_set_message(&app_handle, 1, line1, 15000); //  0, timeout 10s
+
+			break;
+
+		case EVENT_DATA_SWITCH_MODE:
+			printf("Handler EVENT_DATA_SWITCH_MODE\n");
+			lcd_ctx.enable = 1;
+			lcd_ctx.print_type = LCD_PRINT_MODE;
+			if(get_data.is_mode_actic())
+			{
+				lcd_app_set_message(&app_handle, 0, "     Che Do     ", 30000); //  0, timeout 10s
+				lcd_app_set_message(&app_handle, 1, "    Trong Ca    ", 15000); //  0, timeout 10s
+			}
+			else
+			{
+				lcd_app_set_message(&app_handle, 0, "     Che Do     ", 30000); //  0, timeout 10s
+				lcd_app_set_message(&app_handle, 1, "Chay Thu Nghiem ", 15000); //  0, timeout 10s
+			}
+
+			break;
+        default:
+            printf("Unknown LCD event: %d\n", (uint32_t)event->type);
+            break;
+    }
+}
+
 
 #endif /* COUNTER_DEVICE*/
 #endif /* MASTER_CORE*/

@@ -13,7 +13,7 @@
 
 #define U_APP_DEBUG			0
 #if	U_APP_DEBUG
-#define ULOGA(...)	//LOGA(DEFAULT,##__VA_ARGS__)
+#define ULOGA(...)	LOGA(DEFAULT,##__VA_ARGS__)
 #else
 #define ULOGA(...)
 #endif
@@ -24,13 +24,20 @@
 #include "driver/tca9555/tca9555.h"
 #include "driver/button/button.h"
 #include "driver/led/led.h"
+#include "user_app/app_config.h"
+#include "user_app/user_app.h"
+#include "user_app/core/include/event_bus.h"
+#include "user_app/core/include/sub_app.h"
+#include "user_app/core/include/app_manager.h"
 #include "user_app/tca9555_app/tca9555_app.h"
+#include "user_app/lcd_app/lcd_app_drv.h"
 #include "user_app/lcd_app/lcd_app.h"
 #include "user_app/led_7_seg_app/led_7_seg_app.h"
 #include "user_app/button_app/button_app.h"
 #include "user_app/led_app/led_app.h"
 #include "user_app/data_storage/data_storage.h"
-#include "user_app/user_app.h"
+
+
 
 #endif /* MASTER_CORE*/
 #endif /* APPS_USER_USER_LIB_H_ */

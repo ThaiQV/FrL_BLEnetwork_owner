@@ -12,10 +12,11 @@
 
 #include "../../driver/tca9555/tca9555.h"
 
+#define LCD_TIME_DELAY_OFF		15000
+
 /*
  * lcd
  */
-
 
 /* Structure for a standard (character)LCD display.   */
 typedef struct {
@@ -41,20 +42,22 @@ typedef struct {
 /**
  * @brief LCD sub-app shared data
  */
-typedef struct {
-    struct {
-    	char line1[16];
-    	char line2[16];
-    } display;
 
-    bool enable;            ///< Data validity flag
-} lcd_shared_data_t;
+void lcd_on(void);
+void lcd_off(void);
 
-uint8_t user_lcd_app_init(void);
-void user_lcd_app_task(void);
-
-void user_lcd_app_test(void);
+#define get_lcd_event() {\
+	EVENT_LCD_PRINT_MESS,\
+    EVENT_DATA_CALL,\
+    EVENT_DATA_ENDCALL,\
+    EVENT_DATA_PASS_PRODUCT_UP,\
+    EVENT_DATA_ERR_PRODUCT_CHANGE,\
+    EVENT_DATA_PASS_PRODUCT_DOWN,\
+    EVENT_LCD_PRINT_COUNT_PRODUCT,\
+    EVENT_LCD_PRINT_MAC,\
+    EVENT_DATA_SWITCH_MODE,\
+}
 
 #endif /* COUNTER_DEVICE*/
 #endif /* MASTER_CORE*/
-#endif /* VENDOR_USER_USER_APP_LCD_APP_LCD_APP_H_ */
+#endif /* LCD_APP_H_ */

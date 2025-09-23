@@ -37,6 +37,29 @@ Led_Pin_TypeDef led_pin_map = {
 		.NWK = GPIO_PA6,
 };
 
+// Static context instance
+static led_context_t led_ctx = {0};
+
+// Forward declarations
+static subapp_result_t led_app_init(subapp_t* self);
+static subapp_result_t led_app_loop(subapp_t* self);
+static subapp_result_t led_app_deinit(subapp_t* self);
+static void led_app_event_handler(const event_t* event, void* user_data);
+
+
+subapp_t led_app = {
+        .name = "led", 
+        .context = &led_ctx,
+        .state = SUBAPP_STATE_IDLE, 
+        .init = led_app_init, 
+        .loop = led_app_loop, 
+        .deinit = led_app_deinit, 
+        .on_event = NULL,
+        .pause = NULL, 
+        .resume = NULL, 
+        .is_registered = false, 
+        .event_mask = 0 
+    };
 
 
 /*
@@ -101,50 +124,10 @@ void led_callback(uint8_t led_id);
 void led_callback(uint8_t led_id)
 {
 	ULOGA("led blink callback \n");
-}
-
-void user_led_app_init(void)
-{
-
-	led_manager_init(&hal);
-
-	led_data.led_call_on = 0;
-	led_data.led_nwk_on = 0;
-
-	led_all_on();
-
-//	led_blink(LED_ID_CALL, 1000);
-//
-//	led_blink_duty(LED_ID_NWK, 500, 25);
-//	led_set_blink_complete_callback(LED_ID_CALL, led_callback);
-
-//	led_blink_count(led1, 200, 80, 10);
-
-//	uint8_t pattern = led_add_pattern(led1, 100, 50, 3, 500, true);
-//	led_start_pattern(led1, pattern);
-
-}
-
-void user_led_app_task(void)
-{
-
-	static uint64_t ledTimeTick = 0;
-	if(get_system_time_ms() - ledTimeTick > TIME_LED_TASK_MS){
-		ledTimeTick = get_system_time_ms()  ; //10ms
-	}
-	else{
-		return ;
-	}
-
-	if(led_is_ready(LED_ID_CALL))
+	switch (led_id)
 	{
-		if(led_data.led_call_blink_3)
-		{
-			led_blink_count(LED_ID_CALL, 500, 50, 3);
-			led_data.led_call_blink_3 = 0;
-
-		}
-		else if(led_data.led_call_on)
+	case LED_ID_CALL:
+		if(led_ctx.is_call)
 		{
 			led_on(LED_ID_CALL);
 		}
@@ -152,22 +135,122 @@ void user_led_app_task(void)
 		{
 			led_off(LED_ID_CALL);
 		}
+		break;
+
+	case LED_ID_NWK:
+		break;
+	
+	default:
+		break;
+	}
+}
+
+
+static subapp_result_t led_app_init(subapp_t* self)
+{
+	led_manager_init(&hal);
+
+	led_set_blink_complete_callback(LED_ID_CALL, led_callback);
+
+	led_all_on();
+
+	uint32_t app_led_evt_table[] = get_led_event();
+
+	for(int i = 0; i < (sizeof(app_led_evt_table)/sizeof(app_led_evt_table[0])); i++)
+	{
+		char name[32];
+		snprintf(name, sizeof(name), "app_led_evt_table[%d]", i);
+		event_bus_subscribe(app_led_evt_table[i], led_app_event_handler, NULL, name);
+	}
+	
+	return SUBAPP_OK;
+}
+
+static subapp_result_t led_app_loop(subapp_t* self)
+
+{
+	static uint64_t ledTimeTick = 0;
+	if(get_system_time_ms() - ledTimeTick > TIME_LED_TASK_MS){
+		ledTimeTick = get_system_time_ms()  ; //10ms
+	}
+	else{
+		return SUBAPP_OK;
 	}
 
-
-
-	if(led_data.led_nwk_on)
+	if(led_ctx.start == 0)
 	{
-		led_on(LED_ID_NWK);
-	}
-	else
-	{
-		led_off(LED_ID_NWK);
+		return SUBAPP_OK;
 	}
 
 	led_process_all();
 
+	return SUBAPP_OK;
 }
+
+static subapp_result_t led_app_deinit(subapp_t* self)
+{
+	return SUBAPP_OK;
+}
+
+static void led_app_event_handler(const event_t* event, void* user_data)
+{
+	switch (event->type) {
+        case EVENT_LED_NWK_ONLINE:
+            printf("Handle EVENT_LED_NWK_ONLINE\n");
+			led_on(LED_ID_NWK);
+            // TODO: turn LED to indicate network online
+            break;
+
+        case EVENT_LED_NWK_OFFLINE:
+            printf("Handle EVENT_LED_NWK_OFFLINE\n");
+			led_off(LED_ID_NWK);
+            // TODO: turn LED to indicate network offline
+            break;
+
+        case EVENT_LED_CALL_ON:
+            printf("Handle EVENT_LED_CALL_ON\n");
+			led_on(LED_ID_CALL);
+            // TODO: turn LED for call active
+            break;
+
+        case EVENT_LED_NWK_CALL_OFF:
+            printf("Handle EVENT_LED_NWK_CALL_OFF\n");
+			led_off(LED_ID_CALL);
+            // TODO: turn off LED for network call
+            break;
+
+        case EVENT_DATA_RESET:
+            printf("Handle EVENT_LED_CALL_BLINK\n");
+			led_blink_count(LED_ID_CALL, 500, 50, 3);
+            // TODO: blink LED for call state
+            break;
+
+		case EVENT_DATA_CALL:
+            printf("Handle EVENT_DATA_CALL\n");
+			led_ctx.is_call = 1;
+			led_on(LED_ID_CALL);
+            // TODO: blink LED for call state
+			break;
+
+		case EVENT_DATA_ENDCALL:
+            printf("Handle EVENT_DATA_ENDCALL\n");
+			led_ctx.is_call = 0;
+			led_off(LED_ID_CALL);
+            // TODO: blink LED for call state
+			break;
+
+		case EVENT_DATA_START_DONE:
+			printf("Handle EVENT_DATA_START_DONE\n");
+			led_ctx.start = 1;
+			led_all_off();
+			break;
+
+        default:
+            printf("Unknown LED event: %d\n", (uint32_t)event->type);
+            break;
+    }
+}
+
 
 #endif /* COUNTER_DEVICE*/
 #endif /* MASTER_CORE*/

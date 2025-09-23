@@ -121,6 +121,7 @@ uint8_t button_add(uint8_t gpio_pin, bool active_low) {
     btn->enabled = true;
     btn->initialized = true;
     btn->hold_level_count = 0;
+    btn->hold_level_index = 0;
     btn->multiclick_level_count = 0;
     btn->last_hold_level = 0;
     btn->click_count = 0;
@@ -240,30 +241,30 @@ bool button_set_hold_callbacks(uint8_t button_id,
 
 // ... [Keep all existing level management functions as they were] ...
 
-bool button_add_hold_level(uint8_t button_id,
+uint8_t button_add_hold_level(uint8_t button_id,
                           uint32_t hold_time_ms,
                           void (*callback)(uint8_t, uint32_t)) {
     if (!button_validate_id(button_id)) {
-        return false;
+        return -1;
     }
 
     button_config_t *btn = &g_button_manager.buttons[button_id];
 
     if (btn->hold_level_count >= MAX_HOLD_LEVELS) {
         DB_LOG_BT("[BTN] Error: Maximum hold levels reached for button %d\n", button_id);
-        return false;
+        return -1;
     }
 
-    uint8_t level = btn->hold_level_count;
-    btn->hold_levels[level].hold_time = hold_time_ms;
-    btn->hold_levels[level].callback = callback;
-    btn->hold_levels[level].enabled = true;
+    uint8_t level_index = btn->hold_level_count;
+    btn->hold_levels[level_index].hold_time = hold_time_ms;
+    btn->hold_levels[level_index].callback = callback;
+    btn->hold_levels[level_index].enabled = true;
     btn->hold_level_count++;
 
     DB_LOG_BT("[BTN] Added hold level %d for button %d: %d ms\n",
-           level, button_id, hold_time_ms);
+           level_index, button_id, hold_time_ms);
 
-    return true;
+    return level_index;
 }
 
 bool button_remove_hold_level(uint8_t button_id, uint8_t level_index) {
@@ -896,10 +897,10 @@ static void button_process_state_machine(uint8_t button_id) {
         return;
     }
 
-    if(btn->in_combo)
-    {
-        return;
-    }
+    // if(btn->in_combo)
+    // {
+    //     return;
+    // }
 
     // **FIXED**: Always process state machine, but limit callbacks when in active combo
     // This allows individual features to work alongside combo/pattern features
@@ -984,17 +985,13 @@ static void button_process_state_machine(uint8_t button_id) {
                 for (uint8_t i = btn->last_hold_level; i < btn->hold_level_count; i++) {
                     if (btn->hold_levels[i].enabled && hold_time >= btn->hold_levels[i].hold_time) {
                         btn->last_hold_level = i + 1;
-
+                        btn->hold_level_index = i;
                         // Transition to hold state on first level
                         if (btn->state == BUTTON_STATE_PRESSED && i == 0) {
                             btn->state = BUTTON_STATE_HOLD;
                             button_trigger_event(button_id, BUTTON_EVENT_HOLD_START, hold_time);
                         }
 
-                        // Trigger hold level callback
-                        if (btn->hold_levels[i].callback) {
-                            btn->hold_levels[i].callback(button_id, hold_time);
-                        }
 
                         button_trigger_event(button_id, BUTTON_EVENT_HOLD_LEVEL, hold_time);
                     }
@@ -1112,6 +1109,9 @@ static void button_trigger_event(uint8_t button_id, button_event_t event, uint32
             break;
 
         case BUTTON_EVENT_HOLD_LEVEL:
+            if (!suppress_individual && btn->hold_levels[btn->hold_level_index].callback) {
+                btn->hold_levels[btn->hold_level_index].callback(button_id, data);
+            }
             if (!suppress_individual) {
                 DB_LOG_BT("[BTN%d] HOLD_LEVEL (%dms)\n", button_id, data);
             }

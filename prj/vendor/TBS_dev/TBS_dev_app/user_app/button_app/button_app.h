@@ -13,6 +13,10 @@
 void user_button_app_init(void);
 void user_button_app_task(void);
 
+#define get_button_event() {\
+    EVENT_DATA_START_DONE,\
+}
+
 #endif /* COUNTER_DEVICE*/
 #endif /* MASTER_CORE*/
 #endif /* BUTTON_APP_H_ */

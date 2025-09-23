@@ -29,8 +29,14 @@ typedef struct {
 	uint8_t chage_printf;
 } led7seg_shared_data_t;
 
-void user_led_7_seg_app_init(void);
-void user_led_7_seg_app_task(void);
+#define get_led7_event() {\
+	EVENT_DATA_START_DONE,\
+    EVENT_LED7_PRINT_ERR,\
+	EVENT_DATA_ERR_PRODUCT_CHANGE,\
+    EVENT_DATA_PASS_PRODUCT_UP,\
+    EVENT_DATA_PASS_PRODUCT_DOWN,\
+	EVENT_DATA_RESET,\
+}
 
 #endif /* COUNTER_DEVICE*/
 #endif /* MASTER_CORE*/
