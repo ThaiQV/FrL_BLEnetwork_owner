@@ -21,6 +21,7 @@
 #include "fl_nwk_protocol.h"
 
 //Public Key for the freelux network
+u8 MASTER_CLEARNETWORK[18] = {'F','R','E','E','L','U','X','M','A','S','T','E','R','C','L','E','A','R'};
 unsigned char FL_NWK_PB_KEY[16] = "freeluxnetw0rk25";
 const u32 ORIGINAL_TIME_TRUST = 1735689600; //00:00:00 UTC - 1/1/2025
 unsigned char FL_NWK_USE_KEY[16]; //this key used to encrypt -> decrypt
@@ -30,12 +31,10 @@ volatile u8* FL_NWK_COLLECTION_MODE; //
 /***                                Global Parameters                        **/
 /******************************************************************************/
 /******************************************************************************/
-#ifdef MASTER_CORE
-#define SEND_TIMEOUT_MS		50 //ms
-#else
+
 #define SEND_TIMEOUT_MS		50 //ms
 extern _attribute_data_retention_ volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME;
-#endif
+
 volatile u8 F_SENDING_STATE = 0;
 
 fl_adv_settings_t G_ADV_SETTINGS = {
@@ -174,6 +173,22 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 				incomming_data.length = pa->len + 1; //add rssi byte
 				//memcpy(incomming_data.data_arr,pa->data,incomming_data.length);
 //				incomming_data.data_arr[0] = pa->data[0];
+
+#ifndef MASTER_CORE
+				//IMPORTANT DELETE NETWORK
+//				if(MASTER_DELETE_NETWORK_FLAG)
+				{
+					u8 delete_network[32];
+					fl_nwk_decrypt16(FL_NWK_PB_KEY,pa->data,incomming_data.length,delete_network);
+					if (-1 != plog_IndexOf(delete_network,MASTER_CLEARNETWORK,SIZEU8(MASTER_CLEARNETWORK),incomming_data.length)) {
+						extern int REBOOT_DEV(void);
+						ERR(APP,"DETELE NETWORK!!!!\r\n");
+						fl_db_clearAll();
+						delay_ms(1000);
+						REBOOT_DEV();
+					}
+				}
+#endif
 				//Add decrypt
 				NWK_MYKEY();
 				if(!fl_nwk_decrypt16(FL_NWK_USE_KEY,pa->data,incomming_data.length,incomming_data.data_arr)) return 0;
@@ -231,56 +246,6 @@ void fl_durationADV_timeout_proccess(u8 e, u8 *p, int n) {
 /***                      Processing functions 					             **/
 /******************************************************************************/
 /******************************************************************************/
-#ifndef MASTER_CORE
-/***************************************************
- * @brief 		:Align QUEUE SENDING
- *
- * @param[in] 	:none
- *
- * @return	  	:none
- *
- ***************************************************/
-bool _align_QUEUE_SENDING(fl_pack_t _pack){
-	typedef struct {
-		fl_pack_t two_pack[2];
-		u8 origin_indx;
-		u8 loop_times;
-	}manage_sending_loop_t;
-
-	static manage_sending_loop_t man_loop={.origin_indx = 0xFF,.loop_times = 1, .two_pack = {{.length = 0},{.length =0}}};
-	//update pack_arr
-	man_loop.two_pack[0] = man_loop.two_pack[1];
-	man_loop.two_pack[1] = _pack;
-	//find orginal index
-	u32  timetamp_in_pack = fl_rtc_timetamp2milltampStep(fl_adv_timetampStepInPack(man_loop.two_pack[1]));
-	u32  timetamp_in_pre_pack = fl_rtc_timetamp2milltampStep(fl_adv_timetampStepInPack(man_loop.two_pack[0]));
-
-	if(timetamp_in_pack && timetamp_in_pre_pack){ //  parse success
-		//check master original of the previous with currently
-		if(timetamp_in_pack > timetamp_in_pre_pack && timetamp_in_pack >= fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME)){
-//			man_loop.origin_indx = idx_inQUEUE;
-			man_loop.loop_times = (man_loop.loop_times > NWK_REPEAT_LEVEL) ? 1 : man_loop.loop_times + 1;
-		}
-		//Check loop_times to skip packet with ttl < loop_times
-		fl_dataframe_format_t data_parsed;
-		man_loop.two_pack[1].length+=1;
-		u8 rslt_parser=fl_packet_parse(man_loop.two_pack[1],&data_parsed);
-//		LOGA(BLE,"LoopTimes:%d|(%d)TTL:%d\r\n",man_loop.loop_times,rslt_parser,data_parsed.endpoint.repeat_cnt);
-//		LOGA(BLE,"[0].len:%d | [1].len:%d\r\n",man_loop.two_pack[0].length,man_loop.two_pack[1].length);
-		if (rslt_parser) {
-//			LOGA(BLE,"LoopTimes:%d|(%d)TTL:%d\r\n",man_loop.loop_times,rslt_parser,data_parsed.endpoint.repeat_cnt);
-			return (data_parsed.endpoint.repeat_cnt <= man_loop.loop_times);
-		}
-	}
-	else{
-		if (_pack.length != 0) {
-			man_loop.two_pack[0] = _pack;
-			man_loop.two_pack[1] = _pack;
-		}
-	}
-	return false;
-}
-#endif
 
 /***************************************************
  * @brief 		: add data payload adv into queue fifo
@@ -291,18 +256,102 @@ bool _align_QUEUE_SENDING(fl_pack_t _pack){
  *
  ***************************************************/
 int fl_adv_sendFIFO_add(fl_pack_t _pack) {
-	if (FL_QUEUE_FIND(&G_QUEUE_SENDING,&_pack,_pack.length /* - 1 skip rssi*/) == -1) {
+	u8 master_send_skip_LSB = 0;
+#ifdef MASTER_CORE
+	master_send_skip_LSB = 1;
+#endif
+	if (FL_QUEUE_FIND(&G_QUEUE_SENDING,&_pack,_pack.length - master_send_skip_LSB /* - 1 skip LSB (master)*/) == -1) {
 		if (FL_QUEUE_ADD(&G_QUEUE_SENDING,&_pack) < 0) {
-			ERR(BLE,"Err <QUEUE ADD ADV SENDING>!!\r\n");
+			ERR(BLE,"Err FULL <QUEUE ADD ADV SENDING>!!\r\n");
 			return -1;
 		} else {
 //			P_PRINTFHEX_A(BLE,_pack.data_arr,_pack.length,"%s(%d):","QUEUE ADV",_pack.length);
+			LOGA(BLE,"QUEUE SEND ADD: %d/%d (cnt:%d)\r\n",G_QUEUE_SENDING.head_index,G_QUEUE_SENDING.tail_index,G_QUEUE_SENDING.count);
 			return G_QUEUE_SENDING.tail_index;
 		}
 	}
 	ERR(BLE,"Err <QUEUE ALREADY ADV SENDING>!!\r\n");
 	return -1;
 }
+#ifdef MASTER_CORE
+
+void fl_master_adv_createRSPCommon(void) {
+	u8 SlaveID[22-5-2]; //22 bytes paloay - 4 bytes timetamps - delta timetamps
+	u32 timetamp_com[22-5-2]; // for testing list
+	u8 numSlave=0;
+	u8 timetamp_min_u8[SIZEU8(fl_timetamp_withstep_t)];
+	u32 timetamp_min = 0;
+	u32 timetamp_max = 0;
+	u32 origin_pack = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
+	fl_data_frame_u check_rspcom;
+
+	fl_pack_t *p_55RSP[SIZEU8(SlaveID)];
+	for (u8 var = 0; var < G_QUEUE_SENDING.mask + 1; ++var) {
+
+		fl_timetamp_withstep_t timetamp_inpack = fl_adv_timetampStepInPack(G_QUEUE_SENDING.data[var]);
+		u32 inpack = fl_rtc_timetamp2milltampStep(timetamp_inpack);
+		memset(check_rspcom.bytes,0,SIZEU8(check_rspcom.bytes));
+		memcpy(check_rspcom.bytes,G_QUEUE_SENDING.data[var].data_arr,G_QUEUE_SENDING.data[var].length);
+
+		if (inpack >= origin_pack && check_rspcom.frame.endpoint.master == FL_FROM_MASTER && check_rspcom.frame.hdr == NWK_HDR_55
+				&& check_rspcom.frame.slaveID.id_u8 != 0xFF) {
+			//get timetamp_seq in the payload of the rsp
+			fl_timetamp_withstep_t timetamp_str;
+			timetamp_str.timetamp = MAKE_U32(check_rspcom.frame.payload[3],check_rspcom.frame.payload[2],check_rspcom.frame.payload[1],
+					check_rspcom.frame.payload[0]);
+			timetamp_str.milstep = check_rspcom.frame.payload[4];
+			u32 timetamp_rsp = fl_rtc_timetamp2milltampStep(timetamp_str);
+
+			p_55RSP[numSlave] = &G_QUEUE_SENDING.data[var];
+			SlaveID[numSlave] = check_rspcom.frame.slaveID.id_u8;
+			timetamp_com[numSlave] = timetamp_rsp;
+
+			if(timetamp_min==0){
+				timetamp_min=timetamp_rsp;
+				timetamp_max = timetamp_rsp;
+				memcpy(timetamp_min_u8,check_rspcom.frame.payload,SIZEU8(fl_timetamp_withstep_t));
+			}else{
+				if(inpack<=timetamp_min){
+					timetamp_min = timetamp_rsp;
+					memcpy(timetamp_min_u8,check_rspcom.frame.payload,SIZEU8(fl_timetamp_withstep_t));
+				}
+				if(timetamp_rsp>timetamp_max){
+					timetamp_max = timetamp_rsp;
+				}
+			}
+			if(numSlave < SIZEU8(SlaveID))numSlave++;
+			else break;
+		}
+	}
+	if (numSlave < 3)
+		return;
+	//For testing
+	LOGA(APP,"ORIGIN:%d\r\n",ORIGINAL_MASTER_TIME.timetamp);
+	P_PRINTFHEX_A(APP,SlaveID,numSlave,"SlaveID(%d):",numSlave);
+	LOGA(APP,"TimeTamp_min  :%d\r\n",timetamp_min);
+	u16 delta = (timetamp_max > timetamp_min) ? (u16) (timetamp_max - timetamp_min) : 0;
+	LOGA(APP,"TimeTamp_max  :%d\r\n",timetamp_max);
+	LOGA(APP,"TimeTamp_delta:%d\r\n",delta);
+	for (u8 i = 0; i < numSlave; i++) {
+		LOGA(APP,"TimeTamp:%d\r\n",timetamp_com[i]);
+	}
+	//Clear RSP55 old and update G_SENDING_QUEUE.count
+	for(u8 i = 0;i<numSlave;i++){
+		memset(p_55RSP[i]->data_arr,0,SIZEU8(p_55RSP[i]->data_arr));
+		p_55RSP[i]->length = 0;
+	}
+	fl_pack_t RSP_55_Com = fl_master_packet_RSP_55Com_build(SlaveID,numSlave,timetamp_min_u8,delta);
+	P_PRINTFHEX_A(APP,RSP_55_Com.data_arr,RSP_55_Com.length,"RSP_55_Com(%d):",numSlave);
+	fl_adv_sendFIFO_add(RSP_55_Com);
+//	u8 origin[SIZEU8(fl_timetamp_withstep_t)];
+//	origin[0] = U32_BYTE0(ORIGINAL_MASTER_TIME.timetamp);
+//	origin[1] = U32_BYTE1(ORIGINAL_MASTER_TIME.timetamp);
+//	origin[2] = U32_BYTE2(ORIGINAL_MASTER_TIME.timetamp);
+//	origin[3] = U32_BYTE3(ORIGINAL_MASTER_TIME.timetamp);
+//	origin[4] = ORIGINAL_MASTER_TIME.milstep;
+
+}
+#endif
 /***************************************************
  * @brief 		: run and send adv from the queue
  *
@@ -311,34 +360,60 @@ int fl_adv_sendFIFO_add(fl_pack_t _pack) {
  * @return	  	:
  *
  ***************************************************/
-
 void fl_adv_sendFIFO_run(void) {
 	fl_pack_t data_in_queue;
+//	static u8 check_hb_slot = 0;
+//	u16 cur_slot = 0;
 	if (!F_SENDING_STATE) {
 
 #ifdef MASTER_CORE
-		if (FL_QUEUE_GET(&G_QUEUE_SENDING,&data_in_queue)) {
-//			fl_nwk_master_heartbeat_run();
-#else
+		fl_master_adv_createRSPCommon();
+#endif
+		u8 loop_check = 0;
 		while (FL_QUEUE_GET_LOOP(&G_QUEUE_SENDING,&data_in_queue)) {
+			//IMPORTAN SEND DELETE NETWORK
+			if(-1 != plog_IndexOf(data_in_queue.data_arr,MASTER_CLEARNETWORK,SIZEU8(MASTER_CLEARNETWORK),data_in_queue.length)) {
+				ERR(APP,"SEND DELETE NETWORK!!!\r\n");
+				F_SENDING_STATE = 1;
+				fl_adv_send(data_in_queue.data_arr,data_in_queue.length,G_ADV_SETTINGS.adv_duration);
+				return;
+			}
+			/*====================*/
 			fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(data_in_queue);
 			u32 inpack = fl_rtc_timetamp2milltampStep(timetamp_inpack);
 			u32 origin_pack = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
-			if ( inpack < origin_pack){
-//				LOGA(APP,"timetamp:%d | %d \r\n",inpack,origin_pack);
-//				P_PRINTFHEX_A(APP,data_in_queue.data_arr,data_in_queue.length,"[%d]TTL(%d):",G_QUEUE_SENDING.head_index,
-//						data_in_queue.data_arr[data_in_queue.length - 1] & 0x03);
-				return;
+			loop_check++;
+			if ( inpack < origin_pack)
+			{
+				if (loop_check <= G_QUEUE_SENDING.mask)
+					continue;
+				else{
+//					ERR(INF,"NULL ADV SENDING!! \r\n");
+					return;
+				}
 			}
-			//For debuging
-//			P_PRINTFHEX_A(BLE,data_in_queue.data_arr,data_in_queue.length,"[%d]TTL(%d):",G_QUEUE_SENDING.head_index,
-//					data_in_queue.data_arr[data_in_queue.length - 1] & 0x03);
 
-#endif
-//			LOGA(APP,"ADV FIFO(%d):%d/%d\r\n",G_QUEUE_SENDING.count,G_QUEUE_SENDING.head_index,G_QUEUE_SENDING.tail_index);
 			F_SENDING_STATE = 1;
-//			P_PRINTFHEX_A(INF,data_in_queue.data_arr,data_in_queue.length,"Raw Data(len:%d):",data_in_queue.length);
 			fl_adv_send(data_in_queue.data_arr,data_in_queue.length,G_ADV_SETTINGS.adv_duration);
+#ifdef MASTER_CORE
+			//for testing
+//			u16 cur_slot = ((G_QUEUE_SENDING.head_index - 1) &G_QUEUE_SENDING.mask);
+			fl_data_frame_u check_heartbeat;
+			memcpy(check_heartbeat.bytes,data_in_queue.data_arr,data_in_queue.length);
+			if (check_heartbeat.frame.hdr == NWK_HDR_HEARTBEAT) {
+//				check_hb_slot = cur_slot;
+				u32 origin = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
+				u32 new_origin = fl_rtc_timetamp2milltampStep(timetamp_inpack);
+				if (origin < new_origin) {
+					LOGA(APP,"Master Synchronzation Timetamp:%d(%d)\r\n",ORIGINAL_MASTER_TIME.timetamp,ORIGINAL_MASTER_TIME.milstep);
+				}
+				//TODO: IMPORTANT SYNCHRONIZATION TIMESTAMP
+				fl_master_SYNC_ORIGINAL_TIMETAMP(timetamp_inpack);
+			}
+#endif
+//			if (cur_slot != check_hb_slot) {
+//				LOGA(APP,"slot of adv in SENDING QUEUE :%d|%d\r\n",cur_slot , check_hb_slot);
+//			}
 			return;
 		}
 	}
@@ -368,6 +443,14 @@ void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms) {
 		memset(encrypted,0,SIZEU8(encrypted));
 		NWK_MYKEY();
 		fl_nwk_encrypt16(FL_NWK_USE_KEY,_data,_size,encrypted);
+		/*todo: IMPORTANT FOR CLEAR ALL NETWORK*/
+		extern u8 MASTER_CLEARNETWORK[18];
+		if(-1 != plog_IndexOf(_data,MASTER_CLEARNETWORK,SIZEU8(MASTER_CLEARNETWORK),_size)){
+			ERR(APP,"DELETE NETWORK!!!!!\r\n");
+			memset(encrypted,0,SIZEU8(encrypted));
+			fl_nwk_encrypt16(FL_NWK_PB_KEY,_data,_size,encrypted);
+		}
+		/**/
 		bls_ll_setAdvData(encrypted,_size);
 		bls_ll_setAdvDuration(_timeout_ms * 1000,1); // ms->us
 		bls_app_registerEventCallback(BLT_EV_FLAG_ADV_DURATION_TIMEOUT,&fl_durationADV_timeout_proccess);
@@ -421,7 +504,7 @@ void fl_adv_init(void) {
 	fl_db_init();
 #ifdef MASTER_CORE
 	extern fl_master_config_t G_MASTER_INFO;
-	fl_input_external_init();
+//	fl_input_external_init();
 	//fl_adv_sendtest();
 	fl_nwk_master_init();
 
@@ -431,7 +514,6 @@ void fl_adv_init(void) {
 	extern volatile u8 MASTER_INSTALL_STATE;
 	FL_NWK_COLLECTION_MODE = &MASTER_INSTALL_STATE;
 #else
-	fl_input_external_init();
 	extern fl_nodeinnetwork_t G_INFORMATION;
 	fl_nwk_slave_init();
 	fl_repeater_init();
@@ -442,7 +524,7 @@ void fl_adv_init(void) {
 	FL_NWK_COLLECTION_MODE = &G_INFORMATION.profile.run_stt.join_nwk;
 #endif
 	// Init REQ call RSP
-	fl_queue_REQnRSP_TimeoutStart();
+	fl_queue_REQnRSP_TimeoutInit();
 	//
 	rf_set_power_level_index(MY_RF_POWER_INDEX);
 	blc_ll_setAdvCustomedChannel(*G_ADV_SETTINGS.nwk_chn.chn1,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3);
@@ -510,7 +592,6 @@ void fl_adv_collection_channel_deinit(void){
 	blc_ll_setScanEnable(1,0);
 	bls_ll_setAdvEnable(BLC_ADV_ENABLE);  //adv enable
 	FL_QUEUE_CLEAR(&G_DATA_CONTAINER,IN_DATA_SIZE);
-
 	P_INFO("Collection Deinit(%d):%d |%d |%d\r\n",bls_ll_setAdvEnable(BLC_ADV_ENABLE),*G_ADV_SETTINGS.nwk_chn.chn1,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3)
 }
 
@@ -591,6 +672,21 @@ bool fl_adv_IsFromMe(fl_pack_t data_in_queue) {
 	}
 	return false;
 }
+bool fl_adv_MasterToMe(fl_pack_t data_in_queue) {
+	extern fl_nodeinnetwork_t G_INFORMATION;
+	fl_dataframe_format_t data_parsed;
+	if (fl_packet_parse(data_in_queue,&data_parsed)) {
+		if((data_parsed.endpoint.master == FL_FROM_MASTER|| data_parsed.endpoint.master == FL_FROM_MASTER_ACK)
+				&& (
+						(data_parsed.slaveID.id_u8 == G_INFORMATION.slaveID.id_u8 && G_INFORMATION.slaveID.id_u8 != 0xFF)
+						|| (data_parsed.slaveID.id_u8 == 0xFF ||  G_INFORMATION.slaveID.id_u8 == 0xFF)
+					)
+			){
+			return true;
+		}
+	}
+	return false;
+}
 #endif
 /***************************************************
  * @brief 		: build packet adv via the freelux protocol
@@ -605,10 +701,8 @@ fl_pack_t fl_packet_build(u8 *payload, u8 _len) {
 	fl_data_frame_u packet;
 	memset(packet.bytes,0,SIZEU8(packet.bytes));
 	packet.frame.hdr = NWK_HDR_COLLECT; //testing
-
 //	clock_time
 	u32 timetamp = fl_rtc_get();
-
 	packet.frame.timetamp[0] = U32_BYTE0(timetamp);
 	packet.frame.timetamp[1] = U32_BYTE1(timetamp);
 	packet.frame.timetamp[2] = U32_BYTE2(timetamp);
@@ -619,11 +713,9 @@ fl_pack_t fl_packet_build(u8 *payload, u8 _len) {
 //	static u8 rep_level = 0;
 	packet.frame.endpoint.ep_u8 = 0;
 	packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
-
 	pack_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
 	memcpy(pack_built.data_arr,packet.bytes,pack_built.length);
 	return pack_built;
-
 }
 void fl_packet_printf(fl_dataframe_format_t _pack) {
 	LOGA(BLE,"HDR:%02X\r\n",_pack.hdr);
@@ -655,7 +747,6 @@ void fl_adv_run(void) {
 //		LOGA(APP,"QUEUE GET : (%d)%d-%d\r\n",G_DATA_CONTAINER.count,G_DATA_CONTAINER.head_index,G_DATA_CONTAINER.tail_index);
 		fl_dataframe_format_t data_parsed;
 		if (fl_packet_parse(data_in_queue,&data_parsed)) {
-
 //			fl_packet_printf(data_parsed);
 #ifdef MASTER_CORE
 			fl_nwk_master_run(&data_in_queue); //process reponse from the slaves
@@ -666,7 +757,9 @@ void fl_adv_run(void) {
 				fl_repeat_run(&data_in_queue);
 			}
 			//Todo: Handle FORM MASTER REQ
-			if (fl_adv_IsFromMaster(data_in_queue)) {
+			//if (fl_adv_IsFromMaster(data_in_queue))
+			if(fl_adv_MasterToMe(data_in_queue))
+			{
 				fl_nwk_slave_run(&data_in_queue);
 			}
 #endif

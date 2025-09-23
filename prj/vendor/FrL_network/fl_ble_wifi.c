@@ -139,8 +139,8 @@ static void _getnsend_data_report(u8 var, u8 rspcmd) {
 	extern fl_slaves_list_t G_NODE_LIST;
 	//for COUTER DEVICEs
 	/* COUNTER DEVICE
-	 * |Call butt|End call butt|Reset button|Pass product|Error product|Reserve| (sum 22 bytes)
-	 * |   1B	 |      1B     |     1B     |    4Bs     |     4Bs     |  11Bs |
+	 * |Call butt|End call butt|Reset button|Pass product|Error product|  Mode |Reserve| (sum 22 bytes)
+	 * |   1B	 |      1B     |     1B     |    4Bs     |     4Bs     |  1B   |  10Bs |
 	 * */
 	u8 payload[BLE_WIFI_MAXLEN];
 	memset(payload,0xFF,SIZEU8(payload));
@@ -343,7 +343,7 @@ void _SENDMESS_slave_rsp_callback(void *_data,void* _data2){
 		u8 mac[6];
 		if (fl_master_SlaveMAC_get(data->rsp_check.slaveID,mac) != -1) {
 			fl_datawifi2ble_t wfdata;
-			wfdata.cmd = G_WIFI_CON[_wf_CMD_find(GF_CMD_GET_LIST_REQUEST)].rsp.cmd;
+			wfdata.cmd = G_WIFI_CON[_wf_CMD_find(GF_CMD_SENDMESS_REQUEST)].rsp.cmd;
 			memset(wfdata.data,0,SIZEU8(wfdata.data));
 			memcpy(wfdata.data,mac,SIZEU8(mac));
 			wfdata.len_data = SIZEU8(mac);
@@ -355,8 +355,8 @@ void _SENDMESS_slave_rsp_callback(void *_data,void* _data2){
 	else{
 		LOGA(API,"RTT: TIMEOUT (%d ms)\r\n",(data->timeout_set)/1000);
 	}
-	LOGA(API,"cmdID  :%0X\r\n",data->rsp_check.hdr_cmdid);
-	LOGA(API,"SlaveID:%0X\r\n",data->rsp_check.slaveID);
+	LOGA(API,"cmdID  :%02X\r\n",data->rsp_check.hdr_cmdid);
+	LOGA(API,"SlaveID:%d\r\n",data->rsp_check.slaveID);
 	LOGA(API,"SeqTT  :%d\r\n",data->rsp_check.seqTimetamp);
 }
 
@@ -376,6 +376,8 @@ void SENDMESS_REQUEST(u8* _pdata, RspFunc rspfnc){
 	u8 message[22]; //max payload adv
 	memset(message,0,SIZEU8(message));
 	u8 len_mess = (data->len_data - SIZEU8(mac) > SIZEU8(message))? SIZEU8(message):data->len_data - SIZEU8(mac);
+	//convert hex to dec : location index message
+	data->data[SIZEU8(mac)] = data->data[SIZEU8(mac)]-0x30;
 	memcpy(message,&data->data[SIZEU8(mac)],len_mess);
 	fl_api_master_req(mac,NWK_HDR_F6_SENDMESS,message,len_mess,&_SENDMESS_slave_rsp_callback,200,1);
 	if (rspfnc != 0) {
@@ -396,6 +398,10 @@ void RSTFACTORY_REQUEST(u8* _pdata, RspFunc rspfnc){
 	u8 crc8_cal = fl_crc8(data->data,data->len_data);
 	if (crc8_cal != data->crc8) {
 		ERR(MCU,"ERR >> CRC8:0x%02X | 0x%02X\r\n",data->crc8,crc8_cal);
+		return;
+	}
+	u8 cmd_txt[12]={'f','a','c','t','o','r','y','r','e','s','e','t'};
+	if(-1==plog_IndexOf(data->data,cmd_txt,SIZEU8(cmd_txt),data->len_data)){
 		return;
 	}
 	ERR(APP,"Clear and reset factory.....\r\n");
@@ -459,7 +465,8 @@ void fl_wifi2ble_Excute(fl_wifi2ble_exc_e cmd) {
 			if(G_NODE_LIST.slot_inused == 0xFF){break;}
 			//p get info 255 <Period get again> <num slave for each> <num virtual slave> <timeout rsp> <retry cnt>
 			cmd_type = GETCMD;
-			sprintf(cmd_fmt,"p get info %d %d %d %d %d %d",255,0,8,G_NODE_LIST.slot_inused,G_ADV_SETTINGS.time_wait_rsp,G_ADV_SETTINGS.retry_times);
+			//sprintf(cmd_fmt,"p get info %d %d %d %d %d %d",255,0,8,G_NODE_LIST.slot_inused,G_ADV_SETTINGS.time_wait_rsp,G_ADV_SETTINGS.retry_times);
+			sprintf(cmd_fmt,"p get all 0");
 			break;
 		}
 		default:

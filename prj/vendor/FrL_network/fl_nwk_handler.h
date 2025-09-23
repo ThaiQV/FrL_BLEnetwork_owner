@@ -18,7 +18,8 @@
  * @brief	callback function for rsp
  */
 typedef void (*fl_rsp_callback_fnc)(void*, void*);
-#define QUEUE_RSP_SLOT_MAX			10
+
+#define QUEUE_RSP_SLOT_MAX			16
 #define QUEUQ_REQcRSP_INTERVAL  	20*1000 //ms
 
 #define RAND(min, max)				((rand() % ((max) - (min) + 1)) + (min))
@@ -90,10 +91,18 @@ typedef union {
 		u8 bt_call;
 		u8 bt_endcall;
 		u8 bt_rst;
-		u32 pass_product;
-		u32 err_product;
-	//reserve
-	//u8 rsv[11];
+		u16 pass_product;
+		u16 err_product;
+		//add new mode and indx
+		u8 mode;
+		//previous_status
+//		u16 pre_pass_product;
+//		u16 pre_err_product;
+//		u8 pre_mode;
+		//add new index of packet
+//		u16 index;
+		//reverse
+//		u8 reverse[7];
 	} data;
 	u8 bytes[22];
 }__attribute__((packed)) tbs_device_counter_t;
@@ -123,7 +132,7 @@ typedef struct {
 		u32 energy1;       // 24 bits
 		u32 energy2;       // 24 bits
 		u32 energy3;       // 24 bits
-	//u16 reserve;     // 16 bits
+		u16 reserve;     // 16 bits
 	} data;
 }__attribute__((packed)) tbs_device_powermeter_t;
 
@@ -236,8 +245,8 @@ typedef struct {
 
 typedef struct {
 	fl_rsp_callback_fnc rsp_cb;
-	s32 timeout; //use to count-down
-	s32 timeout_set; //use to retry
+	u32 timeout; //use to count-down
+	u32 timeout_set; //use to retry
 	u8 retry;
 	struct {
 		u32 seqTimetamp;
@@ -248,7 +257,8 @@ typedef struct {
 		u8 payload[22];
 		u8 len;
 	} req_payload;
-}__attribute__((packed)) fl_rsp_container_t;
+	fl_pack_t *p_REQ[QUEUE_RSP_SLOT_MAX];
+}fl_rsp_container_t;
 
 #ifdef MASTER_CORE
 #define MAX_NODES 	200
@@ -287,18 +297,29 @@ inline u8 fl_crc8(u8* _pdata, u8 _len) {
 							else   { PLOG_Stop(ALL);  }\
 						} while(0)
 
+static inline uint32_t swap_endian32(uint32_t val) {
+    return ((val >> 24) & 0x000000FF) |
+           ((val >> 8)  & 0x0000FF00) |
+           ((val << 8)  & 0x00FF0000) |
+           ((val << 24) & 0xFF000000);
+}
+
 #ifdef MASTER_CORE
+fl_pack_t fl_master_packet_RSP_55Com_build(u8* _slaveID,u8 _numslave,u8* _seqtimetamp,u16 _deltaTT);
+void fl_master_SYNC_ORIGINAL_TIMETAMP(fl_timetamp_withstep_t _new_origin);
 void fl_nwk_master_init(void);
 void fl_nwk_master_run(fl_pack_t *_pack_handle);
 void fl_nwk_master_process(void);
+int fl_send_heartbeat(void);
 void fl_nwk_master_heartbeat_run(void);
 fl_pack_t fl_master_packet_GetInfo_build(u8 *_slave_mac_arr, u8 _slave_num);
+s8 fl_master_packet_F5_CreateNSend(u8 *_slave_mac_arr, u8 _slave_num);
 void fl_master_nodelist_AddRefesh(fl_nodeinnetwork_t _node);
 s16 fl_master_SlaveID_find(u8 _id);
 u8 fl_master_SlaveID_get(u8* _mac);
 s8 fl_master_SlaveMAC_get(u8 _slaveid,u8* mac);
 void fl_nwk_master_nodelist_load(void);
-void fl_queue_REQcRSP_ScanRec(fl_pack_t _pack);
+s8 fl_queue_REQcRSP_ScanRec(fl_pack_t _pack);
 s8 fl_api_master_req(u8* _mac_slave,u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry);
 #else
 extern volatile u8 NWK_DEBUG_STT; // it will be assigned into end-point byte (dbg :1bit);
@@ -307,14 +328,14 @@ void fl_nwk_slave_run(fl_pack_t *_pack_handle);
 void fl_nwk_slave_process(void);
 bool fl_nwk_slave_checkHDR(u8 _hdr);
 u32 fl_req_slave_packet_createNsend(u8 _cmdid, u8* _data, u8 _len);
-void fl_queue_REQcRSP_ScanRec(fl_pack_t _pack,void *_id);
+s8 fl_queue_REQcRSP_ScanRec(fl_pack_t _pack,void *_id);
 int fl_nwk_slave_reconnect(void);
 s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry);
 #endif
 u32 fl_adv_timetampInPack(fl_pack_t _pack);
 fl_timetamp_withstep_t fl_adv_timetampStepInPack(fl_pack_t _pack);
 s8 fl_queueREQcRSP_add(u8 slaveid,u8 cmdid,u32 _SeqTimetamp,u8* _payloadreq,u8 _len,fl_rsp_callback_fnc *_cb, u32 _timeout_ms,u8 _retry);
-int fl_queue_REQnRSP_TimeoutStart(void);
+void fl_queue_REQnRSP_TimeoutInit(void);
 void fl_adv_setting_update(void);
 int fl_adv_sendFIFO_add(fl_pack_t _pack);
 #endif /* VENDOR_FRL_NETWORK_FL_NWK_HANDLER_H_ */

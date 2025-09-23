@@ -20,7 +20,7 @@
 //Test api
 #include "test_api.h"
 #include "../TBS_dev/TBS_dev_config.h"
-#ifndef MASTER_CORE
+
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -29,11 +29,12 @@
 /*---------------- Synchronization Master RTC --------------------------*/
 volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME = {.timetamp = 0,.milstep = 0};
 
+#ifndef MASTER_CORE
 #define SYNC_ORIGIN_MASTER(x,y) 			do{	\
 												ORIGINAL_MASTER_TIME.timetamp = x;\
 												ORIGINAL_MASTER_TIME.milstep = y;\
 											}while(0) //Sync original time-master req
-
+u8 GETINFO_FLAG_EVENTTEST = 0;
 #define JOIN_NETWORK_TIME 			30*1000 	//ms
 #define RECHECKING_NETWOK_TIME 		30*1000 	//ms - 1mins
 
@@ -80,7 +81,7 @@ extern u8 G_COUNTER_LCD[COUNTER_LCD_MESS_MAX][22];
 tbs_device_powermeter_t G_POWER_METER;
 #endif
 //flag debug of the network
-volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into end-point byte (dbg :1bit)
+volatile u8 NWK_DEBUG_STT = 1; // it will be assigned into end-point byte (dbg :1bit)
 volatile u8 NWK_REPEAT_MODE = 0; // 1: level | 0 : non-level
 volatile u8  NWK_REPEAT_LEVEL = 3;
 /******************************************************************************/
@@ -88,7 +89,7 @@ volatile u8  NWK_REPEAT_LEVEL = 3;
 /***                           Private definitions                           **/
 /******************************************************************************/
 /******************************************************************************/
-
+int fl_nwk_joinnwk_timeout(void) ;
 /******************************************************************************/
 /******************************************************************************/
 /***                       Functions declare                   		         **/
@@ -102,9 +103,9 @@ bool IsOnline(void){
 	return G_INFORMATION.active;
 }
 int _isOnline_check(void) {
-	ERR(INF,"Device -> offline\r\n");
+//	ERR(INF,"Device -> offline\r\n");
 	G_INFORMATION.active = false;
-	return 0;
+	return -1;
 }
 
 int _nwk_slave_backup(void){
@@ -135,19 +136,21 @@ int _nwk_slave_backup(void){
 }
 
 void fl_nwk_slave_init(void) {
-	DEBUG_TURN(NWK_DEBUG_STT);
+//	PLOG_Start(APP);
+//	PLOG_Start(API);
+//	PLOG_Start(INF);
 
+	DEBUG_TURN(NWK_DEBUG_STT);
+	fl_input_external_init();
 	FL_QUEUE_CLEAR(&G_HANDLE_CONTAINER,PACK_HANDLE_SIZE);
 	//Generate information
 	G_INFORMATION.active = false;
 	G_INFORMATION.timelife = 0;
 	memcpy(G_INFORMATION.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_INFORMATION.mac));
-
 	//Load from db
 	fl_slave_profiles_t my_profile = fl_db_slaveprofile_init();
 	G_INFORMATION.slaveID.id_u8 = my_profile.slaveid;
 	G_INFORMATION.profile = my_profile;
-
 //	//Test join network + factory
 	if (G_INFORMATION.slaveID.id_u8 == 0xFF && G_INFORMATION.profile.slaveid==G_INFORMATION.slaveID.id_u8)
 	{
@@ -193,9 +196,8 @@ void fl_nwk_slave_init(void) {
 	//Interval checking network
 //	fl_nwk_slave_reconnect();
 	//Checking online
-	blt_soft_timer_add(&_isOnline_check,RECHECKING_NETWOK_TIME*1000);
+//	blt_soft_timer_add(&_isOnline_check,RECHECKING_NETWOK_TIME*1000);
 	G_INFORMATION.active = false;
-
 	//test random send req
 //	TEST_slave_sendREQ();
 }
@@ -225,7 +227,8 @@ void _nwk_slave_syncFromPack(fl_dataframe_format_t *packet){
 	NWK_REPEAT_LEVEL = packet->endpoint.rep_settings;
 
 	//Sync mastertime origin
-	if (packet->hdr == NWK_HDR_HEARTBEAT) {
+	//if (packet->hdr == NWK_HDR_HEARTBEAT)
+	{
 		SYNC_ORIGIN_MASTER(master_timetamp,packet->milltamp);
 		LOGA(INF,"ORIGINAL MASTER-TIME:%d\r\n",ORIGINAL_MASTER_TIME.milstep);
 	}
@@ -233,19 +236,16 @@ void _nwk_slave_syncFromPack(fl_dataframe_format_t *packet){
 	//if(packet->slaveID.id_u8 == G_INFORMATION.slaveID.id_u8)
 	{
 		G_INFORMATION.active = true;
-		if (blt_soft_timer_find(&_isOnline_check) == -1) {
-			blt_soft_timer_add(&_isOnline_check,RECHECKING_NETWOK_TIME * 1000);
-		} else
-			blt_soft_timer_restart(&_isOnline_check,0);
+		blt_soft_timer_restart(&_isOnline_check,RECHECKING_NETWOK_TIME * 1000);
 	}
 }
 
 s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry) {
 	//register timeout cb
-	if (_cb != 0 && _timeout_ms*1000 >= 2*QUEUQ_REQcRSP_INTERVAL) {
+	if (_cb != 0 &&( _timeout_ms*1000 >= 2*QUEUQ_REQcRSP_INTERVAL || _timeout_ms==0)) {
 		u32 seq_timetamp=fl_req_slave_packet_createNsend(_cmdid,_data,_len);
 		if(seq_timetamp){
-			return fl_queueREQcRSP_add(G_INFORMATION.slaveID.id_u8,_cmdid,seq_timetamp,_data,_len,&_cb,_timeout_ms*1000,_retry);
+			return fl_queueREQcRSP_add(G_INFORMATION.slaveID.id_u8,_cmdid,seq_timetamp,_data,_len,&_cb,_timeout_ms,_retry);
 		}
 	} else if(_cb == 0 && _timeout_ms ==0){
 		return (fl_req_slave_packet_createNsend(_cmdid,_data,_len) == 0?-1:0); // none rsp
@@ -375,9 +375,11 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 		return packet_built;
 	}
 	LOGA(INF,"(%d|%x)HDR_REQ ID: %02X - ACK:%d\r\n",IsJoinedNetwork(),G_INFORMATION.slaveID.id_u8,packet.frame.hdr,packet.frame.endpoint.master);
+
 	switch ((fl_hdr_nwk_type_e) packet.frame.hdr) {
 		case NWK_HDR_HEARTBEAT:
 			_nwk_slave_syncFromPack(&packet.frame);
+			GETINFO_FLAG_EVENTTEST = packet.frame.payload[0];
 			if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
 				//Process rsp
 				memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
@@ -394,10 +396,10 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 			}
 		break;
 		case NWK_HDR_F5_INFO: {
-			_nwk_slave_syncFromPack(&packet.frame);
+//			_nwk_slave_syncFromPack(&packet.frame);
 			if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK && IsJoinedNetwork()) {
 				//Process rsp
-				s8 memid_idx = plog_IndexOf(packet.frame.payload,(u8*)&G_INFORMATION.slaveID.id_u8,1,sizeof(packet.frame.payload));
+				s8 memid_idx = plog_IndexOf(packet.frame.payload,(u8*)&G_INFORMATION.slaveID.id_u8,1,sizeof(packet.frame.payload)-1); //skip lastbyte int the payload
 				u32 master_timetamp; //, slave_timetamp;
 				master_timetamp = MAKE_U32(packet.frame.timetamp[3],packet.frame.timetamp[2],packet.frame.timetamp[1],packet.frame.timetamp[0]);
 				datetime_t cur_dt;
@@ -405,7 +407,8 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 				u8 _payload[POWER_METER_STRUCT_BYTESIZE];
 				memset(_payload,0xFF,SIZEU8(_payload));
 				//u8 len_payload=0;
-				LOGA(APP,"(%d)SlaveID:%X | inPack:%X\r\n",memid_idx,G_INFORMATION.slaveID.id_u8,packet.frame.payload[memid_idx]);
+
+				LOGA(APP,"(%d)SlaveID:%X | inPack:%X | TestEvent:%d\r\n",memid_idx,G_INFORMATION.slaveID.id_u8,packet.frame.payload[memid_idx],GETINFO_FLAG_EVENTTEST);
 				packet.frame.endpoint.dbg = NWK_DEBUG_STT;
 				u8 indx_data = 0;
 				if (memid_idx != -1) {
@@ -441,7 +444,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 		}
 		break;
 		case NWK_HDR_F6_SENDMESS: {
-			_nwk_slave_syncFromPack(&packet.frame);
+//			_nwk_slave_syncFromPack(&packet.frame);
 			if (IsJoinedNetwork()) {
 				//check packet_slaveid
 				if(packet.frame.slaveID.id_u8 == G_INFORMATION.slaveID.id_u8){
@@ -469,7 +472,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 		break;
 		/*============================================================================================*/
 		case NWK_HDR_COLLECT: {
-			_nwk_slave_syncFromPack(&packet.frame);
+//			_nwk_slave_syncFromPack(&packet.frame);
 			if (IsJoinedNetwork() == 0) {
 				if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
 					//get master's mac
@@ -484,6 +487,8 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 					packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
 				}
 			} else {
+				//Joined network -> exit collection mode if the master stopped broadcast Collection packet[
+				blt_soft_timer_restart(fl_nwk_joinnwk_timeout,3*1000*1000); //exit after 3s
 				//Non-rsp
 				packet_built.length = 0;
 				return packet_built;
@@ -492,7 +497,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 		break;
 		case NWK_HDR_ASSIGN:
 		{
-			_nwk_slave_syncFromPack(&packet.frame);
+//			_nwk_slave_syncFromPack(&packet.frame);
 			//Process rsp
 			s8 mymac_idx = plog_IndexOf(packet.frame.payload,G_INFORMATION.mac,SIZEU8(G_INFORMATION.mac),sizeof(packet.frame.payload));
 			if (mymac_idx != -1) {
@@ -544,7 +549,11 @@ int fl_slave_ProccesRSP_cbk(void) {
 	fl_pack_t data_in_queue;
 	if (FL_QUEUE_GET(&G_HANDLE_CONTAINER,&data_in_queue)) {
 		//Scan req call rsp
-		fl_queue_REQcRSP_ScanRec(data_in_queue,&G_INFORMATION);
+		if(-1!=fl_queue_REQcRSP_ScanRec(data_in_queue,&G_INFORMATION))
+		{
+			LOGA(API,"Refesh online status (%d ms)\r\n",RECHECKING_NETWOK_TIME);
+			blt_soft_timer_restart(&_isOnline_check,RECHECKING_NETWOK_TIME * 1000);
+		}
 		//process rsp of the protocol
 		fl_pack_t packet_build;
 		packet_build = fl_rsp_slave_packet_build(data_in_queue);
@@ -566,13 +575,14 @@ int fl_slave_ProccesRSP_cbk(void) {
  *
  ***************************************************/
 int fl_nwk_joinnwk_timeout(void) {
-	ERR(INF,"Join-network timeout and re-scan!!!\r\n");
 	if (IsJoinedNetwork()) {
 		G_INFORMATION.profile.run_stt.join_nwk = 0;
 		fl_adv_collection_channel_deinit();
 		return -1;
-	} else
+	} else {
+		ERR(INF,"Join-network timeout and re-scan!!!\r\n");
 		return 0;
+	}
 }
 void fl_nwk_slave_joinnwk_exc(void) {
 	if (G_INFORMATION.profile.run_stt.join_nwk) {
@@ -642,6 +652,12 @@ void fl_nwk_slave_process(void){
 	fl_nwk_slave_joinnwk_exc();
 	//todo TBS_device process
 	TBS_Device_Run();
+	//For debuging
+	static bool debug_on_offline = false;
+	if(debug_on_offline != G_INFORMATION.active){
+		debug_on_offline = G_INFORMATION.active;
+		ERR(INF,"Device -> %s\r\n",debug_on_offline==true?"Online":"Offline");
+	}
 }
 /***************************************************
  * @brief 		:Main functions to process income packet
