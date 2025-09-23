@@ -466,7 +466,7 @@ void fl_wifi2ble_Excute(fl_wifi2ble_exc_e cmd) {
 			//p get info 255 <Period get again> <num slave for each> <num virtual slave> <timeout rsp> <retry cnt>
 			cmd_type = GETCMD;
 			//sprintf(cmd_fmt,"p get info %d %d %d %d %d %d",255,0,8,G_NODE_LIST.slot_inused,G_ADV_SETTINGS.time_wait_rsp,G_ADV_SETTINGS.retry_times);
-			sprintf(cmd_fmt,"p get all 0 0");
+			sprintf(cmd_fmt,"p get all 0");
 			break;
 		}
 		default:
