@@ -79,15 +79,18 @@ typedef union {
 	u8 bytes[SIZEU8(fl_dataframe_format_t)];
 }__attribute__((packed)) fl_data_frame_u;
 
-/* COUNTER DEVICE
+/* COUNTER DEVICE - old
  * |Call butt|End call butt|Reset button|Pass product|Error product|Reserve| (sum 22 bytes)
  * |   1B	 |      1B     |     1B     |    4Bs     |     4Bs     |  11Bs |
  * */
-typedef union {
+/* New: detail in the protocol document*/
+typedef struct {
+	u8 mac[6];         // MAC address (48 bits)
+	u32 timetamp;     // timetamp (32 bits)
+	u8 type;			//device type
 	struct {
-		u8 mac[6];
-		u32 timetamp;
-		u8 type;
+		//add new index of packet
+		u16 index;
 		u8 bt_call;
 		u8 bt_endcall;
 		u8 bt_rst;
@@ -95,21 +98,18 @@ typedef union {
 		u16 err_product;
 		//add new mode and indx
 		u8 mode;
-		//previous_status
-//		u16 pre_pass_product;
-//		u16 pre_err_product;
-//		u8 pre_mode;
-		//add new index of packet
-//		u16 index;
-		//reverse
+	//previous_status
+		u16 pre_pass_product;
+		u16 pre_err_product;
+		u8 pre_mode;
+	//reverse
 //		u8 reverse[7];
 	} data;
-	u8 bytes[22];
 }__attribute__((packed)) tbs_device_counter_t;
-//typedef struct {
-//	u8 len;
-//	u8 message[22];
-//}__attribute__((packed)) tbs_counter_lcd_t;
+
+#define COUNTER_STRUCT_SIZE			(SIZEU8(tbs_device_counter_t))
+#define COUNTER_DATA_INSTRUCT		15
+
 //For POWER-METER DEVICEs
 /*
  * | Frequency | Voltage | Current 1 | Current 2 | Current 3 | Power 1 | Power 2 | Power 3 | Energy 1 | Energy 2 | Energy 3 | Reserve | (sum 176 bits)
@@ -121,18 +121,21 @@ typedef struct {
 	u8 type;			//device type
 	// Measurement fields (bit-level precision noted)
 	struct {
+		u16 index;          // 16 bits
 		u8 frequency;     	// 7 bits
-		u16 voltage;       // 9 bits
-		u16 current1;      // 10 bits
-		u16 current2;      // 10 bits
-		u16 current3;      // 10 bits
-		u16 power1;        // 14 bits
-		u16 power2;        // 14 bits
-		u16 power3;        // 14 bits
-		u32 energy1;       // 24 bits
-		u32 energy2;       // 24 bits
-		u32 energy3;       // 24 bits
-		u16 reserve;     // 16 bits
+		u16 voltage;        // 9 bits
+		u16 current1;       // 10 bits
+		u16 current2;       // 10 bits
+		u16 current3;       // 10 bits
+		u8 power1;          // 8 bits
+		u8 power2;          // 8 bits
+		u8 power3;          // 8 bits
+		u8 time1;           // 6 bits
+		u8 time2;           // 6 bits
+		u8 time3;           // 6 bits
+		u32 energy1;        // 24 bits
+		u32 energy2;        // 24 bits
+		u32 energy3;        // 24 bits
 	} data;
 }__attribute__((packed)) tbs_device_powermeter_t;
 
@@ -166,14 +169,18 @@ static inline void tbs_pack_powermeter_data(const tbs_device_powermeter_t *src, 
         bitpos += (bits); \
     } while (0)
 
+    WRITE_BITS(src->data.index, 16);
     WRITE_BITS(src->data.frequency, 7);
     WRITE_BITS(src->data.voltage, 9);
     WRITE_BITS(src->data.current1, 10);
     WRITE_BITS(src->data.current2, 10);
     WRITE_BITS(src->data.current3, 10);
-    WRITE_BITS(src->data.power1, 14);
-    WRITE_BITS(src->data.power2, 14);
-    WRITE_BITS(src->data.power3, 14);
+    WRITE_BITS(src->data.power1, 8);
+    WRITE_BITS(src->data.power2, 8);
+    WRITE_BITS(src->data.power3, 8);
+    WRITE_BITS(src->data.time1, 6);
+    WRITE_BITS(src->data.time2, 6);
+    WRITE_BITS(src->data.time3, 6);
     WRITE_BITS(src->data.energy1, 24);
     WRITE_BITS(src->data.energy2, 24);
     WRITE_BITS(src->data.energy3, 24);
@@ -208,14 +215,18 @@ static inline void tbs_unpack_powermeter_data(tbs_device_powermeter_t *dst, cons
         bitpos += (bits); \
     } while (0)
 
+    READ_BITS(dst->data.index, 16);
     READ_BITS(dst->data.frequency, 7);
     READ_BITS(dst->data.voltage, 9);
     READ_BITS(dst->data.current1, 10);
     READ_BITS(dst->data.current2, 10);
     READ_BITS(dst->data.current3, 10);
-    READ_BITS(dst->data.power1, 14);
-    READ_BITS(dst->data.power2, 14);
-    READ_BITS(dst->data.power3, 14);
+    READ_BITS(dst->data.power1, 8);
+    READ_BITS(dst->data.power2, 8);
+    READ_BITS(dst->data.power3, 8);
+    READ_BITS(dst->data.time1, 6);
+    READ_BITS(dst->data.time2, 6);
+    READ_BITS(dst->data.time3, 6);
     READ_BITS(dst->data.energy1, 24);
     READ_BITS(dst->data.energy2, 24);
     READ_BITS(dst->data.energy3, 24);

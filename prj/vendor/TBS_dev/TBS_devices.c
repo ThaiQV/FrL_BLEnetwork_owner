@@ -21,44 +21,52 @@
 
 void tbs_counter_printf(void* _p){
 	tbs_device_counter_t *data = (tbs_device_counter_t*)_p;
-	LOGA(INF,"MAC:0x%02X%02X%02X%02X%02X%02X\r\n",data->data.mac[0],data->data.mac[1],data->data.mac[2],
-			data->data.mac[3],data->data.mac[4],data->data.mac[5]);
-	LOGA(INF,"Timetamp  :%d\r\n",data->data.timetamp);
-	LOGA(INF,"Type      :%d\r\n",data->data.type);
+	LOGA(INF,"COUNTER STRUCT SIZE :%d\%d\r\n",SIZEU8(tbs_device_counter_t),SIZEU8(data->data));
+	LOGA(INF,"MAC:0x%02X%02X%02X%02X%02X%02X\r\n",data->mac[0],data->mac[1],data->mac[2],
+			data->mac[3],data->mac[4],data->mac[5]);
+	LOGA(INF,"Timetamp  :%d\r\n",data->timetamp);
+	LOGA(INF,"Type      :%d\r\n",data->type);
+	LOGA(INF,"Index     :%d\r\n",data->data.index);
 	LOGA(INF,"BT_Call   :%d\r\n",data->data.bt_call);
 	LOGA(INF,"BT_EndCall:%d\r\n",data->data.bt_endcall);
 	LOGA(INF,"BT_Rst    :%d\r\n",data->data.bt_rst);
 	LOGA(INF,"BT_Pass   :%d\r\n",data->data.pass_product);
 	LOGA(INF,"BT_Err    :%d\r\n",data->data.err_product);
 	LOGA(INF,"Mode      :%d\r\n",data->data.mode);
-//	P_PRINTFHEX_A(INF,data->bytes,SIZEU8(data->bytes),"Raw:");
+	LOGA(INF,"pre_pass  :%d\r\n",data->data.pre_pass_product);
+	LOGA(INF,"pre_err   :%d\r\n",data->data.pre_err_product);
+	LOGA(INF,"pre_mode  :%d\r\n",data->data.pre_mode);
 }
 
 void tbs_power_meter_printf(void* _p) {
-	tbs_device_powermeter_t* dev = (tbs_device_powermeter_t*) _p;
-	LOGA(INF,"MAC:0x%02X%02X%02X%02X%02X%02X\r\n",dev->mac[0],dev->mac[1],dev->mac[2],dev->mac[3],dev->mac[4],dev->mac[5]);
-	LOGA(INF,"Timetamp:%d\r\n",dev->timetamp);
-	LOGA(INF,"Type:%d\r\n",dev->type);
-	LOGA(INF,"Frequency: %u\n",dev->data.frequency);
-	LOGA(INF,"Voltage: %u\n",dev->data.voltage);
-	LOGA(INF,"Current1: %u\n",dev->data.current1);
-	LOGA(INF,"Current2: %u\n",dev->data.current2);
-	LOGA(INF,"Current3: %u\n",dev->data.current3);
-	LOGA(INF,"Power1: %u\n",dev->data.power1);
-	LOGA(INF,"Power2: %u\n",dev->data.power2);
-	LOGA(INF,"Power3: %u\n",dev->data.power3);
-	LOGA(INF,"Energy1: %u\n",dev->data.energy1);
-	LOGA(INF,"Energy2: %u\n",dev->data.energy2);
-	LOGA(INF,"Energy3: %u\n", dev->data.energy3);
-//	u8* data_u8 = (u8*)_p;
-//	P_PRINTFHEX_A(INF,data_u8,POWER_METER_STRUCT_BYTESIZE,"Raw:");
+	tbs_device_powermeter_t* dev = (tbs_device_powermeter_t*)_p;
+	LOGA(INF,"POWERMETER STRUCT SIZE :%d\%d\r\n",SIZEU8(tbs_device_powermeter_t),SIZEU8(dev->data));
+	LOGA(INF,"MAC       :0x%02X%02X%02X%02X%02X%02X\r\n",dev->mac[0],dev->mac[1],dev->mac[2],dev->mac[3],dev->mac[4],dev->mac[5]);
+	LOGA(INF,"Timetamp  :%d\r\n",dev->timetamp);
+	LOGA(INF,"Type      :%d\r\n",dev->type);
+	LOGA(INF,"Index     :%d\r\n",dev->data.index);
+	LOGA(INF,"Frequency :%u\n",dev->data.frequency);
+	LOGA(INF,"Voltage   :%u\n",dev->data.voltage);
+	LOGA(INF,"Current1  :%u\n",dev->data.current1);
+	LOGA(INF,"Current2  :%u\n",dev->data.current2);
+	LOGA(INF,"Current3  :%u\n",dev->data.current3);
+	LOGA(INF,"Power1    :%u\n",dev->data.power1);
+	LOGA(INF,"Power2    :%u\n",dev->data.power2);
+	LOGA(INF,"Power3    :%u\n",dev->data.power3);
+	LOGA(INF,"Time1     :%u\n",dev->data.time1);
+	LOGA(INF,"Time2     :%u\n",dev->data.time2);
+	LOGA(INF,"Time3     :%u\n",dev->data.time3);
+	LOGA(INF,"Energy1   :%u\n",dev->data.energy1);
+	LOGA(INF,"Energy2   :%u\n",dev->data.energy2);
+	LOGA(INF,"Energy3   :%u\n", dev->data.energy3);
 }
 
 #ifdef COUNTER_DEVICE
 
-tbs_device_counter_t G_COUNTER_DEV = { .data = {
-												.timetamp = 0,
-												.type = TBS_COUNTER,
+tbs_device_counter_t G_COUNTER_DEV = {  .timetamp = 0,
+										.type = TBS_COUNTER,
+										.data = {
+												.index=0,
 												.bt_call = 0,
 												.bt_endcall = 0,
 												.bt_rst = 0,
@@ -73,22 +81,25 @@ u8 G_COUNTER_LCD[COUNTER_LCD_MESS_MAX][22];
 #ifdef POWER_METER_DEVICE
 
 tbs_device_powermeter_t G_POWER_METER = {
-				        .mac = {0xDE, 0xAD, 0xBE, 0xEF, 0x00, 0x01},
-				        .timetamp = 12345678,
+				        .mac = {0, 0, 0, 0, 0, 0},
+				        .timetamp = 0,
 						.type = TBS_POWERMETER,
 				        .data= {
+				        		.index = 0,
 				        		.frequency = 50,
 								.voltage = 220,
 								.current1 = 11,
 								.current2 = 22,
 								.current3 = 33,
-								.power1 = 242,
-								.power2 = 484,
-								.power3 = 726,
+								.power1 = 220,
+								.power2 = 221,
+								.power3 = 222,
+								.time1 = 51,
+								.time2 = 52,
+								.time3 = 53,
 								.energy1 = 111111,
 								.energy2 = 222222,
 								.energy3 = 333333,
-		//				        .reserve = 0xABCD
 						}
 				    };
 void test_powermeter(void) {
@@ -161,7 +172,7 @@ int TEST_Counter_Event(void){
 		G_COUNTER_DEV.data.bt_call = RAND(0,1);
 		G_COUNTER_DEV.data.bt_endcall = G_COUNTER_DEV.data.bt_call ? 0 : 1;
 		G_COUNTER_DEV.data.bt_rst = G_COUNTER_DEV.data.bt_call ? 0 : RAND(0,1);
-		fl_api_slave_req(NWK_HDR_55,G_COUNTER_DEV.bytes,SIZEU8(G_COUNTER_DEV.bytes),&TEST_rsp_callback,0,1);
+		fl_api_slave_req(NWK_HDR_55,(u8*)&G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data),&TEST_rsp_callback,0,1);
 		TEST_EVENT.rtt = clock_time();
 		TEST_EVENT.req_num++;
 		P_INFO("TEST EVNET after:%d s\r\n",period);
@@ -171,9 +182,9 @@ int TEST_Counter_Event(void){
 /* END TEST*/
 
 void TBS_Counter_init(void){
-	memcpy(G_COUNTER_DEV.data.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_COUNTER_DEV.data.mac));
-	G_COUNTER_DEV.data.type = TBS_COUNTER;
-	G_COUNTER_DEV.data.timetamp = fl_rtc_get();
+	memcpy(G_COUNTER_DEV.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_COUNTER_DEV.mac));
+	G_COUNTER_DEV.type = TBS_COUNTER;
+	G_COUNTER_DEV.timetamp = fl_rtc_get();
 	//passing lcd message
 	for (u8 var = 0; var < COUNTER_LCD_MESS_MAX; ++var) {
 		memset(G_COUNTER_LCD[var],0,SIZEU8(G_COUNTER_LCD[var]));
@@ -183,7 +194,7 @@ void TBS_Counter_init(void){
 	//blt_soft_timer_add(&TEST_Counter_Event,5000*1000);
 }
 void TBS_Counter_Run(void){
-	G_COUNTER_DEV.data.timetamp = fl_rtc_get();
+	G_COUNTER_DEV.timetamp = fl_rtc_get();
 	//For testing : randon valid of fields
 //	G_COUNTER_DEV.data.bt_call = RAND(0,1);
 //	G_COUNTER_DEV.data.bt_endcall = G_COUNTER_DEV.data.bt_call?0:1;
