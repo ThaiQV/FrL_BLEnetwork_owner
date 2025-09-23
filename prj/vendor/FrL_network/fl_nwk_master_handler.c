@@ -698,7 +698,7 @@ static void _master_updateDB_for_Node(u8 node_indx ,fl_data_frame_u *packet)  {
 	/*Data*/
 	P_PRINTFHEX_A(INF,packet->frame.payload,SIZEU8(packet->frame.payload),"PACK:");
 	if (G_NODE_LIST.sla_info[node_indx].dev_type == TBS_COUNTER) {
-		memcpy(&G_NODE_LIST.sla_info[node_indx].data[size_mac + 5],&packet->frame.payload[0],SIZEU8(packet->frame.payload) - (size_mac + 5));
+		memcpy(&G_NODE_LIST.sla_info[node_indx].data[size_mac + 5],&packet->frame.payload[0],SIZEU8(packet->frame.payload));
 		tbs_counter_printf((void*) G_NODE_LIST.sla_info[node_indx].data);
 	}
 	if (G_NODE_LIST.sla_info[node_indx].dev_type == TBS_POWERMETER) {
