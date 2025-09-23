@@ -408,7 +408,6 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 				u8 _payload[POWER_METER_STRUCT_BYTESIZE];
 				memset(_payload,0xFF,SIZEU8(_payload));
 				//u8 len_payload=0;
-
 				LOGA(APP,"(%d)SlaveID:%X | inPack:%X | TestEvent:%d\r\n",memid_idx,G_INFORMATION.slaveID.id_u8,packet.frame.payload[memid_idx],GETINFO_FLAG_EVENTTEST);
 				packet.frame.endpoint.dbg = NWK_DEBUG_STT;
 				u8 indx_data = 0;
