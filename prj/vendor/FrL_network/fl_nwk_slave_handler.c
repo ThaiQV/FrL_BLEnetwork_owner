@@ -422,7 +422,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 					tbs_power_meter_printf((void*)G_INFORMATION.data);
 					tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*)G_INFORMATION.data;
 					tbs_pack_powermeter_data(pwmeter_data,_payload);
-					indx_data = SIZEU8(pwmeter_data->type) +   SIZEU8(pwmeter_data->mac) +  SIZEU8(pwmeter_data->timetamp);
+					indx_data = SIZEU8(pwmeter_data->type) + SIZEU8(pwmeter_data->mac) + SIZEU8(pwmeter_data->timetamp);
 #endif
 					packet.frame.slaveID.id_u8 = G_INFORMATION.slaveID.id_u8;
 					memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
@@ -447,8 +447,10 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 		case NWK_HDR_F6_SENDMESS: {
 //			_nwk_slave_syncFromPack(&packet.frame);
 			if (IsJoinedNetwork()) {
+#ifdef COUNTER_DEVICE
 				//check packet_slaveid
 				if(packet.frame.slaveID.id_u8 == G_INFORMATION.slaveID.id_u8){
+
 					u8 slot_indx = packet.frame.payload[0];
 					memset(G_INFORMATION.lcd_mess[slot_indx],0,SIZEU8(G_INFORMATION.lcd_mess[slot_indx]));
 					memcpy(G_INFORMATION.lcd_mess[slot_indx],&packet.frame.payload[1],SIZEU8(packet.frame.payload) -1);
@@ -460,6 +462,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 						packet.frame.endpoint.master = FL_FROM_SLAVE;
 						//add repeat_cnt
 						packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
+
 					}
 					else{
 						//Non-rsp
@@ -467,7 +470,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 						return packet_built;
 					}
 				}
-
+#endif
 			}
 		}
 		break;

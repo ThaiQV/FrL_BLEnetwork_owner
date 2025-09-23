@@ -174,7 +174,7 @@ static void _getnsend_data_report(u8 var, u8 rspcmd) {
 			memcpy(payload,(u8*) &wfdata,len_payload);
 			//For testing parsing
 			tbs_device_powermeter_t received;
-			tbs_unpack_powermeter_data(&received, wfdata.data);
+			tbs_unpack_powermeter_data(&received, G_NODE_LIST.sla_info[var].data);
 			tbs_power_meter_printf((void*)&received);
 			P_PRINTFHEX_A(MCU,payload,len_payload,"PW Meter struct(%d):",len_payload);
 			/*Send to WIFI*/

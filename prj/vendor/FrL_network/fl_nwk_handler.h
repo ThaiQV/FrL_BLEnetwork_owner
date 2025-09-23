@@ -121,24 +121,26 @@ typedef struct {
 	u8 type;			//device type
 	// Measurement fields (bit-level precision noted)
 	struct {
+		u16 index;          // 16 bits
 		u8 frequency;     	// 7 bits
-		u16 voltage;       // 9 bits
-		u16 current1;      // 10 bits
-		u16 current2;      // 10 bits
-		u16 current3;      // 10 bits
-		u16 power1;        // 14 bits
-		u16 power2;        // 14 bits
-		u16 power3;        // 14 bits
-		u32 energy1;       // 24 bits
-		u32 energy2;       // 24 bits
-		u32 energy3;       // 24 bits
-		u16 reserve;     // 16 bits
+		u16 voltage;        // 9 bits
+		u16 current1;       // 10 bits
+		u16 current2;       // 10 bits
+		u16 current3;       // 10 bits
+		u8 power1;          // 8 bits
+		u8 power2;          // 8 bits
+		u8 power3;          // 8 bits
+		u8 time1;           // 6 bits
+		u8 time2;           // 6 bits
+		u8 time3;           // 6 bits
+		u32 energy1;        // 24 bits
+		u32 energy2;        // 24 bits
+		u32 energy3;        // 24 bits
 	} data;
 }__attribute__((packed)) tbs_device_powermeter_t;
 
 #define POWER_METER_STRUCT_BYTESIZE			(SIZEU8(tbs_device_powermeter_t))
 #define POWER_METER_BITSIZE					34
-
 static inline void tbs_pack_powermeter_data(const tbs_device_powermeter_t *src, u8 *dst) {
     u32 bitpos = 0;
     u32 byte_idx = 0;
@@ -167,14 +169,18 @@ static inline void tbs_pack_powermeter_data(const tbs_device_powermeter_t *src, 
         bitpos += (bits); \
     } while (0)
 
+    WRITE_BITS(src->data.index, 16);
     WRITE_BITS(src->data.frequency, 7);
     WRITE_BITS(src->data.voltage, 9);
     WRITE_BITS(src->data.current1, 10);
     WRITE_BITS(src->data.current2, 10);
     WRITE_BITS(src->data.current3, 10);
-    WRITE_BITS(src->data.power1, 14);
-    WRITE_BITS(src->data.power2, 14);
-    WRITE_BITS(src->data.power3, 14);
+    WRITE_BITS(src->data.power1, 8);
+    WRITE_BITS(src->data.power2, 8);
+    WRITE_BITS(src->data.power3, 8);
+    WRITE_BITS(src->data.time1, 6);
+    WRITE_BITS(src->data.time2, 6);
+    WRITE_BITS(src->data.time3, 6);
     WRITE_BITS(src->data.energy1, 24);
     WRITE_BITS(src->data.energy2, 24);
     WRITE_BITS(src->data.energy3, 24);
@@ -209,14 +215,18 @@ static inline void tbs_unpack_powermeter_data(tbs_device_powermeter_t *dst, cons
         bitpos += (bits); \
     } while (0)
 
+    READ_BITS(dst->data.index, 16);
     READ_BITS(dst->data.frequency, 7);
     READ_BITS(dst->data.voltage, 9);
     READ_BITS(dst->data.current1, 10);
     READ_BITS(dst->data.current2, 10);
     READ_BITS(dst->data.current3, 10);
-    READ_BITS(dst->data.power1, 14);
-    READ_BITS(dst->data.power2, 14);
-    READ_BITS(dst->data.power3, 14);
+    READ_BITS(dst->data.power1, 8);
+    READ_BITS(dst->data.power2, 8);
+    READ_BITS(dst->data.power3, 8);
+    READ_BITS(dst->data.time1, 6);
+    READ_BITS(dst->data.time2, 6);
+    READ_BITS(dst->data.time3, 6);
     READ_BITS(dst->data.energy1, 24);
     READ_BITS(dst->data.energy2, 24);
     READ_BITS(dst->data.energy3, 24);

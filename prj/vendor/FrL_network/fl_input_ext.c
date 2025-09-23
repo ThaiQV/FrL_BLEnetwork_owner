@@ -373,7 +373,7 @@ int _scan_external_input(void) {
 	}
 	return 0;
 }
-#ifdef COUNTER_DEVICE
+#ifndef MASTER_CORE
 /***************************************************
  * @brief 		:initialization the External GPIO via I2C protocol
  *
@@ -418,7 +418,7 @@ void fl_ExIO_init(i2c_sda_pin_e _sda, i2c_scl_pin_e _scl, gpio_pin_e _irq_pin) {
 void fl_input_external_init(void) {
 //init POLLING Container
 	InitPOLLING();
-#ifdef COUNTER_DEVICE
+#ifndef MASTER_CORE //use to test
 	fl_ExIO_init(I2C_GPIO_SDA_E2,I2C_GPIO_SCL_E0,GPIO_PD0);
 //	//	//register function callback
 	fl_exIO_t GPIO_IN;
@@ -444,23 +444,23 @@ void fl_input_external_init(void) {
 	LOGA(PERI,"Button(%d)Reset Register :%d\r\n",GPIO_IN.pin_read(GPIO_IN.pin),regis);
 #endif
 #ifdef POWER_METER_DEVICE
-	fl_exIO_t GPIO_IN;
-	s8 regis=0;
-	extern u8 TEST_Buttons_RST(fl_exButton_states_e _state, void *_data);
-	GPIO_IN.exc = &TEST_Buttons_RST;
-	GPIO_IN.status = BUTT_STATE_NONE;
-	GPIO_IN.mode = DET_LOW;
-	GPIO_IN.pin_read = (FucRead) &gpio_get_level;
-	GPIO_IN.pin = (gpio_pin_e) GPIO_PB0;
-
-	gpio_function_en(GPIO_IN.pin);
-	gpio_set_output(GPIO_IN.pin,0); 		//disable output
-	gpio_set_input(GPIO_IN.pin,1); 		//enable input
-	gpio_set_up_down_res(GPIO_PE0|GPIO_PE2,GPIO_PIN_PULLDOWN_100K);
-
-//Register polling callback
-	regis = RegisterPOLLING(GPIO_IN);
-	LOGA(PERI,"Button(%d)Reset Register :%d\r\n",GPIO_IN.pin_read(GPIO_IN.pin),regis);
+//	fl_exIO_t GPIO_IN;
+//	s8 regis=0;
+//	extern u8 TEST_Buttons_RST(fl_exButton_states_e _state, void *_data);
+//	GPIO_IN.exc = &TEST_Buttons_RST;
+//	GPIO_IN.status = BUTT_STATE_NONE;
+//	GPIO_IN.mode = DET_LOW;
+//	GPIO_IN.pin_read = (FucRead) &gpio_get_level;
+//	GPIO_IN.pin = (gpio_pin_e) GPIO_PB0;
+//
+//	gpio_function_en(GPIO_IN.pin);
+//	gpio_set_output(GPIO_IN.pin,0); 		//disable output
+//	gpio_set_input(GPIO_IN.pin,1); 		//enable input
+//	gpio_set_up_down_res(GPIO_PE0|GPIO_PE2,GPIO_PIN_PULLDOWN_100K);
+//
+////Register polling callback
+//	regis = RegisterPOLLING(GPIO_IN);
+//	LOGA(PERI,"Button(%d)Reset Register :%d\r\n",GPIO_IN.pin_read(GPIO_IN.pin),regis);
 #endif
 //test board testing-> not counter boarrd
 #ifndef MASTER_CORE

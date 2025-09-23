@@ -39,23 +39,26 @@ void tbs_counter_printf(void* _p){
 }
 
 void tbs_power_meter_printf(void* _p) {
-	tbs_device_powermeter_t* dev = (tbs_device_powermeter_t*) _p;
-	LOGA(INF,"MAC:0x%02X%02X%02X%02X%02X%02X\r\n",dev->mac[0],dev->mac[1],dev->mac[2],dev->mac[3],dev->mac[4],dev->mac[5]);
-	LOGA(INF,"Timetamp:%d\r\n",dev->timetamp);
-	LOGA(INF,"Type:%d\r\n",dev->type);
-	LOGA(INF,"Frequency: %u\n",dev->data.frequency);
-	LOGA(INF,"Voltage: %u\n",dev->data.voltage);
-	LOGA(INF,"Current1: %u\n",dev->data.current1);
-	LOGA(INF,"Current2: %u\n",dev->data.current2);
-	LOGA(INF,"Current3: %u\n",dev->data.current3);
-	LOGA(INF,"Power1: %u\n",dev->data.power1);
-	LOGA(INF,"Power2: %u\n",dev->data.power2);
-	LOGA(INF,"Power3: %u\n",dev->data.power3);
-	LOGA(INF,"Energy1: %u\n",dev->data.energy1);
-	LOGA(INF,"Energy2: %u\n",dev->data.energy2);
-	LOGA(INF,"Energy3: %u\n", dev->data.energy3);
-//	u8* data_u8 = (u8*)_p;
-//	P_PRINTFHEX_A(INF,data_u8,POWER_METER_STRUCT_BYTESIZE,"Raw:");
+	tbs_device_powermeter_t* dev = (tbs_device_powermeter_t*)_p;
+	LOGA(INF,"POWERMETER STRUCT SIZE :%d\%d\r\n",SIZEU8(tbs_device_powermeter_t),SIZEU8(dev->data));
+	LOGA(INF,"MAC       :0x%02X%02X%02X%02X%02X%02X\r\n",dev->mac[0],dev->mac[1],dev->mac[2],dev->mac[3],dev->mac[4],dev->mac[5]);
+	LOGA(INF,"Timetamp  :%d\r\n",dev->timetamp);
+	LOGA(INF,"Type      :%d\r\n",dev->type);
+	LOGA(INF,"Index     :%d\r\n",dev->data.index);
+	LOGA(INF,"Frequency :%u\n",dev->data.frequency);
+	LOGA(INF,"Voltage   :%u\n",dev->data.voltage);
+	LOGA(INF,"Current1  :%u\n",dev->data.current1);
+	LOGA(INF,"Current2  :%u\n",dev->data.current2);
+	LOGA(INF,"Current3  :%u\n",dev->data.current3);
+	LOGA(INF,"Power1    :%u\n",dev->data.power1);
+	LOGA(INF,"Power2    :%u\n",dev->data.power2);
+	LOGA(INF,"Power3    :%u\n",dev->data.power3);
+	LOGA(INF,"Time1     :%u\n",dev->data.time1);
+	LOGA(INF,"Time2     :%u\n",dev->data.time2);
+	LOGA(INF,"Time3     :%u\n",dev->data.time3);
+	LOGA(INF,"Energy1   :%u\n",dev->data.energy1);
+	LOGA(INF,"Energy2   :%u\n",dev->data.energy2);
+	LOGA(INF,"Energy3   :%u\n", dev->data.energy3);
 }
 
 #ifdef COUNTER_DEVICE
@@ -78,22 +81,25 @@ u8 G_COUNTER_LCD[COUNTER_LCD_MESS_MAX][22];
 #ifdef POWER_METER_DEVICE
 
 tbs_device_powermeter_t G_POWER_METER = {
-				        .mac = {0xDE, 0xAD, 0xBE, 0xEF, 0x00, 0x01},
-				        .timetamp = 12345678,
+				        .mac = {0, 0, 0, 0, 0, 0},
+				        .timetamp = 0,
 						.type = TBS_POWERMETER,
 				        .data= {
+				        		.index = 0,
 				        		.frequency = 50,
 								.voltage = 220,
 								.current1 = 11,
 								.current2 = 22,
 								.current3 = 33,
-								.power1 = 242,
-								.power2 = 484,
-								.power3 = 726,
+								.power1 = 220,
+								.power2 = 221,
+								.power3 = 222,
+								.time1 = 51,
+								.time2 = 52,
+								.time3 = 53,
 								.energy1 = 111111,
 								.energy2 = 222222,
 								.energy3 = 333333,
-		//				        .reserve = 0xABCD
 						}
 				    };
 void test_powermeter(void) {
