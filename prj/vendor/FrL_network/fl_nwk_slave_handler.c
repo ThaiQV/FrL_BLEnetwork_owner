@@ -292,6 +292,7 @@ u32 fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 			req_pack.frame.milltamp = field_timetamp.milstep;
 
 			req_pack.frame.slaveID.id_u8 = G_INFORMATION.slaveID.id_u8;
+
 			//Create payload
 			memset(req_pack.frame.payload,0xFF,SIZEU8(req_pack.frame.payload));
 			memcpy(req_pack.frame.payload,_data,_len);
@@ -414,8 +415,8 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 				if (memid_idx != -1) {
 #ifdef COUNTER_DEVICE
 					tbs_device_counter_t *counter_data = (tbs_device_counter_t*)G_INFORMATION.data;
-					memcpy(_payload,counter_data->bytes,SIZEU8(counter_data->bytes));
-					tbs_counter_printf((void*)_payload);
+					memcpy(_payload,(u8*)&counter_data->data,SIZEU8(counter_data->data));
+					tbs_counter_printf((void*)counter_data);
 #endif
 #ifdef POWER_METER_DEVICE
 					tbs_power_meter_printf((void*)G_INFORMATION.data);

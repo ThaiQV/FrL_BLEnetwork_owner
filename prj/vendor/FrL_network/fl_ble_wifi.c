@@ -147,11 +147,11 @@ static void _getnsend_data_report(u8 var, u8 rspcmd) {
 	fl_datawifi2ble_t wfdata;
 	if (G_NODE_LIST.sla_info[var].dev_type == TBS_COUNTER) {
 		tbs_device_counter_t *counter_data = (tbs_device_counter_t*) G_NODE_LIST.sla_info[var].data;
-		memcpy(counter_data->data.mac,G_NODE_LIST.sla_info[var].mac,6);
+		memcpy(counter_data->mac,G_NODE_LIST.sla_info[var].mac,6);
 		wfdata.cmd = rspcmd;
-		wfdata.len_data = SIZEU8(counter_data->bytes)+ 1; //+ status
+		wfdata.len_data = SIZEU8(tbs_device_counter_t)+ 1; //+ status
 		wfdata.data[0] = G_NODE_LIST.sla_info[var].active;
-		memcpy(&wfdata.data[1],counter_data->bytes,wfdata.len_data);
+		memcpy(&wfdata.data[1],(u8*)counter_data,wfdata.len_data);
 		wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
 		u8 len_payload = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
 		memcpy(payload,(u8*) &wfdata,len_payload);
@@ -455,7 +455,7 @@ void fl_ble2wifi_EVENT_SEND(u8* _slave_mac){
 
 void fl_wifi2ble_Excute(fl_wifi2ble_exc_e cmd) {
 	extern fl_slaves_list_t G_NODE_LIST;
-	extern fl_adv_settings_t G_ADV_SETTINGS;
+//	extern fl_adv_settings_t G_ADV_SETTINGS;
 	extern void fl_nwk_protcol_ExtCall(type_debug_t _type, u8 *_data);
 	type_debug_t cmd_type = SETCMD;
 	char cmd_fmt[UART_DATA_LEN];

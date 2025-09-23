@@ -685,7 +685,7 @@ static void _master_updateDB_for_Node(u8 node_indx ,fl_data_frame_u *packet)  {
 	G_NODE_LIST.sla_info[node_indx].timelife = (clock_time() - G_NODE_LIST.sla_info[node_indx].timelife);
 	//create MAC + TIMETAMP + DEV_TYPE
 	u8 size_mac = SIZEU8(G_NODE_LIST.sla_info[node_indx].mac);
-	memcpy(&G_NODE_LIST.sla_info[node_indx].data[0],G_NODE_LIST.sla_info[node_indx].mac,size_mac);
+	memcpy(&G_NODE_LIST.sla_info[node_indx].data[0],G_NODE_LIST.sla_info[node_indx].mac,size_mac); //update mac to pointer data
 	/*Timetamp*/
 	fl_timetamp_withstep_t timetampStep = fl_rtc_getWithMilliStep();
 	//	u32 timetamp = fl_rtc_get();
@@ -698,7 +698,7 @@ static void _master_updateDB_for_Node(u8 node_indx ,fl_data_frame_u *packet)  {
 	/*Data*/
 	P_PRINTFHEX_A(INF,packet->frame.payload,SIZEU8(packet->frame.payload),"PACK:");
 	if (G_NODE_LIST.sla_info[node_indx].dev_type == TBS_COUNTER) {
-		memcpy(&G_NODE_LIST.sla_info[node_indx].data[size_mac + 5],&packet->frame.payload[size_mac + 5],SIZEU8(packet->frame.payload) - (size_mac + 5));
+		memcpy(&G_NODE_LIST.sla_info[node_indx].data[size_mac + 5],&packet->frame.payload[0],SIZEU8(packet->frame.payload) - (size_mac + 5));
 		tbs_counter_printf((void*) G_NODE_LIST.sla_info[node_indx].data);
 	}
 	if (G_NODE_LIST.sla_info[node_indx].dev_type == TBS_POWERMETER) {
