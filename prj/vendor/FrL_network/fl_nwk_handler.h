@@ -105,6 +105,7 @@ typedef union {
 	} data;
 	u8 bytes[22];
 }__attribute__((packed)) tbs_device_counter_t;
+
 //typedef struct {
 //	u8 len;
 //	u8 message[22];
@@ -120,7 +121,7 @@ typedef struct {
 	u8 type;			//device type
 	// Measurement fields (bit-level precision noted)
 	struct {
-		u8 frequency;     	// 7 bits
+		u8 frequency;      // 7 bits
 		u16 voltage;       // 9 bits
 		u16 current1;      // 10 bits
 		u16 current2;      // 10 bits
@@ -131,7 +132,7 @@ typedef struct {
 		u32 energy1;       // 24 bits
 		u32 energy2;       // 24 bits
 		u32 energy3;       // 24 bits
-		u16 reserve;     // 16 bits
+		u16 reserve;       // 16 bits
 	} data;
 }__attribute__((packed)) tbs_device_powermeter_t;
 
