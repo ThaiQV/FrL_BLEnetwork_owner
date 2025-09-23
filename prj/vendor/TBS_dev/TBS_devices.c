@@ -252,6 +252,14 @@ void TBS_PowerMeter_Run(void){
 /******************************************************************************/
 void TBS_Device_Init(void){
 #ifdef COUNTER_DEVICE
+	memcpy(G_COUNTER_DEV.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_COUNTER_DEV.mac));
+	G_COUNTER_DEV.type = TBS_COUNTER;
+	G_COUNTER_DEV.timetamp = fl_rtc_get();
+	//passing lcd message
+	for (u8 var = 0; var < COUNTER_LCD_MESS_MAX; ++var) {
+		memset(G_COUNTER_LCD[var],0,SIZEU8(G_COUNTER_LCD[var]));
+	}
+
 	user_app_init();
 #endif
 #ifdef POWER_METER_DEVICE
