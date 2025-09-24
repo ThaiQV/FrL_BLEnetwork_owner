@@ -20,7 +20,7 @@
 #ifdef POWER_METER_DEVICE
 #define DATA_HISTORY_SIZE	28 // 4 (timestamp) + 1 (type) + 2 (index) + 21 (packed data)
 #endif
-#define NUM_HISTORY			10
+#define NUM_HISTORY			20
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -32,7 +32,7 @@ typedef struct {
 	u8 status_proc;
 }__attribute__((packed)) tbs_history_t;
 
-tbs_history_t G_HISTORY_CONTAINER[10];
+tbs_history_t G_HISTORY_CONTAINER[NUM_HISTORY];
 
 /******************************************************************************/
 /******************************************************************************/
@@ -112,6 +112,7 @@ void TBS_history_createSample(void) {
 #endif
 	//store into global struct
 	for (u8 var = 0; var < NUM_HISTORY; ++var) {
+		G_HISTORY_CONTAINER[var].indx =  var;
 		memcpy(G_HISTORY_CONTAINER[var].data,his_array[var],DATA_HISTORY_SIZE);
 		P_PRINTFHEX_A(INF_FILE,G_HISTORY_CONTAINER[var].data,DATA_HISTORY_SIZE,"[%d]",var);
 	}

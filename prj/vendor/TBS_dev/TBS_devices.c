@@ -213,9 +213,6 @@ void TBS_PowerMeter_init(void){
 	G_POWER_METER.timetamp= fl_rtc_get();
 	test_powermeter();
 	//todo:Init Butt,lcd,7segs,.....
-
-	//History create sample test
-	TBS_history_createSample();
 }
 void TBS_PowerMeter_Run(void){
 	G_POWER_METER.timetamp = fl_rtc_get();
@@ -259,6 +256,8 @@ void TBS_Device_Init(void){
 #ifdef POWER_METER_DEVICE
 	TBS_PowerMeter_init();
 #endif
+	//History create sample test
+	TBS_history_createSample();
 }
 void TBS_Device_Run(void){
 #ifdef COUNTER_DEVICE

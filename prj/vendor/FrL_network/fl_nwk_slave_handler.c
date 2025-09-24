@@ -38,7 +38,7 @@ u8 GETINFO_FLAG_EVENTTEST = 0;
 #define JOIN_NETWORK_TIME 			30*1000 	//ms
 #define RECHECKING_NETWOK_TIME 		30*1000 	//ms - 1mins
 
-fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_F6_SENDMESS,NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
+fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_A5_HIS,NWK_HDR_F6_SENDMESS,NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
 fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_55,NWK_HDR_RECONNECT}; // register cmdid REQ
 
 #define NWK_HDR_SIZE (sizeof(G_NWK_HDR_LIST)/sizeof(G_NWK_HDR_LIST[0]))
@@ -136,13 +136,13 @@ int _nwk_slave_backup(void){
 }
 
 void fl_nwk_slave_init(void) {
-//	PLOG_Start(APP);
-//	PLOG_Start(API);
-//	PLOG_Start(INF);
-//	PLOG_Start(INF_FILE);
+	PLOG_Start(APP);
+	PLOG_Start(API);
+	PLOG_Start(INF);
+	PLOG_Start(INF_FILE);
 
 	DEBUG_TURN(NWK_DEBUG_STT);
-//	fl_input_external_init();
+	fl_input_external_init();
 	FL_QUEUE_CLEAR(&G_HANDLE_CONTAINER,PACK_HANDLE_SIZE);
 	//Generate information
 	G_INFORMATION.active = false;
