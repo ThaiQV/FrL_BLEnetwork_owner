@@ -39,7 +39,7 @@ u8 GETINFO_FLAG_EVENTTEST = 0;
 #define RECHECKING_NETWOK_TIME 		30*1000 	//ms - 1mins
 
 fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_A5_HIS,NWK_HDR_F6_SENDMESS,NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
-fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_55,NWK_HDR_RECONNECT}; // register cmdid REQ
+fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_A5_HIS,NWK_HDR_55,NWK_HDR_RECONNECT}; // register cmdid REQ
 
 #define NWK_HDR_SIZE (sizeof(G_NWK_HDR_LIST)/sizeof(G_NWK_HDR_LIST[0]))
 #define NWK_HDR_REQ_SIZE (sizeof(G_NWK_HDR_REQLIST)/sizeof(G_NWK_HDR_REQLIST[0]))
@@ -444,13 +444,31 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 			}
 		}
 		break;
+		case NWK_HDR_A5_HIS:{
+			if (IsJoinedNetwork()) {
+				if(packet.frame.slaveID.id_u8 == G_INFORMATION.slaveID.id_u8){
+					//get mac
+					u8 mac[6];
+					memcpy(mac,&packet.frame.payload[0],SIZEU8(mac));
+					u8 ind_value = SIZEU8(mac);
+					//get from_index and to_index
+					u16 from_index = MAKE_U32(packet.frame.payload[ind_value],packet.frame.payload[ind_value+1],packet.frame.payload[ind_value+2],packet.frame.payload[ind_value+3]);
+					ind_value = ind_value+4;
+					u16 to_index =MAKE_U32(packet.frame.payload[ind_value],packet.frame.payload[ind_value+1],packet.frame.payload[ind_value+2],packet.frame.payload[ind_value+3]);
+					TBS_History_Get((u16)from_index,(u16)to_index);
+				}
+				//Non-rsp
+				packet_built.length = 0;
+				return packet_built;
+			}
+			break;
+		}
 		case NWK_HDR_F6_SENDMESS: {
 //			_nwk_slave_syncFromPack(&packet.frame);
 			if (IsJoinedNetwork()) {
 #ifdef COUNTER_DEVICE
 				//check packet_slaveid
 				if(packet.frame.slaveID.id_u8 == G_INFORMATION.slaveID.id_u8){
-
 					u8 slot_indx = packet.frame.payload[0];
 					memset(G_INFORMATION.lcd_mess[slot_indx],0,SIZEU8(G_INFORMATION.lcd_mess[slot_indx]));
 					memcpy(G_INFORMATION.lcd_mess[slot_indx],&packet.frame.payload[1],SIZEU8(packet.frame.payload) -1);

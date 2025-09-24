@@ -66,16 +66,18 @@ tbs_history_t G_HISTORY_CONTAINER[NUM_HISTORY];
 /***                           Private definitions                           **/
 /******************************************************************************/
 /******************************************************************************/
-#define DATA_HISTORY_SIZE SIZEU8(G_HISTORY_CONTAINER[0].data)
+#define DATA_HISTORY_SIZE 			SIZEU8(G_HISTORY_CONTAINER[0].data)
+
+//EXAMPLE DATABASE
+u8 sample_history_database[NUM_HISTORY][DATA_HISTORY_SIZE];
+
 
 /******************************************************************************/
 /******************************************************************************/
 /***                       Functions declare                   		         **/
 /******************************************************************************/
 /******************************************************************************/
-
 void TBS_history_createSample(void) {
-	u8 his_array[NUM_HISTORY][DATA_HISTORY_SIZE];
 #ifdef POWER_METER_DEVICE
 		for (int i = 0; i < NUM_HISTORY; ++i) {
 			tbs_device_powermeter_t record = {
@@ -101,7 +103,7 @@ void TBS_history_createSample(void) {
 			u8 temp_buffer[34]; // full struct packed
 			tbs_pack_powermeter_data(&record,temp_buffer);
 			// skip mac
-			memcpy(his_array[i],&temp_buffer[6],DATA_HISTORY_SIZE);
+			memcpy(sample_history_database[i],&temp_buffer[6],DATA_HISTORY_SIZE);
 	//
 	//		P_PRINTFHEX_A(INF_FILE,powermeter_array[i],RECORD_SIZE,"[%d]",i);
 	//		tbs_device_powermeter_t received;
@@ -126,7 +128,7 @@ void TBS_history_createSample(void) {
 						.pre_mode =0
 						}
 		};
-		u8 *dst = his_array[i];
+		u8 *dst = sample_history_database[i];
 		int pos = 0;
 		// Copy timetamp (4 bytes)
 		memcpy(&dst[pos],&record.timetamp,sizeof(record.timetamp));
@@ -135,11 +137,9 @@ void TBS_history_createSample(void) {
 		memcpy(&dst[pos],&record.data,sizeof(record.data));
 	}
 #endif
-	//store into global struct
+	//printf test
 	for (u8 var = 0; var < NUM_HISTORY; ++var) {
-		G_HISTORY_CONTAINER[var].indx =  var;
-		memcpy(G_HISTORY_CONTAINER[var].data,his_array[var],DATA_HISTORY_SIZE);
-		P_PRINTFHEX_A(INF_FILE,G_HISTORY_CONTAINER[var].data,DATA_HISTORY_SIZE,"[%d]",var);
+		P_PRINTFHEX_A(APP,sample_history_database[var],DATA_HISTORY_SIZE,"[%d]",var);
 	}
 }
 
@@ -183,17 +183,56 @@ fl_pack_t tbs_history_create_pack(u8* _data) {
 	return packet_built;
 }
 
+static void _CLEAR_G_HISTORY(void) {
+	for (u16 i = 0; i < NUM_HISTORY; i++) {
+		G_HISTORY_CONTAINER[i].indx = U16_MAX;
+		memset(G_HISTORY_CONTAINER[i].data,0,DATA_HISTORY_SIZE);
+		G_HISTORY_CONTAINER[i].status_proc = U8_MAX;
+	}
+}
 /******************************************************************************/
 /******************************************************************************/
 /***                            Functions callback                           **/
 /******************************************************************************/
 /******************************************************************************/
-void TBS_History_Init(void){
-	TBS_history_createSample();
-	for(u8 i=0;i<8;i++){
-		fl_adv_sendFIFO_add(tbs_history_create_pack(G_HISTORY_CONTAINER[i].data));
+s8 TBS_History_Get(u16 _from, u16 _to) {
+	_CLEAR_G_HISTORY();
+	LOGA(APP,"Get his from:%d->to:%d\r\n",_from,_to);
+	for (u16 i = 0; i < NUM_HISTORY && (_from + i) < _to; i++) {
+		memset(G_HISTORY_CONTAINER[i].data,0,DATA_HISTORY_SIZE);
+		G_HISTORY_CONTAINER[i].indx = _from + i;
+		G_HISTORY_CONTAINER[i].status_proc = 0;
+		LOGA(APP,"Get his (%d-%d):[%d]%d\r\n",_from,_to,i,G_HISTORY_CONTAINER[i].indx);
+	}
+	return (_from - _to);
+}
+
+void TBS_History_LoadFromFlash(void){
+	for (u16 i = 0; i < NUM_HISTORY ; i++) {
+		if(G_HISTORY_CONTAINER[i].indx != U16_MAX && G_HISTORY_CONTAINER[i].status_proc == 0){
+			//todo: read flash and fill in the G_HISTORY
+			//Example:
+			memcpy(G_HISTORY_CONTAINER[i].data,sample_history_database[G_HISTORY_CONTAINER[i].indx],DATA_HISTORY_SIZE);
+			G_HISTORY_CONTAINER[i].status_proc = 1;
+			P_PRINTFHEX_A(APP,G_HISTORY_CONTAINER[i].data,DATA_HISTORY_SIZE,"[%d]HIS:",G_HISTORY_CONTAINER[i].indx);
+		}
 	}
 }
+/******************************************************************************/
+/******************************************************************************/
+/***                      Processing functions 					             **/
+/******************************************************************************/
+/******************************************************************************/
+
+void TBS_History_Init(void){
+	//clear G_HISTORY
+	_CLEAR_G_HISTORY();
+	TBS_history_createSample();
+//	for(u8 i=0;i<8;i++){
+//		fl_adv_sendFIFO_add(tbs_history_create_pack(G_HISTORY_CONTAINER[i].data));
+//	}
+}
+
 void TBS_History_Run(void){
 //	static u8 add_his_slot = 0;
 //	fl_adv_sendFIFO_add(tbs_history_create_pack(G_HISTORY_CONTAINER[add_his_slot].data));
@@ -201,11 +240,6 @@ void TBS_History_Run(void){
 //	if(add_his_slot>=NUM_HISTORY){
 //		add_his_slot = 0;
 //	}
+	TBS_History_LoadFromFlash();
 }
-
-/******************************************************************************/
-/******************************************************************************/
-/***                      Processing functions 					             **/
-/******************************************************************************/
-/******************************************************************************/
 #endif

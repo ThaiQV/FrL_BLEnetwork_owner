@@ -209,7 +209,7 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 					} else {
 //						LOGA(APP,"QUEUE ADD (len:%d|RSSI:%d): (%d)%d-%d\r\n",pa->len,rssi,G_DATA_CONTAINER.count,G_DATA_CONTAINER.head_index,
 //								G_DATA_CONTAINER.tail_index);
-//						P_PRINTFHEX_A(BLE,incomming_data.data_arr,incomming_data.length,"%s(%d):","PACK",incomming_data.length);
+						P_PRINTFHEX_A(BLE,incomming_data.data_arr,incomming_data.length,"%s(%d):","PACK",incomming_data.length);
 					}
 				} else {
 //					ERR(BLE,"Err <QUEUE ALREADY>!!\r\n");
@@ -281,7 +281,7 @@ int fl_adv_sendFIFO_add(fl_pack_t _pack) {
 			ERR(BLE,"Err FULL <QUEUE ADD ADV SENDING>!!\r\n");
 			return -1;
 		} else {
-//			P_PRINTFHEX_A(BLE,_pack.data_arr,_pack.length,"%s(%d):","QUEUE ADV",_pack.length);
+			P_PRINTFHEX_A(BLE,_pack.data_arr,_pack.length,"%s(%d):","QUEUE ADV",_pack.length);
 			LOGA(BLE,"QUEUE SEND ADD: %d/%d (cnt:%d)\r\n",G_QUEUE_SENDING.head_index,G_QUEUE_SENDING.tail_index,G_QUEUE_SENDING.count);
 			return G_QUEUE_SENDING.tail_index;
 		}
@@ -495,6 +495,8 @@ void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms) {
 			ERR(BLE,"Set ADV param is FAIL !!!\r\n")
 			while (1);
 		}  //debug: adv setting err
+
+
 		/*Encryt data*/
 		u8 encrypted[_size];
 		memset(encrypted,0,SIZEU8(encrypted));

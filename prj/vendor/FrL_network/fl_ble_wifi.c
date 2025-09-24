@@ -230,8 +230,12 @@ void REPORT_RESPONSE(u8* _pdata) {
 		//todo: get history from the flash
 		else
 		{
-//			P_PRINTFHEX_A(MCU,report_fmt.frame.mac,6,"MAC:");
-//			P_PRINTFHEX_A(MCU,G_NODE_LIST.sla_info[1].mac,6,"MAC2:");
+//			u16 from_index = MAKE_U16(report_fmt.frame.timetamp_begin[2],report_fmt.frame.timetamp_begin[3]);
+//			u16 to_index = MAKE_U16(report_fmt.frame.timetamp_end[2],report_fmt.frame.timetamp_end[3]);
+			if(-1==fl_api_master_req(report_fmt.frame.mac,NWK_HDR_A5_HIS,report_fmt.bytes,SIZEU8(report_fmt.bytes),0,0,0)){
+				ERR(MCU,"REQ API !!!!\r\n");
+			}
+
 		}
 	}
 }
