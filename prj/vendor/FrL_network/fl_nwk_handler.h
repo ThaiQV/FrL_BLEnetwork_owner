@@ -142,6 +142,7 @@ typedef struct {
 
 #define POWER_METER_STRUCT_BYTESIZE			(SIZEU8(tbs_device_powermeter_t))
 #define POWER_METER_BITSIZE					34
+#define POWER_DATA_INSTRUCT					15
 static inline void tbs_pack_powermeter_data(const tbs_device_powermeter_t *src, u8 *dst) {
     u32 bitpos = 0;
     u32 byte_idx = 0;
@@ -327,6 +328,7 @@ void fl_nwk_master_heartbeat_run(void);
 fl_pack_t fl_master_packet_GetInfo_build(u8 *_slave_mac_arr, u8 _slave_num);
 s8 fl_master_packet_F5_CreateNSend(u8 *_slave_mac_arr, u8 _slave_num);
 void fl_master_nodelist_AddRefesh(fl_nodeinnetwork_t _node);
+s16 fl_master_Node_find(u8 *_mac);
 s16 fl_master_SlaveID_find(u8 _id);
 u8 fl_master_SlaveID_get(u8* _mac);
 s8 fl_master_SlaveMAC_get(u8 _slaveid,u8* mac);

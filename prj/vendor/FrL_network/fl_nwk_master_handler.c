@@ -71,6 +71,7 @@ static inline u8 IsREQHDR(fl_hdr_nwk_type_e cmdid) {
 /***                           Private definitions                           **/
 /******************************************************************************/
 /******************************************************************************/
+s16 fl_master_Node_find(u8 *_mac);
 u8 fl_master_SlaveID_get(u8* _mac);
 s16 fl_master_SlaveID_find(u8 _id);
 void fl_nwk_master_nodelist_init(void);
@@ -767,6 +768,16 @@ int fl_master_ProccesRSP_cbk(void) {
 				 P_PRINTFHEX_A(INF,packet.frame.payload,4,"0x%08X:",mac_short);
 				 }
 				 **/
+			}
+			break;
+			case NWK_HDR_A5_HIS: {
+				u8 slave_id = packet.frame.slaveID.id_u8;
+				u8 node_indx = fl_master_SlaveID_find(slave_id);
+				if (node_indx != -1) {
+					if (packet.frame.endpoint.master == FL_FROM_SLAVE) {
+						fl_ble2wifi_HISTORY_SEND(G_NODE_LIST.sla_info[node_indx].mac,packet.frame.timetamp,packet.frame.payload);
+					}
+				}
 			}
 			break;
 			case NWK_HDR_55: {

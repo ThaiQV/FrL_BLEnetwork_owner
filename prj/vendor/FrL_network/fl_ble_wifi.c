@@ -441,7 +441,35 @@ void fl_ble_wifi_proc(u8* _pdata) {
 		len_cmd = data->len_data + SIZEU8(data->cmd) + SIZEU8(data->crc8) + SIZEU8(data->len_data);
 	}
 }
+void fl_ble2wifi_HISTORY_SEND(u8* mac,u8* timetamp,u8* _data){
+	extern fl_slaves_list_t G_NODE_LIST;
+	u8 payload[BLE_WIFI_MAXLEN];
+	memset(payload,0xFF,SIZEU8(payload));
+	fl_datawifi2ble_t wfdata;
 
+	wfdata.cmd = GF_CMD_REPORT_RESPONSE;
+	u8 ind_node = fl_master_Node_find(mac);
+	wfdata.data[0] = 0;//status
+	memcpy(&wfdata.data[1],mac,6);
+	memcpy(&wfdata.data[1+6],timetamp,4);
+	wfdata.data[1 + 6 + 4] = G_NODE_LIST.sla_info[ind_node].dev_type;
+	u8 data_len = 0;
+	if (G_NODE_LIST.sla_info[ind_node].dev_type == TBS_COUNTER) {
+		wfdata.len_data = SIZEU8(tbs_device_counter_t) + 1; //+ status
+		data_len=COUNTER_DATA_INSTRUCT;
+	}
+	else if(G_NODE_LIST.sla_info[ind_node].dev_type == TBS_POWERMETER) {
+		wfdata.len_data = SIZEU8(tbs_device_powermeter_t) + 1; //+ status
+		data_len=POWER_DATA_INSTRUCT;
+	}
+	memcpy(&wfdata.data[1+6+4+1],_data,data_len);
+
+	wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
+	u8 len_payload = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
+	memcpy(payload,(u8*) &wfdata,len_payload);
+	P_PRINTFHEX_A(MCU,payload,len_payload,"His %s(%d):",(G_NODE_LIST.sla_info[ind_node].dev_type == TBS_COUNTER)?"COunter":"PwMeter",len_payload);
+	fl_ble_send_wifi(payload,len_payload);
+}
 void fl_ble2wifi_EVENT_SEND(u8* _slave_mac){
 	fl_datawifi2ble_t wfdata;
 	wfdata.cmd = GF_CMD_REPORT_REQUEST;
