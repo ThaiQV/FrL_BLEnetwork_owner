@@ -335,6 +335,7 @@ s8 fl_queue_REQcRSP_ScanRec(fl_pack_t _pack);
 s8 fl_api_master_req(u8* _mac_slave,u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry);
 #else
 extern volatile u8 NWK_DEBUG_STT; // it will be assigned into end-point byte (dbg :1bit);
+u8 fl_nwk_mySlaveID(void);
 void fl_nwk_slave_init(void);
 void fl_nwk_slave_run(fl_pack_t *_pack_handle);
 void fl_nwk_slave_process(void);

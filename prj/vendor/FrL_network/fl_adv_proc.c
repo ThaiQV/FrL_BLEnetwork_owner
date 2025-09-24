@@ -201,10 +201,6 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 				if (!fl_nwk_slave_checkHDR(incomming_data.data_arr[0])) {
 					return 0;
 				}
-//				/* Skip repeate-adv loop */
-//				if (FL_QUEUE_FIND(&G_QUEUE_SENDING,&incomming_data,incomming_data.length - 2/*skip rssi + repeat_cnt*/) != -1) {
-//					return 0;
-//				}
 #endif
 				if (FL_QUEUE_FIND(&G_DATA_CONTAINER,&incomming_data,incomming_data.length - 1/*skip rssi*/) == -1) {
 //					s8 rssi = (s8) pa->data[pa->len];
@@ -261,22 +257,23 @@ int fl_adv_sendFIFO_add(fl_pack_t _pack) {
 	master_send_skip_LSB = 1;
 #else
 /* History process add data*/
-	fl_dataframe_format_t data_parsed;
-	if (fl_packet_parse(_pack,&data_parsed)) {
-		if (data_parsed.hdr == NWK_HDR_A5_HIS) {
-			if (FL_QUEUE_FIND(&G_QUEUE_HISTORY_SENDING,&_pack,_pack.length) == -1) {
-				if (FL_QUEUE_ADD(&G_QUEUE_HISTORY_SENDING,&_pack) < 0) {
-					ERR(BLE,"Err FULL <QUEUE ADD HISTORY SENDING>!!\r\n");
-					return -1;
-				} else {
-					//P_PRINTFHEX_A(BLE,_pack.data_arr,_pack.length,"%s(%d):","QUEUE ADV",_pack.length);
-					LOGA(BLE,"QUEUE HISTORY SEND ADD: %d/%d (cnt:%d)\r\n",G_QUEUE_HISTORY_SENDING.head_index,G_QUEUE_HISTORY_SENDING.tail_index,G_QUEUE_HISTORY_SENDING.count);
-					return G_QUEUE_HISTORY_SENDING.tail_index;
-				}
+	fl_data_frame_u check_hdr_history;
+	memcpy(check_hdr_history.bytes,_pack.data_arr,_pack.length);
+	if (check_hdr_history.frame.hdr == NWK_HDR_A5_HIS) {
+		if (FL_QUEUE_FIND(&G_QUEUE_HISTORY_SENDING,&_pack,_pack.length) == -1) {
+			if (FL_QUEUE_ADD(&G_QUEUE_HISTORY_SENDING,&_pack) < 0) {
+				ERR(BLE,"Err FULL <QUEUE ADD HISTORY SENDING>!!\r\n");
+				return -1;
+			} else {
+				LOGA(BLE,"QUEUE HISTORY SEND ADD: %d/%d (cnt:%d)\r\n",G_QUEUE_HISTORY_SENDING.head_index,
+						G_QUEUE_HISTORY_SENDING.tail_index,
+						G_QUEUE_HISTORY_SENDING.count);
+				P_PRINTFHEX_A(BLE,_pack.data_arr,_pack.length,"HISTORY QUEUE(%d):",_pack.length);
+				return G_QUEUE_HISTORY_SENDING.tail_index;
 			}
-			ERR(BLE,"Err <QUEUE ALREADY HISTORY ADV SENDING>!!\r\n");
-			return -1;
 		}
+		ERR(BLE,"Err <QUEUE ALREADY HISTORY ADV SENDING>!!\r\n");
+		return -1;
 	}
 #endif
 	if (FL_QUEUE_FIND(&G_QUEUE_SENDING,&_pack,_pack.length - master_send_skip_LSB /* - 1 skip LSB (master)*/) == -1) {
@@ -292,6 +289,21 @@ int fl_adv_sendFIFO_add(fl_pack_t _pack) {
 	ERR(BLE,"Err <QUEUE ALREADY ADV SENDING>!!\r\n");
 	return -1;
 }
+
+u8 fl_adv_sendFIFO_History_run(void) {
+	fl_pack_t his_data_in_queue;
+	//if (!F_SENDING_STATE) {
+		if(FL_QUEUE_GETnCLEAR(&G_QUEUE_HISTORY_SENDING,&his_data_in_queue)) {
+			//F_SENDING_STATE = 1;
+			//fl_adv_send(his_data_in_queue.data_arr,his_data_in_queue.length,G_ADV_SETTINGS.adv_duration);
+			P_PRINTFHEX_A(APP,his_data_in_queue.data_arr,his_data_in_queue.length,"[%d-%d/%d]HIS(%d):",
+					G_QUEUE_HISTORY_SENDING.head_index,G_QUEUE_HISTORY_SENDING.tail_index,G_QUEUE_HISTORY_SENDING.count,
+					his_data_in_queue.length);
+		}
+	//}
+	return 1;
+}
+
 #ifdef MASTER_CORE
 
 void fl_master_adv_55_RSPCommon_Create(void) {
@@ -407,7 +419,8 @@ u8 fl_adv_sendFIFO_run(void) {
 		fl_master_adv_55_RSPCommon_Create();
 #endif
 		u8 loop_check = 0;
-		while (FL_QUEUE_GET_LOOP(&G_QUEUE_SENDING,&data_in_queue)) {
+		s16 indx_head_cur = -1;
+		while ((indx_head_cur = FL_QUEUE_GET_LOOP(&G_QUEUE_SENDING,&data_in_queue)) != -1) {
 			//IMPORTAN SEND DELETE NETWORK
 			if(-1 != plog_IndexOf(data_in_queue.data_arr,MASTER_CLEARNETWORK,SIZEU8(MASTER_CLEARNETWORK),data_in_queue.length)) {
 				ERR(APP,"SEND DELETE NETWORK!!!\r\n");
@@ -417,10 +430,10 @@ u8 fl_adv_sendFIFO_run(void) {
 			}
 			/*====================*/
 			fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(data_in_queue);
-			 inpack = fl_rtc_timetamp2milltampStep(timetamp_inpack);
+			inpack = fl_rtc_timetamp2milltampStep(timetamp_inpack);
 			origin_pack = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
 			loop_check++;
-			if ( inpack < origin_pack)
+			if ( inpack < origin_pack || data_in_queue.length < 10 )
 			{
 				if (loop_check <= G_QUEUE_SENDING.mask)
 					continue;
@@ -429,14 +442,20 @@ u8 fl_adv_sendFIFO_run(void) {
 					return inused_slot;
 				}
 			}
-
 			F_SENDING_STATE = 1;
 			fl_adv_send(data_in_queue.data_arr,data_in_queue.length,G_ADV_SETTINGS.adv_duration);
-#ifdef MASTER_CORE
-			//for testing
-//			u16 cur_slot = ((G_QUEUE_SENDING.head_index - 1) &G_QUEUE_SENDING.mask);
+			/*Processor HB packet*/
 			fl_data_frame_u check_heartbeat;
 			memcpy(check_heartbeat.bytes,data_in_queue.data_arr,data_in_queue.length);
+#ifndef	MASTER_CORE //for slave
+			//Clear HB packer REPEATER
+			if(inused_slot == 1 && check_heartbeat.frame.hdr == NWK_HDR_HEARTBEAT ){ // only have HB packet=> send it one times
+				//CLEAR
+				G_QUEUE_SENDING.data[indx_head_cur].length = 0;
+			}
+#else //for master
+			//
+//			u16 cur_slot = ((G_QUEUE_SENDING.head_index - 1) &G_QUEUE_SENDING.mask);
 			if (check_heartbeat.frame.hdr == NWK_HDR_HEARTBEAT) {
 //				check_hb_slot = cur_slot;
 				u32 origin = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
@@ -720,7 +739,6 @@ void fl_adv_run(void) {
 				fl_repeat_run(&data_in_queue);
 			}
 			//Todo: Handle FORM MASTER REQ
-			//if (fl_adv_IsFromMaster(data_in_queue))
 			if(fl_adv_MasterToMe(data_in_queue))
 			{
 				fl_nwk_slave_run(&data_in_queue);
@@ -738,6 +756,8 @@ void fl_adv_run(void) {
 	fl_nwk_slave_process();
 #endif
 	/* SEND ADV */
-	fl_adv_sendFIFO_run();
+	if(fl_adv_sendFIFO_run()==0){
+		fl_adv_sendFIFO_History_run();
+	}
 
 }

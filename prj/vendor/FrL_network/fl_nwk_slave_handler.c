@@ -71,7 +71,7 @@ fl_pack_t g_handle_array[PACK_HANDLE_SIZE];
 fl_data_container_t G_HANDLE_CONTAINER = { .data = g_handle_array, .head_index = 0, .tail_index = 0, .mask = PACK_HANDLE_SIZE - 1, .count = 0 };
 
 //My information
-fl_nodeinnetwork_t G_INFORMATION ;
+fl_nodeinnetwork_t G_INFORMATION ={.active=false};
 #ifndef MASTER_CORE
 #ifdef COUNTER_DEVICE
 extern tbs_device_counter_t G_COUNTER_DEV ;
@@ -95,6 +95,9 @@ int fl_nwk_joinnwk_timeout(void) ;
 /***                       Functions declare                   		         **/
 /******************************************************************************/
 /******************************************************************************/
+u8 fl_nwk_mySlaveID(void){
+	return G_INFORMATION.slaveID.id_u8;
+}
 
 bool IsJoinedNetwork(void)	{
 	return(G_INFORMATION.slaveID.id_u8 != 0xFF);
@@ -136,10 +139,7 @@ int _nwk_slave_backup(void){
 }
 
 void fl_nwk_slave_init(void) {
-	PLOG_Start(APP);
-	PLOG_Start(API);
-	PLOG_Start(INF);
-	PLOG_Start(INF_FILE);
+	PLOG_Start(ALL);
 
 	DEBUG_TURN(NWK_DEBUG_STT);
 	fl_input_external_init();

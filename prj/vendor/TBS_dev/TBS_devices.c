@@ -256,8 +256,8 @@ void TBS_Device_Init(void){
 #ifdef POWER_METER_DEVICE
 	TBS_PowerMeter_init();
 #endif
-	//History create sample test
-	TBS_history_createSample();
+	//History init
+	TBS_History_Init();
 }
 void TBS_Device_Run(void){
 #ifdef COUNTER_DEVICE
@@ -266,4 +266,5 @@ void TBS_Device_Run(void){
 #ifdef POWER_METER_DEVICE
 	TBS_PowerMeter_Run();
 #endif
+	TBS_History_Run();
 }

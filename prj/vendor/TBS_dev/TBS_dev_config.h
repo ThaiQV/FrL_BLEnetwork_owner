@@ -28,4 +28,6 @@ void TBS_Device_Init(void);
 void TBS_Device_Run(void);
 
 void TBS_history_createSample(void);
+void TBS_History_Init(void);
+void TBS_History_Run(void);
 #endif /* VENDOR_FRL_NETWORK_TBS_DEV_CONFIG_H_ */
