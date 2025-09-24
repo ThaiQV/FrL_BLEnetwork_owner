@@ -139,7 +139,7 @@ int _nwk_slave_backup(void){
 }
 
 void fl_nwk_slave_init(void) {
-	PLOG_Start(ALL);
+//	PLOG_Start(ALL);
 
 	DEBUG_TURN(NWK_DEBUG_STT);
 	fl_input_external_init();

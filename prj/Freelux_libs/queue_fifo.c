@@ -130,8 +130,7 @@ u16 FL_QUEUE_GETnCLEAR(fl_data_container_t *pCont, fl_pack_t *pdata) {
 		return 0;
 	}
 	*pdata = pCont->data[pCont->head_index];
-//	memset(pCont->data[pCont->head_index].data_arr,0,sizeof(fl_pack_t));
-//	pCont->data[pCont->head_index].length =0;
+	memset(&pCont->data[pCont->head_index], 0, sizeof(fl_pack_t));
 	pCont->head_index = ((pCont->head_index + 1) & pCont->mask);
 	pCont->count--;
 	return 1;

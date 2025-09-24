@@ -215,6 +215,7 @@ void TBS_History_LoadFromFlash(void){
 			memcpy(G_HISTORY_CONTAINER[i].data,sample_history_database[G_HISTORY_CONTAINER[i].indx],DATA_HISTORY_SIZE);
 			G_HISTORY_CONTAINER[i].status_proc = 1;
 			P_PRINTFHEX_A(APP,G_HISTORY_CONTAINER[i].data,DATA_HISTORY_SIZE,"[%d]HIS:",G_HISTORY_CONTAINER[i].indx);
+			fl_adv_sendFIFO_add(tbs_history_create_pack(G_HISTORY_CONTAINER[i].data));
 		}
 	}
 }
