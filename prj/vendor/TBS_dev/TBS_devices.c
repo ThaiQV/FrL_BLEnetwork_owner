@@ -64,7 +64,7 @@ void tbs_power_meter_printf(void* _p) {
 tbs_device_counter_t G_COUNTER_DEV = {  .timetamp = 0,
 										.type = TBS_COUNTER,
 										.data = {
-												.index=1,
+												.index=101,
 												.bt_call = 2,
 												.bt_endcall = 3,
 												.bt_rst = 4,
@@ -191,8 +191,8 @@ void TBS_Counter_init(void){
 		memset(G_COUNTER_LCD[var],0,SIZEU8(G_COUNTER_LCD[var]));
 	}
 	//todo:Init Butt,lcd,7segs,.....
-	//TEST_EVENT.lifetime = fl_rtc_get();
-	//blt_soft_timer_add(&TEST_Counter_Event,5000*1000);
+	TEST_EVENT.lifetime = fl_rtc_get();
+	blt_soft_timer_add(&TEST_Counter_Event,5000*1000);
 }
 void TBS_Counter_Run(void){
 	G_COUNTER_DEV.timetamp = fl_rtc_get();

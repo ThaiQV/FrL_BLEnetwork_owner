@@ -17,7 +17,7 @@
 
 #ifndef MASTER_CORE
 
-#define NUM_HISTORY			20
+#define NUM_HISTORY			50
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -198,7 +198,7 @@ static void _CLEAR_G_HISTORY(void) {
 s8 TBS_History_Get(u16 _from, u16 _to) {
 	_CLEAR_G_HISTORY();
 	LOGA(APP,"Get his from:%d->to:%d\r\n",_from,_to);
-	for (u16 i = 0; i < NUM_HISTORY && (_from + i) < _to; i++) {
+	for (u16 i = 0; i < NUM_HISTORY && (_from + i) <= _to; i++) {
 		memset(G_HISTORY_CONTAINER[i].data,0,DATA_HISTORY_SIZE);
 		G_HISTORY_CONTAINER[i].indx = _from + i;
 		G_HISTORY_CONTAINER[i].status_proc = 0;
