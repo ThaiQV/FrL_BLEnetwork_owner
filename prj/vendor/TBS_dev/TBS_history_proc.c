@@ -103,34 +103,34 @@ void TBS_history_createSample(void) {
 #ifdef POWER_METER_DEVICE
 		for (int i = 0; i < NUM_HISTORY; ++i) {
 			tbs_device_powermeter_t record = {
-				.timetamp = 1758639600 + i * 60, //
-				.type = 0x01,//
-				.data = {
-					.index = i,
-					.frequency = 50,
-					.voltage = 220,
-					.current1 = 11,
-					.current2 = 22,
-					.current3 = 33,
-					.power1 = 100,
-					.power2 = 101,
-					.power3 = 102,
-					.time1 = 30,
-					.time2 = 31,
-					.time3 = 32,
-					.energy1 = 111111,
-					.energy2 = 222222,
-					.energy3 = 333333}};
-
-			u8 temp_buffer[34]; // full struct packed
+					.mac = {0, 0, 0, 0, 0, 0},
+					.timetamp = 1758639600 + i * 60,
+					.type = TBS_POWERMETER,
+					.data= {
+							.index = i,
+							.frequency = 50,
+							.voltage = 220,
+							.current1 = 11,
+							.current2 = 22,
+							.current3 = 33,
+							.power1 = 220,
+							.power2 = 221,
+							.power3 = 222,
+							.time1 = 51,
+							.time2 = 52,
+							.time3 = 53,
+							.energy1 = 111111,
+							.energy2 = 222222,
+							.energy3 = 333333,
+											}};
+			memcpy(record.mac,blc_ll_get_macAddrPublic(),SIZEU8(record.mac));
+			u8 temp_buffer[SIZEU8(tbs_history_powermeter_t)]; // full struct packed
 			tbs_pack_powermeter_data(&record,temp_buffer);
-			// skip mac
-			memcpy(sample_history_database[i],&temp_buffer[6],DATA_HISTORY_SIZE);
-	//
-	//		P_PRINTFHEX_A(INF_FILE,powermeter_array[i],RECORD_SIZE,"[%d]",i);
-	//		tbs_device_powermeter_t received;
-	//		tbs_unpack_powermeter_data(&received,temp_buffer);
-	//		tbs_power_meter_printf((void*)&received);
+
+			// skip mac -> store timetamp
+			memcpy(&sample_history_database[i][0],&temp_buffer[6],4);
+			// skip type -> store data
+			memcpy(&sample_history_database[i][4],&temp_buffer[6+4+1],SIZEU8(record.data));
 		}
 #endif
 #ifdef COUNTER_DEVICE
