@@ -6,7 +6,7 @@
 /* For storage */
 #define DEVICE_STORAGE_SIZE		0x80000
 #define SECOND_PER_WEEK			604800
-#define TIMESLOT_MAP_LENGTH		16
+#define MAP_LENGTH				16
 /* For OTA */
 #define OTA_PACKET_LENGTH		16
 
@@ -54,17 +54,12 @@ typedef struct
 /* For storage */
 void storage_init(void);
 void storage_clean(void);
-void storage_set_timestamp_start(uint32_t timestamp);
-uint32_t storage_get_timestamp_start(void);
-void storage_set_timeslot_current(uint32_t timeslot);
-void storage_set_timeslot_unspecified(uint32_t timeslot);
 static bool check_sector_available(uint32_t sector);
-storage_ret_t storage_timeslot_map_check(uint32_t timeslot, uint32_t len);
-void storage_timeslot_map_fill_status(uint32_t timeslot, uint32_t len);
-void storage_timeslot_map_set(uint32_t timeslot, uint32_t len);
-storage_ret_t storage_put_data(uint32_t timestamp, uint8_t *pdata,uint32_t len);
-storage_ret_t storage_get_data(uint32_t timestamp, uint8_t *pdata,uint32_t len);
-storage_ret_t storage_get_data_unspecified(uint32_t index, uint8_t *pdata,uint32_t len);
+storage_ret_t storage_map_check(uint16_t index, uint32_t len);
+void storage_timeslot_map_fill_status(uint16_t index, uint32_t len);
+void storage_timeslot_map_set(uint16_t index, uint32_t len);
+storage_ret_t storage_put_data(uint8_t *pdata,uint32_t pdata_len);
+storage_ret_t storage_get_data(uint8_t *pdata,uint32_t len);
 /* For OTA */
 ota_ret_t ota_fw_put(uint8_t *pdata);
 ota_ret_t ota_fw_header_set(ota_fw_header_t *header);

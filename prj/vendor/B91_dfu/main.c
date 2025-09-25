@@ -27,6 +27,7 @@
 #include "app.h"
 #include "dfu.h"
 
+#include "storage_weekly_data.h"
 
 /**
  * @brief      uart1 irq code for application
@@ -124,6 +125,8 @@ fl_version_t _bootloader = { 0, 0, 0 };
 fl_version_t _fw = { 1, 0, 0 };
 fl_version_t _hw = { 0, 0, 0 };
 
+uint8_t buff[20] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
+storage_ret_t retval;
 _attribute_ram_code_ int main(void)   //must on ramcode
 {
 	DBG_CHN0_LOW;
@@ -171,13 +174,55 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 
 		/* Test code */
 		LOG_P(APP,"DFU\n");
-		firmware_check();
+//		firmware_check();
+		storage_init();
+//		storage_clean();
+		retval = storage_put_data(buff,sizeof(buff));
+		LOGA(APP,"retval put: %d\n",retval);
+		memset(buff,0x00,sizeof(buff));
+		retval = storage_get_data(buff,sizeof(buff));
+		LOGA(APP,"retval get: %d\n",retval);
+
+		int i = 0;
+		for(i=0;i<sizeof(buff);i++)
+		{
+			printf("%d ",buff[i]);
+		}
+		printf("\n");
+
+		memset(buff,0x01,sizeof(buff));
+		retval = storage_put_data(buff,sizeof(buff));
+		LOGA(APP,"retval put: %d\n",retval);
+		memset(buff,0x00,sizeof(buff));
+		buff[5] = 1;
+		retval = storage_get_data(buff,sizeof(buff));
+		LOGA(APP,"retval get: %d\n",retval);
+
+		for(i=0;i<sizeof(buff);i++)
+		{
+			printf("%d ",buff[i]);
+		}
+		printf("\n");
+
+		memset(buff,0x02,sizeof(buff));
+		retval = storage_put_data(buff,sizeof(buff));
+		LOGA(APP,"retval put: %d\n",retval);
+		memset(buff,0x00,sizeof(buff));
+		buff[5] = 2;
+		retval = storage_get_data(buff,sizeof(buff));
+		LOGA(APP,"retval get: %d\n",retval);
+
+		for(i=0;i<sizeof(buff);i++)
+		{
+			printf("%d ",buff[i]);
+		}
+		printf("\n");
 
 		irq_enable();
-		/// wdt init
-		wd_set_interval_ms(5000);     // 5s
+		// wdt init
+		wd_set_interval_ms(5000);	// 5s
 		wd_start();
-		while (1)
+		while(1)
 		{
 			main_loop();
 			wd_clear();
