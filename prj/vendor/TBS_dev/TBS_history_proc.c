@@ -47,6 +47,28 @@ typedef struct {
 	//		u8 reverse[7];
 	} data;
 }__attribute__((packed)) tbs_history_counter_t;
+//
+typedef struct {
+	u32 timetamp;     	// timetamp (32 bits)
+	// Measurement fields (bit-level precision noted)
+	struct {
+		u16 index;          // 16 bits
+		u8 frequency;     	// 7 bits
+		u16 voltage;        // 9 bits
+		u16 current1;       // 10 bits
+		u16 current2;       // 10 bits
+		u16 current3;       // 10 bits
+		u8 power1;          // 8 bits
+		u8 power2;          // 8 bits
+		u8 power3;          // 8 bits
+		u8 time1;           // 6 bits
+		u8 time2;           // 6 bits
+		u8 time3;           // 6 bits
+		u32 energy1;        // 24 bits
+		u32 energy2;        // 24 bits
+		u32 energy3;        // 24 bits
+	} data;
+}__attribute__((packed)) tbs_history_powermeter_t;
 
 typedef struct {
 	u16 indx;
@@ -54,7 +76,7 @@ typedef struct {
 	u8 data[SIZEU8(tbs_history_counter_t)];
 #endif
 #ifdef POWER_METER_DEVICE
-	u8 data[SIZEU8(tbs_history_powermeter_t)]
+	u8 data[SIZEU8(tbs_history_powermeter_t)];
 #endif
 	u8 status_proc;
 }__attribute__((packed)) tbs_history_t;
@@ -152,7 +174,7 @@ fl_pack_t tbs_history_create_pack(u8* _data) {
 #ifdef COUNTER_DEVICE
 	tbs_history_counter_t *data_dev = (tbs_history_counter_t*)_data;
 #else
-	tbs_device_powermeter_t *data_dev = (tbs_device_powermeter_t*)_data;
+	tbs_history_powermeter_t *data_dev = (tbs_history_powermeter_t*)_data;
 #endif
 	packet.frame.hdr = NWK_HDR_A5_HIS;
 

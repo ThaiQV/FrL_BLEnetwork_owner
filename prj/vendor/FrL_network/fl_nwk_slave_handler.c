@@ -35,8 +35,9 @@ volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME = {.timetamp = 0,.milstep =
 												ORIGINAL_MASTER_TIME.milstep = y;\
 											}while(0) //Sync original time-master req
 u8 GETINFO_FLAG_EVENTTEST = 0;
-#define JOIN_NETWORK_TIME 			30*1000 	//ms
-#define RECHECKING_NETWOK_TIME 		30*1000 	//ms - 1mins
+#define JOIN_NETWORK_TIME 			30*1000 			//ms
+#define RECHECKING_NETWOK_TIME 		30*1000 		    //ms
+#define RECONNECT_TIME				60*1000*1000		//s
 
 fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_A5_HIS,NWK_HDR_F6_SENDMESS,NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
 fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_A5_HIS,NWK_HDR_55,NWK_HDR_RECONNECT}; // register cmdid REQ
@@ -140,9 +141,8 @@ int _nwk_slave_backup(void){
 
 void fl_nwk_slave_init(void) {
 //	PLOG_Start(ALL);
-
 	DEBUG_TURN(NWK_DEBUG_STT);
-	fl_input_external_init();
+//	fl_input_external_init();
 	FL_QUEUE_CLEAR(&G_HANDLE_CONTAINER,PACK_HANDLE_SIZE);
 	//Generate information
 	G_INFORMATION.active = false;
@@ -195,7 +195,8 @@ void fl_nwk_slave_init(void) {
 	blt_soft_timer_add(_nwk_slave_backup,2*1000*1000);
 
 	//Interval checking network
-//	fl_nwk_slave_reconnect();
+	blt_soft_timer_add(fl_nwk_slave_reconnect,1000*1000);//s -> send information online to master
+
 	//Checking online
 //	blt_soft_timer_add(&_isOnline_check,RECHECKING_NETWOK_TIME*1000);
 	G_INFORMATION.active = false;
@@ -429,6 +430,9 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 					memcpy(&packet.frame.payload,&_payload[indx_data],SIZEU8(packet.frame.payload));
 					//CRC
 					packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
+
+					//Restart timeout reconnect
+					blt_soft_timer_restart(fl_nwk_slave_reconnect,RECONNECT_TIME);
 				} else {
 					packet_built.length = 0;
 					return packet_built;
@@ -623,15 +627,21 @@ void fl_nwk_slave_joinnwk_exc(void) {
  *
  ***************************************************/
 int fl_nwk_slave_reconnect(void){
-	//create timer interval for checking online
-	if(blt_soft_timer_find(&fl_nwk_slave_reconnect)==-1){
-		blt_soft_timer_add(&fl_nwk_slave_reconnect,RECHECKING_NETWOK_TIME*1000);
+	if(IsJoinedNetwork()){
+		LOGA(INF,"Reconnect network (%d s)!!!\r\n",RECONNECT_TIME/1000/1000);
+		//
+#ifdef COUNTER_DEVICE
+		fl_api_slave_req(NWK_HDR_55,(u8*)&G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data),0,0,0);
+#else //POWERMETER
+		u8 _payload[SIZEU8(tbs_device_powermeter_t)];
+		tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) G_INFORMATION.data;
+		tbs_pack_powermeter_data(pwmeter_data,_payload);
+		u8 indx_data = SIZEU8(pwmeter_data->type) + SIZEU8(pwmeter_data->mac) + SIZEU8(pwmeter_data->timetamp);
+		fl_api_slave_req(NWK_HDR_55,&_payload[indx_data],SIZEU8(pwmeter_data->data),0,0,0);
+#endif
+		return RECONNECT_TIME;
 	}
-	if(IsJoinedNetwork() && G_INFORMATION.active == false){
-		LOGA(INF,"Reconnect network (%d s)!!!\r\n",RECHECKING_NETWOK_TIME/1000);
-		fl_api_slave_req(NWK_HDR_RECONNECT,G_INFORMATION.mac,SIZEU8(G_INFORMATION.mac),0,0,0);
-	}
-	return 0;
+	return 1000*1000;
 }
 
 /******************************************************************************/

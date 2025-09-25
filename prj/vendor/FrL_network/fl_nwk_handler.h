@@ -142,7 +142,7 @@ typedef struct {
 
 #define POWER_METER_STRUCT_BYTESIZE			(SIZEU8(tbs_device_powermeter_t))
 #define POWER_METER_BITSIZE					34
-#define POWER_DATA_INSTRUCT					15
+#define POWER_DATA_INSTRUCT					22
 static inline void tbs_pack_powermeter_data(const tbs_device_powermeter_t *src, u8 *dst) {
     u32 bitpos = 0;
     u32 byte_idx = 0;
