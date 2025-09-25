@@ -37,6 +37,7 @@ typedef enum {
 	NWK_HDR_RECONNECT = 0x11,
 	/*Frl protocols*/
 	NWK_HDR_55 = 0x55, // REQ from slave
+	NWK_HDR_A5_HIS=0xA5, //history
 	// master -> req -> slave -> rsp
 	NWK_HDR_F5_INFO = 0xF5, //get data information real-time
 	NWK_HDR_F6_SENDMESS = 0xF6, //send mess to slave
@@ -116,8 +117,8 @@ typedef struct {
  * |   7 bits  |  9 bits |  10 bits  |  10 bits  |  10 bits  | 14 bits | 14 bits | 14 bits | 24 bits  | 24 bits  | 24 bits  | 16 bits |
  */
 typedef struct {
-	u8 mac[6];         // MAC address (48 bits)
-	u32 timetamp;     // timetamp (32 bits)
+	u8 mac[6];         	// MAC address (48 bits)
+	u32 timetamp;     	// timetamp (32 bits)
 	u8 type;			//device type
 	// Measurement fields (bit-level precision noted)
 	struct {
@@ -141,6 +142,7 @@ typedef struct {
 
 #define POWER_METER_STRUCT_BYTESIZE			(SIZEU8(tbs_device_powermeter_t))
 #define POWER_METER_BITSIZE					34
+#define POWER_DATA_INSTRUCT					22
 static inline void tbs_pack_powermeter_data(const tbs_device_powermeter_t *src, u8 *dst) {
     u32 bitpos = 0;
     u32 byte_idx = 0;
@@ -326,6 +328,7 @@ void fl_nwk_master_heartbeat_run(void);
 fl_pack_t fl_master_packet_GetInfo_build(u8 *_slave_mac_arr, u8 _slave_num);
 s8 fl_master_packet_F5_CreateNSend(u8 *_slave_mac_arr, u8 _slave_num);
 void fl_master_nodelist_AddRefesh(fl_nodeinnetwork_t _node);
+s16 fl_master_Node_find(u8 *_mac);
 s16 fl_master_SlaveID_find(u8 _id);
 u8 fl_master_SlaveID_get(u8* _mac);
 s8 fl_master_SlaveMAC_get(u8 _slaveid,u8* mac);
@@ -334,6 +337,7 @@ s8 fl_queue_REQcRSP_ScanRec(fl_pack_t _pack);
 s8 fl_api_master_req(u8* _mac_slave,u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry);
 #else
 extern volatile u8 NWK_DEBUG_STT; // it will be assigned into end-point byte (dbg :1bit);
+u8 fl_nwk_mySlaveID(void);
 void fl_nwk_slave_init(void);
 void fl_nwk_slave_run(fl_pack_t *_pack_handle);
 void fl_nwk_slave_process(void);

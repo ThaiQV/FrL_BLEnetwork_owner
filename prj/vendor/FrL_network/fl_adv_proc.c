@@ -31,7 +31,6 @@ volatile u8* FL_NWK_COLLECTION_MODE; //
 /***                                Global Parameters                        **/
 /******************************************************************************/
 /******************************************************************************/
-
 #define SEND_TIMEOUT_MS		50 //ms
 extern _attribute_data_retention_ volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME;
 
@@ -56,11 +55,16 @@ fl_pack_t g_data_array[IN_DATA_SIZE];
 fl_data_container_t G_DATA_CONTAINER = { .data = g_data_array, .head_index = 0, .tail_index = 0, .mask = IN_DATA_SIZE - 1, .count = 0 };
 
 /*---------------- ADV SEND QUEUE --------------------------*/
-#define QUEUE_SENDING_SIZE 		16
+#define QUEUE_SENDING_SIZE 				16
 fl_pack_t g_sending_array[QUEUE_SENDING_SIZE];
 fl_data_container_t G_QUEUE_SENDING = { .data = g_sending_array, .head_index = 0, .tail_index = 0, .mask = QUEUE_SENDING_SIZE - 1, .count = 0 };
+/*---------------- ADV SEND QUEUE --------------------------*/
+#define QUEUE_HISTORY_SENDING_SIZE 		16
+fl_pack_t g_history_sending_array[QUEUE_HISTORY_SENDING_SIZE];
+fl_data_container_t G_QUEUE_HISTORY_SENDING = { .data = g_history_sending_array, .head_index = 0, .tail_index = 0, .mask = QUEUE_HISTORY_SENDING_SIZE - 1, .count = 0 };
+/*-----------------------------------------------------------*/
 
-fl_hdr_nwk_type_e FL_NWK_HDR[]={NWK_HDR_RECONNECT,NWK_HDR_55,NWK_HDR_F5_INFO,NWK_HDR_F6_SENDMESS,NWK_HDR_ASSIGN,NWK_HDR_HEARTBEAT,NWK_HDR_COLLECT};
+fl_hdr_nwk_type_e FL_NWK_HDR[]={NWK_HDR_RECONNECT,NWK_HDR_A5_HIS,NWK_HDR_55,NWK_HDR_F5_INFO,NWK_HDR_F6_SENDMESS,NWK_HDR_ASSIGN,NWK_HDR_HEARTBEAT,NWK_HDR_COLLECT};
 #define FL_NWK_HDR_SIZE	(sizeof(FL_NWK_HDR)/sizeof(FL_NWK_HDR[0]))
 
 /******************************************************************************/
@@ -68,9 +72,6 @@ fl_hdr_nwk_type_e FL_NWK_HDR[]={NWK_HDR_RECONNECT,NWK_HDR_55,NWK_HDR_F5_INFO,NWK
 /***                           Private definitions                           **/
 /******************************************************************************/
 /******************************************************************************/
-#ifndef MASTER_CORE
-#define SEND_HISTORY_S		1 //second
-#endif
 
 /******************************************************************************/
 /******************************************************************************/
@@ -78,7 +79,6 @@ fl_hdr_nwk_type_e FL_NWK_HDR[]={NWK_HDR_RECONNECT,NWK_HDR_55,NWK_HDR_F5_INFO,NWK
 /******************************************************************************/
 /******************************************************************************/
 void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms);
-fl_pack_t fl_packet_build(u8 *payload, u8 _len);
 s8 fl_adv_IsFromMaster(fl_pack_t data_in_queue);
 u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
 
@@ -201,10 +201,6 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 				if (!fl_nwk_slave_checkHDR(incomming_data.data_arr[0])) {
 					return 0;
 				}
-//				/* Skip repeate-adv loop */
-//				if (FL_QUEUE_FIND(&G_QUEUE_SENDING,&incomming_data,incomming_data.length - 2/*skip rssi + repeat_cnt*/) != -1) {
-//					return 0;
-//				}
 #endif
 				if (FL_QUEUE_FIND(&G_DATA_CONTAINER,&incomming_data,incomming_data.length - 1/*skip rssi*/) == -1) {
 //					s8 rssi = (s8) pa->data[pa->len];
@@ -213,7 +209,7 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 					} else {
 //						LOGA(APP,"QUEUE ADD (len:%d|RSSI:%d): (%d)%d-%d\r\n",pa->len,rssi,G_DATA_CONTAINER.count,G_DATA_CONTAINER.head_index,
 //								G_DATA_CONTAINER.tail_index);
-//						P_PRINTFHEX_A(BLE,incomming_data.data_arr,incomming_data.length,"%s(%d):","PACK",incomming_data.length);
+						P_PRINTFHEX_A(BLE,incomming_data.data_arr,incomming_data.length,"%s(%d):","PACK",incomming_data.length);
 					}
 				} else {
 //					ERR(BLE,"Err <QUEUE ALREADY>!!\r\n");
@@ -259,13 +255,33 @@ int fl_adv_sendFIFO_add(fl_pack_t _pack) {
 	u8 master_send_skip_LSB = 0;
 #ifdef MASTER_CORE
 	master_send_skip_LSB = 1;
+#else
+/* History process add data*/
+	fl_data_frame_u check_hdr_history;
+	memcpy(check_hdr_history.bytes,_pack.data_arr,_pack.length);
+	if (check_hdr_history.frame.hdr == NWK_HDR_A5_HIS) {
+		if (FL_QUEUE_FIND(&G_QUEUE_HISTORY_SENDING,&_pack,_pack.length) == -1) {
+			if (FL_QUEUE_ADD(&G_QUEUE_HISTORY_SENDING,&_pack) < 0) {
+				ERR(BLE,"Err FULL <QUEUE ADD HISTORY SENDING>!!\r\n");
+				return -1;
+			} else {
+				LOGA(BLE,"QUEUE HISTORY SEND ADD: %d/%d (cnt:%d)\r\n",G_QUEUE_HISTORY_SENDING.head_index,
+						G_QUEUE_HISTORY_SENDING.tail_index,
+						G_QUEUE_HISTORY_SENDING.count);
+				P_PRINTFHEX_A(BLE,_pack.data_arr,_pack.length,"HISTORY QUEUE(%d):",_pack.length);
+				return G_QUEUE_HISTORY_SENDING.tail_index;
+			}
+		}
+		ERR(BLE,"Err <QUEUE ALREADY HISTORY ADV SENDING>!!\r\n");
+		return -1;
+	}
 #endif
 	if (FL_QUEUE_FIND(&G_QUEUE_SENDING,&_pack,_pack.length - master_send_skip_LSB /* - 1 skip LSB (master)*/) == -1) {
 		if (FL_QUEUE_ADD(&G_QUEUE_SENDING,&_pack) < 0) {
 			ERR(BLE,"Err FULL <QUEUE ADD ADV SENDING>!!\r\n");
 			return -1;
 		} else {
-//			P_PRINTFHEX_A(BLE,_pack.data_arr,_pack.length,"%s(%d):","QUEUE ADV",_pack.length);
+			P_PRINTFHEX_A(BLE,_pack.data_arr,_pack.length,"%s(%d):","QUEUE ADV",_pack.length);
 			LOGA(BLE,"QUEUE SEND ADD: %d/%d (cnt:%d)\r\n",G_QUEUE_SENDING.head_index,G_QUEUE_SENDING.tail_index,G_QUEUE_SENDING.count);
 			return G_QUEUE_SENDING.tail_index;
 		}
@@ -273,9 +289,24 @@ int fl_adv_sendFIFO_add(fl_pack_t _pack) {
 	ERR(BLE,"Err <QUEUE ALREADY ADV SENDING>!!\r\n");
 	return -1;
 }
+
+u8 fl_adv_sendFIFO_History_run(void) {
+	fl_pack_t his_data_in_queue;
+	if (!F_SENDING_STATE) {
+		if(FL_QUEUE_GETnCLEAR(&G_QUEUE_HISTORY_SENDING,&his_data_in_queue)) {
+			F_SENDING_STATE = 1;
+			fl_adv_send(his_data_in_queue.data_arr,his_data_in_queue.length,G_ADV_SETTINGS.adv_duration);
+			P_PRINTFHEX_A(APP,his_data_in_queue.data_arr,his_data_in_queue.length,"[%d-%d/%d]HIS(%d):",
+					G_QUEUE_HISTORY_SENDING.head_index,G_QUEUE_HISTORY_SENDING.tail_index,G_QUEUE_HISTORY_SENDING.count,
+					his_data_in_queue.length);
+		}
+	}
+	return 1;
+}
+
 #ifdef MASTER_CORE
 
-void fl_master_adv_createRSPCommon(void) {
+void fl_master_adv_55_RSPCommon_Create(void) {
 	u8 SlaveID[22-5-2]; //22 bytes paloay - 4 bytes timetamps - delta timetamps
 	u32 timetamp_com[22-5-2]; // for testing list
 	u8 numSlave=0;
@@ -357,49 +388,74 @@ void fl_master_adv_createRSPCommon(void) {
  *
  * @param[in] 	: none
  *
- * @return	  	:
+ * @return	  	: num of busy slot
  *
  ***************************************************/
-void fl_adv_sendFIFO_run(void) {
+u8 fl_adv_sendFIFO_run(void) {
 	fl_pack_t data_in_queue;
-//	static u8 check_hb_slot = 0;
-//	u16 cur_slot = 0;
+	u8 inused_slot = 0;
+	u32 inpack =0;
+	u32 origin_pack = 0;
+	static u8 check_inused = 0;
 	if (!F_SENDING_STATE) {
-
+		/* Get busy slot*/
+		for (u8 slot = 0; slot < G_QUEUE_SENDING.mask + 1; ++slot) {
+			fl_pack_t check_busy_slot;
+			FL_QUEUE_GET_LOOP(&G_QUEUE_SENDING,&check_busy_slot);
+			fl_timetamp_withstep_t timetamp_inpack = fl_adv_timetampStepInPack(check_busy_slot);
+			if (timetamp_inpack.timetamp > 0) {
+				inpack = fl_rtc_timetamp2milltampStep(timetamp_inpack);
+				origin_pack = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
+				if (inpack >= origin_pack) {
+					inused_slot++;
+				}
+			}
+		}
+		if (check_inused != inused_slot) {
+			check_inused = inused_slot;
+			LOGA(APP,"SENDING QUEUES :%d/%d\r\n",check_inused,G_QUEUE_SENDING.mask + 1);
+		}
 #ifdef MASTER_CORE
-		fl_master_adv_createRSPCommon();
+		fl_master_adv_55_RSPCommon_Create();
 #endif
 		u8 loop_check = 0;
-		while (FL_QUEUE_GET_LOOP(&G_QUEUE_SENDING,&data_in_queue)) {
+		s16 indx_head_cur = -1;
+		while ((indx_head_cur = FL_QUEUE_GET_LOOP(&G_QUEUE_SENDING,&data_in_queue)) != -1) {
 			//IMPORTAN SEND DELETE NETWORK
 			if(-1 != plog_IndexOf(data_in_queue.data_arr,MASTER_CLEARNETWORK,SIZEU8(MASTER_CLEARNETWORK),data_in_queue.length)) {
 				ERR(APP,"SEND DELETE NETWORK!!!\r\n");
 				F_SENDING_STATE = 1;
 				fl_adv_send(data_in_queue.data_arr,data_in_queue.length,G_ADV_SETTINGS.adv_duration);
-				return;
+				return inused_slot ;
 			}
 			/*====================*/
 			fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(data_in_queue);
-			u32 inpack = fl_rtc_timetamp2milltampStep(timetamp_inpack);
-			u32 origin_pack = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
+			inpack = fl_rtc_timetamp2milltampStep(timetamp_inpack);
+			origin_pack = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
 			loop_check++;
-			if ( inpack < origin_pack)
+			if ( inpack < origin_pack || data_in_queue.length < 10 )
 			{
 				if (loop_check <= G_QUEUE_SENDING.mask)
 					continue;
 				else{
 //					ERR(INF,"NULL ADV SENDING!! \r\n");
-					return;
+					return inused_slot;
 				}
 			}
-
 			F_SENDING_STATE = 1;
 			fl_adv_send(data_in_queue.data_arr,data_in_queue.length,G_ADV_SETTINGS.adv_duration);
-#ifdef MASTER_CORE
-			//for testing
-//			u16 cur_slot = ((G_QUEUE_SENDING.head_index - 1) &G_QUEUE_SENDING.mask);
+			/*Processor HB packet*/
 			fl_data_frame_u check_heartbeat;
 			memcpy(check_heartbeat.bytes,data_in_queue.data_arr,data_in_queue.length);
+#ifndef	MASTER_CORE //for slave
+			//Clear HB packer REPEATER
+			if(inused_slot == 1 && check_heartbeat.frame.hdr == NWK_HDR_HEARTBEAT ){ // only have HB packet=> send it one times
+				//CLEAR
+				G_QUEUE_SENDING.data[indx_head_cur].length = 0;
+			}
+#else //for master
+			//
+//			u16 cur_slot = ((G_QUEUE_SENDING.head_index - 1) &G_QUEUE_SENDING.mask);
 			if (check_heartbeat.frame.hdr == NWK_HDR_HEARTBEAT) {
 //				check_hb_slot = cur_slot;
 				u32 origin = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
@@ -414,9 +470,10 @@ void fl_adv_sendFIFO_run(void) {
 //			if (cur_slot != check_hb_slot) {
 //				LOGA(APP,"slot of adv in SENDING QUEUE :%d|%d\r\n",cur_slot , check_hb_slot);
 //			}
-			return;
+			return inused_slot;
 		}
 	}
+	return inused_slot;
 }
 
 /**
@@ -438,6 +495,8 @@ void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms) {
 			ERR(BLE,"Set ADV param is FAIL !!!\r\n")
 			while (1);
 		}  //debug: adv setting err
+
+
 		/*Encryt data*/
 		u8 encrypted[_size];
 		memset(encrypted,0,SIZEU8(encrypted));
@@ -460,38 +519,7 @@ void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms) {
 		ERR(APP,"Err: ADV send!\r\n");
 	}
 }
-/***************************************************
- * @brief 		:soft-timer callback for the sending
- *
- * @param[in] 	:none
- *
- * @return	  	:none
- *
- ***************************************************/
-int TEST_ADVPeriod_softtimer_cbk(void) {
-	static u32 tbl_advData = 0;
-	tbl_advData++;
-	u8 adv_arr[] = { U32_BYTE0(tbl_advData), U32_BYTE1(tbl_advData), U32_BYTE2(tbl_advData), U32_BYTE3(tbl_advData) };
-	//remove callback timer
-//	blt_soft_timer_delete(&TEST_ADVPeriod_softtimer_cbk);
-	fl_pack_t sending_data;
-	sending_data = fl_packet_build(adv_arr,SIZEU8(adv_arr));
-	fl_adv_sendFIFO_add(sending_data);
-	return 0;
-}
-/***************************************************
- * @brief 		: TEST sending
- *
- * @param[in] 	:none
- *
- * @return	  	:none
- *
- ***************************************************/
-void fl_adv_sendtest(void) {
-	u32 period = 2000 * 1000;
-	LOGA(APP,"FL ADV testing (%d)!!\r\n",period);
-	blt_soft_timer_add(&TEST_ADVPeriod_softtimer_cbk,period);
-}
+
 /***************************************************
  * @brief 		:init periodic timer adv
  *
@@ -688,49 +716,6 @@ bool fl_adv_MasterToMe(fl_pack_t data_in_queue) {
 	return false;
 }
 #endif
-/***************************************************
- * @brief 		: build packet adv via the freelux protocol
- *
- * @param[in] 	: none
- *
- * @return	  	: 1 if success, 0 otherwise
- *
- ***************************************************/
-fl_pack_t fl_packet_build(u8 *payload, u8 _len) {
-	fl_pack_t pack_built;
-	fl_data_frame_u packet;
-	memset(packet.bytes,0,SIZEU8(packet.bytes));
-	packet.frame.hdr = NWK_HDR_COLLECT; //testing
-//	clock_time
-	u32 timetamp = fl_rtc_get();
-	packet.frame.timetamp[0] = U32_BYTE0(timetamp);
-	packet.frame.timetamp[1] = U32_BYTE1(timetamp);
-	packet.frame.timetamp[2] = U32_BYTE2(timetamp);
-	packet.frame.timetamp[3] = U32_BYTE3(timetamp);
-	//u8 data_test[] = {1,2,3,4,5};
-	memcpy(packet.frame.payload,payload,_len);
-	//for testing repeat level
-//	static u8 rep_level = 0;
-	packet.frame.endpoint.ep_u8 = 0;
-	packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
-	pack_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
-	memcpy(pack_built.data_arr,packet.bytes,pack_built.length);
-	return pack_built;
-}
-void fl_packet_printf(fl_dataframe_format_t _pack) {
-	LOGA(BLE,"HDR:%02X\r\n",_pack.hdr);
-//	P_PRINTFHEX_A(BLE,_pack.timetamp,SIZEU8(_pack.timetamp),"%s:","Timetamp");
-	u32 time_cvt = MAKE_U32(_pack.timetamp[3],_pack.timetamp[2],_pack.timetamp[1],_pack.timetamp[0]);
-	datetime_t datetime_cvt;
-	fl_rtc_timestamp_to_datetime(time_cvt,&datetime_cvt);
-//	LOGA(BLE,"Timetamp:%d\r\n",(u32 )time_cvt);
-	LOGA(BLE,"Datetime:%d/%d/%d -%02d:%02d:%02d\r\n",datetime_cvt.year,datetime_cvt.month,datetime_cvt.day,datetime_cvt.hour,datetime_cvt.minute,
-			datetime_cvt.second);
-	P_PRINTFHEX_A(BLE,_pack.payload,SIZEU8(_pack.payload),"%s:","Payload");
-	LOGA(BLE,"From:%s\r\n",_pack.endpoint.master == 1 ? "MASTER" : "NODE");
-	LOGA(BLE,"Repeat_cnt:%d\r\n",_pack.endpoint.repeat_cnt);
-	LOGA(BLE,"RSSI:%d\r\n",_pack.rssi);
-}
 
 /***************************************************
  * @brief 		: send adv report periodic
@@ -747,7 +732,6 @@ void fl_adv_run(void) {
 //		LOGA(APP,"QUEUE GET : (%d)%d-%d\r\n",G_DATA_CONTAINER.count,G_DATA_CONTAINER.head_index,G_DATA_CONTAINER.tail_index);
 		fl_dataframe_format_t data_parsed;
 		if (fl_packet_parse(data_in_queue,&data_parsed)) {
-//			fl_packet_printf(data_parsed);
 #ifdef MASTER_CORE
 			fl_nwk_master_run(&data_in_queue); //process reponse from the slaves
 #else //SLAVE
@@ -757,7 +741,6 @@ void fl_adv_run(void) {
 				fl_repeat_run(&data_in_queue);
 			}
 			//Todo: Handle FORM MASTER REQ
-			//if (fl_adv_IsFromMaster(data_in_queue))
 			if(fl_adv_MasterToMe(data_in_queue))
 			{
 				fl_nwk_slave_run(&data_in_queue);
@@ -775,5 +758,8 @@ void fl_adv_run(void) {
 	fl_nwk_slave_process();
 #endif
 	/* SEND ADV */
-	fl_adv_sendFIFO_run();
+	if(fl_adv_sendFIFO_run()==0){
+		fl_adv_sendFIFO_History_run();
+	}
+
 }
