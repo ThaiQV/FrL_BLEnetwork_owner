@@ -82,9 +82,9 @@ extern u8 G_COUNTER_LCD[COUNTER_LCD_MESS_MAX][22];
 tbs_device_powermeter_t G_POWER_METER;
 #endif
 //flag debug of the network
-volatile u8 NWK_DEBUG_STT = 1; // it will be assigned into end-point byte (dbg :1bit)
+volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into end-point byte (dbg :1bit)
 volatile u8 NWK_REPEAT_MODE = 0; // 1: level | 0 : non-level
-volatile u8  NWK_REPEAT_LEVEL = 3;
+volatile u8  NWK_REPEAT_LEVEL = 2;
 /******************************************************************************/
 /******************************************************************************/
 /***                           Private definitions                           **/
@@ -456,9 +456,9 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 					memcpy(mac,&packet.frame.payload[0],SIZEU8(mac));
 					u8 ind_value = SIZEU8(mac);
 					//get from_index and to_index
-					u16 from_index = MAKE_U32(packet.frame.payload[ind_value],packet.frame.payload[ind_value+1],packet.frame.payload[ind_value+2],packet.frame.payload[ind_value+3]);
+					u16 from_index = MAKE_U32(packet.frame.payload[ind_value+3],packet.frame.payload[ind_value+2],packet.frame.payload[ind_value+1],packet.frame.payload[ind_value]);
 					ind_value = ind_value+4;
-					u16 to_index =MAKE_U32(packet.frame.payload[ind_value],packet.frame.payload[ind_value+1],packet.frame.payload[ind_value+2],packet.frame.payload[ind_value+3]);
+					u16 to_index =MAKE_U32(packet.frame.payload[ind_value+3],packet.frame.payload[ind_value+2],packet.frame.payload[ind_value+1],packet.frame.payload[ind_value]);
 					TBS_History_Get((u16)from_index,(u16)to_index);
 				}
 				//Non-rsp
