@@ -455,14 +455,13 @@ void fl_ble2wifi_HISTORY_SEND(u8* mac,u8* timetamp,u8* _data){
 	wfdata.data[1 + 6 + 4] = G_NODE_LIST.sla_info[ind_node].dev_type;
 	u8 data_len = 0;
 	if (G_NODE_LIST.sla_info[ind_node].dev_type == TBS_COUNTER) {
-		//wfdata.len_data = SIZEU8(tbs_device_counter_t) + 1; //+ status
+		wfdata.len_data = SIZEU8(tbs_device_counter_t) + 1; //+ status
 		data_len=COUNTER_DATA_INSTRUCT;
 	}
 	else if(G_NODE_LIST.sla_info[ind_node].dev_type == TBS_POWERMETER) {
-		//wfdata.len_data = SIZEU8(tbs_device_powermeter_t) + 1; //+ status
 		data_len=POWER_DATA_INSTRUCT;
+		wfdata.len_data = POWER_METER_BITSIZE +1;//SIZEU8(tbs_device_powermeter_t) + 1; //+ status
 	}
-	wfdata.len_data = data_len;
 	memcpy(&wfdata.data[1+6+4+1],_data,data_len);
 
 	wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);

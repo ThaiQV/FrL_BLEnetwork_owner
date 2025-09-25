@@ -142,7 +142,7 @@ int _nwk_slave_backup(void){
 void fl_nwk_slave_init(void) {
 //	PLOG_Start(ALL);
 	DEBUG_TURN(NWK_DEBUG_STT);
-//	fl_input_external_init();
+	fl_input_external_init();
 	FL_QUEUE_CLEAR(&G_HANDLE_CONTAINER,PACK_HANDLE_SIZE);
 	//Generate information
 	G_INFORMATION.active = false;
