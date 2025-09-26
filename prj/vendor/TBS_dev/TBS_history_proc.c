@@ -93,7 +93,6 @@ tbs_history_t G_HISTORY_CONTAINER[NUM_HISTORY];
 //EXAMPLE DATABASE
 u8 sample_history_database[NUM_HISTORY][DATA_HISTORY_SIZE];
 
-
 /******************************************************************************/
 /******************************************************************************/
 /***                       Functions declare                   		         **/
