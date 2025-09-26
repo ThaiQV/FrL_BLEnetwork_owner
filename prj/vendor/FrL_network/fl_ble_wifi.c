@@ -53,6 +53,8 @@ typedef enum {
 	GF_CMD_TIMESTAMP_RESPONSE = 0x08,
 	GF_CMD_RSTFACTORY_REQUEST = 0x0A,
 	GF_CMD_RSTFACTORY_RESPONSE = 0x0A,
+	GF_CMD_RSTPWMETER_REQUEST = 0x0D,
+	GF_CMD_RSTPWMETER_RESPONSE = 0x0D,
 }fl_wifi_cmd_e;
 
 typedef void (*RspFunc)(u8*);
@@ -97,7 +99,8 @@ void SENDMESS_REQUEST(u8* _pdata, RspFunc rspfnc);
 void SENDMESS_RESPONSE(u8* _pdata);
 void RSTFACTORY_REQUEST(u8* _pdata, RspFunc rspfnc);
 void RSTFACTORY_RESPONSE(u8* _pdata);
-
+void RSTPWMETER_REQUEST(u8* _pdata, RspFunc rspfnc);
+void RSTPWMETER_RESPONSE(u8* _pdata);
 
 fl_wifiprotocol_proc_t G_WIFI_CON[] = {
 			{ { GF_CMD_PING, PING_REQ }, { GF_CMD_PING, PING_RSP } }, //ping
@@ -107,6 +110,7 @@ fl_wifiprotocol_proc_t G_WIFI_CON[] = {
 			{ { GF_CMD_SENDMESS_REQUEST, SENDMESS_REQUEST }, {GF_CMD_SENDMESS_RESPONSE, SENDMESS_RESPONSE } },
 			{ { GF_CMD_TIMESTAMP_REQUEST, TIMETAMP_REQUEST }, {GF_CMD_TIMESTAMP_RESPONSE, TIMETAMP_RESPONSE } },
 			{ { GF_CMD_RSTFACTORY_REQUEST, RSTFACTORY_REQUEST }, {GF_CMD_RSTFACTORY_RESPONSE, RSTFACTORY_RESPONSE } },
+			{ { GF_CMD_RSTPWMETER_REQUEST, RSTPWMETER_REQUEST }, {GF_CMD_RSTPWMETER_RESPONSE, RSTPWMETER_RESPONSE } },
 			};
 
 #define GWIFI_SIZE 				(sizeof(G_WIFI_CON)/sizeof(G_WIFI_CON[0]))
@@ -203,6 +207,7 @@ void REPORT_REQUEST(u8* _pdata, RspFunc rspfnc) {
 		}
 	}
 }
+
 void REPORT_RESPONSE(u8* _pdata) {
 	extern fl_slaves_list_t G_NODE_LIST;
 	fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[1];
@@ -335,19 +340,26 @@ void TIMETAMP_RESPONSE(u8* _pdata) {
 	fl_ble_send_wifi((u8*)&wfdata,payload_len);
 }
 
-
-void _SENDMESS_slave_rsp_callback(void *_data,void* _data2){
-	fl_rsp_container_t *data =  (fl_rsp_container_t*)_data;
+/***************************************************
+ * @brief 		:slave RSP after sent REQ -> send rsp MAC to wifi
+ *
+ * @param[in] 	:none
+ *
+ * @return	  	:none
+ *
+ ***************************************************/
+void _slave_rsp_callbackNrspWifiMAC(fl_wifi_cmd_e _rsp_cmdID,void *_data, void* _data2){
+	fl_rsp_container_t *data = (fl_rsp_container_t*) _data;
 	//rsp data
-	if(data->timeout > 0){
-		LOGA(API,"RTT:%d ms\r\n",(data->timeout_set - data->timeout)/1000);
-		fl_pack_t *packet = (fl_pack_t *)_data2;
+	if (data->timeout > 0) {
+		LOGA(API,"RTT:%d ms\r\n",(data->timeout_set - data->timeout) / 1000);
+		fl_pack_t *packet = (fl_pack_t *) _data2;
 		P_PRINTFHEX_A(API,packet->data_arr,packet->length,"RSP: ");
 		//Rsp to WIFI
 		u8 mac[6];
 		if (fl_master_SlaveMAC_get(data->rsp_check.slaveID,mac) != -1) {
 			fl_datawifi2ble_t wfdata;
-			wfdata.cmd = G_WIFI_CON[_wf_CMD_find(GF_CMD_SENDMESS_REQUEST)].rsp.cmd;
+			wfdata.cmd = _rsp_cmdID;
 			memset(wfdata.data,0,SIZEU8(wfdata.data));
 			memcpy(wfdata.data,mac,SIZEU8(mac));
 			wfdata.len_data = SIZEU8(mac);
@@ -355,13 +367,15 @@ void _SENDMESS_slave_rsp_callback(void *_data,void* _data2){
 			u8 payload_len = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
 			fl_ble_send_wifi((u8*) &wfdata,payload_len);
 		}
-	}
-	else{
-		LOGA(API,"RTT: TIMEOUT (%d ms)\r\n",(data->timeout_set)/1000);
+	} else {
+		LOGA(API,"RTT: TIMEOUT (%d ms)\r\n",(data->timeout_set) / 1000);
 	}
 	LOGA(API,"cmdID  :%02X\r\n",data->rsp_check.hdr_cmdid);
 	LOGA(API,"SlaveID:%d\r\n",data->rsp_check.slaveID);
 	LOGA(API,"SeqTT  :%d\r\n",data->rsp_check.seqTimetamp);
+}
+void _SENDMESS_slave_rsp_callback(void *_data,void* _data2){
+	_slave_rsp_callbackNrspWifiMAC(G_WIFI_CON[_wf_CMD_find(GF_CMD_SENDMESS_REQUEST)].rsp.cmd,_data,_data2);
 }
 
 void SENDMESS_REQUEST(u8* _pdata, RspFunc rspfnc){
@@ -383,6 +397,7 @@ void SENDMESS_REQUEST(u8* _pdata, RspFunc rspfnc){
 	//convert hex to dec : location index message
 	data->data[SIZEU8(mac)] = data->data[SIZEU8(mac)]-0x30;
 	memcpy(message,&data->data[SIZEU8(mac)],len_mess);
+
 	fl_api_master_req(mac,NWK_HDR_F6_SENDMESS,message,len_mess,&_SENDMESS_slave_rsp_callback,200,1);
 	if (rspfnc != 0) {
 		//don't reponse in here => wait slave rsp or timeout
@@ -390,8 +405,34 @@ void SENDMESS_REQUEST(u8* _pdata, RspFunc rspfnc){
 }
 
 void SENDMESS_RESPONSE(u8* _pdata){
-
 }
+
+void _RSTPWMETER_slave_rsp_callback(void *_data, void* _data2) {
+	_slave_rsp_callbackNrspWifiMAC(G_WIFI_CON[_wf_CMD_find(GF_CMD_RSTPWMETER_REQUEST)].rsp.cmd,_data,_data2);
+}
+
+void RSTPWMETER_REQUEST(u8* _pdata, RspFunc rspfnc){
+	fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[1];
+	LOGA(MCU,"LEN:0x%02X\r\n",data->len_data);
+	LOGA(MCU,"cmdID:0x%02X\r\n",data->cmd);
+	LOGA(MCU,"CRC8:0x%02X\r\n",data->crc8);
+	P_PRINTFHEX_A(MCU,data->data,data->len_data,"Data:");
+	u8 crc8_cal = fl_crc8(data->data,data->len_data);
+	if (crc8_cal != data->crc8) {
+		ERR(MCU,"ERR >> CRC8:0x%02X | 0x%02X\r\n",data->crc8,crc8_cal);
+		return;
+	}
+	u8 mac[6];
+	memcpy(mac,data->data,SIZEU8(mac));
+	u8 message[22]; //max payload adv
+	memset(message,0,SIZEU8(message));
+	memcpy(message,&data->data[SIZEU8(mac)],3);
+	fl_api_master_req(mac,NWK_HDR_F7_RSTPWMETER,message,3,&_RSTPWMETER_slave_rsp_callback,200,1);
+	if (rspfnc != 0) {
+		//don't reponse in here => wait slave rsp or timeout
+	}
+}
+void RSTPWMETER_RESPONSE(u8* _pdata){};
 
 void RSTFACTORY_REQUEST(u8* _pdata, RspFunc rspfnc){
 	fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[1];

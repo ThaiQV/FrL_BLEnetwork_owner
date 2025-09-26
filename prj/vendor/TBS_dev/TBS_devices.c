@@ -241,8 +241,12 @@ void TBS_PowerMeter_Run(void){
 /***                            Functions callback                           **/
 /******************************************************************************/
 /******************************************************************************/
-
-
+#ifdef POWER_METER_DEVICE
+void TBS_PowerMeter_RESETbyMaster(u8 _ch1,u8 _ch2,u8 _ch3){
+	ERR(PERI,"Master RESET PWMeter channel:%d-%d-%d\r\n",_ch1,_ch2,_ch3);
+	//todo: RESET pwmeter struct
+}
+#endif
 /******************************************************************************/
 /******************************************************************************/
 /***                      Processing functions 					             **/

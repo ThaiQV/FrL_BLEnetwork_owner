@@ -39,7 +39,7 @@ u8 GETINFO_FLAG_EVENTTEST = 0;
 #define RECHECKING_NETWOK_TIME 		30*1000 		    //ms
 #define RECONNECT_TIME				60*1000*1000		//s
 
-fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_A5_HIS,NWK_HDR_F6_SENDMESS,NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
+fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_A5_HIS,NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
 fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_A5_HIS,NWK_HDR_55,NWK_HDR_RECONNECT}; // register cmdid REQ
 
 #define NWK_HDR_SIZE (sizeof(G_NWK_HDR_LIST)/sizeof(G_NWK_HDR_LIST[0]))
@@ -487,6 +487,31 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 
 					}
 					else{
+						//Non-rsp
+						packet_built.length = 0;
+						return packet_built;
+					}
+				}
+#endif
+			}
+		}
+		break;
+		case NWK_HDR_F7_RSTPWMETER: {
+			if (IsJoinedNetwork()) {
+#ifdef POWER_METER_DEVICE
+				//check packet_slaveid
+				if (packet.frame.slaveID.id_u8 == G_INFORMATION.slaveID.id_u8) {
+					TBS_PowerMeter_RESETbyMaster(packet.frame.payload[0],packet.frame.payload[1],packet.frame.payload[2]);
+					if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
+						u8 ok[2] = { 'o', 'k' };
+						memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
+						memcpy(packet.frame.payload,ok,SIZEU8(ok));
+						//change endpoint to node source
+						packet.frame.endpoint.master = FL_FROM_SLAVE;
+						//add repeat_cnt
+						packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
+
+					} else {
 						//Non-rsp
 						packet_built.length = 0;
 						return packet_built;
