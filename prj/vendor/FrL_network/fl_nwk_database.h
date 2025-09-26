@@ -81,6 +81,7 @@ fl_db_master_profile_t fl_db_masterprofile_init(void);
 void fl_db_masterprofile_save(fl_db_master_profile_t entry);
 fl_db_master_profile_t fl_db_masterprofile_load(void);
 #else
+
 typedef struct {
 	u8 slaveid;
 	struct {
@@ -88,6 +89,7 @@ typedef struct {
 		u8 private_key[NWK_PRIVATE_KEY_SIZE];//todo: encrypt
 		u32 mac_parent;
 	} nwk;
+//	u16 parameters[4]; //change size if we need more parametes
 	struct {
 		u8 rst_factory;
 		u8 join_nwk;

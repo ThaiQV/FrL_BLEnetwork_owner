@@ -81,6 +81,7 @@ u8 G_COUNTER_LCD[COUNTER_LCD_MESS_MAX][22];
 #endif
 #ifdef POWER_METER_DEVICE
 
+u16 G_POWER_METER_PARAMETER[3]; //
 tbs_device_powermeter_t G_POWER_METER = {
 				        .mac = {0, 0, 0, 0, 0, 0},
 				        .timetamp = 0,
@@ -209,6 +210,7 @@ void TBS_Counter_Run(void){
 #ifdef POWER_METER_DEVICE
 void TBS_PowerMeter_init(void){
 	memcpy(G_POWER_METER.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_POWER_METER.mac));
+
 	G_POWER_METER.type = TBS_POWERMETER;
 	G_POWER_METER.timetamp= fl_rtc_get();
 	test_powermeter();
@@ -241,8 +243,21 @@ void TBS_PowerMeter_Run(void){
 /***                            Functions callback                           **/
 /******************************************************************************/
 /******************************************************************************/
+#ifdef POWER_METER_DEVICE
 
+void TBS_PowerMeter_RESETbyMaster(u8 _ch1,u8 _ch2,u8 _ch3){
+	ERR(PERI,"Master RESET PWMeter channel:%d-%d-%d\r\n",_ch1,_ch2,_ch3);
+	//todo: RESET pwmeter struct
+}
 
+void TBS_PwMeter_SetThreshod(u16 _chn1,u16 _chn2,u16 _chn3){
+	ERR(PERI,"Master SET Threshold channel:%d-%d-%d\r\n",_chn1,_chn2,_chn3);
+	G_POWER_METER_PARAMETER[0]=_chn1;
+	G_POWER_METER_PARAMETER[1]=_chn2;
+	G_POWER_METER_PARAMETER[2]=_chn3;
+}
+
+#endif
 /******************************************************************************/
 /******************************************************************************/
 /***                      Processing functions 					             **/

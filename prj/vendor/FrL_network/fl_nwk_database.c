@@ -38,7 +38,7 @@ fl_slave_profiles_t SLAVE_PROFILE_DEFAULT = {
 											.magic= SLAVE_PROFILE_MAGIC,
 											.run_stt.rst_factory = 0,
 											.run_stt.join_nwk = 0,
-											.nwk = {.chn = {37,38,39},.mac_parent = 0xFF},
+											.nwk = {.chn = {37,38,39}},
 											};
 #endif
 
@@ -322,6 +322,7 @@ fl_slave_profiles_t fl_db_slaveprofile_init(void){
 	LOGA(FLA,"SlaveID:%d\r\n",profile.slaveid);
 	LOGA(FLA,"NWK channel:%d |%d |%d \r\n",profile.nwk.chn[0],profile.nwk.chn[1],profile.nwk.chn[2]);
 	LOGA(FLA,"NWK Parent(%d):0x%X\r\n",profile.run_stt.join_nwk,profile.nwk.mac_parent);
+//	P_PRINTFHEX_A(FLA,profile.parameters,sizeof(profile.parameters)/sizeof(profile.parameters[0]),"Parameters(%d}:",sizeof(profile.parameters)/sizeof(profile.parameters[0]));
 	LOGA(FLA,"Factory Reset:%d\r\n",profile.run_stt.rst_factory);
 	LOGA(FLA,"NWK Key:%s(%02X%02X)\r\n",(profile.nwk.private_key[0] != 0xFF && profile.nwk.private_key[1] != 0xFF )?"*****":"NULL",profile.nwk.private_key[0],profile.nwk.private_key[1]);
 	return profile;

@@ -17,10 +17,12 @@ typedef enum{
 }tbs_dev_type_e;
 
 #ifndef MASTER_CORE
-#define COUNTER_DEVICE
+//#define COUNTER_DEVICE
 #define COUNTER_LCD_MESS_MAX		10
 #ifndef COUNTER_DEVICE
 #define POWER_METER_DEVICE
+void TBS_PowerMeter_RESETbyMaster(u8 _ch1,u8 _ch2,u8 _ch3);
+void TBS_PwMeter_SetThreshod(u16 _chn1,u16 _chn2,u16 _chn3);
 #endif
 #endif
 void tbs_counter_printf(void* _p);
