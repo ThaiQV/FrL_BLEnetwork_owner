@@ -38,7 +38,10 @@ fl_slave_profiles_t SLAVE_PROFILE_DEFAULT = {
 											.magic= SLAVE_PROFILE_MAGIC,
 											.run_stt.rst_factory = 0,
 											.run_stt.join_nwk = 0,
-											.nwk = {.chn = {37,38,39},.mac_parent = 0xFF},
+											.nwk = {.chn = {37,38,39}},
+											};
+fl_slave_settings_t SLAVE_SETTINGS_DEFAULT = {
+											.magic= SLAVE_PROFILE_MAGIC,
 											};
 #endif
 
@@ -301,6 +304,8 @@ void fl_db_slaveprofile_save(fl_slave_profiles_t entry) {
 	flash_erase_sector(ADDR_SLAVE_PROFILE_START);
 	flash_page_program(ADDR_SLAVE_PROFILE_START,SLAVE_PROFILE_ENTRY_SIZE,(uint8_t*) &entry);
 }
+
+
 /***************************************************
  * @brief 		: initialization slave profile database
  *
@@ -322,9 +327,76 @@ fl_slave_profiles_t fl_db_slaveprofile_init(void){
 	LOGA(FLA,"SlaveID:%d\r\n",profile.slaveid);
 	LOGA(FLA,"NWK channel:%d |%d |%d \r\n",profile.nwk.chn[0],profile.nwk.chn[1],profile.nwk.chn[2]);
 	LOGA(FLA,"NWK Parent(%d):0x%X\r\n",profile.run_stt.join_nwk,profile.nwk.mac_parent);
+//	P_PRINTFHEX_A(FLA,profile.parameters,sizeof(profile.parameters)/sizeof(profile.parameters[0]),"Parameters(%d}:",sizeof(profile.parameters)/sizeof(profile.parameters[0]));
 	LOGA(FLA,"Factory Reset:%d\r\n",profile.run_stt.rst_factory);
 	LOGA(FLA,"NWK Key:%s(%02X%02X)\r\n",(profile.nwk.private_key[0] != 0xFF && profile.nwk.private_key[1] != 0xFF )?"*****":"NULL",profile.nwk.private_key[0],profile.nwk.private_key[1]);
 	return profile;
+}
+/***************************************************
+ * @brief 		: read settings in flash
+ *
+ * @param[in] 	:none
+ *
+ * @return	  	:settings struct
+ *
+ ***************************************************/
+fl_slave_settings_t fl_db_slavesettings_load(void) {
+	fl_slave_settings_t entry;
+	for (s16 i = SLAVE_SETTINGS_MAX_ENTRIES - 1; i >= 0; i--) {
+		flash_dread(ADDR_SLAVE_SETTINGS_START + i * SLAVE_SETTINGS_ENTRY_SIZE,SLAVE_SETTINGS_ENTRY_SIZE,(uint8_t*) &entry);
+		if (entry.magic == SLAVE_SETTINGS_MAGIC) {
+			LOGA(FLA,"SLAVE SETTINGS Load(0x%X)\r\n",ADDR_SLAVE_SETTINGS_START + i * SLAVE_SETTINGS_ENTRY_SIZE);
+			return entry;
+		}
+	}
+	return entry;
+}
+/***************************************************
+ * @brief 		:store settings into the flash
+ *
+ * @param[in] 	:none
+ *
+ * @return	  	:settings struct
+ *
+ ***************************************************/
+void fl_db_slavesettings_save(u8 *_data,u8 _size) {
+	fl_slave_settings_t entry;
+	memset(entry.setting_arr,0,sizeof(entry.setting_arr));
+	memcpy(entry.setting_arr,_data,_size);
+	entry.magic = SLAVE_SETTINGS_MAGIC;
+	fl_slave_settings_t check;
+	for (u16 i = 0; i < SLAVE_SETTINGS_MAX_ENTRIES; i++) {
+		check.magic = 0;
+		flash_dread(ADDR_SLAVE_SETTINGS_START + i * SLAVE_SETTINGS_ENTRY_SIZE,SLAVE_SETTINGS_ENTRY_SIZE,(uint8_t*) &check);
+		if (check.magic != SLAVE_SETTINGS_MAGIC) {
+			flash_page_program(ADDR_SLAVE_SETTINGS_START + i * SLAVE_SETTINGS_ENTRY_SIZE,SLAVE_SETTINGS_ENTRY_SIZE,(uint8_t*) &entry);
+			LOGA(FLA,"SLAVE SETTINGS Stored(0x%X)\r\n",ADDR_SLAVE_SETTINGS_START + i * SLAVE_SETTINGS_ENTRY_SIZE);
+			return;
+		}
+	}
+	flash_erase_sector(ADDR_SLAVE_SETTINGS_START);
+	flash_page_program(ADDR_SLAVE_SETTINGS_START,SLAVE_SETTINGS_ENTRY_SIZE,(uint8_t*) &entry);
+}
+
+/***************************************************
+ * @brief 		: initialization slave settings database
+ *
+ * @param[in] 	: none
+ *
+ * @return	  	: none
+ *
+ ***************************************************/
+fl_slave_settings_t fl_db_slavesettings_init(void){
+	fl_slave_settings_t settings;
+	settings = fl_db_slavesettings_load();
+	if(settings.magic != SLAVE_SETTINGS_MAGIC){
+		//clear all and write default settings
+		flash_erase_sector(ADDR_SLAVE_SETTINGS_START);
+		memset(SLAVE_SETTINGS_DEFAULT.setting_arr,0,sizeof(SLAVE_SETTINGS_DEFAULT.setting_arr));
+		fl_db_slavesettings_save(SLAVE_SETTINGS_DEFAULT.setting_arr,sizeof(SLAVE_SETTINGS_DEFAULT.setting_arr));
+		settings = fl_db_slavesettings_load();
+	}
+	return settings;
 }
 #endif
 /******************************************************************************/
@@ -355,6 +427,8 @@ void fl_db_init(void) {
 	LOGA(FLA,"MASTERPROFILE (%d):0x%X-0x%X\r\n",MASTER_PROFILE_ENTRY_SIZE,ADDR_MASTER_PROFILE_START,ADDR_MASTER_PROFILE_START+MASTERPROFILE_SIZE);
 #else
 	LOGA(FLA,"SLAVEPROFILE  (%d):0x%X-0x%X\r\n",SLAVE_PROFILE_ENTRY_SIZE,ADDR_SLAVE_PROFILE_START,ADDR_SLAVE_PROFILE_START+SLAVEPROFILE_SIZE);
+	LOGA(FLA,"SLAVESETTINGS (%d):0x%X-0x%X\r\n",SLAVE_SETTINGS_ENTRY_SIZE,ADDR_SLAVE_SETTINGS_START,ADDR_SLAVE_SETTINGS_START+SLAVESETTINGS_SIZE);
+
 #endif
 }
 void fl_db_all_save(void){
@@ -368,6 +442,7 @@ void fl_db_clearAll(void){
 	flash_erase_sector(ADDR_MASTER_PROFILE_START);
 #else
 	flash_erase_sector(ADDR_SLAVE_PROFILE_START);
+	flash_erase_sector(ADDR_SLAVE_SETTINGS_START);
 #endif
 }
 /******************************************************************************/

@@ -18,8 +18,9 @@
  * @brief	callback function for rsp
  */
 typedef void (*fl_rsp_callback_fnc)(void*, void*);
-#define QUEUE_RSP_SLOT_MAX		16
-#define QUEUQ_REQcRSP_INTERVAL  20*1000 //ms
+
+#define QUEUE_RSP_SLOT_MAX			16
+#define QUEUQ_REQcRSP_INTERVAL  	20*1000 //ms
 
 #define RAND(min, max)				((rand() % ((max) - (min) + 1)) + (min))
 #define RAND_INT(min, max)  		((rand() % ((min) + (max) + 1)) - (min))
@@ -36,9 +37,12 @@ typedef enum {
 	NWK_HDR_RECONNECT = 0x11,
 	/*Frl protocols*/
 	NWK_HDR_55 = 0x55, // REQ from slave
+	NWK_HDR_A5_HIS=0xA5, //history
 	// master -> req -> slave -> rsp
 	NWK_HDR_F5_INFO = 0xF5, //get data information real-time
 	NWK_HDR_F6_SENDMESS = 0xF6, //send mess to slave
+	NWK_HDR_F7_RSTPWMETER = 0xF7, //Send req to rst pwmeter
+	NWK_HDR_F8_PWMETER_SET = 0xF8, //Send req to set parameter's pwmeter
 	NWK_HDR_ASSIGN = 0xFC,	//Use to assign SlaveID to slave
 	NWK_HDR_HEARTBEAT = 0xFD,
 	NWK_HDR_COLLECT = 0xFE, //Use to collect slave (master and slaves)
@@ -78,15 +82,18 @@ typedef union {
 	u8 bytes[SIZEU8(fl_dataframe_format_t)];
 }__attribute__((packed)) fl_data_frame_u;
 
-/* COUNTER DEVICE
+/* COUNTER DEVICE - old
  * |Call butt|End call butt|Reset button|Pass product|Error product|Reserve| (sum 22 bytes)
  * |   1B	 |      1B     |     1B     |    4Bs     |     4Bs     |  11Bs |
  * */
-typedef union {
+/* New: detail in the protocol document*/
+typedef struct {
+	u8 mac[6];         // MAC address (48 bits)
+	u32 timetamp;     // timetamp (32 bits)
+	u8 type;			//device type
 	struct {
-		u8 mac[6];
-		u32 timetamp;
-		u8 type;
+		//add new index of packet
+		u16 index;
 		u8 bt_call;
 		u8 bt_endcall;
 		u8 bt_rst;
@@ -94,50 +101,50 @@ typedef union {
 		u16 err_product;
 		//add new mode and indx
 		u8 mode;
-		//previous_status
-//		u16 pre_pass_product;
-//		u16 pre_err_product;
-//		u8 pre_mode;
-		//add new index of packet
-//		u16 index;
-		//reverse
+	//previous_status
+		u16 pre_pass_product;
+		u16 pre_err_product;
+		u8 pre_mode;
+	//reverse
 //		u8 reverse[7];
 	} data;
-	u8 bytes[22];
 }__attribute__((packed)) tbs_device_counter_t;
 
-//typedef struct {
-//	u8 len;
-//	u8 message[22];
-//}__attribute__((packed)) tbs_counter_lcd_t;
+#define COUNTER_STRUCT_SIZE			(SIZEU8(tbs_device_counter_t))
+#define COUNTER_DATA_INSTRUCT		15
 //For POWER-METER DEVICEs
 /*
  * | Frequency | Voltage | Current 1 | Current 2 | Current 3 | Power 1 | Power 2 | Power 3 | Energy 1 | Energy 2 | Energy 3 | Reserve | (sum 176 bits)
  * |   7 bits  |  9 bits |  10 bits  |  10 bits  |  10 bits  | 14 bits | 14 bits | 14 bits | 24 bits  | 24 bits  | 24 bits  | 16 bits |
  */
 typedef struct {
-	u8 mac[6];         // MAC address (48 bits)
-	u32 timetamp;     // timetamp (32 bits)
+	u8 mac[6];         	// MAC address (48 bits)
+	u32 timetamp;     	// timetamp (32 bits)
 	u8 type;			//device type
 	// Measurement fields (bit-level precision noted)
 	struct {
-		u8 frequency;      // 7 bits
-		u16 voltage;       // 9 bits
-		u16 current1;      // 10 bits
-		u16 current2;      // 10 bits
-		u16 current3;      // 10 bits
-		u16 power1;        // 14 bits
-		u16 power2;        // 14 bits
-		u16 power3;        // 14 bits
-		u32 energy1;       // 24 bits
-		u32 energy2;       // 24 bits
-		u32 energy3;       // 24 bits
-		u16 reserve;       // 16 bits
+
+		u16 index;          // 16 bits
+		u8 frequency;     	// 7 bits
+		u16 voltage;        // 9 bits
+		u16 current1;       // 10 bits
+		u16 current2;       // 10 bits
+		u16 current3;       // 10 bits
+		u8 power1;          // 8 bits
+		u8 power2;          // 8 bits
+		u8 power3;          // 8 bits
+		u8 time1;           // 6 bits
+		u8 time2;           // 6 bits
+		u8 time3;           // 6 bits
+		u32 energy1;        // 24 bits
+		u32 energy2;        // 24 bits
+		u32 energy3;        // 24 bits
 	} data;
 }__attribute__((packed)) tbs_device_powermeter_t;
 
 #define POWER_METER_STRUCT_BYTESIZE			(SIZEU8(tbs_device_powermeter_t))
 #define POWER_METER_BITSIZE					34
+#define POWER_DATA_INSTRUCT					22
 static inline void tbs_pack_powermeter_data(const tbs_device_powermeter_t *src, u8 *dst) {
     u32 bitpos = 0;
     u32 byte_idx = 0;
@@ -166,14 +173,18 @@ static inline void tbs_pack_powermeter_data(const tbs_device_powermeter_t *src, 
         bitpos += (bits); \
     } while (0)
 
+    WRITE_BITS(src->data.index, 16);
     WRITE_BITS(src->data.frequency, 7);
     WRITE_BITS(src->data.voltage, 9);
     WRITE_BITS(src->data.current1, 10);
     WRITE_BITS(src->data.current2, 10);
     WRITE_BITS(src->data.current3, 10);
-    WRITE_BITS(src->data.power1, 14);
-    WRITE_BITS(src->data.power2, 14);
-    WRITE_BITS(src->data.power3, 14);
+    WRITE_BITS(src->data.power1, 8);
+    WRITE_BITS(src->data.power2, 8);
+    WRITE_BITS(src->data.power3, 8);
+    WRITE_BITS(src->data.time1, 6);
+    WRITE_BITS(src->data.time2, 6);
+    WRITE_BITS(src->data.time3, 6);
     WRITE_BITS(src->data.energy1, 24);
     WRITE_BITS(src->data.energy2, 24);
     WRITE_BITS(src->data.energy3, 24);
@@ -208,14 +219,18 @@ static inline void tbs_unpack_powermeter_data(tbs_device_powermeter_t *dst, cons
         bitpos += (bits); \
     } while (0)
 
+    READ_BITS(dst->data.index, 16);
     READ_BITS(dst->data.frequency, 7);
     READ_BITS(dst->data.voltage, 9);
     READ_BITS(dst->data.current1, 10);
     READ_BITS(dst->data.current2, 10);
     READ_BITS(dst->data.current3, 10);
-    READ_BITS(dst->data.power1, 14);
-    READ_BITS(dst->data.power2, 14);
-    READ_BITS(dst->data.power3, 14);
+    READ_BITS(dst->data.power1, 8);
+    READ_BITS(dst->data.power2, 8);
+    READ_BITS(dst->data.power3, 8);
+    READ_BITS(dst->data.time1, 6);
+    READ_BITS(dst->data.time2, 6);
+    READ_BITS(dst->data.time3, 6);
     READ_BITS(dst->data.energy1, 24);
     READ_BITS(dst->data.energy2, 24);
     READ_BITS(dst->data.energy3, 24);
@@ -315,6 +330,7 @@ void fl_nwk_master_heartbeat_run(void);
 fl_pack_t fl_master_packet_GetInfo_build(u8 *_slave_mac_arr, u8 _slave_num);
 s8 fl_master_packet_F5_CreateNSend(u8 *_slave_mac_arr, u8 _slave_num);
 void fl_master_nodelist_AddRefesh(fl_nodeinnetwork_t _node);
+s16 fl_master_Node_find(u8 *_mac);
 s16 fl_master_SlaveID_find(u8 _id);
 u8 fl_master_SlaveID_get(u8* _mac);
 s8 fl_master_SlaveMAC_get(u8 _slaveid,u8* mac);
@@ -323,6 +339,7 @@ s8 fl_queue_REQcRSP_ScanRec(fl_pack_t _pack);
 s8 fl_api_master_req(u8* _mac_slave,u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry);
 #else
 extern volatile u8 NWK_DEBUG_STT; // it will be assigned into end-point byte (dbg :1bit);
+u8 fl_nwk_mySlaveID(void);
 void fl_nwk_slave_init(void);
 void fl_nwk_slave_run(fl_pack_t *_pack_handle);
 void fl_nwk_slave_process(void);
@@ -338,5 +355,4 @@ s8 fl_queueREQcRSP_add(u8 slaveid,u8 cmdid,u32 _SeqTimetamp,u8* _payloadreq,u8 _
 void fl_queue_REQnRSP_TimeoutInit(void);
 void fl_adv_setting_update(void);
 int fl_adv_sendFIFO_add(fl_pack_t _pack);
-
 #endif /* VENDOR_FRL_NETWORK_FL_NWK_HANDLER_H_ */

@@ -32,6 +32,8 @@
 
 #define SLAVEPROFILE_SIZE				SECTOR_FLASH_SIZE
 
+#define SLAVESETTINGS_SIZE				SECTOR_FLASH_SIZE
+
 #define MASTERPROFILE_SIZE				SECTOR_FLASH_SIZE
 //////// ======================================================================
 #define ADDR_RTC_START					(ADDR_USERAREA_START)
@@ -81,6 +83,7 @@ fl_db_master_profile_t fl_db_masterprofile_init(void);
 void fl_db_masterprofile_save(fl_db_master_profile_t entry);
 fl_db_master_profile_t fl_db_masterprofile_load(void);
 #else
+
 typedef struct {
 	u8 slaveid;
 	struct {
@@ -88,6 +91,7 @@ typedef struct {
 		u8 private_key[NWK_PRIVATE_KEY_SIZE];//todo: encrypt
 		u32 mac_parent;
 	} nwk;
+//	u16 parameters[4]; //change size if we need more parametes
 	struct {
 		u8 rst_factory;
 		u8 join_nwk;
@@ -104,6 +108,21 @@ typedef struct {
 fl_slave_profiles_t fl_db_slaveprofile_init(void);
 void fl_db_slaveprofile_save(fl_slave_profiles_t entry);
 fl_slave_profiles_t fl_db_slaveprofile_load(void);
+
+typedef struct {
+	u8 setting_arr[10 * 22]; //MAX size = num of slot LCD * max size characters
+	//Don't change
+	u32 magic; // constant for LSB
+}__attribute__((packed)) fl_slave_settings_t;
+
+#define ADDR_SLAVE_SETTINGS_START		(ADDR_SLAVE_PROFILE_START + SLAVEPROFILE_SIZE)
+#define SLAVE_SETTINGS_MAGIC 			0xEEEEEEEE
+#define SLAVE_SETTINGS_ENTRY_SIZE       (sizeof(fl_slave_settings_t)/sizeof(u8))
+#define SLAVE_SETTINGS_MAX_ENTRIES      (SLAVESETTINGS_SIZE / SLAVE_SETTINGS_ENTRY_SIZE - 1)
+
+fl_slave_settings_t fl_db_slavesettings_init(void);
+void fl_db_slavesettings_save(u8 *_data,u8 _size);
+fl_slave_settings_t fl_db_slavesettings_load(void);
 
 #endif
 //////// ======================================================================

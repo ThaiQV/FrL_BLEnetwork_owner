@@ -53,7 +53,7 @@ volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into endpoint byte (dbg :1
 volatile u8 NWK_REPEAT_MODE = 0; // 1: level | 0 : non-level
 volatile u8 NWK_REPEAT_LEVEL = 3;
 
-fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_F6_SENDMESS}; // register cmdid REQ
+fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_A5_HIS, NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET}; // register cmdid REQ
 
 #define NWK_HDR_REQ_SIZE (sizeof(G_NWK_HDR_REQLIST)/sizeof(G_NWK_HDR_REQLIST[0]))
 
@@ -71,6 +71,7 @@ static inline u8 IsREQHDR(fl_hdr_nwk_type_e cmdid) {
 /***                           Private definitions                           **/
 /******************************************************************************/
 /******************************************************************************/
+s16 fl_master_Node_find(u8 *_mac);
 u8 fl_master_SlaveID_get(u8* _mac);
 s16 fl_master_SlaveID_find(u8 _id);
 void fl_nwk_master_nodelist_init(void);
@@ -535,37 +536,57 @@ u32 fl_req_master_packet_createNsend(u8* _slave_mac,u8 _cmdid,u8* _data, u8 _len
 		ERR(API,"SlaveID NOT FOUND!!\r\n");
 		return 0;
 	}
+	fl_send_heartbeat();
 	//generate seqtimetamp
 	fl_timetamp_withstep_t timetampStep = fl_rtc_getWithMilliStep();
 	timetampStep.milstep++;
 	fl_data_frame_u req_pack;
+	/*Create common packet */
+	req_pack.frame.hdr = cmdid;
+	req_pack.frame.timetamp[0] = U32_BYTE0(timetampStep.timetamp);
+	req_pack.frame.timetamp[1] = U32_BYTE1(timetampStep.timetamp);
+	req_pack.frame.timetamp[2] = U32_BYTE2(timetampStep.timetamp);
+	req_pack.frame.timetamp[3] = U32_BYTE3(timetampStep.timetamp);
+
+	//Add new mill-step
+	req_pack.frame.milltamp = timetampStep.milstep;
+	LOGA(INF,"Send %02X REQ to Slave %d:%d/%d\r\n",req_pack.frame.hdr,slaveID,timetampStep.timetamp,timetampStep.milstep);
+
+	req_pack.frame.slaveID.id_u8 = slaveID;
+	//Create payload
+	memset(req_pack.frame.payload,0x0,SIZEU8(req_pack.frame.payload));
+	memcpy(req_pack.frame.payload,_data,_len);
+	//crc
+	req_pack.frame.crc8 = fl_crc8(req_pack.frame.payload,SIZEU8(req_pack.frame.payload));
+
+	//create endpoint
+	req_pack.frame.endpoint.dbg = NWK_DEBUG_STT;
+	req_pack.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
+	req_pack.frame.endpoint.rep_settings = NWK_REPEAT_LEVEL;
+	req_pack.frame.endpoint.repeat_mode = NWK_REPEAT_MODE;
+	//Create packet from slave
+	req_pack.frame.endpoint.master = FL_FROM_MASTER;
+	/*======================*/
 	switch (cmdid) {
-		case NWK_HDR_F6_SENDMESS: {
-			req_pack.frame.hdr = cmdid;
-
-			req_pack.frame.timetamp[0] = U32_BYTE0(timetampStep.timetamp);
-			req_pack.frame.timetamp[1] = U32_BYTE1(timetampStep.timetamp);
-			req_pack.frame.timetamp[2] = U32_BYTE2(timetampStep.timetamp);
-			req_pack.frame.timetamp[3] = U32_BYTE3(timetampStep.timetamp);
-
-			//Add new mill-step
-			req_pack.frame.milltamp = timetampStep.milstep;
-			LOGA(INF,"Send F6 REQ to Slave %d:%d/%d\r\n",slaveID,timetampStep.timetamp,timetampStep.milstep);
-
-			req_pack.frame.slaveID.id_u8 = slaveID;
-			//Create payload
-			memset(req_pack.frame.payload,0x0,SIZEU8(req_pack.frame.payload));
-			memcpy(req_pack.frame.payload,_data,_len);
-			//crc
-			req_pack.frame.crc8 = fl_crc8(req_pack.frame.payload,SIZEU8(req_pack.frame.payload));
-
-			//create endpoint
-			req_pack.frame.endpoint.dbg = NWK_DEBUG_STT;
-			req_pack.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
-			req_pack.frame.endpoint.rep_settings = NWK_REPEAT_LEVEL;
-			req_pack.frame.endpoint.repeat_mode = NWK_REPEAT_MODE;
+		case NWK_HDR_A5_HIS:{
 			//Create packet from slave
-			req_pack.frame.endpoint.master = FL_FROM_MASTER_ACK;
+			req_pack.frame.endpoint.master = FL_FROM_MASTER;
+		}
+			break;
+		case NWK_HDR_F6_SENDMESS: {
+			if (G_NODE_LIST.sla_info[slaveID].dev_type == TBS_COUNTER) {
+				req_pack.frame.endpoint.master = FL_FROM_MASTER_ACK;
+			}
+		}
+		break;
+		case NWK_HDR_F7_RSTPWMETER:
+		case NWK_HDR_F8_PWMETER_SET:
+		{
+			if(G_NODE_LIST.sla_info[slaveID].dev_type==TBS_POWERMETER){
+				req_pack.frame.endpoint.master = FL_FROM_MASTER_ACK;
+			}else{
+				return 0;
+			}
 		}
 		break;
 		default:
@@ -577,7 +598,6 @@ u32 fl_req_master_packet_createNsend(u8* _slave_mac,u8 _cmdid,u8* _data, u8 _len
 	memcpy(rslt.data_arr,req_pack.bytes,rslt.length );
 	P_PRINTFHEX_A(INF,rslt.data_arr,rslt.length,"REQ %X ",_cmdid);
 	//Send ADV
-	fl_send_heartbeat();
 	s8 add_rslt = fl_adv_sendFIFO_add(rslt);
 	u32 seq_timetamp = 0;
 	if(add_rslt!=-1){
@@ -598,7 +618,7 @@ s8 fl_api_master_req(u8* _mac_slave,u8 _cmdid, u8* _data, u8 _len, fl_rsp_callba
 		if(seq_timetamp){
 			return fl_queueREQcRSP_add(fl_master_Node_find(_mac_slave),_cmdid,seq_timetamp,_data,_len,&_cb,_timeout_ms,_retry);
 		}
-	} else if(_cb == 0 && _timeout_ms ==0){
+	} else if(_timeout_ms ==0){
 		return (fl_req_master_packet_createNsend(_mac_slave,_cmdid,_data,_len) == 0?-1:0); // none rsp
 	}
 	ERR(API,"Can't register REQ (%d/%d ms)!!\r\n",(u32)_cb,_timeout_ms);
@@ -685,7 +705,7 @@ static void _master_updateDB_for_Node(u8 node_indx ,fl_data_frame_u *packet)  {
 	G_NODE_LIST.sla_info[node_indx].timelife = (clock_time() - G_NODE_LIST.sla_info[node_indx].timelife);
 	//create MAC + TIMETAMP + DEV_TYPE
 	u8 size_mac = SIZEU8(G_NODE_LIST.sla_info[node_indx].mac);
-	memcpy(&G_NODE_LIST.sla_info[node_indx].data[0],G_NODE_LIST.sla_info[node_indx].mac,size_mac);
+	memcpy(&G_NODE_LIST.sla_info[node_indx].data[0],G_NODE_LIST.sla_info[node_indx].mac,size_mac); //update mac to pointer data
 	/*Timetamp*/
 	fl_timetamp_withstep_t timetampStep = fl_rtc_getWithMilliStep();
 	//	u32 timetamp = fl_rtc_get();
@@ -698,7 +718,7 @@ static void _master_updateDB_for_Node(u8 node_indx ,fl_data_frame_u *packet)  {
 	/*Data*/
 	P_PRINTFHEX_A(INF,packet->frame.payload,SIZEU8(packet->frame.payload),"PACK:");
 	if (G_NODE_LIST.sla_info[node_indx].dev_type == TBS_COUNTER) {
-		memcpy(&G_NODE_LIST.sla_info[node_indx].data[size_mac + 5],&packet->frame.payload[size_mac + 5],SIZEU8(packet->frame.payload) - (size_mac + 5));
+		memcpy(&G_NODE_LIST.sla_info[node_indx].data[size_mac + 5],&packet->frame.payload[0],SIZEU8(packet->frame.payload));
 		tbs_counter_printf((void*) G_NODE_LIST.sla_info[node_indx].data);
 	}
 	if (G_NODE_LIST.sla_info[node_indx].dev_type == TBS_POWERMETER) {
@@ -740,6 +760,16 @@ int fl_master_ProccesRSP_cbk(void) {
 				 P_PRINTFHEX_A(INF,packet.frame.payload,4,"0x%08X:",mac_short);
 				 }
 				 **/
+			}
+			break;
+			case NWK_HDR_A5_HIS: {
+				u8 slave_id = packet.frame.slaveID.id_u8;
+				u8 node_indx = fl_master_SlaveID_find(slave_id);
+				if (node_indx != -1) {
+					if (packet.frame.endpoint.master == FL_FROM_SLAVE) {
+						fl_ble2wifi_HISTORY_SEND(G_NODE_LIST.sla_info[node_indx].mac,packet.frame.timetamp,packet.frame.payload);
+					}
+				}
 			}
 			break;
 			case NWK_HDR_55: {

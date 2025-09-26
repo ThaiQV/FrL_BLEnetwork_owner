@@ -95,7 +95,14 @@ u8 TEST_Buttons(fl_exButton_states_e _state, void *_data) {
 	test_u8[3] = U32_BYTE3(test_pack_cnt);
 #ifdef COUNTER_DEVICE
 	extern tbs_device_counter_t G_COUNTER_DEV ;
-	memcpy(test_u8,G_COUNTER_DEV.bytes,SIZEU8(G_COUNTER_DEV.bytes));
+	memcpy(test_u8,(u8*)&G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data));
+#endif
+#ifdef POWER_METER_DEVICE
+	extern tbs_device_powermeter_t G_POWER_METER ;
+	u8 _payload[SIZEU8(tbs_device_powermeter_t)];
+	tbs_pack_powermeter_data(&G_POWER_METER,_payload);
+	u8 indx_data = SIZEU8(G_POWER_METER.type) + SIZEU8(G_POWER_METER.mac) + SIZEU8(G_POWER_METER.timetamp);
+	memcpy(test_u8,&_payload[indx_data],SIZEU8(G_POWER_METER.data));
 #endif
 	if (IsJoinedNetwork() && IsOnline()){
 		fl_api_slave_req(NWK_HDR_55,test_u8,SIZEU8(test_u8),&_rsp_callback,800,0);

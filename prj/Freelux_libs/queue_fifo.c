@@ -104,17 +104,19 @@ u16 FL_QUEUE_GET(fl_data_container_t *pCont, fl_pack_t *pdata) {
  * Returns the pack in a queue container.(FIFO)
  * @param buffer The buffer from which the data should be returned.
  * @param data A pointer to the location at which the data should be placed.
- * @return 1 if data was returned; 0 otherwise.
+ * @return >=0 if data was returned; -1 otherwise.
  */
-u16 FL_QUEUE_GET_LOOP(fl_data_container_t *pCont, fl_pack_t *pdata) {
+s16 FL_QUEUE_GET_LOOP(fl_data_container_t *pCont, fl_pack_t *pdata) {
 //	if(pCont->data[pCont->head_index].length  < 2){
 //		return 0;
 //	}
+	s16 indx_head = -1;
 	*pdata = pCont->data[pCont->head_index];
 //	memcpy(pdata,pCont->data[pCont->head_index].data_arr,sizeof(fl_pack_t)/sizeof(u8));
+	indx_head = pCont->head_index;
 	pCont->head_index = ((pCont->head_index + 1) & pCont->mask);
 	if(pCont->count>0) pCont->count--;
-	return 1;
+	return indx_head;
 }
 /**
  * Returns the pack in a queue container AND CLEAR IT.(FIFO)
@@ -128,8 +130,7 @@ u16 FL_QUEUE_GETnCLEAR(fl_data_container_t *pCont, fl_pack_t *pdata) {
 		return 0;
 	}
 	*pdata = pCont->data[pCont->head_index];
-	memset(pCont->data[pCont->head_index].data_arr,0,sizeof(fl_pack_t));
-	pCont->data[pCont->head_index].length =0;
+	memset(&pCont->data[pCont->head_index], 0, sizeof(fl_pack_t));
 	pCont->head_index = ((pCont->head_index + 1) & pCont->mask);
 	pCont->count--;
 	return 1;

@@ -35,11 +35,12 @@ volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME = {.timetamp = 0,.milstep =
 												ORIGINAL_MASTER_TIME.milstep = y;\
 											}while(0) //Sync original time-master req
 u8 GETINFO_FLAG_EVENTTEST = 0;
-#define JOIN_NETWORK_TIME 			30*1000 	//ms
-#define RECHECKING_NETWOK_TIME 		30*1000 	//ms - 1mins
+#define JOIN_NETWORK_TIME 			30*1000 			//ms
+#define RECHECKING_NETWOK_TIME 		30*1000 		    //ms
+#define RECONNECT_TIME				60*1000*1000		//s
 
-fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_F6_SENDMESS,NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
-fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_55,NWK_HDR_RECONNECT}; // register cmdid REQ
+fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_A5_HIS,NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
+fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_A5_HIS,NWK_HDR_55,NWK_HDR_RECONNECT}; // register cmdid REQ
 
 #define NWK_HDR_SIZE (sizeof(G_NWK_HDR_LIST)/sizeof(G_NWK_HDR_LIST[0]))
 #define NWK_HDR_REQ_SIZE (sizeof(G_NWK_HDR_REQLIST)/sizeof(G_NWK_HDR_REQLIST[0]))
@@ -71,7 +72,7 @@ fl_pack_t g_handle_array[PACK_HANDLE_SIZE];
 fl_data_container_t G_HANDLE_CONTAINER = { .data = g_handle_array, .head_index = 0, .tail_index = 0, .mask = PACK_HANDLE_SIZE - 1, .count = 0 };
 
 //My information
-fl_nodeinnetwork_t G_INFORMATION ;
+fl_nodeinnetwork_t G_INFORMATION ={.active=false};
 #ifndef MASTER_CORE
 #ifdef COUNTER_DEVICE
 extern tbs_device_counter_t G_COUNTER_DEV ;
@@ -79,11 +80,12 @@ extern u8 G_COUNTER_LCD[COUNTER_LCD_MESS_MAX][22];
 #endif
 #ifdef POWER_METER_DEVICE
 tbs_device_powermeter_t G_POWER_METER;
+
 #endif
 //flag debug of the network
-volatile u8 NWK_DEBUG_STT = 1; // it will be assigned into end-point byte (dbg :1bit)
+volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into end-point byte (dbg :1bit)
 volatile u8 NWK_REPEAT_MODE = 0; // 1: level | 0 : non-level
-volatile u8  NWK_REPEAT_LEVEL = 3;
+volatile u8  NWK_REPEAT_LEVEL = 2;
 /******************************************************************************/
 /******************************************************************************/
 /***                           Private definitions                           **/
@@ -95,6 +97,9 @@ int fl_nwk_joinnwk_timeout(void) ;
 /***                       Functions declare                   		         **/
 /******************************************************************************/
 /******************************************************************************/
+u8 fl_nwk_mySlaveID(void){
+	return G_INFORMATION.slaveID.id_u8;
+}
 
 bool IsJoinedNetwork(void)	{
 	return(G_INFORMATION.slaveID.id_u8 != 0xFF);
@@ -136,12 +141,9 @@ int _nwk_slave_backup(void){
 }
 
 void fl_nwk_slave_init(void) {
-//	PLOG_Start(APP);
-//	PLOG_Start(API);
-//	PLOG_Start(INF);
-
+//	PLOG_Start(ALL);
 	DEBUG_TURN(NWK_DEBUG_STT);
-	fl_input_external_init();
+//	fl_input_external_init();
 	FL_QUEUE_CLEAR(&G_HANDLE_CONTAINER,PACK_HANDLE_SIZE);
 	//Generate information
 	G_INFORMATION.active = false;
@@ -194,7 +196,8 @@ void fl_nwk_slave_init(void) {
 	blt_soft_timer_add(_nwk_slave_backup,2*1000*1000);
 
 	//Interval checking network
-//	fl_nwk_slave_reconnect();
+	blt_soft_timer_add(fl_nwk_slave_reconnect,1000*1000);//s -> send information online to master
+
 	//Checking online
 //	blt_soft_timer_add(&_isOnline_check,RECHECKING_NETWOK_TIME*1000);
 	G_INFORMATION.active = false;
@@ -292,6 +295,7 @@ u32 fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 			req_pack.frame.milltamp = field_timetamp.milstep;
 
 			req_pack.frame.slaveID.id_u8 = G_INFORMATION.slaveID.id_u8;
+
 			//Create payload
 			memset(req_pack.frame.payload,0xFF,SIZEU8(req_pack.frame.payload));
 			memcpy(req_pack.frame.payload,_data,_len);
@@ -407,27 +411,29 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 				u8 _payload[POWER_METER_STRUCT_BYTESIZE];
 				memset(_payload,0xFF,SIZEU8(_payload));
 				//u8 len_payload=0;
-
 				LOGA(APP,"(%d)SlaveID:%X | inPack:%X | TestEvent:%d\r\n",memid_idx,G_INFORMATION.slaveID.id_u8,packet.frame.payload[memid_idx],GETINFO_FLAG_EVENTTEST);
 				packet.frame.endpoint.dbg = NWK_DEBUG_STT;
 				u8 indx_data = 0;
 				if (memid_idx != -1) {
 #ifdef COUNTER_DEVICE
 					tbs_device_counter_t *counter_data = (tbs_device_counter_t*)G_INFORMATION.data;
-					memcpy(_payload,counter_data->bytes,SIZEU8(counter_data->bytes));
-					tbs_counter_printf((void*)_payload);
+					memcpy(_payload,(u8*)&counter_data->data,SIZEU8(counter_data->data));
+					tbs_counter_printf((void*)counter_data);
 #endif
 #ifdef POWER_METER_DEVICE
 					tbs_power_meter_printf((void*)G_INFORMATION.data);
 					tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*)G_INFORMATION.data;
 					tbs_pack_powermeter_data(pwmeter_data,_payload);
-					indx_data = SIZEU8(pwmeter_data->type) +   SIZEU8(pwmeter_data->mac) +  SIZEU8(pwmeter_data->timetamp);
+					indx_data = SIZEU8(pwmeter_data->type) + SIZEU8(pwmeter_data->mac) + SIZEU8(pwmeter_data->timetamp);
 #endif
 					packet.frame.slaveID.id_u8 = G_INFORMATION.slaveID.id_u8;
 					memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
 					memcpy(&packet.frame.payload,&_payload[indx_data],SIZEU8(packet.frame.payload));
 					//CRC
 					packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
+
+					//Restart timeout reconnect
+					blt_soft_timer_restart(fl_nwk_slave_reconnect,RECONNECT_TIME);
 				} else {
 					packet_built.length = 0;
 					return packet_built;
@@ -443,9 +449,29 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 			}
 		}
 		break;
+		case NWK_HDR_A5_HIS:{
+			if (IsJoinedNetwork()) {
+				if(packet.frame.slaveID.id_u8 == G_INFORMATION.slaveID.id_u8){
+					//get mac
+					u8 mac[6];
+					memcpy(mac,&packet.frame.payload[0],SIZEU8(mac));
+					u8 ind_value = SIZEU8(mac);
+					//get from_index and to_index
+					u16 from_index = MAKE_U32(packet.frame.payload[ind_value+3],packet.frame.payload[ind_value+2],packet.frame.payload[ind_value+1],packet.frame.payload[ind_value]);
+					ind_value = ind_value+4;
+					u16 to_index =MAKE_U32(packet.frame.payload[ind_value+3],packet.frame.payload[ind_value+2],packet.frame.payload[ind_value+1],packet.frame.payload[ind_value]);
+					TBS_History_Get((u16)from_index,(u16)to_index);
+				}
+				//Non-rsp
+				packet_built.length = 0;
+				return packet_built;
+			}
+			break;
+		}
 		case NWK_HDR_F6_SENDMESS: {
 //			_nwk_slave_syncFromPack(&packet.frame);
 			if (IsJoinedNetwork()) {
+#ifdef COUNTER_DEVICE
 				//check packet_slaveid
 				if(packet.frame.slaveID.id_u8 == G_INFORMATION.slaveID.id_u8){
 					u8 slot_indx = packet.frame.payload[0];
@@ -459,6 +485,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 						packet.frame.endpoint.master = FL_FROM_SLAVE;
 						//add repeat_cnt
 						packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
+
 					}
 					else{
 						//Non-rsp
@@ -466,7 +493,59 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 						return packet_built;
 					}
 				}
+#endif
+			}
+		}
+		break;
+		case NWK_HDR_F7_RSTPWMETER: {
+			if (IsJoinedNetwork()) {
+#ifdef POWER_METER_DEVICE
+				//check packet_slaveid
+				if (packet.frame.slaveID.id_u8 == G_INFORMATION.slaveID.id_u8) {
+					TBS_PowerMeter_RESETbyMaster(packet.frame.payload[0],packet.frame.payload[1],packet.frame.payload[2]);
+					if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
+						u8 ok[2] = { 'o', 'k' };
+						memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
+						memcpy(packet.frame.payload,ok,SIZEU8(ok));
+						//change endpoint to node source
+						packet.frame.endpoint.master = FL_FROM_SLAVE;
+						//add repeat_cnt
+						packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
+					} else {
+						//Non-rsp
+						packet_built.length = 0;
+						return packet_built;
+					}
+				}
+#endif
+			}
+		}
+		break;
+		case NWK_HDR_F8_PWMETER_SET: {
+			if (IsJoinedNetwork()) {
+#ifdef POWER_METER_DEVICE
+				//check packet_slaveid
+				if (packet.frame.slaveID.id_u8 == G_INFORMATION.slaveID.id_u8) {
+					u16 chn1 = MAKE_U16(packet.frame.payload[1],packet.frame.payload[0]);
+					u16 chn2= MAKE_U16(packet.frame.payload[3],packet.frame.payload[2]);
+					u16 chn3= MAKE_U16(packet.frame.payload[5],packet.frame.payload[4]);
+					TBS_PwMeter_SetThreshod(chn1,chn2,chn3);
+					if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
+						u8 ok[2] = { 'o', 'k' };
+						memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
+						memcpy(packet.frame.payload,ok,SIZEU8(ok));
+						//change endpoint to node source
+						packet.frame.endpoint.master = FL_FROM_SLAVE;
+						//add repeat_cnt
+						packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
 
+					} else {
+						//Non-rsp
+						packet_built.length = 0;
+						return packet_built;
+					}
+				}
+#endif
 			}
 		}
 		break;
@@ -601,15 +680,21 @@ void fl_nwk_slave_joinnwk_exc(void) {
  *
  ***************************************************/
 int fl_nwk_slave_reconnect(void){
-	//create timer interval for checking online
-	if(blt_soft_timer_find(&fl_nwk_slave_reconnect)==-1){
-		blt_soft_timer_add(&fl_nwk_slave_reconnect,RECHECKING_NETWOK_TIME*1000);
+	if(IsJoinedNetwork()){
+		LOGA(INF,"Reconnect network (%d s)!!!\r\n",RECONNECT_TIME/1000/1000);
+		//
+#ifdef COUNTER_DEVICE
+		fl_api_slave_req(NWK_HDR_55,(u8*)&G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data),0,0,0);
+#else //POWERMETER
+		u8 _payload[SIZEU8(tbs_device_powermeter_t)];
+		tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) G_INFORMATION.data;
+		tbs_pack_powermeter_data(pwmeter_data,_payload);
+		u8 indx_data = SIZEU8(pwmeter_data->type) + SIZEU8(pwmeter_data->mac) + SIZEU8(pwmeter_data->timetamp);
+		fl_api_slave_req(NWK_HDR_55,&_payload[indx_data],SIZEU8(pwmeter_data->data),0,0,0);
+#endif
+		return RECONNECT_TIME;
 	}
-	if(IsJoinedNetwork() && G_INFORMATION.active == false){
-		LOGA(INF,"Reconnect network (%d s)!!!\r\n",RECHECKING_NETWOK_TIME/1000);
-		fl_api_slave_req(NWK_HDR_RECONNECT,G_INFORMATION.mac,SIZEU8(G_INFORMATION.mac),0,0,0);
-	}
-	return 0;
+	return 1000*1000;
 }
 
 /******************************************************************************/

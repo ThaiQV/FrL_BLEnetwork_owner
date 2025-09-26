@@ -81,6 +81,8 @@ int fl_repeat_send_cbk(void) {
 		//u8 pack_arr[SIZEU8(fl_dataframe_format_t) - 1];
 		fl_pack_t packet_built;
 		packet_built = fl_repeat_packet_build(data_in_queue);
+		//todo: New field for pin repeater packet
+//		packet_built.data_arr[SIZEU8(packet_built.data_arr)-1] = 0xAA; //for testing
 		//P_PRINTFHEX_A(ZIG_GP,pack_arr,SIZEU8(pack_arr),"%s:","RepeatPack");
 //		LOGA(ZIG_GP,"Repeat lvl: %d\r\n",packet_built.data_arr[packet_built.length - 1] & 0x03);
 		fl_adv_sendFIFO_add(packet_built);
