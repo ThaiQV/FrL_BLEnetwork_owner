@@ -55,6 +55,8 @@ typedef enum {
 	GF_CMD_RSTFACTORY_RESPONSE = 0x0A,
 	GF_CMD_RSTPWMETER_REQUEST = 0x0D,
 	GF_CMD_RSTPWMETER_RESPONSE = 0x0D,
+	GF_CMD_PWMETER_RUNNING_SET_REQUEST = 0x0E,
+	GF_CMD_PWMETER_RUNNING_SET_RESPONSE = 0x0E,
 }fl_wifi_cmd_e;
 
 typedef void (*RspFunc)(u8*);
@@ -101,6 +103,8 @@ void RSTFACTORY_REQUEST(u8* _pdata, RspFunc rspfnc);
 void RSTFACTORY_RESPONSE(u8* _pdata);
 void RSTPWMETER_REQUEST(u8* _pdata, RspFunc rspfnc);
 void RSTPWMETER_RESPONSE(u8* _pdata);
+void PWMETER_RUNNING_SET_REQUEST(u8* _pdata, RspFunc rspfnc);
+void PWMETER_RUNNING_SET_RESPONSE(u8* _pdata){};
 
 fl_wifiprotocol_proc_t G_WIFI_CON[] = {
 			{ { GF_CMD_PING, PING_REQ }, { GF_CMD_PING, PING_RSP } }, //ping
@@ -111,6 +115,7 @@ fl_wifiprotocol_proc_t G_WIFI_CON[] = {
 			{ { GF_CMD_TIMESTAMP_REQUEST, TIMETAMP_REQUEST }, {GF_CMD_TIMESTAMP_RESPONSE, TIMETAMP_RESPONSE } },
 			{ { GF_CMD_RSTFACTORY_REQUEST, RSTFACTORY_REQUEST }, {GF_CMD_RSTFACTORY_RESPONSE, RSTFACTORY_RESPONSE } },
 			{ { GF_CMD_RSTPWMETER_REQUEST, RSTPWMETER_REQUEST }, {GF_CMD_RSTPWMETER_RESPONSE, RSTPWMETER_RESPONSE } },
+			{ { GF_CMD_PWMETER_RUNNING_SET_REQUEST, PWMETER_RUNNING_SET_REQUEST }, {GF_CMD_PWMETER_RUNNING_SET_RESPONSE, PWMETER_RUNNING_SET_RESPONSE } },
 			};
 
 #define GWIFI_SIZE 				(sizeof(G_WIFI_CON)/sizeof(G_WIFI_CON[0]))
@@ -433,6 +438,31 @@ void RSTPWMETER_REQUEST(u8* _pdata, RspFunc rspfnc){
 	}
 }
 void RSTPWMETER_RESPONSE(u8* _pdata){};
+
+void _PWMETER_SET_slave_rsp_callback(void *_data, void* _data2) {
+	_slave_rsp_callbackNrspWifiMAC(G_WIFI_CON[_wf_CMD_find(GF_CMD_PWMETER_RUNNING_SET_REQUEST)].rsp.cmd,_data,_data2);
+}
+void PWMETER_RUNNING_SET_REQUEST(u8* _pdata, RspFunc rspfnc) {
+	fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[1];
+	LOGA(MCU,"LEN:0x%02X\r\n",data->len_data);
+	LOGA(MCU,"cmdID:0x%02X\r\n",data->cmd);
+	LOGA(MCU,"CRC8:0x%02X\r\n",data->crc8);
+	P_PRINTFHEX_A(MCU,data->data,data->len_data,"Data:");
+	u8 crc8_cal = fl_crc8(data->data,data->len_data);
+	if (crc8_cal != data->crc8) {
+		ERR(MCU,"ERR >> CRC8:0x%02X | 0x%02X\r\n",data->crc8,crc8_cal);
+		return;
+	}
+	u8 mac[6];
+	memcpy(mac,data->data,SIZEU8(mac));
+	u8 message[22]; //max payload adv
+	memset(message,0,SIZEU8(message));
+	memcpy(message,&data->data[SIZEU8(mac)],3*2);
+	fl_api_master_req(mac,NWK_HDR_F8_PWMETER_SET,message,3*2,&_PWMETER_SET_slave_rsp_callback,200,1);
+	if (rspfnc != 0) {
+		//don't reponse in here => wait slave rsp or timeout
+	}
+}
 
 void RSTFACTORY_REQUEST(u8* _pdata, RspFunc rspfnc){
 	fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[1];

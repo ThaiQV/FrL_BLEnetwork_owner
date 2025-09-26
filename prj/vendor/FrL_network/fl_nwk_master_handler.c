@@ -53,7 +53,7 @@ volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into endpoint byte (dbg :1
 volatile u8 NWK_REPEAT_MODE = 0; // 1: level | 0 : non-level
 volatile u8 NWK_REPEAT_LEVEL = 3;
 
-fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_A5_HIS, NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER}; // register cmdid REQ
+fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_A5_HIS, NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET}; // register cmdid REQ
 
 #define NWK_HDR_REQ_SIZE (sizeof(G_NWK_HDR_REQLIST)/sizeof(G_NWK_HDR_REQLIST[0]))
 
@@ -574,11 +574,19 @@ u32 fl_req_master_packet_createNsend(u8* _slave_mac,u8 _cmdid,u8* _data, u8 _len
 		}
 			break;
 		case NWK_HDR_F6_SENDMESS: {
-			req_pack.frame.endpoint.master = FL_FROM_MASTER_ACK;
+			if (G_NODE_LIST.sla_info[slaveID].dev_type == TBS_COUNTER) {
+				req_pack.frame.endpoint.master = FL_FROM_MASTER_ACK;
+			}
 		}
 		break;
-		case NWK_HDR_F7_RSTPWMETER:{
-			req_pack.frame.endpoint.master = FL_FROM_MASTER_ACK;
+		case NWK_HDR_F7_RSTPWMETER:
+		case NWK_HDR_F8_PWMETER_SET:
+		{
+			if(G_NODE_LIST.sla_info[slaveID].dev_type==TBS_POWERMETER){
+				req_pack.frame.endpoint.master = FL_FROM_MASTER_ACK;
+			}else{
+				return 0;
+			}
 		}
 		break;
 		default:

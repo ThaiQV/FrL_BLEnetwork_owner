@@ -42,6 +42,7 @@ typedef enum {
 	NWK_HDR_F5_INFO = 0xF5, //get data information real-time
 	NWK_HDR_F6_SENDMESS = 0xF6, //send mess to slave
 	NWK_HDR_F7_RSTPWMETER = 0xF7, //Send req to rst pwmeter
+	NWK_HDR_F8_PWMETER_SET = 0xF8, //Send req to set parameter's pwmeter
 	NWK_HDR_ASSIGN = 0xFC,	//Use to assign SlaveID to slave
 	NWK_HDR_HEARTBEAT = 0xFD,
 	NWK_HDR_COLLECT = 0xFE, //Use to collect slave (master and slaves)
