@@ -80,8 +80,6 @@ tbs_device_counter_t G_COUNTER_DEV = {  .timetamp = 0,
 u8 G_COUNTER_LCD[COUNTER_LCD_MESS_MAX][22];
 #endif
 #ifdef POWER_METER_DEVICE
-
-u16 G_POWER_METER_PARAMETER[3]; //
 tbs_device_powermeter_t G_POWER_METER = {
 				        .mac = {0, 0, 0, 0, 0, 0},
 				        .timetamp = 0,
@@ -104,6 +102,9 @@ tbs_device_powermeter_t G_POWER_METER = {
 								.energy3 = 333333,
 						}
 				    };
+//use to store setting parameter
+u16 G_POWER_METER_PARAMETER[3];
+
 void test_powermeter(void) {
 	u8 buffer[POWER_METER_BITSIZE];
 	memset(buffer,0,POWER_METER_BITSIZE);
@@ -120,17 +121,19 @@ void test_powermeter(void) {
 /******************************************************************************/
 /******************************************************************************/
 #ifdef COUNTER_DEVICE
-void Counter_LCD_Print(void){
+void Counter_LCD_MessageStore(void){
 	static u32 crc32 = 0;
 	u32 crc32_curr = fl_db_crc32((u8*)G_COUNTER_LCD,SIZEU8(G_COUNTER_LCD[0])*COUNTER_LCD_MESS_MAX);
 	if (crc32 != crc32_curr) {
-		P_INFO("========================\r\n");
+		LOGA(PERI,"========================\r\n");
 		for (u8 i = 0; i < COUNTER_LCD_MESS_MAX; i++) {
-			if (G_COUNTER_LCD[i][0] != 0)
-				P_INFO("[%d]%s\r\n",i,(char* )G_COUNTER_LCD[i]);
+			if (G_COUNTER_LCD[i][0] != 0xFF)
+				LOGA(PERI,"0x%02X[%d]%s\r\n",G_COUNTER_LCD[i][0],i,(char* )G_COUNTER_LCD[i]);
 		}
-		P_INFO("========================\r\n");
+		LOGA(PERI,"========================\r\n");
 		crc32=crc32_curr;
+		//Store message
+		fl_db_slavesettings_save((u8*)G_COUNTER_LCD,SIZEU8(G_COUNTER_LCD[0])*COUNTER_LCD_MESS_MAX);
 	}
 }
 
@@ -188,9 +191,9 @@ void TBS_Counter_init(void){
 	G_COUNTER_DEV.type = TBS_COUNTER;
 	G_COUNTER_DEV.timetamp = fl_rtc_get();
 	//passing lcd message
-	for (u8 var = 0; var < COUNTER_LCD_MESS_MAX; ++var) {
-		memset(G_COUNTER_LCD[var],0,SIZEU8(G_COUNTER_LCD[var]));
-	}
+
+	memcpy(G_COUNTER_LCD,fl_db_slavesettings_load().setting_arr,SIZEU8(G_COUNTER_LCD[0]) * COUNTER_LCD_MESS_MAX);
+
 	//todo:Init Butt,lcd,7segs,.....
 	TEST_EVENT.lifetime = fl_rtc_get();
 	blt_soft_timer_add(&TEST_Counter_Event,5000*1000);
@@ -204,13 +207,23 @@ void TBS_Counter_Run(void){
 //	G_COUNTER_DEV.data.pass_product = RAND(1,1020);
 //	G_COUNTER_DEV.data.err_product = RAND(1,500);
 //	G_COUNTER_DEV.data.mode = 1;
-	Counter_LCD_Print();
+	Counter_LCD_MessageStore();
 }
 #endif
 #ifdef POWER_METER_DEVICE
 void TBS_PowerMeter_init(void){
-	memcpy(G_POWER_METER.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_POWER_METER.mac));
+	//init db settings
+	fl_db_slavesettings_init();
+	//Load settings
+	u8 settings[6];
+	memcpy(settings,fl_db_slavesettings_load().setting_arr,SIZEU8(settings));
+	G_POWER_METER_PARAMETER[0] = MAKE_U16(settings[1],settings[0]);
+	G_POWER_METER_PARAMETER[1] = MAKE_U16(settings[3],settings[2]);
+	G_POWER_METER_PARAMETER[2] = MAKE_U16(settings[5],settings[4]);
 
+	LOGA(PERI,"Threshold channel:%d-%d-%d\r\n",G_POWER_METER_PARAMETER[0],	G_POWER_METER_PARAMETER[1],	G_POWER_METER_PARAMETER[2]);
+
+	memcpy(G_POWER_METER.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_POWER_METER.mac));
 	G_POWER_METER.type = TBS_POWERMETER;
 	G_POWER_METER.timetamp= fl_rtc_get();
 	test_powermeter();
@@ -246,15 +259,26 @@ void TBS_PowerMeter_Run(void){
 #ifdef POWER_METER_DEVICE
 
 void TBS_PowerMeter_RESETbyMaster(u8 _ch1,u8 _ch2,u8 _ch3){
-	ERR(PERI,"Master RESET PWMeter channel:%d-%d-%d\r\n",_ch1,_ch2,_ch3);
+	LOGA(PERI,"Master RESET PWMeter channel:%d-%d-%d\r\n",_ch1,_ch2,_ch3);
 	//todo: RESET pwmeter struct
 }
 
 void TBS_PwMeter_SetThreshod(u16 _chn1,u16 _chn2,u16 _chn3){
-	ERR(PERI,"Master SET Threshold channel:%d-%d-%d\r\n",_chn1,_chn2,_chn3);
+	LOGA(PERI,"Master SET Threshold channel:%d-%d-%d\r\n",_chn1,_chn2,_chn3);
 	G_POWER_METER_PARAMETER[0]=_chn1;
 	G_POWER_METER_PARAMETER[1]=_chn2;
 	G_POWER_METER_PARAMETER[2]=_chn3;
+	//Store settings
+	fl_db_slavesettings_save((u8*)G_POWER_METER_PARAMETER,SIZEU8(G_POWER_METER_PARAMETER));
+	//For testing
+//	u8 settings[6];
+//	memcpy(settings,fl_db_slavesettings_load().setting_arr,SIZEU8(settings));
+//	G_POWER_METER_PARAMETER[0] = MAKE_U16(settings[1],settings[0]);
+//	G_POWER_METER_PARAMETER[1] = MAKE_U16(settings[3],settings[2]);
+//	G_POWER_METER_PARAMETER[2] = MAKE_U16(settings[5],settings[4]);
+//
+//	ERR(PERI,"Threshold channel:%d-%d-%d\r\n",G_POWER_METER_PARAMETER[0],	G_POWER_METER_PARAMETER[1],	G_POWER_METER_PARAMETER[2]);
+
 }
 
 #endif
