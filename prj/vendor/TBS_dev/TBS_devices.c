@@ -80,8 +80,6 @@ tbs_device_counter_t G_COUNTER_DEV = {  .timetamp = 0,
 u8 G_COUNTER_LCD[COUNTER_LCD_MESS_MAX][22];
 #endif
 #ifdef POWER_METER_DEVICE
-
-u16 G_POWER_METER_PARAMETER[3]; //
 tbs_device_powermeter_t G_POWER_METER = {
 				        .mac = {0, 0, 0, 0, 0, 0},
 				        .timetamp = 0,
@@ -104,6 +102,9 @@ tbs_device_powermeter_t G_POWER_METER = {
 								.energy3 = 333333,
 						}
 				    };
+//use to store setting parameter
+u16 G_POWER_METER_PARAMETER[3];
+
 void test_powermeter(void) {
 	u8 buffer[POWER_METER_BITSIZE];
 	memset(buffer,0,POWER_METER_BITSIZE);
@@ -209,8 +210,18 @@ void TBS_Counter_Run(void){
 #endif
 #ifdef POWER_METER_DEVICE
 void TBS_PowerMeter_init(void){
-	memcpy(G_POWER_METER.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_POWER_METER.mac));
+	//init db settings
+	fl_db_slavesettings_init();
+	//Load settings
+	u8 settings[6];
+	memcpy(settings,fl_db_slavesettings_load().setting_arr,SIZEU8(settings));
+	G_POWER_METER_PARAMETER[0] = MAKE_U16(settings[1],settings[0]);
+	G_POWER_METER_PARAMETER[1] = MAKE_U16(settings[3],settings[2]);
+	G_POWER_METER_PARAMETER[2] = MAKE_U16(settings[5],settings[4]);
 
+	ERR(PERI,"Threshold channel:%d-%d-%d\r\n",G_POWER_METER_PARAMETER[0],	G_POWER_METER_PARAMETER[1],	G_POWER_METER_PARAMETER[2]);
+
+	memcpy(G_POWER_METER.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_POWER_METER.mac));
 	G_POWER_METER.type = TBS_POWERMETER;
 	G_POWER_METER.timetamp= fl_rtc_get();
 	test_powermeter();
@@ -255,6 +266,17 @@ void TBS_PwMeter_SetThreshod(u16 _chn1,u16 _chn2,u16 _chn3){
 	G_POWER_METER_PARAMETER[0]=_chn1;
 	G_POWER_METER_PARAMETER[1]=_chn2;
 	G_POWER_METER_PARAMETER[2]=_chn3;
+	//Store settings
+	fl_db_slavesettings_save((u8*)G_POWER_METER_PARAMETER,SIZEU8(G_POWER_METER_PARAMETER));
+	//For testing
+	u8 settings[6];
+	memcpy(settings,fl_db_slavesettings_load().setting_arr,SIZEU8(settings));
+	G_POWER_METER_PARAMETER[0] = MAKE_U16(settings[1],settings[0]);
+	G_POWER_METER_PARAMETER[1] = MAKE_U16(settings[3],settings[2]);
+	G_POWER_METER_PARAMETER[2] = MAKE_U16(settings[5],settings[4]);
+
+	ERR(PERI,"Threshold channel:%d-%d-%d\r\n",G_POWER_METER_PARAMETER[0],	G_POWER_METER_PARAMETER[1],	G_POWER_METER_PARAMETER[2]);
+
 }
 
 #endif

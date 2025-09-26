@@ -80,6 +80,7 @@ extern u8 G_COUNTER_LCD[COUNTER_LCD_MESS_MAX][22];
 #endif
 #ifdef POWER_METER_DEVICE
 tbs_device_powermeter_t G_POWER_METER;
+
 #endif
 //flag debug of the network
 volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into end-point byte (dbg :1bit)
@@ -510,7 +511,6 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 						packet.frame.endpoint.master = FL_FROM_SLAVE;
 						//add repeat_cnt
 						packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
-
 					} else {
 						//Non-rsp
 						packet_built.length = 0;
