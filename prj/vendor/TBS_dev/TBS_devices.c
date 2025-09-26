@@ -78,6 +78,7 @@ tbs_device_counter_t G_COUNTER_DEV = {  .timetamp = 0,
 									};
 //use to store display message
 u8 G_COUNTER_LCD[COUNTER_LCD_MESS_MAX][22];
+
 #endif
 #ifdef POWER_METER_DEVICE
 tbs_device_powermeter_t G_POWER_METER = {
