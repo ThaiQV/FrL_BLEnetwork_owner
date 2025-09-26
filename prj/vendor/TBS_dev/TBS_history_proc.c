@@ -169,6 +169,7 @@ fl_pack_t tbs_history_create_pack(u8* _data) {
 	packet_built.length = 0;
 	memset(packet_built.data_arr,0,SIZEU8(packet_built.data_arr));
 	fl_data_frame_u packet;
+	static u8 next_req=0;
 	/* parse parameter in the _data */
 #ifdef COUNTER_DEVICE
 	tbs_history_counter_t *data_dev = (tbs_history_counter_t*)_data;
@@ -181,7 +182,7 @@ fl_pack_t tbs_history_create_pack(u8* _data) {
 	packet.frame.timetamp[1] = U32_BYTE1(data_dev->timetamp);
 	packet.frame.timetamp[2] = U32_BYTE2(data_dev->timetamp);
 	packet.frame.timetamp[3] = U32_BYTE3(data_dev->timetamp);
-	packet.frame.milltamp = 0;
+	packet.frame.milltamp = next_req++;
 
 	packet.frame.slaveID.id_u8 = fl_nwk_mySlaveID();
 
@@ -236,6 +237,7 @@ void TBS_History_LoadFromFlash(void){
 			memcpy(G_HISTORY_CONTAINER[i].data,sample_history_database[G_HISTORY_CONTAINER[i].indx],DATA_HISTORY_SIZE);
 			G_HISTORY_CONTAINER[i].status_proc = 1;
 			P_PRINTFHEX_A(APP,G_HISTORY_CONTAINER[i].data,DATA_HISTORY_SIZE,"[%d]HIS:",G_HISTORY_CONTAINER[i].indx);
+			//Send to Master
 			fl_adv_sendFIFO_add(tbs_history_create_pack(G_HISTORY_CONTAINER[i].data));
 		}
 	}
