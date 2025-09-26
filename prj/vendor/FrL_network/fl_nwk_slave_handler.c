@@ -526,9 +526,9 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 #ifdef POWER_METER_DEVICE
 				//check packet_slaveid
 				if (packet.frame.slaveID.id_u8 == G_INFORMATION.slaveID.id_u8) {
-					u16 chn1 = MAKE_U16(packet.frame.payload[0],packet.frame.payload[1]);
-					u16 chn2= MAKE_U16(packet.frame.payload[2],packet.frame.payload[3]);
-					u16 chn3= MAKE_U16(packet.frame.payload[4],packet.frame.payload[5]);
+					u16 chn1 = MAKE_U16(packet.frame.payload[1],packet.frame.payload[0]);
+					u16 chn2= MAKE_U16(packet.frame.payload[3],packet.frame.payload[2]);
+					u16 chn3= MAKE_U16(packet.frame.payload[5],packet.frame.payload[4]);
 					TBS_PwMeter_SetThreshod(chn1,chn2,chn3);
 					if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
 						u8 ok[2] = { 'o', 'k' };
