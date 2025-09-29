@@ -143,7 +143,7 @@ void Counter_LCD_MessageCheck_FlagNew(void){
 	for (u8 var = 0; var < COUNTER_LCD_MESS_MAX; ++var) {
 		tbs_counter_lcd_t *mess_lcd = (tbs_counter_lcd_t *)&G_COUNTER_LCD[var][0];
 		if(mess_lcd->f_new == 1){
-			P_INFO("[%d]%s\r\n",var,(char* )G_COUNTER_LCD[var]);
+			P_INFO("[%d]%s\r\n",var,(char* )mess_lcd->mess);
 			mess_lcd->f_new=0;
 		}
 	}
