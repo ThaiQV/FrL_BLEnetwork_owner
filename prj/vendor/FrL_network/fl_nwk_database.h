@@ -110,7 +110,7 @@ void fl_db_slaveprofile_save(fl_slave_profiles_t entry);
 fl_slave_profiles_t fl_db_slaveprofile_load(void);
 
 typedef struct {
-	u8 setting_arr[10 * 22]; //MAX size = num of slot LCD * max size characters
+	u8 setting_arr[10 * (22 +1)]; //MAX size = num of slot LCD * (max size characters + 1 byte f_new)
 	//Don't change
 	u32 magic; // constant for LSB
 }__attribute__((packed)) fl_slave_settings_t;

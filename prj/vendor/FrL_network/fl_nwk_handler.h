@@ -82,6 +82,14 @@ typedef union {
 	u8 bytes[SIZEU8(fl_dataframe_format_t)];
 }__attribute__((packed)) fl_data_frame_u;
 
+//use to store display message
+typedef struct {
+	u8 mess[22];
+	u8 f_new; //ues to check new message
+}__attribute__((packed)) tbs_counter_lcd_t;
+
+#define LCD_MESSAGE_SIZE			(sizeof(tbs_counter_lcd_t)/sizeof(u8))
+
 /* COUNTER DEVICE - old
  * |Call butt|End call butt|Reset button|Pass product|Error product|Reserve| (sum 22 bytes)
  * |   1B	 |      1B     |     1B     |    4Bs     |     4Bs     |  11Bs |
@@ -273,7 +281,7 @@ typedef struct {
 		u8 len;
 	} req_payload;
 	fl_pack_t *p_REQ[QUEUE_RSP_SLOT_MAX];
-}fl_rsp_container_t;
+}__attribute__((packed)) fl_rsp_container_t;
 
 #ifdef MASTER_CORE
 #define MAX_NODES 	200

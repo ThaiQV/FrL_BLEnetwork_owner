@@ -76,7 +76,7 @@ fl_nodeinnetwork_t G_INFORMATION ={.active=false};
 #ifndef MASTER_CORE
 #ifdef COUNTER_DEVICE
 extern tbs_device_counter_t G_COUNTER_DEV ;
-extern u8 G_COUNTER_LCD[COUNTER_LCD_MESS_MAX][22];
+extern u8 G_COUNTER_LCD[COUNTER_LCD_MESS_MAX][LCD_MESSAGE_SIZE];
 #endif
 #ifdef POWER_METER_DEVICE
 tbs_device_powermeter_t G_POWER_METER;
@@ -476,7 +476,13 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 				if(packet.frame.slaveID.id_u8 == G_INFORMATION.slaveID.id_u8){
 					u8 slot_indx = packet.frame.payload[0];
 					memset(G_INFORMATION.lcd_mess[slot_indx],0,SIZEU8(G_INFORMATION.lcd_mess[slot_indx]));
-					memcpy(G_INFORMATION.lcd_mess[slot_indx],&packet.frame.payload[1],SIZEU8(packet.frame.payload) -1);
+					memcpy(G_INFORMATION.lcd_mess[slot_indx],&packet.frame.payload[1],SIZEU8(packet.frame.payload)-1);
+					G_INFORMATION.lcd_mess[slot_indx][LCD_MESSAGE_SIZE-1] = 1; //update lsb f_new =1
+
+//					u8 slot_indx = packet.frame.payload[0];
+//					memset(G_INFORMATION.lcd_mess[slot_indx],0,SIZEU8(G_INFORMATION.lcd_mess[slot_indx]));
+//					memcpy(G_INFORMATION.lcd_mess[slot_indx],&packet.frame.payload[1],SIZEU8(packet.frame.payload) -1);
+
 					if(packet.frame.endpoint.master == FL_FROM_MASTER_ACK){
 						u8 ok[2] = {'o','k'};
 						memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));

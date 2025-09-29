@@ -76,8 +76,9 @@ tbs_device_counter_t G_COUNTER_DEV = {  .timetamp = 0,
 												.pre_mode =0
 												}
 									};
-//use to store display message
-u8 G_COUNTER_LCD[COUNTER_LCD_MESS_MAX][22];
+
+
+u8 G_COUNTER_LCD[COUNTER_LCD_MESS_MAX][LCD_MESSAGE_SIZE];
 
 #endif
 #ifdef POWER_METER_DEVICE
@@ -126,15 +127,25 @@ void Counter_LCD_MessageStore(void){
 	static u32 crc32 = 0;
 	u32 crc32_curr = fl_db_crc32((u8*)G_COUNTER_LCD,SIZEU8(G_COUNTER_LCD[0])*COUNTER_LCD_MESS_MAX);
 	if (crc32 != crc32_curr) {
-		LOGA(PERI,"========================\r\n");
-		for (u8 i = 0; i < COUNTER_LCD_MESS_MAX; i++) {
-			if (G_COUNTER_LCD[i][0] != 0xFF)
-				LOGA(PERI,"0x%02X[%d]%s\r\n",G_COUNTER_LCD[i][0],i,(char* )G_COUNTER_LCD[i]);
-		}
-		LOGA(PERI,"========================\r\n");
+//		LOGA(PERI,"========================\r\n");
+//		for (u8 i = 0; i < COUNTER_LCD_MESS_MAX; i++) {
+//			if (G_COUNTER_LCD[i][0] != 0xFF)
+//				LOGA(PERI,"0x%02X[%d]%s\r\n",G_COUNTER_LCD[i][LCD_MESSAGE_SIZE-1],i,(char* )G_COUNTER_LCD[i]);
+//		}
+//		LOGA(PERI,"========================\r\n");
 		crc32=crc32_curr;
 		//Store message
 		fl_db_slavesettings_save((u8*)G_COUNTER_LCD,SIZEU8(G_COUNTER_LCD[0])*COUNTER_LCD_MESS_MAX);
+	}
+}
+
+void Counter_LCD_MessageCheck_FlagNew(void){
+	for (u8 var = 0; var < COUNTER_LCD_MESS_MAX; ++var) {
+		tbs_counter_lcd_t *mess_lcd = (tbs_counter_lcd_t *)&G_COUNTER_LCD[var][0];
+		if(mess_lcd->f_new == 1){
+			P_INFO("[%d]%s\r\n",var,(char* )G_COUNTER_LCD[var]);
+			mess_lcd->f_new=0;
+		}
 	}
 }
 
@@ -192,8 +203,16 @@ void TBS_Counter_init(void){
 	G_COUNTER_DEV.type = TBS_COUNTER;
 	G_COUNTER_DEV.timetamp = fl_rtc_get();
 	//passing lcd message
-
 	memcpy(G_COUNTER_LCD,fl_db_slavesettings_load().setting_arr,SIZEU8(G_COUNTER_LCD[0]) * COUNTER_LCD_MESS_MAX);
+	//for debuging
+	LOG_P(PERI,"========================\r\n");
+	for (u8 i = 0; i < COUNTER_LCD_MESS_MAX; i++) {
+		if (G_COUNTER_LCD[i][0] != 0xFF){
+//			sprintf(str_mess,"[%d]%s",i,G_COUNTER_LCD[i]);
+			P_INFO("[%d]%s-%d\r\n",i,(char* )G_COUNTER_LCD[i],G_COUNTER_LCD[i][LCD_MESSAGE_SIZE-1]);
+		}
+	}
+	LOG_P(PERI,"========================\r\n");
 
 	//todo:Init Butt,lcd,7segs,.....
 	TEST_EVENT.lifetime = fl_rtc_get();
@@ -209,6 +228,7 @@ void TBS_Counter_Run(void){
 //	G_COUNTER_DEV.data.err_product = RAND(1,500);
 //	G_COUNTER_DEV.data.mode = 1;
 	Counter_LCD_MessageStore();
+	Counter_LCD_MessageCheck_FlagNew();
 }
 #endif
 #ifdef POWER_METER_DEVICE
