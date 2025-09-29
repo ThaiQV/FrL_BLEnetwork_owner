@@ -529,7 +529,6 @@ int _GETALLNODES(void) {
 	u8 slaveID[GETALL_NUMOF1TIMES];
 	//last slaveID array
 	static u8 pre_slaveID[GETALL_NUMOF1TIMES];
-	//req retry
 
 	memset(slaveID,0xFF,SIZEU8(slaveID));
 	if (p_ALLNODES.timeout <= GETALL_TIMEOUT_1_NODE)

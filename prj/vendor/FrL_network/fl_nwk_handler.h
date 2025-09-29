@@ -123,7 +123,6 @@ typedef struct {
 	u8 type;			//device type
 	// Measurement fields (bit-level precision noted)
 	struct {
-
 		u16 index;          // 16 bits
 		u8 frequency;     	// 7 bits
 		u16 voltage;        // 9 bits
