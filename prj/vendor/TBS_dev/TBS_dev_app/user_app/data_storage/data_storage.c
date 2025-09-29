@@ -31,7 +31,7 @@ static data_storage_context_t data_storage_ctx = {0};
 static subapp_result_t data_storage_app_init(subapp_t* self);
 static subapp_result_t data_storage_app_loop(subapp_t* self);
 static subapp_result_t data_storage_app_deinit(subapp_t* self);
-static void data_storage_app_event_handler(const event_t* event, void* user_data);
+//static void data_storage_app_event_handler(const event_t* event, void* user_data);
 
 subapp_t data_storage_app = {
         .name = "data_storage", 
@@ -55,8 +55,8 @@ static subapp_result_t data_storage_app_init(subapp_t* self)
 //	storage_get_data(data_storage_data.timestamp, pre_data_save.data, sizeof(data_save_t));
 //	data_storage_ctx.data_save.product_pass = get_data.pass_product();
 //	data_storage_ctx.data_save.product_error = get_data.err_product();
-//	printf("%d %d\n", data_storage_ctx.data_save.product_pass, data_storage_ctx.data_save.product_error);
-//	printf("%d %d\n", pre_data_save.product_pass, pre_data_save.product_error);
+//	ULOGA("%d %d\n", data_storage_ctx.data_save.product_pass, data_storage_ctx.data_save.product_error);
+//	ULOGA("%d %d\n", pre_data_save.product_pass, pre_data_save.product_error);
 	return SUBAPP_OK;
 }
 
@@ -76,9 +76,9 @@ static subapp_result_t data_storage_app_loop(subapp_t* self)
 	uint32_t timetemp1 = get_data.timetamp();
 
 	storage_put_data(timetemp1, pre_data_save.data, sizeof(data_save_t));
-	printf("save data: timestamp %d %d %d\n", timetemp1, pre_data_save.product_pass, pre_data_save.product_error);
+	ULOGA("save data: timestamp %d %d %d\n", timetemp1, pre_data_save.product_pass, pre_data_save.product_error);
 	// storage_get_data(timetemp1, pre_data_save.data, sizeof(data_save_t));
-	// printf("read data: timestamp %d %d %d\n", timetemp1, pre_data_save.product_pass, pre_data_save.product_error);
+	// ULOGA("read data: timestamp %d %d %d\n", timetemp1, pre_data_save.product_pass, pre_data_save.product_error);
 
 	return SUBAPP_OK;
 }
@@ -88,10 +88,10 @@ static subapp_result_t data_storage_app_deinit(subapp_t* self)
 	return SUBAPP_OK;
 }
 
-static void data_storage_app_event_handler(const event_t* event, void* user_data)
-{
-
-}
+//static void data_storage_app_event_handler(const event_t* event, void* user_data)
+//{
+//
+//}
 
 void hw_storage_init(void)
 {

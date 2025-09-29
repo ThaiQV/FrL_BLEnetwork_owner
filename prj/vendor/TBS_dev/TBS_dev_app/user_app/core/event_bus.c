@@ -5,6 +5,12 @@
  * @date 2025
  */
 
+#ifndef MASTER_CORE
+
+#include "vendor/TBS_dev/TBS_dev_config.h"
+
+#ifdef COUNTER_DEVICE
+
 #include "include/event_bus.h"
 #include <string.h>
 #include <stdio.h>
@@ -448,7 +454,7 @@ static void event_sort_queue_by_priority(void)
 
 /* ========== DEBUG FUNCTIONS ========== */
 
-#ifdef DEBUG
+#ifdef EVENT_DEBUG
 
 void event_bus_debug_print(void)
 {
@@ -508,3 +514,6 @@ const char* event_type_to_string(event_type_t type)
 }
 
 #endif /* DEBUG */
+
+#endif /* COUNTER_DEVICE*/
+#endif /* MASTER_CORE*/

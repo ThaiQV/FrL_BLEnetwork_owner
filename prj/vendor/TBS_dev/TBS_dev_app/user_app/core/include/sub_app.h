@@ -1,6 +1,9 @@
 #ifndef SUBAPP_H
 #define SUBAPP_H
 
+#ifndef MASTER_CORE
+#ifdef COUNTER_DEVICE
+
 #include <stdint.h>
 #include <stdbool.h>
 #include "event_bus.h"
@@ -54,4 +57,6 @@ bool subapp_is_finished(const subapp_t* subapp);
 void subapp_set_context(subapp_t* subapp, void* context);
 void* subapp_get_context(const subapp_t* subapp);
 
+#endif /* COUNTER_DEVICE*/
+#endif /* MASTER_CORE*/
 #endif // SUBAPP_H

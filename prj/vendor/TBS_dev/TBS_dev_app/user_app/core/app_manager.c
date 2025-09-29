@@ -1,9 +1,28 @@
+/**
+ * @file app_manager.h
+ * @brief 
+ * @author Nghia Hoang
+ * @date 2025
+ */
+
+#ifndef MASTER_CORE
+
+#include "vendor/TBS_dev/TBS_dev_config.h"
+
+#ifdef COUNTER_DEVICE
+
 #include "include/app_manager.h"
 #include "include/event_bus.h"
 #include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+
 #include <stdint.h>
+
+#define APP_MANAGER_DEBUG			0
+#if	APP_MANAGER_DEBUG
+#define AM_LOG_BT(...)	ULOGA(__VA_ARGS__)
+#else
+#define AM_LOG_BT(...)
+#endif
 
 // Internal SubApp registry
 typedef struct {
@@ -28,12 +47,11 @@ static uint32_t get_system_time_ms(void);
 static subapp_t* find_subapp_by_name(const char* name);
 static void update_stats(void);
 static void handle_subapp_error(subapp_t* subapp, subapp_result_t result);
-static void delay_ms(uint32_t ms);
 
 // Public API implementation
 app_manager_result_t app_manager_init(void) {
     if (g_app_manager.initialized) {
-        printf("[AppManager] Already initialized\n");
+        AM_LOG_BT("[AppManager] Already initialized\n");
         return APP_MANAGER_OK;
     }
     
@@ -50,7 +68,7 @@ app_manager_result_t app_manager_init(void) {
     
     // Initialize Event Bus
     if (event_bus_init() != EVENT_BUS_OK) {
-        printf("[AppManager] Failed to initialize Event Bus\n");
+        AM_LOG_BT("[AppManager] Failed to initialize Event Bus\n");
         g_app_manager.state = APP_MANAGER_STATE_ERROR;
         return APP_MANAGER_ERROR;
     }
@@ -61,7 +79,7 @@ app_manager_result_t app_manager_init(void) {
                                                      &g_app_manager, 
                                                      "AppManager");
     if (g_app_manager_subscriber_id < 0) {
-        printf("[AppManager] Failed to subscribe to events\n");
+        AM_LOG_BT("[AppManager] Failed to subscribe to events\n");
         event_bus_deinit();
         g_app_manager.state = APP_MANAGER_STATE_ERROR;
         return APP_MANAGER_ERROR;
@@ -70,7 +88,7 @@ app_manager_result_t app_manager_init(void) {
     g_app_manager.initialized = true;
     g_app_manager.state = APP_MANAGER_STATE_IDLE;
     
-    printf("[AppManager] Initialized successfully (Version: %s)\n", APP_MANAGER_VERSION);
+    AM_LOG_BT("[AppManager] Initialized successfully (Version: %s)\n", APP_MANAGER_VERSION);
     return APP_MANAGER_OK;
 }
 
@@ -79,7 +97,7 @@ void app_manager_deinit(void) {
         return;
     }
     
-    printf("[AppManager] Deinitializing...\n");
+    AM_LOG_BT("[AppManager] Deinitializing...\n");
     
     // Stop all SubApps
     app_manager_stop_all();
@@ -99,7 +117,7 @@ void app_manager_deinit(void) {
     g_app_manager.initialized = false;
     g_app_manager.state = APP_MANAGER_STATE_IDLE;
     
-    printf("[AppManager] Deinitialized\n");
+    AM_LOG_BT("[AppManager] Deinitialized\n");
 }
 
 app_manager_result_t app_manager_register(subapp_t* subapp) {
@@ -108,20 +126,20 @@ app_manager_result_t app_manager_register(subapp_t* subapp) {
     }
     
     if (g_app_manager.count >= APP_MANAGER_MAX_SUBAPPS) {
-        printf("[AppManager] Cannot register SubApp '%s': registry is full\n", 
+        AM_LOG_BT("[AppManager] Cannot register SubApp '%s': registry is full\n", 
                subapp->name ? subapp->name : "unknown");
         return APP_MANAGER_FULL;
     }
     
     // Check if SubApp already exists
     if (find_subapp_by_name(subapp->name)) {
-        printf("[AppManager] SubApp '%s' already registered\n", subapp->name);
+        AM_LOG_BT("[AppManager] SubApp '%s' already registered\n", subapp->name);
         return APP_MANAGER_ALREADY_EXISTS;
     }
     
     // Validate SubApp structure
     if (!subapp->init || !subapp->loop || !subapp->deinit) {
-        printf("[AppManager] Invalid SubApp '%s': missing required callbacks\n", 
+        AM_LOG_BT("[AppManager] Invalid SubApp '%s': missing required callbacks\n", 
                subapp->name ? subapp->name : "unknown");
         return APP_MANAGER_INVALID_PARAM;
     }
@@ -133,7 +151,7 @@ app_manager_result_t app_manager_register(subapp_t* subapp) {
     g_app_manager.count++;
     g_app_manager.stats.total_registered++;
     
-    printf("[AppManager] Registered SubApp '%s' (%lu/%d)\n",
+    AM_LOG_BT("[AppManager] Registered SubApp '%s' (%lu/%d)\n",
            subapp->name, g_app_manager.count, APP_MANAGER_MAX_SUBAPPS);
     
     return APP_MANAGER_OK;
@@ -164,7 +182,7 @@ app_manager_result_t app_manager_unregister(const char* name) {
             subapp->state = SUBAPP_STATE_IDLE;
             g_app_manager.count--;
             
-            printf("[AppManager] Unregistered SubApp '%s'\n", name);
+            AM_LOG_BT("[AppManager] Unregistered SubApp '%s'\n", name);
             return APP_MANAGER_OK;
         }
     }
@@ -173,7 +191,7 @@ app_manager_result_t app_manager_unregister(const char* name) {
 }
 
 app_manager_result_t app_manager_unregister_all(void) {
-    printf("[AppManager] Unregistering all SubApps...\n");
+    AM_LOG_BT("[AppManager] Unregistering all SubApps...\n");
     
     while (g_app_manager.count > 0) {
         subapp_t* subapp = g_app_manager.subapps[0];
@@ -188,7 +206,7 @@ app_manager_result_t app_manager_start_all(void) {
         return APP_MANAGER_INVALID_PARAM;
     }
     
-    printf("[AppManager] Starting all SubApps...\n");
+    AM_LOG_BT("[AppManager] Starting all SubApps...\n");
     g_app_manager.state = APP_MANAGER_STATE_INITIALIZING;
     
     uint32_t started = 0;
@@ -197,7 +215,7 @@ app_manager_result_t app_manager_start_all(void) {
         subapp_t* subapp = g_app_manager.subapps[i];
         
         if (subapp && subapp->init) {
-            printf("[AppManager] Initializing SubApp '%s'...\n", subapp->name);
+            AM_LOG_BT("[AppManager] Initializing SubApp '%s'...\n", subapp->name);
             
             subapp_result_t result = subapp->init(subapp);
             g_app_manager.stats.total_init_calls++;
@@ -205,11 +223,11 @@ app_manager_result_t app_manager_start_all(void) {
             if (result == SUBAPP_OK) {
                 subapp->state = SUBAPP_STATE_RUNNING;
                 started++;
-                printf("[AppManager] SubApp '%s' started successfully\n", subapp->name);
+                AM_LOG_BT("[AppManager] SubApp '%s' started successfully\n", subapp->name);
             } else {
                 subapp->state = SUBAPP_STATE_ERROR;
                 g_app_manager.stats.total_errors++;
-                printf("[AppManager] Failed to start SubApp '%s' (error: %d)\n", 
+                AM_LOG_BT("[AppManager] Failed to start SubApp '%s' (error: %d)\n", 
                        subapp->name, result);
             }
         }
@@ -221,7 +239,7 @@ app_manager_result_t app_manager_start_all(void) {
     // Send system start event
     EVENT_PUBLISH_SIMPLE(EVENT_SYSTEM_START, EVENT_PRIORITY_NORMAL);
     
-    printf("[AppManager] Started %lu/%lu SubApps successfully\n", started, g_app_manager.count);
+    AM_LOG_BT("[AppManager] Started %lu/%lu SubApps successfully\n", started, g_app_manager.count);
     return APP_MANAGER_OK;
 }
 
@@ -249,13 +267,13 @@ app_manager_result_t app_manager_loop(void) {
             
             // Check for long-running loops
             if (loop_time > g_app_manager.config.max_loop_time_ms) {
-                printf("[AppManager] Warning: SubApp '%s' loop took %lu ms (max: %lu ms)\n",
+                AM_LOG_BT("[AppManager] Warning: SubApp '%s' loop took %lu ms (max: %lu ms)\n",
                        subapp->name, loop_time, g_app_manager.config.max_loop_time_ms);
             }
             
             // Handle SubApp result
             if (result == SUBAPP_FINISHED) {
-                printf("[AppManager] SubApp '%s' finished\n", subapp->name);
+                AM_LOG_BT("[AppManager] SubApp '%s' finished\n", subapp->name);
                 subapp->state = SUBAPP_STATE_FINISHED;
                 g_app_manager.stats.active_subapps--;
             } else if (result != SUBAPP_OK) {
@@ -273,7 +291,7 @@ app_manager_result_t app_manager_pause_all(void) {
         return APP_MANAGER_INVALID_PARAM;
     }
     
-    printf("[AppManager] Pausing all SubApps...\n");
+    AM_LOG_BT("[AppManager] Pausing all SubApps...\n");
     g_app_manager.state = APP_MANAGER_STATE_PAUSING;
     
     for (uint32_t i = 0; i < g_app_manager.count; i++) {
@@ -298,7 +316,7 @@ app_manager_result_t app_manager_resume_all(void) {
         return APP_MANAGER_INVALID_PARAM;
     }
     
-    printf("[AppManager] Resuming all SubApps...\n");
+    AM_LOG_BT("[AppManager] Resuming all SubApps...\n");
     
     for (uint32_t i = 0; i < g_app_manager.count; i++) {
         subapp_t* subapp = g_app_manager.subapps[i];
@@ -324,7 +342,7 @@ app_manager_result_t app_manager_stop_all(void) {
         return APP_MANAGER_INVALID_PARAM;
     }
     
-    printf("[AppManager] Stopping all SubApps...\n");
+    AM_LOG_BT("[AppManager] Stopping all SubApps...\n");
     g_app_manager.state = APP_MANAGER_STATE_STOPPING;
     
     // Send system stop event
@@ -335,12 +353,12 @@ app_manager_result_t app_manager_stop_all(void) {
         
         if (subapp && (subapp->state == SUBAPP_STATE_RUNNING || 
                       subapp->state == SUBAPP_STATE_PAUSED)) {
-            printf("[AppManager] Stopping SubApp '%s'...\n", subapp->name);
+            AM_LOG_BT("[AppManager] Stopping SubApp '%s'...\n", subapp->name);
             
             if (subapp->deinit) {
                 subapp_result_t result = subapp->deinit(subapp);
                 if (result != SUBAPP_OK) {
-                    printf("[AppManager] Warning: SubApp '%s' deinit returned error: %d\n",
+                    AM_LOG_BT("[AppManager] Warning: SubApp '%s' deinit returned error: %d\n",
                            subapp->name, result);
                 }
             }
@@ -352,7 +370,7 @@ app_manager_result_t app_manager_stop_all(void) {
     g_app_manager.stats.active_subapps = 0;
     g_app_manager.state = APP_MANAGER_STATE_IDLE;
     
-    printf("[AppManager] All SubApps stopped\n");
+    AM_LOG_BT("[AppManager] All SubApps stopped\n");
     return APP_MANAGER_OK;
 }
 
@@ -363,7 +381,7 @@ app_manager_result_t app_manager_start_subapp(const char* name) {
     }
     
     if (subapp->state != SUBAPP_STATE_IDLE) {
-        printf("[AppManager] SubApp '%s' is not in idle state\n", name);
+        AM_LOG_BT("[AppManager] SubApp '%s' is not in idle state\n", name);
         return APP_MANAGER_ERROR;
     }
     
@@ -374,12 +392,12 @@ app_manager_result_t app_manager_start_subapp(const char* name) {
         if (result == SUBAPP_OK) {
             subapp->state = SUBAPP_STATE_RUNNING;
             g_app_manager.stats.active_subapps++;
-            printf("[AppManager] Started SubApp '%s'\n", name);
+            AM_LOG_BT("[AppManager] Started SubApp '%s'\n", name);
             return APP_MANAGER_OK;
         } else {
             subapp->state = SUBAPP_STATE_ERROR;
             g_app_manager.stats.total_errors++;
-            printf("[AppManager] Failed to start SubApp '%s'\n", name);
+            AM_LOG_BT("[AppManager] Failed to start SubApp '%s'\n", name);
             return APP_MANAGER_ERROR;
         }
     }
@@ -402,7 +420,7 @@ app_manager_result_t app_manager_pause_subapp(const char* name) {
     }
     subapp->state = SUBAPP_STATE_PAUSED;
     
-    printf("[AppManager] Paused SubApp '%s'\n", name);
+    AM_LOG_BT("[AppManager] Paused SubApp '%s'\n", name);
     return APP_MANAGER_OK;
 }
 
@@ -421,7 +439,7 @@ app_manager_result_t app_manager_resume_subapp(const char* name) {
     }
     subapp->state = SUBAPP_STATE_RUNNING;
     
-    printf("[AppManager] Resumed SubApp '%s'\n", name);
+    AM_LOG_BT("[AppManager] Resumed SubApp '%s'\n", name);
     return APP_MANAGER_OK;
 }
 
@@ -438,7 +456,7 @@ app_manager_result_t app_manager_stop_subapp(const char* name) {
         subapp->state = SUBAPP_STATE_IDLE;
         g_app_manager.stats.active_subapps--;
         
-        printf("[AppManager] Stopped SubApp '%s'\n", name);
+        AM_LOG_BT("[AppManager] Stopped SubApp '%s'\n", name);
     }
     
     return APP_MANAGER_OK;
@@ -472,7 +490,7 @@ void app_manager_reset_stats(void) {
 }
 
 void app_manager_print_subapps(void) {
-    printf("[AppManager] Registered SubApps (%lu/%d):\n",
+    AM_LOG_BT("[AppManager] Registered SubApps (%lu/%d):\n",
            g_app_manager.count, APP_MANAGER_MAX_SUBAPPS);
     
     for (uint32_t i = 0; i < g_app_manager.count; i++) {
@@ -487,7 +505,7 @@ void app_manager_print_subapps(void) {
             case SUBAPP_STATE_FINISHED: state_str = "Finished"; break;
         }
         
-        printf("  [%lu] %s - State: %s, Events: 0x%08lx\n",
+        AM_LOG_BT("  [%lu] %s - State: %s, Events: 0x%08lx\n",
                i, subapp->name, state_str, subapp->event_mask);
     }
 }
@@ -503,11 +521,11 @@ app_manager_result_t app_manager_configure(const app_manager_config_t* config) {
     
     memcpy(&g_app_manager.config, config, sizeof(app_manager_config_t));
     
-    printf("[AppManager] Configuration updated:\n");
-    printf("  Loop delay: %lu ms\n", config->loop_delay_ms);
-    printf("  Auto handle events: %s\n", config->auto_handle_events ? "Yes" : "No");
-    printf("  Enable watchdog: %s\n", config->enable_watchdog ? "Yes" : "No");
-    printf("  Max loop time: %lu ms\n", config->max_loop_time_ms);
+    AM_LOG_BT("[AppManager] Configuration updated:\n");
+    AM_LOG_BT("  Loop delay: %lu ms\n", config->loop_delay_ms);
+    AM_LOG_BT("  Auto handle events: %s\n", config->auto_handle_events ? "Yes" : "No");
+    AM_LOG_BT("  Enable watchdog: %s\n", config->enable_watchdog ? "Yes" : "No");
+    AM_LOG_BT("  Max loop time: %lu ms\n", config->max_loop_time_ms);
     
     return APP_MANAGER_OK;
 }
@@ -517,12 +535,12 @@ app_manager_result_t app_manager_run(void) {
         return APP_MANAGER_INVALID_PARAM;
     }
     
-    printf("[AppManager] Starting main run loop...\n");
+    AM_LOG_BT("[AppManager] Starting main run loop...\n");
     
     // Start all SubApps
     app_manager_result_t result = app_manager_start_all();
     if (result != APP_MANAGER_OK) {
-        printf("[AppManager] Failed to start SubApps\n");
+        AM_LOG_BT("[AppManager] Failed to start SubApps\n");
         return result;
     }
     
@@ -532,7 +550,7 @@ app_manager_result_t app_manager_run(void) {
         
         result = app_manager_loop();
         if (result != APP_MANAGER_OK) {
-            printf("[AppManager] Loop error: %d\n", result);
+            AM_LOG_BT("[AppManager] Loop error: %d\n", result);
             break;
         }
         
@@ -542,7 +560,7 @@ app_manager_result_t app_manager_run(void) {
         }
     }
     
-    printf("[AppManager] Main run loop finished\n");
+    AM_LOG_BT("[AppManager] Main run loop finished\n");
     app_manager_stop_all();
     
     return APP_MANAGER_OK;
@@ -575,39 +593,35 @@ static void update_stats(void) {
 }
 
 static void handle_subapp_error(subapp_t* subapp, subapp_result_t result) {
-    printf("[AppManager] SubApp '%s' error: %d\n", subapp->name, result);
+    AM_LOG_BT("[AppManager] SubApp '%s' error: %d\n", subapp->name, result);
     subapp->state = SUBAPP_STATE_ERROR;
     g_app_manager.stats.total_errors++;
     g_app_manager.stats.active_subapps--;
 }
 
-static void delay_ms(uint32_t ms) {
-    // Simplified delay - in real system would use proper timer/sleep
-    volatile uint32_t count = ms * 1000;  // Rough delay simulation
-    while (count--) {
-        // Simple busy wait
-    }
-}
 
 // Event handler for App Manager
 static void app_manager_event_handler(const event_t* event, void* user_data) {
     app_manager_t* app_mgr = (app_manager_t*)user_data;
     
-    printf("[AppManager] Received event: 0x%04lx\n", (uint32_t)event->type);
+    AM_LOG_BT("[AppManager] Received event: 0x%04lx\n", (uint32_t)event->type);
     
     switch (event->type) {
         case EVENT_SYSTEM_ERROR:
-            printf("[AppManager] System error detected!\n");
+            AM_LOG_BT("[AppManager] System error detected!\n");
             app_mgr->stats.total_errors++;
             
             // Handle system error
             if (event->data_size > 0 && event->data_size <= sizeof(app_mgr->stats)) {
-                printf("[AppManager] Error data received\n");
+                AM_LOG_BT("[AppManager] Error data received\n");
             }
             break;
             
         default:
-            printf("[AppManager] Unhandled event: 0x%04lx\n", (uint32_t)event->type);
+            AM_LOG_BT("[AppManager] Unhandled event: 0x%04lx\n", (uint32_t)event->type);
             break;
     }
 }
+
+#endif /* COUNTER_DEVICE*/
+#endif /* MASTER_CORE*/

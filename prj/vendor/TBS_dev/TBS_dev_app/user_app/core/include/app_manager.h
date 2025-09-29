@@ -1,5 +1,15 @@
+/**
+ * @file app_manager.h
+ * @brief 
+ * @author Nghia Hoang
+ * @date 2025
+ */
+
 #ifndef APP_MANAGER_H
 #define APP_MANAGER_H
+
+#ifndef MASTER_CORE
+#ifdef COUNTER_DEVICE
 
 #include "sub_app.h"
 #include "event_bus.h"
@@ -87,4 +97,6 @@ typedef struct {
 app_manager_result_t app_manager_configure(const app_manager_config_t* config);
 app_manager_result_t app_manager_run(void);  // Main run loop
 
+#endif /* COUNTER_DEVICE*/
+#endif /* MASTER_CORE*/
 #endif // APP_MANAGER_H

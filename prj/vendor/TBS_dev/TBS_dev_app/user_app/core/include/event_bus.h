@@ -1,12 +1,15 @@
 /**
  * @file event_bus.h
  * @brief Event-driven publish/subscribe system
- * @author Your Name
+ * @author Nghia Hoang
  * @date 2025
  */
 
 #ifndef EVENT_BUS_H
 #define EVENT_BUS_H
+
+#ifndef MASTER_CORE
+#ifdef COUNTER_DEVICE
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -357,4 +360,6 @@ const char* event_type_to_string(event_type_t type);
 }
 #endif
 
+#endif /* COUNTER_DEVICE*/
+#endif /* MASTER_CORE*/
 #endif /* EVENT_BUS_H */

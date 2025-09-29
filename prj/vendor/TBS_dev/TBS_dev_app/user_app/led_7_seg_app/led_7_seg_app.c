@@ -154,23 +154,22 @@ static subapp_result_t led7_app_deinit(subapp_t* self)
 
 static void led7_app_event_handler(const event_t* event, void* user_data)
 {
-	uint16_t value =0;
 	switch (event->type) {
         case EVENT_DATA_START_DONE:
-            printf("led Handle EVENT_DATA_START_DONE\n");
+            ULOGA("led Handle EVENT_DATA_START_DONE\n");
 			et6226m_display_number(&display_handle, get_data.pass_product(), false);
 			led7_ctx.start = 1;
             // TODO: turn LED to indicate network online
             break;
 
         case EVENT_LED7_PRINT_ERR:
-            printf("Handle EVENT_LED7_PRINT_ERR\n");
+            ULOGA("Handle EVENT_LED7_PRINT_ERR\n");
 			
             // TODO: turn LED to indicate network offline
             break;
 
         case EVENT_DATA_ERR_PRODUCT_CHANGE:
-            printf("Handle EVENT_DATA_ERR_PRODUCT_CHANGE\n");
+            ULOGA("Handle EVENT_DATA_ERR_PRODUCT_CHANGE\n");
 			et6226m_display_printf(&display_handle, "E%3d", get_data.err_product());
 			led7_ctx.print_err = 1;
 			led7_ctx.timeout_print_err = get_system_time_ms() + TIME_OUT_PRINTF_ERR_MS;
@@ -178,25 +177,25 @@ static void led7_app_event_handler(const event_t* event, void* user_data)
             break;
 
         case EVENT_DATA_PASS_PRODUCT_UP:
-            printf("Handle EVENT_DATA_PASS_PRODUCT_UP\n");
+            ULOGA("Handle EVENT_DATA_PASS_PRODUCT_UP\n");
 			et6226m_display_number(&display_handle, get_data.pass_product(), false);
             // TODO: turn off LED for network call
             break;
 
         case EVENT_DATA_PASS_PRODUCT_DOWN:
-            printf("Handle EVENT_DATA_PASS_PRODUCT_DOWN\n");
+            ULOGA("Handle EVENT_DATA_PASS_PRODUCT_DOWN\n");
 			et6226m_display_number(&display_handle, get_data.pass_product(), false);
             // TODO: blink LED for call state
             break;
 
 		case EVENT_DATA_RESET:
-            printf("Handle EVENT_DATA_CALL\n");
+            ULOGA("Handle EVENT_DATA_CALL\n");
 			et6226m_display_number(&display_handle, get_data.pass_product(), false);
             // TODO: blink LED for call state
 			break;
 
         default:
-            printf("Unknown LED7 event: %u\n", (uint32_t)event->type);
+            ULOGA("Unknown LED7 event: %u\n", (uint32_t)event->type);
             break;
     }
 }

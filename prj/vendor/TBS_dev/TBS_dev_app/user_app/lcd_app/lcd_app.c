@@ -25,6 +25,7 @@ typedef enum {
 	LCD_PRINT_ENDCALL,
 	LCD_PRINT_MAC,
 	LCD_PRINT_MODE,
+	LCD_PRINT_RESET,
 } lcd_print_type_t;
 
 // SubApp context structure
@@ -36,6 +37,7 @@ typedef struct {
     uint8_t row0_mess_num;
     uint8_t row1_mess_num;
     uint32_t time_off;
+	bool print_mode;
     bool enable;            ///< Data validity flag
     bool startup;
     lcd_print_type_t print_type;
@@ -153,19 +155,24 @@ void my_timeout_callback(uint8_t row) {
 			break;
 
 		case LCD_PRINT_ENDCALL:
-			lcd_ctx.print_type = LCD_PRINT_NONE;
+			lcd_ctx.print_type = LCD_PRINT_OFF;
 			continue;
 
 		case LCD_PRINT_MESS:
 			lcd_ctx.print_type = LCD_PRINT_NONE;
+			lcd_ctx.print_mode = 0;
 			continue;
 		
 		case LCD_PRINT_ERR:
-			lcd_ctx.print_type = LCD_PRINT_NONE;
+			lcd_ctx.print_type = LCD_PRINT_OFF;
 			continue;
 
 		case LCD_PRINT_MODE:
-			lcd_ctx.print_type = LCD_PRINT_NONE;
+			lcd_ctx.print_type = LCD_PRINT_OFF;
+			continue;
+
+		case LCD_PRINT_RESET:
+			lcd_ctx.print_type = LCD_PRINT_OFF;
 			continue;
 
 		case LCD_PRINT_NONE:
@@ -184,8 +191,17 @@ void my_timeout_callback(uint8_t row) {
 			break;
 
 		default:
-			lcd_ctx.enable = false;
-			lcd_off();
+			if (get_data.is_call())
+			{
+				lcd_ctx.print_type = LCD_PRINT_CALL;
+				continue;
+			}
+			else
+			{
+				lcd_ctx.enable = false;
+				lcd_off();
+			}
+			
 			break;
 		}
 		break;
@@ -219,6 +235,10 @@ static subapp_result_t lcd_app_init(subapp_t* self)
 	gpio_set_level(GPIO_PC0, 1);
 
 	lcd16x2_error_t result = lcd16x2_init(&lcd_handle, &lcd_config);
+	if(result != 0)
+	{
+		ULOGA("lcd init erro\n");
+	}
 	lcd16x2_clear(&lcd_handle);
 
 	lcd_app_init_drv(&app_handle, &lcd_handle, &app_config);
@@ -285,15 +305,80 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 	switch (event->type)
 	{
         case EVENT_LCD_PRINT_MESS:
-            printf("Handle EVENT_LCD_PRINT_MESS\n");
+            ULOGA("Handle EVENT_LCD_PRINT_MESS\n");
 			lcd_ctx.enable = 1;
 			lcd_ctx.print_type = LCD_PRINT_MESS;
-			// lcd_ctx.time_off = get_system_time_ms() + 15000;
-			lcd_app_clear_all(&app_handle);
-			lcd_app_set_message(&app_handle, 0, G_COUNTER_LCD[lcd_ctx.row0_mess_num], 30000); //  0, timeout 10s
-			lcd_app_set_message(&app_handle, 1, G_COUNTER_LCD[lcd_ctx.row1_mess_num], 15000); //  1, timeout 15s
-			lcd_ctx.row0_mess_num = (lcd_ctx.row0_mess_num +1) % 10;
-			lcd_ctx.row1_mess_num = (lcd_ctx.row1_mess_num +1) % 10;
+			uint8_t mess_zero[22] = {0};
+			if(lcd_ctx.print_mode == 0)
+			{
+				if(get_data.is_mode_actic())
+				{
+					lcd_app_set_message(&app_handle, 0, " Dang Trong Ca  ", 20000); //  0, timeout 10s
+				}
+				else
+				{
+					lcd_app_set_message(&app_handle, 0, " Dang Chay Thu  ", 20000); //  0, timeout 10s
+				}
+
+				for(int i = 0; i <= 10; i++)
+				{
+					if(i == 10)
+					{
+						lcd_app_set_message(&app_handle, 1, "Khong Co Thong Bao", 15000); //  0, timeout 10s
+						break;
+					}
+					if(memcmp(mess_zero, (uint8_t *)G_COUNTER_LCD[lcd_ctx.row0_mess_num], 20) == 0)
+					{
+						lcd_ctx.row0_mess_num = (lcd_ctx.row0_mess_num +1) % 10;
+						continue;
+					}
+					else
+					{
+						lcd_app_set_message(&app_handle, 1, (char *)(G_COUNTER_LCD[lcd_ctx.row0_mess_num]), 15000); //  1, timeout 15s
+						lcd_ctx.row0_mess_num = (lcd_ctx.row0_mess_num +1) % 10;
+						lcd_ctx.row1_mess_num = (lcd_ctx.row0_mess_num +1) % 10;
+						lcd_ctx.print_mode = 1;
+						break;
+					}
+				}
+			}
+			else
+			{
+				lcd_app_clear_all(&app_handle);
+				
+				for( int i = 0; i < 10; i++)
+				{
+					if(memcmp(mess_zero, (uint8_t *)G_COUNTER_LCD[lcd_ctx.row0_mess_num], 20) == 0)
+					{
+						lcd_ctx.row0_mess_num = (lcd_ctx.row0_mess_num +1) % 10;
+						continue;
+					}
+					else
+					{
+						lcd_app_set_message(&app_handle, 0, (char *)G_COUNTER_LCD[lcd_ctx.row0_mess_num], 15000); //  1, timeout 15s
+						lcd_ctx.row0_mess_num = (lcd_ctx.row0_mess_num +1) % 10;
+						lcd_ctx.row1_mess_num = (lcd_ctx.row0_mess_num +1) % 10;
+						break;
+					}
+				}
+
+				for( int i = 0; i < 10; i++)
+				{
+					if(memcmp(mess_zero, (uint8_t *)G_COUNTER_LCD[lcd_ctx.row1_mess_num], 20) == 0)
+					{
+						lcd_ctx.row1_mess_num = (lcd_ctx.row1_mess_num +1) % 10;
+						continue;
+					}
+					else
+					{
+						lcd_app_set_message(&app_handle, 1, (char *)G_COUNTER_LCD[lcd_ctx.row1_mess_num], 15000); //  1, timeout 15s
+						lcd_ctx.row1_mess_num = (lcd_ctx.row1_mess_num +1) % 10;
+						break;
+					}
+				}
+				
+			}
+			
 			
             // TODO: turn LED to indicate network online
             break;
@@ -306,7 +391,7 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 		case EVENT_DATA_ERR_PRODUCT_CHANGE:
 		case EVENT_DATA_PASS_PRODUCT_DOWN:
         case EVENT_LCD_PRINT_COUNT_PRODUCT:
-            printf("Handle EVENT_LCD_PRINT_COUNT_PRODUCT\n");
+            ULOGA("Handle EVENT_LCD_PRINT_COUNT_PRODUCT\n");
 			lcd_ctx.enable = 1;
 			lcd_ctx.print_type = LCD_PRINT_ERR;
 			sprintf(lcd_ctx.display.line1, "pass %4d", get_data.pass_product());
@@ -318,7 +403,7 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
             break;
 		
 		case EVENT_DATA_CALL:
-            printf("Handle EVENT_DATA_CALL\n");
+            ULOGA("Handle EVENT_DATA_CALL\n");
 			lcd_ctx.enable = 1;
 			lcd_ctx.print_type = LCD_PRINT_CALL;
 			lcd_ctx.time_off = 0;
@@ -329,7 +414,7 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 			break;
 
 		case EVENT_DATA_ENDCALL:
-            printf("Handle EVENT_DATA_ENDCALL\n");
+            ULOGA("Handle EVENT_DATA_ENDCALL\n");
 			lcd_ctx.enable = 1;
 			lcd_ctx.print_type = LCD_PRINT_ENDCALL;
 			lcd_app_set_message(&app_handle, 0, "  End Calling  ", 15000); //  0, timeout 10s
@@ -339,7 +424,7 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 			break;
 
 		case EVENT_LCD_PRINT_MAC:
-			printf("Handle EVENT_LCD_PRINT_MAC\n");
+			ULOGA("Handle EVENT_LCD_PRINT_MAC\n");
 			lcd_ctx.enable = 1;
 			lcd_ctx.print_type = LCD_PRINT_ENDCALL;
 			char line0[16];
@@ -352,13 +437,13 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 			break;
 
 		case EVENT_DATA_SWITCH_MODE:
-			printf("Handler EVENT_DATA_SWITCH_MODE\n");
+			ULOGA("Handler EVENT_DATA_SWITCH_MODE\n");
 			lcd_ctx.enable = 1;
 			lcd_ctx.print_type = LCD_PRINT_MODE;
 			if(get_data.is_mode_actic())
 			{
-				lcd_app_set_message(&app_handle, 0, "     Che Do     ", 30000); //  0, timeout 10s
-				lcd_app_set_message(&app_handle, 1, "    Trong Ca    ", 15000); //  0, timeout 10s
+				lcd_app_set_message(&app_handle, 0, "    Chuc Ban    ", 30000); //  0, timeout 10s
+				lcd_app_set_message(&app_handle, 1, "  Hieu Qua Cao  ", 15000); //  0, timeout 10s
 			}
 			else
 			{
@@ -367,8 +452,25 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 			}
 
 			break;
+
+		case EVENT_DATA_RESET:
+			ULOGA("Handle EVENT_DATA_RESET\n");
+			lcd_ctx.enable = 1;
+			lcd_ctx.print_type = LCD_PRINT_RESET;
+			lcd_app_set_message(&app_handle, 0, "    Reset OK     ", 30000); //  0, timeout 10s
+			if(get_data.is_mode_actic())
+			{
+				lcd_app_set_message(&app_handle, 1, "    Trong Ca    ", 15000); //  0, timeout 10s
+			}
+			else
+			{
+				lcd_app_set_message(&app_handle, 1, "Chay Thu Nghiem ", 15000); //  0, timeout 10s
+			}
+
+			break;
+
         default:
-            printf("Unknown LCD event: %d\n", (uint32_t)event->type);
+            ULOGA("Unknown LCD event: %d\n", (uint32_t)event->type);
             break;
     }
 }

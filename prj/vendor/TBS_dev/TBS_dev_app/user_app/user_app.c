@@ -38,15 +38,29 @@ extern subapp_t data_storage_app;
 
 const char mess[10][24] = {
     "0 chao buoi sang",
-    "1 hello world",
+	{0},
+    // "1 hello world",
     "2 1 ngay noi",
-    "3 mot hai ba bon nam",
-    "4 on twe three for",
+	{0},{0},
+    // "3 mot hai ba bon nam",
+    // "4 on twe three for",
     "5 numberone ",
-    "6 viet nam  1 2 3 4",
+	{0},
+    // "6 viet nam  1 2 3 4",
     "7 hi what your name",
     "8 counter",
-    "9 test mess end",
+	{0},
+    // "9 test mess end",
+	// {0},
+	// {0},
+	// {0},
+	// {0},
+	// {0},
+	// {0},
+	// {0},
+	// {0},
+	// {0},
+	// {0},
 };
 
 /******************************************************************/
@@ -136,10 +150,10 @@ void user_app_init(void)
 {
 	ULOGA("user_app_init start\n");
 
-	// printf("MAC: ");
+	// ULOGA("MAC: ");
 	// for(int i = 0; i < 6; i++)
 	// {
-	// 	printf("%02x ", G_COUNTER_DEV.data.mac[i]);
+	// 	ULOGA("%02x ", G_COUNTER_DEV.data.mac[i]);
 	// }
 
 	user_tca9555_app_init();
@@ -245,13 +259,13 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 {
     switch (event->type) {
         case EVENT_BUTTON_RST_ONCLICK:
-            printf("Handle EVENT_BUTTON_RST_ONCLICK\n");
+            ULOGA("Handle EVENT_BUTTON_RST_ONCLICK\n");
 			EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_MESS, EVENT_PRIORITY_HIGH);
 
             break;
 
         case EVENT_BUTTON_RST_HOLD_3S:
-            printf("Handle EVENT_BUTTON_RST_HOLD_3S\n");
+            ULOGA("Handle EVENT_BUTTON_RST_HOLD_3S\n");
 
 			G_COUNTER_DEV.data.bt_rst = 1;
 			fl_api_slave_req(NWK_HDR_55, (u8*)&G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data), rst_cb_rsp, TIME_OUT_CHECK_RSP, NUM_RETRY);
@@ -263,7 +277,7 @@ static void data_app_event_handler(const event_t* event, void* user_data)
             break;
 
         case EVENT_BUTTON_CALL_ONCLICK:
-            printf("Handle EVENT_BUTTON_CALL_ONCLICK\n");
+            ULOGA("Handle EVENT_BUTTON_CALL_ONCLICK\n");
 
 			G_COUNTER_DEV.data.bt_call = 1;
 			fl_api_slave_req(NWK_HDR_55, (u8*)&G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data), call_cb_rsp, TIME_OUT_CHECK_RSP, NUM_RETRY);
@@ -274,7 +288,7 @@ static void data_app_event_handler(const event_t* event, void* user_data)
             break;
 
         case EVENT_BUTTON_ENDCALL_ONCLICK:
-            printf("Handle EVENT_BUTTON_ENDCALL_ONCLICK\n");
+            ULOGA("Handle EVENT_BUTTON_ENDCALL_ONCLICK\n");
 			if( g_app_data.is_call)
 			{
 				G_COUNTER_DEV.data.bt_endcall = 1;
@@ -287,7 +301,7 @@ static void data_app_event_handler(const event_t* event, void* user_data)
             break;
 
         case EVENT_BUTTON_PPD_ONCLICK:
-            printf("Handle EVENT_BUTTON_PPD_ONCLICK\n");
+            ULOGA("Handle EVENT_BUTTON_PPD_ONCLICK\n");
 			if(g_app_data.count->pass_product > 0)
 			{
 				g_app_data.count->pass_product--;
@@ -297,7 +311,7 @@ static void data_app_event_handler(const event_t* event, void* user_data)
             break;
 
         case EVENT_BUTTON_PPU_ONCLICK:
-            printf("Handle EVENT_BUTTON_PPU_ONCLICK\n");
+            ULOGA("Handle EVENT_BUTTON_PPU_ONCLICK\n");
 			if(g_app_data.count->pass_product++ >= 10000)
 			{
 				g_app_data.count->pass_product = 0;
@@ -307,7 +321,7 @@ static void data_app_event_handler(const event_t* event, void* user_data)
             break;
 
         case EVENT_BUTTON_PED_ONCLICK:
-            printf("Handle EVENT_BUTTON_PED_ONCLICK\n");
+            ULOGA("Handle EVENT_BUTTON_PED_ONCLICK\n");
 			if(g_app_data.count->err_product)
 			{
 				g_app_data.count->err_product--;
@@ -317,7 +331,7 @@ static void data_app_event_handler(const event_t* event, void* user_data)
             break;
 
         case EVENT_BUTTON_PEU_ONCLICK:
-            printf("Handle EVENT_BUTTON_PEU_ONCLICK\n");
+            ULOGA("Handle EVENT_BUTTON_PEU_ONCLICK\n");
 			if(g_app_data.count->err_product++ >= 1000)
 			{
 				g_app_data.count->err_product = 0;
@@ -327,24 +341,24 @@ static void data_app_event_handler(const event_t* event, void* user_data)
             break;
 
         case EVENT_BUTTON_RST_PED_HOLD_5S:
-            printf("Handle EVENT_BUTTON_RST_PED_HOLD_5S\n");
+            ULOGA("Handle EVENT_BUTTON_RST_PED_HOLD_5S\n");
 			ULOGA("RST Factory\n");
 			
-//			fl_db_clearAll();
-//			storage_clean();
-//			sys_reboot();
+			fl_db_clearAll();
+			storage_clean();
+			sys_reboot();
 
             break;
 
         case EVENT_BUTTON_RST_PEU_HOLD_5S:
-            printf("Handle EVENT_BUTTON_RST_PEU_HOLD_5S\n");
+            ULOGA("Handle EVENT_BUTTON_RST_PEU_HOLD_5S\n");
 			ULOGA("PAIR\n");
-//			fl_db_clearAll();
-//			sys_reboot();
+			fl_db_clearAll();
+			sys_reboot();
             break;
 
         case EVENT_BUTTON_RST_PPU_HOLD_5S:
-            printf("Handle EVENT_BUTTON_RST_PPU_HOLD_5S\n");
+            ULOGA("Handle EVENT_BUTTON_RST_PPU_HOLD_5S\n");
 			if(g_app_data.mode == APP_MODE_TESTS)
 			{
 				g_app_data.mode = APP_MODE_ACTICS;
@@ -365,13 +379,13 @@ static void data_app_event_handler(const event_t* event, void* user_data)
             break;
 
 		case EVENT_BUTTON_ENDCALL_HOLD_5S:
-            printf("Handle EVENT_BUTTON_ENDCALL_HOLD_5S\n");
+            ULOGA("Handle EVENT_BUTTON_ENDCALL_HOLD_5S\n");
 			EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_MAC, EVENT_PRIORITY_HIGH);
 
             break;
 
         default:
-            printf("Unknown event: 0x%lx\n", (uint32_t)event);
+            ULOGA("Unknown event: 0x%lx\n", (uint32_t)event);
             break;
     }
 

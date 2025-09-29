@@ -26,7 +26,7 @@ typedef struct {
 	uint64_t time_out_err;
 	bool print_err;
 	bool enabled;           ///< Display enabled
-	uint8_t chage_printf;
+	uint8_t chage_ULOGA;
 } led7seg_shared_data_t;
 
 #define get_led7_event() {\

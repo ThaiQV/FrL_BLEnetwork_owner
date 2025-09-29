@@ -56,6 +56,7 @@ void lcd_off(void);
     EVENT_LCD_PRINT_COUNT_PRODUCT,\
     EVENT_LCD_PRINT_MAC,\
     EVENT_DATA_SWITCH_MODE,\
+    EVENT_DATA_RESET,\
 }
 
 #endif /* COUNTER_DEVICE*/

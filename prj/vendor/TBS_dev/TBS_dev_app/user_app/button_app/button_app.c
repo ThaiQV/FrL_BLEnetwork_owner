@@ -32,6 +32,7 @@ extern tca9555_handle_t tca9555_handle;
 // SubApp context structure
 typedef struct {
 	bool start;
+	uint8_t combo_rst;
 } button_context_t;
 
 // Static context instance
@@ -148,28 +149,29 @@ static subapp_result_t button_app_init(subapp_t* self)
         return SUBAPP_ERROR;
     }
 
-    button_set_click_callback(BUTTON_ID_PED, ped_on_lick);
-    button_set_click_callback(BUTTON_ID_PEU, peu_on_lick);
-    button_set_click_callback(BUTTON_ID_PPD, ppd_on_lick);
-    button_set_click_callback(BUTTON_ID_PPU, ppu_on_lick);
-    button_set_click_callback(BUTTON_ID_MAIN, main_on_lick);
-    button_set_click_callback(BUTTON_ID_CMAIN, cmain_on_lick);
-    button_set_click_callback(BUTTON_ID_RESET, reset_on_lick);
-    button_add_hold_level(BUTTON_ID_RESET, 3000, reset_hold_3s);
-	button_add_hold_level(BUTTON_ID_CMAIN, 5000, endcall_hold_5s);
+    // button_set_click_callback(BUTTON_ID_PED, ped_on_lick);
+    // button_set_click_callback(BUTTON_ID_PEU, peu_on_lick);
+    // button_set_click_callback(BUTTON_ID_PPD, ppd_on_lick);
+    // button_set_click_callback(BUTTON_ID_PPU, ppu_on_lick);
+    // button_set_click_callback(BUTTON_ID_MAIN, main_on_lick);
+    // button_set_click_callback(BUTTON_ID_CMAIN, cmain_on_lick);
+    // button_set_click_callback(BUTTON_ID_RESET, reset_on_lick);
+    // button_add_hold_level(BUTTON_ID_RESET, 5000, reset_hold_3s);
+	// button_add_hold_level(BUTTON_ID_CMAIN, 5000, endcall_hold_5s);
 	
-    // Combo:
+    // // Combo:
     uint8_t combo_buttons1[] = {BUTTON_ID_PED, BUTTON_ID_RESET};
     uint8_t combo_id1 = button_add_combo(combo_buttons1, 2, 500); // 500ms detection window
     button_set_combo_hold_callback(combo_id1, 5000, ped_rst_hold_5s);
+	button_ctx.combo_rst = combo_id1;
 
-    uint8_t combo_buttons2[] = {BUTTON_ID_PEU, BUTTON_ID_RESET};
-    uint8_t combo_id2 = button_add_combo(combo_buttons2, 2, 500); // 500ms detection window
-    button_set_combo_hold_callback(combo_id2, 5000, peu_rst_hold_5s);
+    // uint8_t combo_buttons2[] = {BUTTON_ID_PEU, BUTTON_ID_RESET};
+    // uint8_t combo_id2 = button_add_combo(combo_buttons2, 2, 500); // 500ms detection window
+    // button_set_combo_hold_callback(combo_id2, 5000, peu_rst_hold_5s);
 
-	uint8_t combo_buttons3[] = {BUTTON_ID_PPU, BUTTON_ID_RESET};
-    uint8_t combo_id3 = button_add_combo(combo_buttons3, 2, 500); // 500ms detection window
-    button_set_combo_hold_callback(combo_id3, 5000, ppu_rst_hold_5s);
+	// uint8_t combo_buttons3[] = {BUTTON_ID_PPU, BUTTON_ID_RESET};
+    // uint8_t combo_id3 = button_add_combo(combo_buttons3, 2, 500); // 500ms detection window
+    // button_set_combo_hold_callback(combo_id3, 5000, ppu_rst_hold_5s);
 
     uint32_t app_button_evt_table[] = get_button_event();
 
@@ -193,10 +195,10 @@ static subapp_result_t button_app_loop(subapp_t* self)
 		return SUBAPP_OK;
 	}
 
-    if(button_ctx.start == 0)
-    {
-        return SUBAPP_OK;
-    }
+    // if(button_ctx.start == 0)
+    // {
+    //     return SUBAPP_OK;
+    // }
 
 	button_process_all();
 	
@@ -213,8 +215,30 @@ static void button_app_event_handler(const event_t* event, void* user_data)
     switch(event->type)
     {
         case EVENT_DATA_START_DONE:
-            printf("button Handle EVENT_DATA_START_DONE\n");
+            ULOGA("button Handle EVENT_DATA_START_DONE\n");
             button_ctx.start = 1;
+			// button_remove_combo(button_ctx.combo_rst);
+			// button_set_combo_enabled(button_ctx.combo_rst, false);
+
+			button_set_click_callback(BUTTON_ID_PED, ped_on_lick);
+			button_set_click_callback(BUTTON_ID_PEU, peu_on_lick);
+			button_set_click_callback(BUTTON_ID_PPD, ppd_on_lick);
+			button_set_click_callback(BUTTON_ID_PPU, ppu_on_lick);
+			button_set_click_callback(BUTTON_ID_MAIN, main_on_lick);
+			button_set_click_callback(BUTTON_ID_CMAIN, cmain_on_lick);
+			button_set_click_callback(BUTTON_ID_RESET, reset_on_lick);
+			button_add_hold_level(BUTTON_ID_RESET, 5000, reset_hold_3s);
+			button_add_hold_level(BUTTON_ID_CMAIN, 5000, endcall_hold_5s);
+			
+			// Combo:
+
+			uint8_t combo_buttons2[] = {BUTTON_ID_PEU, BUTTON_ID_RESET};
+			uint8_t combo_id2 = button_add_combo(combo_buttons2, 2, 500); // 500ms detection window
+			button_set_combo_hold_callback(combo_id2, 5000, peu_rst_hold_5s);
+
+			uint8_t combo_buttons3[] = {BUTTON_ID_PPU, BUTTON_ID_RESET};
+			uint8_t combo_id3 = button_add_combo(combo_buttons3, 2, 500); // 500ms detection window
+			button_set_combo_hold_callback(combo_id3, 5000, ppu_rst_hold_5s);
 
             break;
         default:
@@ -282,6 +306,10 @@ static void peu_rst_hold_5s(uint8_t *button_ids, uint8_t count, uint32_t hold_ti
 static void ped_rst_hold_5s(uint8_t *button_ids, uint8_t count, uint32_t hold_time)
 {
 	ULOGA("peu_rst_hold_5s\n");
+	if(button_ctx.start)
+	{
+		return;
+	}
 	EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_RST_PED_HOLD_5S, EVENT_PRIORITY_HIGH);
 }
 

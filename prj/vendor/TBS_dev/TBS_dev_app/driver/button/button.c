@@ -359,8 +359,6 @@ bool button_remove_multiclick_level(uint8_t button_id, uint8_t level_index) {
         return false;
     }
 
-    uint8_t removed_clicks = btn->multiclick_levels[level_index].click_count;
-
     // Shift remaining levels down
     for (uint8_t i = level_index; i < btn->multiclick_level_count - 1; i++) {
         btn->multiclick_levels[i] = btn->multiclick_levels[i + 1];
@@ -369,7 +367,7 @@ bool button_remove_multiclick_level(uint8_t button_id, uint8_t level_index) {
     btn->multiclick_level_count--;
     memset(&btn->multiclick_levels[btn->multiclick_level_count], 0, sizeof(button_multiclick_t));
 
-    DB_LOG_BT("[BTN] Removed multi-click level (%d clicks) from button %d\n",removed_clicks, button_id);
+    DB_LOG_BT("[BTN] Removed multi-click level (%d clicks) from button %d\n",btn->multiclick_levels[level_index].click_count, button_id);
     return true;
 }
 

@@ -196,57 +196,57 @@ static void led_app_event_handler(const event_t* event, void* user_data)
 {
 	switch (event->type) {
         case EVENT_LED_NWK_ONLINE:
-            printf("Handle EVENT_LED_NWK_ONLINE\n");
+            ULOGA("Handle EVENT_LED_NWK_ONLINE\n");
 			led_on(LED_ID_NWK);
             // TODO: turn LED to indicate network online
             break;
 
         case EVENT_LED_NWK_OFFLINE:
-            printf("Handle EVENT_LED_NWK_OFFLINE\n");
+            ULOGA("Handle EVENT_LED_NWK_OFFLINE\n");
 			led_off(LED_ID_NWK);
             // TODO: turn LED to indicate network offline
             break;
 
         case EVENT_LED_CALL_ON:
-            printf("Handle EVENT_LED_CALL_ON\n");
+            ULOGA("Handle EVENT_LED_CALL_ON\n");
 			led_on(LED_ID_CALL);
             // TODO: turn LED for call active
             break;
 
         case EVENT_LED_NWK_CALL_OFF:
-            printf("Handle EVENT_LED_NWK_CALL_OFF\n");
+            ULOGA("Handle EVENT_LED_NWK_CALL_OFF\n");
 			led_off(LED_ID_CALL);
             // TODO: turn off LED for network call
             break;
 
         case EVENT_DATA_RESET:
-            printf("Handle EVENT_LED_CALL_BLINK\n");
+            ULOGA("Handle EVENT_LED_CALL_BLINK\n");
 			led_blink_count(LED_ID_CALL, 500, 50, 3);
             // TODO: blink LED for call state
             break;
 
 		case EVENT_DATA_CALL:
-            printf("Handle EVENT_DATA_CALL\n");
+            ULOGA("Handle EVENT_DATA_CALL\n");
 			led_ctx.is_call = 1;
 			led_on(LED_ID_CALL);
             // TODO: blink LED for call state
 			break;
 
 		case EVENT_DATA_ENDCALL:
-            printf("Handle EVENT_DATA_ENDCALL\n");
+            ULOGA("Handle EVENT_DATA_ENDCALL\n");
 			led_ctx.is_call = 0;
 			led_off(LED_ID_CALL);
             // TODO: blink LED for call state
 			break;
 
 		case EVENT_DATA_START_DONE:
-			printf("Handle EVENT_DATA_START_DONE\n");
+			ULOGA("Handle EVENT_DATA_START_DONE\n");
 			led_ctx.start = 1;
 			led_all_off();
 			break;
 
         default:
-            printf("Unknown LED event: %d\n", (uint32_t)event->type);
+            ULOGA("Unknown LED event: %d\n", (uint32_t)event->type);
             break;
     }
 }
