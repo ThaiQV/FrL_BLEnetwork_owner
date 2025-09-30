@@ -51,11 +51,31 @@ void storage_init(void)
 
 	// Load storage_index
 	ret = nvm_record_read(STORAGE_INDEX,(uint8_t*)&storage_index,sizeof(storage_index));
+
 	if(ret == NVM_NO_RECORD)
 	{
 		storage_index = 0;
-//		nvm_record_write(STORAGE_INDEX,(uint8_t*)&storage_index,sizeof(storage_index));
+		nvm_record_write(STORAGE_INDEX,(uint8_t*)&storage_index,sizeof(storage_index));
 	}
+	PRINTF("storage_index: %d\n",storage_index);
+
+
+//	int j,k;
+//	uint8_t buffer[20];
+//	storage_ret_t retval;
+//
+//	for(j=0;j<storage_index;j++)
+//	{
+//		buffer[5] = j;
+//		buffer[6] = 0;
+//		retval = storage_get_data(buffer,sizeof(buffer));
+//		LOGA(APP,"retval get: %d\n",retval);
+//		for(k=0;k<sizeof(buffer);k++)
+//		{
+//			printf("%d ",buffer[k]);
+//		}
+//		printf("\n");
+//	}
 }
 
 /**
@@ -134,6 +154,7 @@ storage_ret_t storage_map_check(uint16_t index, uint32_t len)
 		// Erase the sector has this timeslot if it has full written already
 		FLASH_Erase_Sector(EX_FLASH_DEVICE_STORAGE_ADDRESS + sector*DEF_UDISK_SECTOR_SIZE);
 		map[(sector/8)] &= (~(0x01 << (sector%8)));
+		nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
 		STORAGE_LOG("FLASH_Erase_Sector 1: %d\n",sector);
 	}
 	if(next_sector_erase == 1)
@@ -144,6 +165,7 @@ storage_ret_t storage_map_check(uint16_t index, uint32_t len)
 		{
 			FLASH_Erase_Sector(EX_FLASH_DEVICE_STORAGE_ADDRESS + sector*DEF_UDISK_SECTOR_SIZE);
 			map[(sector/8)] &= (~(0x01 << (sector%8)));
+			nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
 			STORAGE_LOG("FLASH_Erase_Sector 2: %d\n",sector);
 		}
 	}
@@ -163,15 +185,22 @@ void storage_map_fill_status(uint32_t index, uint32_t len)
 	// Set status of previous sector is written
 	if(sector > 0)
 	{
-		map[(sector/8)] |= (0x01 << ((sector%8) - 1));
-//		STORAGE_LOG("storage_map_fill_status: %d - %d\n",sector,map[(sector/8)]);
+		if((map[(sector/8)] && (0x01 << ((sector%8) - 1))) == 0x00)
+		{
+			map[(sector/8)] |= (0x01 << ((sector%8) - 1));
+			nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
+			STORAGE_LOG("storage_map_fill_status: %d - %d\n",sector,map[(sector/8)]);
+		}
 	}
 	else if(sector == 0) // Set status of the last sector is written
 	{
-		map[(MAP_LENGTH - 1)] |= (0x01 << (7));
-//		STORAGE_LOG("storage_map_fill_status: %d - %d\n",sector,map[(MAP_LENGTH - 1)]);
+		if((map[(MAP_LENGTH - 1)] && (0x01 << (7))) == 0x00)
+		{
+			map[(MAP_LENGTH - 1)] |= (0x01 << (7));
+			nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
+			STORAGE_LOG("storage_map_fill_status: %d - %d\n",sector,map[(MAP_LENGTH - 1)]);
+		}
 	}
-	nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
 }
 
 /**
@@ -223,6 +252,8 @@ storage_ret_t storage_put_data(uint8_t *pdata,uint32_t pdata_len)
 	uint8_t 		write[40];
 	uint8_t			len = 0;
 	nvm_status_t	retval;
+	uint32_t 		sector = 0;
+	uint8_t 		sector_data[DEF_UDISK_SECTOR_SIZE];
 
 	// Set index in byte 5,6 of pdata
 	memcpy(&pdata[5],(uint8_t*)&storage_index,sizeof(storage_index));
@@ -234,6 +265,9 @@ storage_ret_t storage_put_data(uint8_t *pdata,uint32_t pdata_len)
 	// Put crc next to pdata
 	write[len] = crc;
 	len += sizeof(crc);
+	// Check sector before write flash
+	storage_map_fill_status(storage_index,len);
+	storage_map_check(storage_index,len);
 	// Write to flash
 	address = EX_FLASH_DEVICE_STORAGE_ADDRESS + storage_index*len;
 	W25XXX_WR_Block(write,address,len);
@@ -246,6 +280,31 @@ storage_ret_t storage_put_data(uint8_t *pdata,uint32_t pdata_len)
 		if(retval == NVM_OK)
 		{
 			return STORAGE_RET_OK;
+		}
+	}
+	else // write fail -> re-write the whole sector
+	{
+//		STORAGE_LOG("re-write\n");
+		sector = ((storage_index*len)/DEF_UDISK_SECTOR_SIZE);
+		// read data from sector
+		W25XXX_Read(sector_data,EX_FLASH_DEVICE_STORAGE_ADDRESS + sector*DEF_UDISK_SECTOR_SIZE,DEF_UDISK_SECTOR_SIZE);
+		// erase this sector
+		FLASH_Erase_Sector(EX_FLASH_DEVICE_STORAGE_ADDRESS + sector*DEF_UDISK_SECTOR_SIZE);
+		// write new data into sector_data
+		memcpy(&sector_data[(storage_index*len)%DEF_UDISK_SECTOR_SIZE],write,len);
+		// write sector_data into erase sector
+		W25XXX_WR_Block(sector_data,EX_FLASH_DEVICE_STORAGE_ADDRESS + sector*DEF_UDISK_SECTOR_SIZE,DEF_UDISK_SECTOR_SIZE);
+
+		W25XXX_Read(read,address,len);
+		if(memcmp(read,write,len) == 0) // check write successfully
+		{
+			// increase index
+			storage_index++;
+			retval = nvm_record_write(STORAGE_INDEX,(uint8_t*)&storage_index,sizeof(storage_index));
+			if(retval == NVM_OK)
+			{
+				return STORAGE_RET_OK;
+			}
 		}
 	}
 	return STORAGE_RET_ERROR;

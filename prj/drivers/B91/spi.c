@@ -600,7 +600,8 @@ void spi_master_write_read(spi_sel_e spi_sel, unsigned char *wr_data, unsigned i
 	spi_rx_fifo_clr(spi_sel);
 	spi_tx_cnt(spi_sel, wr_len);
 	spi_rx_cnt(spi_sel, rd_len);
-	spi_set_transmode(spi_sel, SPI_MODE_WRITE_READ);
+//	spi_set_transmode(spi_sel, SPI_MODE_WRITE_READ);
+	spi_set_transmode(spi_sel, SPI_MODE_WRITE_AND_READ);
 	spi_set_cmd(spi_sel, 0x00);//when  cmd  disable that  will not sent cmd,just trigger spi send .
 	spi_write(spi_sel, (unsigned char *)wr_data, wr_len);
 	spi_read(spi_sel, (unsigned char *)rd_data, rd_len);

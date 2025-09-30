@@ -8,7 +8,7 @@ volatile uint32_t  Flash_ID = 0x00;                                             
 volatile uint32_t  Flash_Sector_Count = 0x00;                                   /* FLASH sector number */
 volatile uint16_t  Flash_Sector_Size = 0x00;                                    /* FLASH sector size */
 
-
+#define USING_HSPI 1
 
 /*******************************************************************************
 * Function Name  : Software SPI
@@ -25,13 +25,14 @@ void __delay_us(unsigned int us)
 }
 unsigned char writeSPIByte(unsigned char transmit)
 {
-  PIN_CLEAR(PIN_CLK);
-
   //make the transmission
-  unsigned char mask = 0x80;                //Initialize to write and read bit 7
   unsigned char ret = 0;                    //Initialize read byte with 0
 
-  do{
+#if !USING_HSPI
+  unsigned char mask = 0x80;                //Initialize to write and read bit 7
+  PIN_CLEAR(PIN_CLK);
+  do
+  {
     //Clock out current bit onto SPI Out line
     if(transmit & mask)
     {
@@ -53,6 +54,20 @@ unsigned char writeSPIByte(unsigned char transmit)
     __delay_us(1);      //Ensure minimum delay of 1000ns between bits
 //    __asm__("nop");
   }while (mask != 0);
+
+#else
+	spi_tx_dma_dis(HSPI_MODULE);
+	spi_rx_dma_dis(HSPI_MODULE);
+	spi_tx_fifo_clr(HSPI_MODULE);
+	spi_rx_fifo_clr(HSPI_MODULE);
+	spi_tx_cnt(HSPI_MODULE, 1);
+	spi_rx_cnt(HSPI_MODULE, 1);
+	spi_set_transmode(HSPI_MODULE, SPI_MODE_WRITE_AND_READ);
+	spi_set_cmd(HSPI_MODULE, 0x00);//when  cmd  disable that  will not sent cmd,just trigger spi send .
+	spi_write(HSPI_MODULE,&transmit,1);
+	spi_read(HSPI_MODULE,&ret,1);
+	while (spi_is_busy(HSPI_MODULE));
+#endif
 
   return ret;
 }
@@ -80,6 +95,7 @@ int readSPIWord(void)
 unsigned char readSPIByte(void)
 {
   unsigned char data;
+
   data = writeSPIByte(0x00);
   return data;
 }
@@ -93,6 +109,7 @@ unsigned char readSPIByte(void)
 *******************************************************************************/
 void FLASH_Port_Init(void)
 {
+#if !USING_HSPI
 	gpio_function_en(PIN_CS);
 	gpio_set_output(PIN_CS,1); 		//enable output
 	gpio_set_up_down_res(PIN_CS,GPIO_PIN_PULLUP_10K);
@@ -117,6 +134,25 @@ void FLASH_Port_Init(void)
 	gpio_set_output(PIN_CLK,1); 		//enable output
 	gpio_set_up_down_res(PIN_CLK,GPIO_PIN_PULLUP_10K);
 	PIN_CLEAR(PIN_CLK);
+#else
+	hspi_pin_config_t config;
+
+	config.hspi_clk_pin = HSPI_CLK_PB4;
+	config.hspi_mosi_io0_pin = HSPI_MOSI_IO0_PB3;
+	config.hspi_miso_io1_pin = HSPI_MISO_IO1_PB2;
+
+    spi_master_init(HSPI_MODULE,4, SPI_MODE3);
+    hspi_set_pin(&config);
+
+	gpio_function_en(PIN_CS);
+	gpio_set_output(PIN_CS,1); 		//enable output
+	gpio_set_up_down_res(PIN_CS,GPIO_PIN_PULLUP_10K);
+	PIN_SET(PIN_CS);
+	gpio_function_en(PIN_WP);
+	gpio_set_output(PIN_WP,1); 		//enable output
+	gpio_set_up_down_res(PIN_WP,GPIO_PIN_PULLUP_10K);
+	PIN_SET(PIN_WP);
+#endif
 
 //	LOG_P(DRV,"FLASH_Port_Init\r\n");
 }

@@ -177,46 +177,47 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 //		firmware_check();
 		storage_init();
 //		storage_clean();
-		retval = storage_put_data(buff,sizeof(buff));
-		LOGA(APP,"retval put: %d\n",retval);
-		memset(buff,0x00,sizeof(buff));
-		retval = storage_get_data(buff,sizeof(buff));
-		LOGA(APP,"retval get: %d\n",retval);
 
-		int i = 0;
-		for(i=0;i<sizeof(buff);i++)
-		{
-			printf("%d ",buff[i]);
-		}
-		printf("\n");
-
-		memset(buff,0x01,sizeof(buff));
-		retval = storage_put_data(buff,sizeof(buff));
-		LOGA(APP,"retval put: %d\n",retval);
-		memset(buff,0x00,sizeof(buff));
-		buff[5] = 1;
-		retval = storage_get_data(buff,sizeof(buff));
-		LOGA(APP,"retval get: %d\n",retval);
-
-		for(i=0;i<sizeof(buff);i++)
-		{
-			printf("%d ",buff[i]);
-		}
-		printf("\n");
-
-		memset(buff,0x02,sizeof(buff));
-		retval = storage_put_data(buff,sizeof(buff));
-		LOGA(APP,"retval put: %d\n",retval);
-		memset(buff,0x00,sizeof(buff));
-		buff[5] = 2;
-		retval = storage_get_data(buff,sizeof(buff));
-		LOGA(APP,"retval get: %d\n",retval);
-
-		for(i=0;i<sizeof(buff);i++)
-		{
-			printf("%d ",buff[i]);
-		}
-		printf("\n");
+//		retval = storage_put_data(buff,sizeof(buff));
+//		LOGA(APP,"retval put: %d\n",retval);
+//		memset(buff,0x00,sizeof(buff));
+//		retval = storage_get_data(buff,sizeof(buff));
+//		LOGA(APP,"retval get: %d\n",retval);
+//
+//		int i = 0;
+//		for(i=0;i<sizeof(buff);i++)
+//		{
+//			printf("%d ",buff[i]);
+//		}
+//		printf("\n");
+//
+//		memset(buff,0x01,sizeof(buff));
+//		retval = storage_put_data(buff,sizeof(buff));
+//		LOGA(APP,"retval put: %d\n",retval);
+//		memset(buff,0x00,sizeof(buff));
+//		buff[5] = 1;
+//		retval = storage_get_data(buff,sizeof(buff));
+//		LOGA(APP,"retval get: %d\n",retval);
+//
+//		for(i=0;i<sizeof(buff);i++)
+//		{
+//			printf("%d ",buff[i]);
+//		}
+//		printf("\n");
+//
+//		memset(buff,0x02,sizeof(buff));
+//		retval = storage_put_data(buff,sizeof(buff));
+//		LOGA(APP,"retval put: %d\n",retval);
+//		memset(buff,0x00,sizeof(buff));
+//		buff[5] = 2;
+//		retval = storage_get_data(buff,sizeof(buff));
+//		LOGA(APP,"retval get: %d\n",retval);
+//
+//		for(i=0;i<sizeof(buff);i++)
+//		{
+//			printf("%d ",buff[i]);
+//		}
+//		printf("\n");
 
 		irq_enable();
 		// wdt init
