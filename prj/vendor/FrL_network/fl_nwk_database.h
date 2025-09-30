@@ -34,7 +34,10 @@
 
 #define SLAVESETTINGS_SIZE				SECTOR_FLASH_SIZE
 
+#define SLAVEUSERDATA_SIZE				SECTOR_FLASH_SIZE
+
 #define MASTERPROFILE_SIZE				SECTOR_FLASH_SIZE
+
 //////// ======================================================================
 #define ADDR_RTC_START					(ADDR_USERAREA_START)
 
@@ -124,6 +127,26 @@ fl_slave_settings_t fl_db_slavesettings_init(void);
 void fl_db_slavesettings_save(u8 *_data,u8 _size);
 fl_slave_settings_t fl_db_slavesettings_load(void);
 
+typedef struct {
+	u8 len;
+	u8 payload[50];
+}__attribute__((packed)) fl_db_userdata_t;
+
+typedef struct {
+	fl_db_userdata_t data;
+	//Don't change
+	u32 magic; // constant for LSB
+}__attribute__((packed)) fl_slave_userdata_t;
+
+#define ADDR_SLAVE_USERDATA_START		(ADDR_SLAVE_SETTINGS_START + SLAVESETTINGS_SIZE)
+#define SLAVE_USERDATA_MAGIC 			0xDDDDDDDD
+#define SLAVE_USERDATA_ENTRY_SIZE       (sizeof(fl_slave_userdata_t)/sizeof(u8))
+#define SLAVE_USERDATA_MAX_ENTRIES      (SLAVEUSERDATA_SIZE / SLAVE_USERDATA_ENTRY_SIZE - 1)
+
+fl_db_userdata_t fl_db_slaveuserdata_init(void);
+void fl_db_slaveuserdata_save(u8 *_data,u8 _size);
+fl_slave_userdata_t fl_db_slaveuserdata_load(void);
+
 #endif
 //////// ======================================================================
 uint32_t fl_db_crc32(uint8_t *data, size_t len);
@@ -134,6 +157,7 @@ u32 fl_db_rtc_load(void);
 void fl_db_init(void);
 void fl_db_all_save(void);
 void fl_db_clearAll(void);
+void fl_db_Pairing_Clear(void);
 #ifdef MASTER_CORE
 void fl_db_nodelist_init(void);
 bool fl_db_nodelist_save(fl_nodelist_db_t *_pnodelist);
