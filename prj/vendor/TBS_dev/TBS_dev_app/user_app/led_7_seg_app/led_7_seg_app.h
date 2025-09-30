@@ -20,14 +20,6 @@
 /**
  * @brief 7-Segment LED sub-app shared data
  */
-typedef struct {
-	uint32_t value;         ///< Value to display (0-9999)
-	uint32_t value_err;
-	uint64_t time_out_err;
-	bool print_err;
-	bool enabled;           ///< Display enabled
-	uint8_t chage_ULOGA;
-} led7seg_shared_data_t;
 
 #define get_led7_event() {\
 	EVENT_DATA_START_DONE,\

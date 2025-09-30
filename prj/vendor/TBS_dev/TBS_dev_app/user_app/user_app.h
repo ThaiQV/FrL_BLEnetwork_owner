@@ -24,6 +24,7 @@
 typedef enum{
 	APP_MODE_TESTS,
 	APP_MODE_ACTICS,
+    APP_MODE_SELEC,
 } app_mode_t;
 
 typedef struct {
@@ -58,6 +59,8 @@ void user_app_run(void);
 #define get_data_event()   {\
     EVENT_BUTTON_RST_ONCLICK,\
     EVENT_BUTTON_RST_HOLD_3S,\
+    EVENT_BUTTON_RST_HOLD_5S,\
+    EVENT_BUTTON_PPD_HOLD_3S,\
     EVENT_BUTTON_CALL_ONCLICK,\
     EVENT_BUTTON_ENDCALL_ONCLICK,\
     EVENT_BUTTON_PPD_ONCLICK,\
@@ -68,6 +71,7 @@ void user_app_run(void);
     EVENT_BUTTON_RST_PEU_HOLD_5S,\
     EVENT_BUTTON_RST_PPU_HOLD_5S,\
 	EVENT_BUTTON_ENDCALL_HOLD_5S,\
+    EVENT_LCD_PRINT_SELECT_MODE_TIMEOUT,\
 }
 
 #endif /* COUNTER_DEVICE*/

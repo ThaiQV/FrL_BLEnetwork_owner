@@ -10,9 +10,6 @@
 #ifndef MASTER_CORE
 #ifdef COUNTER_DEVICE
 
-void user_button_app_init(void);
-void user_button_app_task(void);
-
 #define get_button_event() {\
     EVENT_DATA_START_DONE,\
 }

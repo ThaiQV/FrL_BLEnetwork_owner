@@ -490,11 +490,13 @@ void app_manager_reset_stats(void) {
 }
 
 void app_manager_print_subapps(void) {
+#if APP_MANAGER_DEBUG
     AM_LOG_BT("[AppManager] Registered SubApps (%lu/%d):\n",
            g_app_manager.count, APP_MANAGER_MAX_SUBAPPS);
     
     for (uint32_t i = 0; i < g_app_manager.count; i++) {
         subapp_t* subapp = g_app_manager.subapps[i];
+
         const char* state_str = "Unknown";
         
         switch (subapp->state) {
@@ -508,6 +510,7 @@ void app_manager_print_subapps(void) {
         AM_LOG_BT("  [%lu] %s - State: %s, Events: 0x%08lx\n",
                i, subapp->name, state_str, subapp->event_mask);
     }
+#endif
 }
 
 const char* app_manager_get_version(void) {

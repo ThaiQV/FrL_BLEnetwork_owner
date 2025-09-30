@@ -26,12 +26,6 @@ typedef struct {
     bool start;
 } led_context_t;
 
-typedef struct {
-	bool led_nwk_on;
-	bool led_call_on;
-	bool led_call_blink_3;
-} led_shared_data_t;
-
 #define get_led_event() {\
 	EVENT_LED_NWK_ONLINE ,\
     EVENT_LED_NWK_OFFLINE,\

@@ -100,7 +100,6 @@ static et6226m_config_t config = {
 
 static et6226m_handle_t display_handle;
 
-led7seg_shared_data_t led7seg_data;
 
 static subapp_result_t led7_app_init(subapp_t* self)
 {

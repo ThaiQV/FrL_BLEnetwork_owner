@@ -10,7 +10,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#define BUTTON_DRV_DEBUG			0
+#define BUTTON_DRV_DEBUG			1
 #if	BUTTON_DRV_DEBUG
 #define DB_LOG_BT(...)	ULOGA(__VA_ARGS__)
 #else
@@ -1015,10 +1015,7 @@ static void button_process_state_machine(uint8_t button_id) {
                 for (uint8_t i = btn->last_hold_level; i < btn->hold_level_count; i++) {
                     if (btn->hold_levels[i].enabled && hold_time >= btn->hold_levels[i].hold_time) {
                         btn->last_hold_level = i + 1;
-
-                        if (btn->hold_levels[i].callback) {
-                            btn->hold_levels[i].callback(button_id, hold_time);
-                        }
+                        btn->hold_level_index = i;
 
                         button_trigger_event(button_id, BUTTON_EVENT_HOLD_LEVEL, hold_time);
                     }

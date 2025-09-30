@@ -118,7 +118,6 @@ led_hal_t hal = {
     .get_system_time_ms = led_MsTick_get,
 };
 
-led_shared_data_t led_data;
 void led_callback(uint8_t led_id);
 
 void led_callback(uint8_t led_id)

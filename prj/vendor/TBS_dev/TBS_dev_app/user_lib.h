@@ -13,7 +13,7 @@
 
 #define U_APP_DEBUG			0
 #if	U_APP_DEBUG
-#define ULOGA(...)	LOGA(DEFAULT,##__VA_ARGS__)
+#define ULOGA(...)	printf(__VA_ARGS__)
 #else
 #define ULOGA(...)
 #endif
@@ -35,7 +35,6 @@
 #include "user_app/led_7_seg_app/led_7_seg_app.h"
 #include "user_app/button_app/button_app.h"
 #include "user_app/led_app/led_app.h"
-#include "user_app/data_storage/data_storage.h"
 
 
 
