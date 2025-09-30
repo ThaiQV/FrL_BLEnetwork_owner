@@ -504,9 +504,11 @@ void fl_db_init(void) {
 void fl_db_all_save(void){
 	fl_rtc_set(0); // storage currently time
 }
+#ifndef MASTER_CORE
 void fl_db_Pairing_Clear(void){
 	flash_erase_sector(ADDR_SLAVE_PROFILE_START);
 }
+#endif
 void fl_db_clearAll(void){
 	flash_erase_sector(ADDR_RTC_START);
 #ifdef MASTER_CORE

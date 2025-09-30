@@ -325,24 +325,17 @@ fl_pack_t fl_master_packet_RSP_55Com_build(u8* _slaveID,u8 _numslave,u8* _seqtim
 	memcpy(packet_built.data_arr,packet.bytes,packet_built.length);
 	return packet_built;
 }
-/***************************************************
- * @brief 		: build packet RSP 55 to rsp SlaveID
- *
- * @param[in] 	: none
- *
- * @return	  	: fl_pack_t
- *
- ***************************************************/
-fl_pack_t fl_master_packet_RSP_55_build(u8 slaveID,u8* _seqtimetamp) {
+
+fl_pack_t fl_master_packet_RSP_TimetampREQ_build(u8 cmdid, u8 slaveID, u8* _seqtimetamp) {
 	extern fl_adv_settings_t G_ADV_SETTINGS;
 	fl_pack_t packet_built;
 
 	fl_data_frame_u packet;
 	memset(packet.bytes,0,SIZEU8(packet.bytes));
-	packet.frame.hdr = NWK_HDR_55;
+	packet.frame.hdr = cmdid;
 
 	fl_timetamp_withstep_t timetampStep = fl_rtc_getWithMilliStep();
-//	u32 timetamp = fl_rtc_get();
+	//	u32 timetamp = fl_rtc_get();
 	packet.frame.timetamp[0] = U32_BYTE0(timetampStep.timetamp);
 	packet.frame.timetamp[1] = U32_BYTE1(timetampStep.timetamp);
 	packet.frame.timetamp[2] = U32_BYTE2(timetampStep.timetamp);
@@ -356,7 +349,7 @@ fl_pack_t fl_master_packet_RSP_55_build(u8 slaveID,u8* _seqtimetamp) {
 
 	//u8 ack[2] = { 'O', 'K' };
 	//fl_timetamp_withstep_t *ack_seqtimetamp = (fl_timetamp_withstep_t *)_seqtimetamp;
-	memcpy(packet.frame.payload,(u8*)_seqtimetamp,SIZEU8(fl_timetamp_withstep_t));
+	memcpy(packet.frame.payload,(u8*) _seqtimetamp,SIZEU8(fl_timetamp_withstep_t));
 	//crc
 	packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
 	//assign slaveID
@@ -371,6 +364,18 @@ fl_pack_t fl_master_packet_RSP_55_build(u8 slaveID,u8* _seqtimetamp) {
 	packet_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
 	memcpy(packet_built.data_arr,packet.bytes,packet_built.length);
 	return packet_built;
+}
+
+/***************************************************
+ * @brief 		: build packet RSP 55 to rsp SlaveID
+ *
+ * @param[in] 	: none
+ *
+ * @return	  	: fl_pack_t
+ *
+ ***************************************************/
+fl_pack_t fl_master_packet_RSP_55_build(u8 slaveID,u8* _seqtimetamp) {
+	return fl_master_packet_RSP_TimetampREQ_build(NWK_HDR_55,slaveID,_seqtimetamp);
 }
 /***************************************************
  * @brief 		: build packet get information slave
@@ -719,14 +724,14 @@ static void _master_updateDB_for_Node(u8 node_indx ,fl_data_frame_u *packet)  {
 	P_PRINTFHEX_A(INF,packet->frame.payload,SIZEU8(packet->frame.payload),"PACK:");
 	if (G_NODE_LIST.sla_info[node_indx].dev_type == TBS_COUNTER) {
 		memcpy(&G_NODE_LIST.sla_info[node_indx].data[size_mac + 5],&packet->frame.payload[0],SIZEU8(packet->frame.payload));
-		tbs_counter_printf((void*) G_NODE_LIST.sla_info[node_indx].data);
+		tbs_counter_printf(INF,(void*) G_NODE_LIST.sla_info[node_indx].data);
 	}
 	if (G_NODE_LIST.sla_info[node_indx].dev_type == TBS_POWERMETER) {
 		memcpy(&G_NODE_LIST.sla_info[node_indx].data[size_mac + 5],&packet->frame.payload[0],SIZEU8(packet->frame.payload));
 		//for test
 		tbs_device_powermeter_t received;
 		tbs_unpack_powermeter_data(&received,G_NODE_LIST.sla_info[node_indx].data);
-		tbs_power_meter_printf((void*) &received);
+		tbs_power_meter_printf(INF,(void*) &received);
 	}
 }
 
@@ -762,6 +767,7 @@ int fl_master_ProccesRSP_cbk(void) {
 				 **/
 			}
 			break;
+
 			case NWK_HDR_A5_HIS: {
 				u8 slave_id = packet.frame.slaveID.id_u8;
 				u8 node_indx = fl_master_SlaveID_find(slave_id);
@@ -769,6 +775,24 @@ int fl_master_ProccesRSP_cbk(void) {
 					if (packet.frame.endpoint.master == FL_FROM_SLAVE) {
 						fl_ble2wifi_HISTORY_SEND(G_NODE_LIST.sla_info[node_indx].mac,packet.frame.timetamp,packet.frame.payload);
 					}
+				}
+			}
+			break;
+			case NWK_HDR_11_REACTIVE: {
+				u8 slave_id = packet.frame.slaveID.id_u8;
+				u8 node_indx = fl_master_SlaveID_find(slave_id);
+				if (node_indx != -1) {
+					if (packet.frame.endpoint.master == FL_FROM_SLAVE_ACK) {
+						_master_updateDB_for_Node(node_indx,&packet);
+						//Send rsp to slave
+						u8 seq_timetamp[5];
+						memcpy(seq_timetamp,packet.frame.timetamp,SIZEU8(packet.frame.timetamp));
+						seq_timetamp[SIZEU8(packet.frame.timetamp)] = packet.frame.milltamp;
+						fl_adv_sendFIFO_add(fl_master_packet_RSP_TimetampREQ_build(NWK_HDR_11_REACTIVE,slave_id,seq_timetamp));
+					}
+				} else {
+					ERR(INF,"ID not foud:%02X\r\n",slave_id);
+					return -1;
 				}
 			}
 			break;

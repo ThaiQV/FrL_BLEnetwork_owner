@@ -62,6 +62,7 @@ void tbs_power_meter_printf(type_debug_t _plog_type,void* _p) {
 	LOGA(_plog_type,"Energy3   :%u\r\n",dev->data.energy3);
 }
 
+#ifndef MASTER_CORE
 #ifdef COUNTER_DEVICE
 
 tbs_device_counter_t G_COUNTER_DEV = {  .timetamp = 0,
@@ -397,3 +398,4 @@ void TBS_Device_Run(void){
 #endif
 	TBS_History_Run();
 }
+#endif

@@ -38,9 +38,9 @@ u8 GETINFO_FLAG_EVENTTEST = 0;
 #define JOIN_NETWORK_TIME 			30*1000 			//ms
 #define RECHECKING_NETWOK_TIME 		30*1000 		    //ms
 #define RECONNECT_TIME				55*1000*1000		//s
-
+#define INFORM_MASTER				5*1000*1000
 fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_A5_HIS,NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
-fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_A5_HIS,NWK_HDR_55,NWK_HDR_RECONNECT}; // register cmdid REQ
+fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_A5_HIS,NWK_HDR_55,NWK_HDR_11_REACTIVE}; // register cmdid REQ
 
 #define NWK_HDR_SIZE (sizeof(G_NWK_HDR_LIST)/sizeof(G_NWK_HDR_LIST[0]))
 #define NWK_HDR_REQ_SIZE (sizeof(G_NWK_HDR_REQLIST)/sizeof(G_NWK_HDR_REQLIST[0]))
@@ -92,6 +92,7 @@ volatile u8  NWK_REPEAT_LEVEL = 2;
 /******************************************************************************/
 /******************************************************************************/
 int fl_nwk_joinnwk_timeout(void) ;
+int _informMaster(void);
 /******************************************************************************/
 /******************************************************************************/
 /***                       Functions declare                   		         **/
@@ -107,9 +108,39 @@ bool IsJoinedNetwork(void)	{
 bool IsOnline(void){
 	return G_INFORMATION.active;
 }
+void _Inform11_rsp_callback(void *_data,void* _data2){
+	fl_rsp_container_t *data =  (fl_rsp_container_t*)_data;
+	LOGA(API,"Timeout:%d\r\n",data->timeout);
+	LOGA(API,"cmdID  :%0X\r\n",data->rsp_check.hdr_cmdid);
+	LOGA(API,"SlaveID:%0X\r\n",data->rsp_check.slaveID);
+	//rsp data
+	if(data->timeout > 0){
+		blt_soft_timer_delete(_informMaster);
+	}else{
+//		P_INFO("Master RSP: NON-RSP \r\n");
+		blt_soft_timer_restart(_informMaster,INFORM_MASTER);
+	}
+}
+
+int _informMaster(void){
+	if(IsJoinedNetwork()){
+		LOGA(INF,"Inform to master (%d s)!!!\r\n",INFORM_MASTER/1000/1000);
+#ifdef COUNTER_DEVICE
+		fl_api_slave_req(NWK_HDR_11_REACTIVE,(u8*)&G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data),_Inform11_rsp_callback,0,0);
+#else //POWERMETER
+		u8 _payload[SIZEU8(tbs_device_powermeter_t)];
+		tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) G_INFORMATION.data;
+		tbs_pack_powermeter_data(pwmeter_data,_payload);
+		u8 indx_data = SIZEU8(pwmeter_data->type) + SIZEU8(pwmeter_data->mac) + SIZEU8(pwmeter_data->timetamp);
+		fl_api_slave_req(NWK_HDR_11_REACTIVE,&_payload[indx_data],SIZEU8(pwmeter_data->data),_Inform11_rsp_callback,0,0);
+#endif
+	}
+	return -1;
+}
 int _isOnline_check(void) {
 //	ERR(INF,"Device -> offline\r\n");
 	G_INFORMATION.active = false;
+	blt_soft_timer_restart(_informMaster,INFORM_MASTER);
 	return -1;
 }
 
@@ -198,8 +229,9 @@ void fl_nwk_slave_init(void) {
 	//Interval checking network
 	blt_soft_timer_add(fl_nwk_slave_reconnect,RECONNECT_TIME);//s -> send information online to master
 
-	//Checking online
-//	blt_soft_timer_add(&_isOnline_check,RECHECKING_NETWOK_TIME*1000);
+	//inform to master
+	blt_soft_timer_add(&_informMaster,INFORM_MASTER);
+
 	G_INFORMATION.active = false;
 	//test random send req
 //	TEST_slave_sendREQ();
@@ -312,10 +344,9 @@ u32 fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 			TBS_Device_Index_manage();
 		}
 		break;
-		case NWK_HDR_RECONNECT: {
+		case NWK_HDR_11_REACTIVE: {
 
-			//LOGA(INF,"Send 55 REQ to Master:%d/%d\r\n",ORIGINAL_MASTER_TIME.timetamp,ORIGINAL_MASTER_TIME.milstep);
-			req_pack.frame.hdr = NWK_HDR_RECONNECT;
+			req_pack.frame.hdr = NWK_HDR_11_REACTIVE;
 
 			fl_timetamp_withstep_t field_timetamp = GenerateTimetampField();
 
@@ -337,7 +368,7 @@ u32 fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 			req_pack.frame.endpoint.rep_settings = NWK_REPEAT_LEVEL;
 			req_pack.frame.endpoint.repeat_mode = NWK_REPEAT_MODE;
 			//Create packet from slave
-			req_pack.frame.endpoint.master = FL_FROM_SLAVE;
+			req_pack.frame.endpoint.master = FL_FROM_SLAVE_ACK;
 		}
 		break;
 		default:
@@ -704,6 +735,7 @@ int fl_nwk_slave_reconnect(void){
 	}
 	return 0;
 }
+
 
 /******************************************************************************/
 /******************************************************************************/
