@@ -420,7 +420,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 					tbs_counter_printf(APP,(void*)counter_data);
 #endif
 #ifdef POWER_METER_DEVICE
-					tbs_power_meter_printf((void*)G_INFORMATION.data);
+					tbs_power_meter_printf(APP,(void*)G_INFORMATION.data);
 					tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*)G_INFORMATION.data;
 					tbs_pack_powermeter_data(pwmeter_data,_payload);
 					indx_data = SIZEU8(pwmeter_data->type) + SIZEU8(pwmeter_data->mac) + SIZEU8(pwmeter_data->timetamp);

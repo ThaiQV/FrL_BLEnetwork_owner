@@ -110,8 +110,6 @@ tbs_device_powermeter_t G_POWER_METER = {
 //use to store setting parameter
 u16 G_POWER_METER_PARAMETER[3];
 
-
-
 void test_powermeter(void) {
 	u8 buffer[POWER_METER_BITSIZE];
 	memset(buffer,0,POWER_METER_BITSIZE);
@@ -119,7 +117,7 @@ void test_powermeter(void) {
 //P_PRINTFHEX_A(MCU,buffer,34,"PACK(%d):",SIZEU8(buffer));
 	tbs_device_powermeter_t received;
 	tbs_unpack_powermeter_data(&received, buffer);
-	tbs_power_meter_printf((void*)&received);
+	tbs_power_meter_printf(APP,(void*)&received);
 }
 #endif
 
@@ -358,8 +356,6 @@ void TBS_Device_Store_run(void) {
 		LOGA(FLA,"%s store currently data !!\r\n",dev_str);
 		tbs_counter_printf(FLA,(void*)&data);
 		fl_db_slaveuserdata_save(data+6,data_size);
-//		TBS_Device_Flash_Init_n_Reload((u8*)&G_TBS_DEVICE.timetamp);
-//		tbs_counter_printf(FLA,(void*)&G_TBS_DEVICE);
 		crc_check_change = crc;
 	}
 }

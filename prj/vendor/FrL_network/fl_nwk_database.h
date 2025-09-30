@@ -129,7 +129,7 @@ fl_slave_settings_t fl_db_slavesettings_load(void);
 
 typedef struct {
 	u8 len;
-	u8 payload[U8_MAX];
+	u8 payload[50];
 }__attribute__((packed)) fl_db_userdata_t;
 
 typedef struct {
