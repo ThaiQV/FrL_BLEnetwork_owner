@@ -13,6 +13,8 @@
 #include "TBS_dev_config.h"
 #include "../FrL_Network/fl_nwk_handler.h"
 #include "../FrL_Network/fl_nwk_api.h"
+
+#define TBS_DEVICE_STORE_INTERVAL 		5*1000*1000 //5s
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -337,7 +339,7 @@ void TBS_PwMeter_SetThreshod(u16 _chn1,u16 _chn2,u16 _chn3){
 /***                      Processing functions 					             **/
 /******************************************************************************/
 /******************************************************************************/
-void TBS_Device_Store_run(void) {
+int TBS_Device_Store_run(void) {
 	char *dev_str;
 	u8 data_size=0;
 #ifdef COUNTER_DEVICE
@@ -354,23 +356,27 @@ void TBS_Device_Store_run(void) {
 	u32 crc = fl_db_crc32(data+6,data_size);
 	if (crc_check_change != crc) {
 		LOGA(FLA,"%s store currently data !!\r\n",dev_str);
-		tbs_counter_printf(FLA,(void*)&data);
+		if(G_TBS_DEVICE.type == TBS_COUNTER) tbs_counter_printf(FLA,(void*)&data);
+		else tbs_power_meter_printf(FLA,(void*)&data);
 		fl_db_slaveuserdata_save(data+6,data_size);
 		crc_check_change = crc;
 	}
+	return 0;
 }
 
 void TBS_Device_Init(void){
+	TBS_Device_Flash_Init_n_Reload((u8*) &G_TBS_DEVICE.timetamp);
 #ifdef COUNTER_DEVICE
 	TBS_Counter_init();
 #endif
 #ifdef POWER_METER_DEVICE
 	TBS_PowerMeter_init();
 #endif
-	TBS_Device_Flash_Init_n_Reload((u8*) &G_TBS_DEVICE.timetamp);
-	tbs_counter_printf(PERI,(void*)&G_TBS_DEVICE);
+	if(G_TBS_DEVICE.type == TBS_COUNTER) tbs_counter_printf(FLA,(void*)&G_TBS_DEVICE);
+	else tbs_power_meter_printf(FLA,(void*)&G_TBS_DEVICE);
 	//History init
 	TBS_History_Init();
+	blt_soft_timer_add(TBS_Device_Store_run,TBS_DEVICE_STORE_INTERVAL);
 }
 void TBS_Device_Run(void){
 #ifdef COUNTER_DEVICE
@@ -379,6 +385,5 @@ void TBS_Device_Run(void){
 #ifdef POWER_METER_DEVICE
 	TBS_PowerMeter_Run();
 #endif
-	TBS_Device_Store_run();
 	TBS_History_Run();
 }

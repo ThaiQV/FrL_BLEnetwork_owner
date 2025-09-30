@@ -416,7 +416,6 @@ void fl_db_slaveuserdata_save(u8 *_data,u8 _size) {
 	entry.data.len = _size;
 	memcpy(entry.data.payload,_data,_size);
 	entry.magic = SLAVE_USERDATA_MAGIC;
-
 	fl_slave_userdata_t check;
 	for (u16 i = 0; i < SLAVE_USERDATA_MAX_ENTRIES; i++) {
 		check.magic = 0;
