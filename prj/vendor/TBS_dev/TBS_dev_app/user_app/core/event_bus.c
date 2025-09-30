@@ -6,7 +6,7 @@
  */
 
 #ifndef MASTER_CORE
-
+#include "tl_common.h"
 #include "vendor/TBS_dev/TBS_dev_config.h"
 
 #ifdef COUNTER_DEVICE
