@@ -144,6 +144,7 @@ void Counter_LCD_MessageCheck_FlagNew(void){
 		tbs_counter_lcd_t *mess_lcd = (tbs_counter_lcd_t *)&G_COUNTER_LCD[var][0];
 		if(mess_lcd->f_new == 1){
 			P_INFO("[%d]%s\r\n",var,(char* )mess_lcd->mess);
+
 			mess_lcd->f_new=0;
 		}
 	}
@@ -170,8 +171,10 @@ void TEST_rsp_callback(void *_data,void* _data2){
 		P_PRINTFHEX_A(API,packet->data_arr,packet->length,"RSP: ");
 //		P_INFO("Master RSP:%c%c\r\n",packet->data_arr[7],packet->data_arr[8]);
 		TEST_EVENT.rsp_num++;
+
 	}else{
 //		P_INFO("Master RSP: NON-RSP \r\n");
+
 	}
 	u32 lifetime = (fl_rtc_get() - TEST_EVENT.lifetime);
 	P_INFO("==============================\r\n");
@@ -189,7 +192,9 @@ int TEST_Counter_Event(void){
 		G_COUNTER_DEV.data.bt_call = RAND(0,1);
 		G_COUNTER_DEV.data.bt_endcall = G_COUNTER_DEV.data.bt_call ? 0 : 1;
 		G_COUNTER_DEV.data.bt_rst = G_COUNTER_DEV.data.bt_call ? 0 : RAND(0,1);
+
 		fl_api_slave_req(NWK_HDR_55,(u8*)&G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data),&TEST_rsp_callback,0,1);
+
 		TEST_EVENT.rtt = clock_time();
 		TEST_EVENT.req_num++;
 		P_INFO("TEST EVNET after:%d s\r\n",period);
