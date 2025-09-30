@@ -41,7 +41,10 @@ fl_slave_profiles_t SLAVE_PROFILE_DEFAULT = {
 											.nwk = {.chn = {37,38,39}},
 											};
 fl_slave_settings_t SLAVE_SETTINGS_DEFAULT = {
-											.magic= SLAVE_PROFILE_MAGIC,
+											.magic= SLAVE_SETTINGS_MAGIC,
+											};
+fl_slave_userdata_t SLAVE_USERDATA_DEFAULT = {
+											.magic= SLAVE_USERDATA_MAGIC,
 											};
 #endif
 
@@ -398,6 +401,74 @@ fl_slave_settings_t fl_db_slavesettings_init(void){
 	}
 	return settings;
 }
+
+/***************************************************
+ * @brief 		:store userdata into the flash
+ *
+ * @param[in] 	:none
+ *
+ * @return	  	:userdata struct
+ *
+ ***************************************************/
+void fl_db_slaveuserdata_save(u8 *_data,u8 _size) {
+	fl_slave_userdata_t entry;
+	memset(entry.data.payload,0,sizeof(entry.data.payload));
+	entry.data.len = _size;
+	memcpy(entry.data.payload,_data,_size);
+	entry.magic = SLAVE_USERDATA_MAGIC;
+
+	fl_slave_userdata_t check;
+	for (u16 i = 0; i < SLAVE_USERDATA_MAX_ENTRIES; i++) {
+		check.magic = 0;
+		flash_dread(ADDR_SLAVE_USERDATA_START+ i * SLAVE_USERDATA_ENTRY_SIZE,SLAVE_USERDATA_ENTRY_SIZE,(uint8_t*) &check);
+		if (check.magic != SLAVE_USERDATA_MAGIC) {
+			flash_page_program(ADDR_SLAVE_USERDATA_START + i * SLAVE_USERDATA_ENTRY_SIZE,SLAVE_USERDATA_ENTRY_SIZE,(uint8_t*) &entry);
+			LOGA(FLA,"SLAVE USERDATA Stored(0x%X)\r\n",ADDR_SLAVE_USERDATA_START + i * SLAVE_USERDATA_ENTRY_SIZE);
+			return;
+		}
+	}
+	flash_erase_sector(ADDR_SLAVE_USERDATA_START);
+	flash_page_program(ADDR_SLAVE_USERDATA_START,SLAVE_USERDATA_ENTRY_SIZE,(uint8_t*) &entry);
+}
+/***************************************************
+ * @brief 		: read userdata in flash
+ *
+ * @param[in] 	:none
+ *
+ * @return	  	:userdata struct
+ *
+ ***************************************************/
+fl_slave_userdata_t fl_db_slaveuserdata_load(void) {
+	fl_slave_userdata_t entry = {};
+	for (s16 i = SLAVE_USERDATA_MAX_ENTRIES - 1; i >= 0; i--) {
+		flash_dread(ADDR_SLAVE_USERDATA_START + i * SLAVE_USERDATA_ENTRY_SIZE,SLAVE_USERDATA_ENTRY_SIZE,(uint8_t*) &entry);
+		if (entry.magic == SLAVE_USERDATA_MAGIC) {
+			LOGA(FLA,"SLAVE USERDATA Load(0x%X)\r\n",ADDR_SLAVE_USERDATA_START + i * SLAVE_USERDATA_ENTRY_SIZE);
+			return entry;
+		}
+	}
+	return entry;
+}
+/***************************************************
+ * @brief 		: initialization slave userdata database
+ *
+ * @param[in] 	: none
+ *
+ * @return	  	: none
+ *
+ ***************************************************/
+fl_db_userdata_t fl_db_slaveuserdata_init(void){
+	fl_slave_userdata_t userdata;
+	userdata = fl_db_slaveuserdata_load();
+	if(userdata.magic != SLAVE_USERDATA_MAGIC){
+		//clear all and write default userdata
+		flash_erase_sector(ADDR_SLAVE_USERDATA_START);
+		memset((u8*)SLAVE_USERDATA_DEFAULT.data.payload,0,sizeof(SLAVE_USERDATA_DEFAULT.data.payload));
+		fl_db_slaveuserdata_save(SLAVE_USERDATA_DEFAULT.data.payload,sizeof(SLAVE_USERDATA_DEFAULT.data.payload));
+		userdata = fl_db_slaveuserdata_load();
+	}
+	return userdata.data;
+}
 #endif
 /******************************************************************************/
 /******************************************************************************/
@@ -426,15 +497,17 @@ void fl_db_init(void) {
 	LOGA(FLA,"NODELIST      (%d):0x%X-0x%X\r\n",NODELIST_NUMSLAVE_SIZE,ADDR_NODELIST_START,ADDR_NODELIST_START+NODELIST_SIZE);
 	LOGA(FLA,"MASTERPROFILE (%d):0x%X-0x%X\r\n",MASTER_PROFILE_ENTRY_SIZE,ADDR_MASTER_PROFILE_START,ADDR_MASTER_PROFILE_START+MASTERPROFILE_SIZE);
 #else
-	LOGA(FLA,"SLAVEPROFILE  (%d):0x%X-0x%X\r\n",SLAVE_PROFILE_ENTRY_SIZE,ADDR_SLAVE_PROFILE_START,ADDR_SLAVE_PROFILE_START+SLAVEPROFILE_SIZE);
-	LOGA(FLA,"SLAVESETTINGS (%d):0x%X-0x%X\r\n",SLAVE_SETTINGS_ENTRY_SIZE,ADDR_SLAVE_SETTINGS_START,ADDR_SLAVE_SETTINGS_START+SLAVESETTINGS_SIZE);
-
+	LOGA(FLA,"SLAVE_PROFILE  (%d):0x%X-0x%X\r\n",SLAVE_PROFILE_ENTRY_SIZE,ADDR_SLAVE_PROFILE_START,ADDR_SLAVE_PROFILE_START+SLAVEPROFILE_SIZE);
+	LOGA(FLA,"SLAVE_SETTINGS (%d):0x%X-0x%X\r\n",SLAVE_SETTINGS_ENTRY_SIZE,ADDR_SLAVE_SETTINGS_START,ADDR_SLAVE_SETTINGS_START+SLAVESETTINGS_SIZE);
+	LOGA(FLA,"SLAVE_USERDATA (%d):0x%X-0x%X\r\n",SLAVE_USERDATA_ENTRY_SIZE,ADDR_SLAVE_USERDATA_START,ADDR_SLAVE_USERDATA_START+SLAVEUSERDATA_SIZE);
 #endif
 }
 void fl_db_all_save(void){
 	fl_rtc_set(0); // storage currently time
 }
-
+void fl_db_Pairing_Clear(void){
+	flash_erase_sector(ADDR_SLAVE_PROFILE_START);
+}
 void fl_db_clearAll(void){
 	flash_erase_sector(ADDR_RTC_START);
 #ifdef MASTER_CORE
@@ -443,6 +516,7 @@ void fl_db_clearAll(void){
 #else
 	flash_erase_sector(ADDR_SLAVE_PROFILE_START);
 	flash_erase_sector(ADDR_SLAVE_SETTINGS_START);
+	flash_erase_sector(ADDR_SLAVE_USERDATA_START);
 #endif
 }
 /******************************************************************************/

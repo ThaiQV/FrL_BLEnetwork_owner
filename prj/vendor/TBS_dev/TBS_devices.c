@@ -18,45 +18,45 @@
 /***                                Global Parameters                        **/
 /******************************************************************************/
 /******************************************************************************/
-void tbs_counter_printf(void* _p){
+void tbs_counter_printf(type_debug_t _plog_type,void* _p){
 	tbs_device_counter_t *data = (tbs_device_counter_t*)_p;
-	LOGA(INF,"COUNTER STRUCT SIZE :%d\%d\r\n",SIZEU8(tbs_device_counter_t),SIZEU8(data->data));
-	LOGA(INF,"MAC:0x%02X%02X%02X%02X%02X%02X\r\n",data->mac[0],data->mac[1],data->mac[2],data->mac[3],data->mac[4],data->mac[5]);
-	LOGA(INF,"Timetamp  :%d\r\n",data->timetamp);
-	LOGA(INF,"Type      :%d\r\n",data->type);
-	LOGA(INF,"Index     :%d\r\n",data->data.index);
-	LOGA(INF,"BT_Call   :%d\r\n",data->data.bt_call);
-	LOGA(INF,"BT_EndCall:%d\r\n",data->data.bt_endcall);
-	LOGA(INF,"BT_Rst    :%d\r\n",data->data.bt_rst);
-	LOGA(INF,"BT_Pass   :%d\r\n",data->data.pass_product);
-	LOGA(INF,"BT_Err    :%d\r\n",data->data.err_product);
-	LOGA(INF,"Mode      :%d\r\n",data->data.mode);
-	LOGA(INF,"pre_pass  :%d\r\n",data->data.pre_pass_product);
-	LOGA(INF,"pre_err   :%d\r\n",data->data.pre_err_product);
-	LOGA(INF,"pre_mode  :%d\r\n",data->data.pre_mode);
+	LOGA(_plog_type,"COUNTER STRUCT SIZE :%d/%d\r\n",SIZEU8(tbs_device_counter_t),SIZEU8(data->data));
+	LOGA(_plog_type,"MAC:0x%02X%02X%02X%02X%02X%02X\r\n",data->mac[0],data->mac[1],data->mac[2],data->mac[3],data->mac[4],data->mac[5]);
+	LOGA(_plog_type,"Timetamp  :%d\r\n",data->timetamp);
+	LOGA(_plog_type,"Type      :%d\r\n",data->type);
+	LOGA(_plog_type,"Index     :%d\r\n",data->data.index);
+	LOGA(_plog_type,"BT_Call   :%d\r\n",data->data.bt_call);
+	LOGA(_plog_type,"BT_EndCall:%d\r\n",data->data.bt_endcall);
+	LOGA(_plog_type,"BT_Rst    :%d\r\n",data->data.bt_rst);
+	LOGA(_plog_type,"BT_Pass   :%d\r\n",data->data.pass_product);
+	LOGA(_plog_type,"BT_Err    :%d\r\n",data->data.err_product);
+	LOGA(_plog_type,"Mode      :%d\r\n",data->data.mode);
+	LOGA(_plog_type,"pre_pass  :%d\r\n",data->data.pre_pass_product);
+	LOGA(_plog_type,"pre_err   :%d\r\n",data->data.pre_err_product);
+	LOGA(_plog_type,"pre_mode  :%d\r\n",data->data.pre_mode);
 }
 
-void tbs_power_meter_printf(void* _p) {
+void tbs_power_meter_printf(type_debug_t _plog_type,void* _p) {
 	tbs_device_powermeter_t* dev = (tbs_device_powermeter_t*)_p;
-	LOGA(INF,"POWERMETER STRUCT SIZE :%d\%d\r\n",SIZEU8(tbs_device_powermeter_t),SIZEU8(dev->data));
-	LOGA(INF,"MAC       :0x%02X%02X%02X%02X%02X%02X\r\n",dev->mac[0],dev->mac[1],dev->mac[2],dev->mac[3],dev->mac[4],dev->mac[5]);
-	LOGA(INF,"Timetamp  :%d\r\n",dev->timetamp);
-	LOGA(INF,"Type      :%d\r\n",dev->type);
-	LOGA(INF,"Index     :%d\r\n",dev->data.index);
-	LOGA(INF,"Frequency :%u\r\n",dev->data.frequency);
-	LOGA(INF,"Voltage   :%u\r\n",dev->data.voltage);
-	LOGA(INF,"Current1  :%u\r\n",dev->data.current1);
-	LOGA(INF,"Current2  :%u\r\n",dev->data.current2);
-	LOGA(INF,"Current3  :%u\r\n",dev->data.current3);
-	LOGA(INF,"Power1    :%u\r\n",dev->data.power1);
-	LOGA(INF,"Power2    :%u\r\n",dev->data.power2);
-	LOGA(INF,"Power3    :%u\r\n",dev->data.power3);
-	LOGA(INF,"Time1     :%u\r\n",dev->data.time1);
-	LOGA(INF,"Time2     :%u\r\n",dev->data.time2);
-	LOGA(INF,"Time3     :%u\r\n",dev->data.time3);
-	LOGA(INF,"Energy1   :%u\r\n",dev->data.energy1);
-	LOGA(INF,"Energy2   :%u\r\n",dev->data.energy2);
-	LOGA(INF,"Energy3   :%u\r\n",dev->data.energy3);
+	LOGA(_plog_type,"POWERMETER STRUCT SIZE :%d/%d\r\n",SIZEU8(tbs_device_powermeter_t),SIZEU8(dev->data));
+	LOGA(_plog_type,"MAC       :0x%02X%02X%02X%02X%02X%02X\r\n",dev->mac[0],dev->mac[1],dev->mac[2],dev->mac[3],dev->mac[4],dev->mac[5]);
+	LOGA(_plog_type,"Timetamp  :%d\r\n",dev->timetamp);
+	LOGA(_plog_type,"Type      :%d\r\n",dev->type);
+	LOGA(_plog_type,"Index     :%d\r\n",dev->data.index);
+	LOGA(_plog_type,"Frequency :%u\r\n",dev->data.frequency);
+	LOGA(_plog_type,"Voltage   :%u\r\n",dev->data.voltage);
+	LOGA(_plog_type,"Current1  :%u\r\n",dev->data.current1);
+	LOGA(_plog_type,"Current2  :%u\r\n",dev->data.current2);
+	LOGA(_plog_type,"Current3  :%u\r\n",dev->data.current3);
+	LOGA(_plog_type,"Power1    :%u\r\n",dev->data.power1);
+	LOGA(_plog_type,"Power2    :%u\r\n",dev->data.power2);
+	LOGA(_plog_type,"Power3    :%u\r\n",dev->data.power3);
+	LOGA(_plog_type,"Time1     :%u\r\n",dev->data.time1);
+	LOGA(_plog_type,"Time2     :%u\r\n",dev->data.time2);
+	LOGA(_plog_type,"Time3     :%u\r\n",dev->data.time3);
+	LOGA(_plog_type,"Energy1   :%u\r\n",dev->data.energy1);
+	LOGA(_plog_type,"Energy2   :%u\r\n",dev->data.energy2);
+	LOGA(_plog_type,"Energy3   :%u\r\n",dev->data.energy3);
 }
 
 #ifdef COUNTER_DEVICE
@@ -80,6 +80,7 @@ tbs_device_counter_t G_COUNTER_DEV = {  .timetamp = 0,
 
 u8 G_COUNTER_LCD[COUNTER_LCD_MESS_MAX][LCD_MESSAGE_SIZE];
 
+#define G_TBS_DEVICE		G_COUNTER_DEV
 #endif
 #ifdef POWER_METER_DEVICE
 tbs_device_powermeter_t G_POWER_METER = {
@@ -104,8 +105,12 @@ tbs_device_powermeter_t G_POWER_METER = {
 								.energy3 = 333333,
 						}
 				    };
+
+#define G_TBS_DEVICE		G_POWER_METER
 //use to store setting parameter
 u16 G_POWER_METER_PARAMETER[3];
+
+
 
 void test_powermeter(void) {
 	u8 buffer[POWER_METER_BITSIZE];
@@ -117,6 +122,7 @@ void test_powermeter(void) {
 	tbs_power_meter_printf((void*)&received);
 }
 #endif
+
 /******************************************************************************/
 /******************************************************************************/
 /***                           Private definitions                           **/
@@ -144,7 +150,6 @@ void Counter_LCD_MessageCheck_FlagNew(void){
 		tbs_counter_lcd_t *mess_lcd = (tbs_counter_lcd_t *)&G_COUNTER_LCD[var][0];
 		if(mess_lcd->f_new == 1){
 			P_INFO("[%d]%s\r\n",var,(char* )mess_lcd->mess);
-
 			mess_lcd->f_new=0;
 		}
 	}
@@ -189,6 +194,17 @@ int TEST_Counter_Event(void){
 	extern u8 GETINFO_FLAG_EVENTTEST; // for testing
 	u32 period = RAND(1,30);
 	if (IsJoinedNetwork() && IsOnline() && GETINFO_FLAG_EVENTTEST ==1) {
+		//For testing : randon valid of fields
+		G_COUNTER_DEV.data.bt_call = RAND(0,1);
+		G_COUNTER_DEV.data.bt_endcall = G_COUNTER_DEV.data.bt_call ? 0 : 1;
+		G_COUNTER_DEV.data.bt_rst = RAND(0,1);
+		G_COUNTER_DEV.data.pass_product = RAND(1,1020);
+		G_COUNTER_DEV.data.err_product = RAND(1,500);
+		G_COUNTER_DEV.data.mode = 1;
+		G_COUNTER_DEV.data.pre_err_product = RAND(1,1020);
+		G_COUNTER_DEV.data.pre_pass_product = RAND(1,1020);
+		G_COUNTER_DEV.data.pre_mode = RAND(1,1020);
+		//
 		G_COUNTER_DEV.data.bt_call = RAND(0,1);
 		G_COUNTER_DEV.data.bt_endcall = G_COUNTER_DEV.data.bt_call ? 0 : 1;
 		G_COUNTER_DEV.data.bt_rst = G_COUNTER_DEV.data.bt_call ? 0 : RAND(0,1);
@@ -223,15 +239,19 @@ void TBS_Counter_init(void){
 	TEST_EVENT.lifetime = fl_rtc_get();
 	blt_soft_timer_add(&TEST_Counter_Event,5000*1000);
 }
+
 void TBS_Counter_Run(void){
 	G_COUNTER_DEV.timetamp = fl_rtc_get();
-	//For testing : randon valid of fields
+//	//For testing : randon valid of fields
 //	G_COUNTER_DEV.data.bt_call = RAND(0,1);
 //	G_COUNTER_DEV.data.bt_endcall = G_COUNTER_DEV.data.bt_call?0:1;
 //	G_COUNTER_DEV.data.bt_rst = RAND(0,1);
 //	G_COUNTER_DEV.data.pass_product = RAND(1,1020);
 //	G_COUNTER_DEV.data.err_product = RAND(1,500);
 //	G_COUNTER_DEV.data.mode = 1;
+//	G_COUNTER_DEV.data.pre_err_product= RAND(1,1020);
+//	G_COUNTER_DEV.data.pre_pass_product= RAND(1,1020);
+//	G_COUNTER_DEV.data.pre_mode= RAND(1,1020);
 	Counter_LCD_MessageStore();
 	Counter_LCD_MessageCheck_FlagNew();
 }
@@ -277,6 +297,12 @@ void TBS_PowerMeter_Run(void){
 /******************************************************************************/
 /******************************************************************************/
 
+void TBS_Device_Flash_Init_n_Reload(u8* db){
+	LOGA(FLA,"TBS_Device flash init and reload !! \r\n");
+	fl_db_userdata_t userdata = fl_db_slaveuserdata_init();
+	memcpy(db,userdata.payload,userdata.len);
+}
+
 /******************************************************************************/
 /******************************************************************************/
 /***                            Functions callback                           **/
@@ -313,6 +339,31 @@ void TBS_PwMeter_SetThreshod(u16 _chn1,u16 _chn2,u16 _chn3){
 /***                      Processing functions 					             **/
 /******************************************************************************/
 /******************************************************************************/
+void TBS_Device_Store_run(void) {
+	char *dev_str;
+	u8 data_size=0;
+#ifdef COUNTER_DEVICE
+	u8 data[SIZEU8(tbs_device_counter_t)];
+	dev_str = "Counter";
+	memcpy(data,(u8*)&G_COUNTER_DEV,SIZEU8(data));
+#else
+	dev_str = "PWMeter";
+	u8 data[SIZEU8(tbs_device_powermeter_t)];
+	memcpy(data,(u8*)&G_POWER_METER,SIZEU8(data));
+#endif
+	data_size = SIZEU8(data) - 6;//skip mac
+	static u32 crc_check_change = 0;
+	u32 crc = fl_db_crc32(data+6,data_size);
+	if (crc_check_change != crc) {
+		LOGA(FLA,"%s store currently data !!\r\n",dev_str);
+		tbs_counter_printf(FLA,(void*)&data);
+		fl_db_slaveuserdata_save(data+6,data_size);
+//		TBS_Device_Flash_Init_n_Reload((u8*)&G_TBS_DEVICE.timetamp);
+//		tbs_counter_printf(FLA,(void*)&G_TBS_DEVICE);
+		crc_check_change = crc;
+	}
+}
+
 void TBS_Device_Init(void){
 #ifdef COUNTER_DEVICE
 	TBS_Counter_init();
@@ -320,6 +371,8 @@ void TBS_Device_Init(void){
 #ifdef POWER_METER_DEVICE
 	TBS_PowerMeter_init();
 #endif
+	TBS_Device_Flash_Init_n_Reload((u8*) &G_TBS_DEVICE.timetamp);
+	tbs_counter_printf(PERI,(void*)&G_TBS_DEVICE);
 	//History init
 	TBS_History_Init();
 }
@@ -330,5 +383,6 @@ void TBS_Device_Run(void){
 #ifdef POWER_METER_DEVICE
 	TBS_PowerMeter_Run();
 #endif
+	TBS_Device_Store_run();
 	TBS_History_Run();
 }

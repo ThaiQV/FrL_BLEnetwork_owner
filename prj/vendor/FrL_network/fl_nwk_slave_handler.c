@@ -141,9 +141,9 @@ int _nwk_slave_backup(void){
 }
 
 void fl_nwk_slave_init(void) {
-//	PLOG_Start(ALL);
+	PLOG_Start(ALL);
 	DEBUG_TURN(NWK_DEBUG_STT);
-//	fl_input_external_init();
+	fl_input_external_init();
 	FL_QUEUE_CLEAR(&G_HANDLE_CONTAINER,PACK_HANDLE_SIZE);
 	//Generate information
 	G_INFORMATION.active = false;
@@ -273,7 +273,6 @@ u32 fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 	/* | 1B  |   4Bs    |    1B     |    1B   |   20Bs  |  1B  | 1B | -> .master = FL_FROM_SLAVE_ACK / FL_FROM_SLAVE */
 	/*****************************************************************/
 	//**todo: Need to convert _data to payload base on special command ID
-	//
 	fl_pack_t rslt = {.length = 0};
 	fl_hdr_nwk_type_e cmdid = (fl_hdr_nwk_type_e)_cmdid;
 	if(!IsREQHDR(cmdid)){
@@ -418,7 +417,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 #ifdef COUNTER_DEVICE
 					tbs_device_counter_t *counter_data = (tbs_device_counter_t*)G_INFORMATION.data;
 					memcpy(_payload,(u8*)&counter_data->data,SIZEU8(counter_data->data));
-					tbs_counter_printf((void*)counter_data);
+					tbs_counter_printf(APP,(void*)counter_data);
 #endif
 #ifdef POWER_METER_DEVICE
 					tbs_power_meter_printf((void*)G_INFORMATION.data);
@@ -572,7 +571,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 					packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
 				}
 			} else {
-				//Joined network -> exit collection mode if the master stopped broadcast Collection packet[
+				//Joined network -> exit collection mode if the master stopped broadcast Collection packet
 				blt_soft_timer_restart(fl_nwk_joinnwk_timeout,3*1000*1000); //exit after 3s
 				//Non-rsp
 				packet_built.length = 0;
