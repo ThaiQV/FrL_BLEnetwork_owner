@@ -37,7 +37,7 @@ volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME = {.timetamp = 0,.milstep =
 u8 GETINFO_FLAG_EVENTTEST = 0;
 #define JOIN_NETWORK_TIME 			30*1000 			//ms
 #define RECHECKING_NETWOK_TIME 		30*1000 		    //ms
-#define RECONNECT_TIME				60*1000*1000		//s
+#define RECONNECT_TIME				55*1000*1000		//s
 
 fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_A5_HIS,NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
 fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_A5_HIS,NWK_HDR_55,NWK_HDR_RECONNECT}; // register cmdid REQ
@@ -196,7 +196,7 @@ void fl_nwk_slave_init(void) {
 	blt_soft_timer_add(_nwk_slave_backup,2*1000*1000);
 
 	//Interval checking network
-	blt_soft_timer_add(fl_nwk_slave_reconnect,1000*1000);//s -> send information online to master
+	blt_soft_timer_add(fl_nwk_slave_reconnect,RECONNECT_TIME);//s -> send information online to master
 
 	//Checking online
 //	blt_soft_timer_add(&_isOnline_check,RECHECKING_NETWOK_TIME*1000);
@@ -308,6 +308,8 @@ u32 fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 			req_pack.frame.endpoint.repeat_mode = NWK_REPEAT_MODE;
 			//Create packet from slave
 			req_pack.frame.endpoint.master = FL_FROM_SLAVE_ACK;
+			//tbs index manage
+			TBS_Device_Index_manage();
 		}
 		break;
 		case NWK_HDR_RECONNECT: {
@@ -430,7 +432,8 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 					memcpy(&packet.frame.payload,&_payload[indx_data],SIZEU8(packet.frame.payload));
 					//CRC
 					packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
-
+					//increase index tbs
+					TBS_Device_Index_manage();
 					//Restart timeout reconnect
 					blt_soft_timer_restart(fl_nwk_slave_reconnect,RECONNECT_TIME);
 				} else {
@@ -699,7 +702,7 @@ int fl_nwk_slave_reconnect(void){
 #endif
 		return RECONNECT_TIME;
 	}
-	return 1000*1000;
+	return 0;
 }
 
 /******************************************************************************/

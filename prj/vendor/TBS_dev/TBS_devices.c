@@ -15,6 +15,7 @@
 #include "../FrL_Network/fl_nwk_api.h"
 
 #define TBS_DEVICE_STORE_INTERVAL 		5*1000*1000 //5s
+#define TBS_PACKET_INDEX_MAX			10000
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -364,6 +365,14 @@ int TBS_Device_Store_run(void) {
 	return 0;
 }
 
+void TBS_Device_Index_manage(void) {
+	G_TBS_DEVICE.data.index++;
+	if (G_TBS_DEVICE.data.index >= TBS_PACKET_INDEX_MAX) {
+		G_TBS_DEVICE.data.index = 0;
+	}
+	//todo:
+}
+
 void TBS_Device_Init(void){
 	TBS_Device_Flash_Init_n_Reload((u8*) &G_TBS_DEVICE.timetamp);
 #ifdef COUNTER_DEVICE
@@ -378,6 +387,7 @@ void TBS_Device_Init(void){
 	TBS_History_Init();
 	blt_soft_timer_add(TBS_Device_Store_run,TBS_DEVICE_STORE_INTERVAL);
 }
+
 void TBS_Device_Run(void){
 #ifdef COUNTER_DEVICE
 	TBS_Counter_Run();
