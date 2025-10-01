@@ -256,7 +256,7 @@ void TBS_Counter_Run(void){
 //	G_COUNTER_DEV.data.pre_pass_product= RAND(1,1020);
 //	G_COUNTER_DEV.data.pre_mode= RAND(1,1020);
 	Counter_LCD_MessageStore();
-	Counter_LCD_MessageCheck_FlagNew();
+//	Counter_LCD_MessageCheck_FlagNew();
 }
 #endif
 #ifdef POWER_METER_DEVICE
@@ -393,8 +393,8 @@ void TBS_Device_Init(void){
 
 void TBS_Device_Run(void){
 #ifdef COUNTER_DEVICE
-	TBS_Counter_Run();
 	user_app_loop();
+	TBS_Counter_Run();
 #endif
 #ifdef POWER_METER_DEVICE
 	TBS_PowerMeter_Run();
