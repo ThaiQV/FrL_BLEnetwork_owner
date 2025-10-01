@@ -334,6 +334,7 @@ fl_slave_profiles_t fl_db_slaveprofile_init(void){
 //	P_PRINTFHEX_A(FLA,profile.parameters,sizeof(profile.parameters)/sizeof(profile.parameters[0]),"Parameters(%d}:",sizeof(profile.parameters)/sizeof(profile.parameters[0]));
 	LOGA(FLA,"Factory Reset:%d\r\n",profile.run_stt.rst_factory);
 	LOGA(FLA,"NWK Key:%s(%02X%02X)\r\n",(profile.nwk.private_key[0] != 0xFF && profile.nwk.private_key[1] != 0xFF )?"*****":"NULL",profile.nwk.private_key[0],profile.nwk.private_key[1]);
+
 	return profile;
 }
 /***************************************************
