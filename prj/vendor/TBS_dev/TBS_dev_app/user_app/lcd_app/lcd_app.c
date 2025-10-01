@@ -196,7 +196,8 @@ void my_timeout_callback(uint8_t row) {
 			break;
 
 		case LCD_PRINT_PAIRING:
-			fl_db_clearAll();
+//			fl_db_clearAll();
+			fl_db_Pairing_Clear();
 			sys_reboot();
 			break;
 
