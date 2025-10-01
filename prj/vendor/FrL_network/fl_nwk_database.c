@@ -44,6 +44,7 @@ fl_slave_settings_t SLAVE_SETTINGS_DEFAULT = {
 											.magic= SLAVE_SETTINGS_MAGIC,
 											};
 fl_slave_userdata_t SLAVE_USERDATA_DEFAULT = {
+											.data={.len=40},
 											.magic= SLAVE_USERDATA_MAGIC,
 											};
 #endif
@@ -362,6 +363,7 @@ fl_slave_settings_t fl_db_slavesettings_load(void) {
  * @return	  	:settings struct
  *
  ***************************************************/
+
 void fl_db_slavesettings_save(u8 *_data,u8 _size) {
 	fl_slave_settings_t entry;
 	memset(entry.setting_arr,0,sizeof(entry.setting_arr));
@@ -439,6 +441,8 @@ void fl_db_slaveuserdata_save(u8 *_data,u8 _size) {
  ***************************************************/
 fl_slave_userdata_t fl_db_slaveuserdata_load(void) {
 	fl_slave_userdata_t entry = {};
+	memset(entry.data.payload,0,sizeof(entry.data.payload));
+	entry.data.len = 0;
 	for (s16 i = SLAVE_USERDATA_MAX_ENTRIES - 1; i >= 0; i--) {
 		flash_dread(ADDR_SLAVE_USERDATA_START + i * SLAVE_USERDATA_ENTRY_SIZE,SLAVE_USERDATA_ENTRY_SIZE,(uint8_t*) &entry);
 		if (entry.magic == SLAVE_USERDATA_MAGIC) {

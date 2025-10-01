@@ -443,55 +443,6 @@ void fl_input_external_init(void) {
 	regis = RegisterPOLLING(GPIO_IN);
 	LOGA(PERI,"Button(%d)Reset Register :%d\r\n",GPIO_IN.pin_read(GPIO_IN.pin),regis);
 #endif
-#ifdef POWER_METER_DEVICE
-//	fl_exIO_t GPIO_IN;
-//	s8 regis=0;
-//	extern u8 TEST_Buttons_RST(fl_exButton_states_e _state, void *_data);
-//	GPIO_IN.exc = &TEST_Buttons_RST;
-//	GPIO_IN.status = BUTT_STATE_NONE;
-//	GPIO_IN.mode = DET_LOW;
-//	GPIO_IN.pin_read = (FucRead) &gpio_get_level;
-//	GPIO_IN.pin = (gpio_pin_e) GPIO_PB0;
-//
-//	gpio_function_en(GPIO_IN.pin);
-//	gpio_set_output(GPIO_IN.pin,0); 		//disable output
-//	gpio_set_input(GPIO_IN.pin,1); 		//enable input
-//	gpio_set_up_down_res(GPIO_PE0|GPIO_PE2,GPIO_PIN_PULLDOWN_100K);
-//
-////Register polling callback
-//	regis = RegisterPOLLING(GPIO_IN);
-//	LOGA(PERI,"Button(%d)Reset Register :%d\r\n",GPIO_IN.pin_read(GPIO_IN.pin),regis);
-#endif
-//test board testing-> not counter boarrd
-#ifndef MASTER_CORE
-
-//	gpio_function_en(GPIO_PE0|GPIO_PE2);
-//	gpio_set_output(GPIO_PE0|GPIO_PE2,0); 		//disable output
-//	gpio_set_input(GPIO_PE0|GPIO_PE2,1); 		//enable input
-//	gpio_set_up_down_res(GPIO_PE0|GPIO_PE2,GPIO_PIN_PULLDOWN_100K);
-//
-//	fl_exIO_t GPIO_IN;
-//	extern u8 TEST_Buttons(fl_exButton_states_e _state, void *_data);
-//	GPIO_IN.exc = &TEST_Buttons;
-//	GPIO_IN.status = BUTT_STATE_NONE;
-//	GPIO_IN.mode = DET_HIGH;
-//	GPIO_IN.pin_read = (FucRead)&gpio_get_level;
-//	GPIO_IN.pin = (gpio_pin_e) GPIO_PE2;
-//	//Register polling callback
-//	s8 regis = RegisterPOLLING(GPIO_IN);
-//	LOGA(PERI,"Button(%d)Calling Register :%d\r\n",GPIO_IN.pin_read(GPIO_IN.pin),regis);
-//
-//	extern u8 TEST_Buttons_RST(fl_exButton_states_e _state, void *_data);
-//	GPIO_IN.exc = &TEST_Buttons_RST;
-//	GPIO_IN.status = BUTT_STATE_NONE;
-//	GPIO_IN.mode = DET_HIGH;
-//	GPIO_IN.pin_read = (FucRead)&gpio_get_level;
-//	GPIO_IN.pin = (gpio_pin_e) GPIO_PE0;
-//	//Register polling callback
-//	regis = RegisterPOLLING(GPIO_IN);
-//	LOGA(PERI,"Button(%d)Reset Register :%d\r\n",GPIO_IN.pin_read(GPIO_IN.pin),regis);
-
-#endif
 	/* --- Polling read input --- */
 	blt_soft_timer_add(_scan_external_input,FL_IO_SCAN_INTERVAL * 1000); //ms
 }

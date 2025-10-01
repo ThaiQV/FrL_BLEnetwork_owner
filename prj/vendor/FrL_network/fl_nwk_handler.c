@@ -171,7 +171,7 @@ int fl_queue_REQnRSP_TimeoutStart(void){
 }
 void fl_queue_REQnRSP_TimeoutInit(void) {
 	if (blt_soft_timer_find(&fl_queue_REQnRSP_TimeoutStart) == -1) {
-		LOGA(INF,"REQcRSP initialization (%d ms)!!\r\n",QUEUQ_REQcRSP_INTERVAL);
+		LOGA(INF,"REQcRSP initialization (%d ms)!!\r\n",QUEUQ_REQcRSP_INTERVAL/1000);
 		blt_soft_timer_add(&fl_queue_REQnRSP_TimeoutStart,QUEUQ_REQcRSP_INTERVAL);
 		fl_queueREQcRSP_clear(G_QUEUE_REQ_CALL_RSP);
 	}

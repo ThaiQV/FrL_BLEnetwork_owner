@@ -63,8 +63,8 @@ void tbs_power_meter_printf(type_debug_t _plog_type,void* _p) {
 }
 
 #ifndef MASTER_CORE
-#ifdef COUNTER_DEVICE
 
+#ifdef COUNTER_DEVICE
 tbs_device_counter_t G_COUNTER_DEV = {  .timetamp = 0,
 										.type = TBS_COUNTER,
 										.data = {
@@ -226,7 +226,7 @@ void TBS_Counter_init(void){
 	G_COUNTER_DEV.type = TBS_COUNTER;
 	G_COUNTER_DEV.timetamp = fl_rtc_get();
 	//passing lcd message
-	memcpy(G_COUNTER_LCD,fl_db_slavesettings_load().setting_arr,SIZEU8(G_COUNTER_LCD[0]) * COUNTER_LCD_MESS_MAX);
+	memcpy(G_COUNTER_LCD,fl_db_slavesettings_init().setting_arr,SIZEU8(G_COUNTER_LCD[0]) * COUNTER_LCD_MESS_MAX);
 	//for debuging
 	LOG_P(PERI,"========================\r\n");
 	for (u8 i = 0; i < COUNTER_LCD_MESS_MAX; i++) {
