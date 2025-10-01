@@ -57,6 +57,7 @@ static subapp_result_t lcd_app_loop(subapp_t* self);
 static subapp_result_t lcd_app_deinit(subapp_t* self);
 static void lcd_app_event_handler(const event_t* event, void* user_data);
 static void LCD_MessageCheck_FlagNew(void);
+static uint8_t find_next_mess(uint8_t index);
 
 subapp_t lcd_app = {
         .name = "lcd", 
@@ -196,13 +197,19 @@ void my_timeout_callback(uint8_t row) {
 			break;
 
 		case LCD_PRINT_PAIRING:
+			lcd_ctx.print_type = LCD_PRINT_OFF;
+			lcd_app_clear_all(&app_handle);
+			lcd_off();
 //			fl_db_clearAll();
 			fl_db_Pairing_Clear();
+			fl_db_clearAll();
 			sys_reboot();
 			break;
 
 		case LCD_PRINT_FACTORY_RESET:
 			lcd_ctx.print_type = LCD_PRINT_OFF;
+			lcd_app_clear_all(&app_handle);
+			lcd_off();
 			fl_db_clearAll();
 			// storage_clean();
 			sys_reboot();
@@ -213,36 +220,15 @@ void my_timeout_callback(uint8_t row) {
 			continue;
 
 		case LCD_PRINT_MESS_NEW:
-			if(get_system_time_ms() > lcd_ctx.time_off)
+			if (get_data.is_call())
 			{
 				lcd_ctx.print_type = LCD_PRINT_OFF;
 				continue;
 			}
-
-			lcd_ctx.row0_mess_num = (lcd_ctx.row1_mess_num +1) % 10;
-			for( int i = 0; i < 10; i++)
+			if(get_system_time_ms() > lcd_ctx.time_off)
 			{
-				if(memcmp(mess_zero, (uint8_t *)G_COUNTER_LCD[lcd_ctx.row0_mess_num], 20) == 0)
-				{
-					lcd_ctx.row0_mess_num = (lcd_ctx.row0_mess_num + 1) % 10;
-				}
-				else
-				{
-					lcd_ctx.row1_mess_num = (lcd_ctx.row0_mess_num + 1) % 10;
-					break;
-				}
-			}
-
-			for( int i = 0; i < 10; i++)
-			{
-				if(memcmp(mess_zero, (uint8_t *)G_COUNTER_LCD[lcd_ctx.row1_mess_num], 20) == 0)
-				{
-					lcd_ctx.row1_mess_num = (lcd_ctx.row1_mess_num +1) % 10;
-				}
-				else
-				{
-					break;
-				}
+				lcd_ctx.print_type = LCD_PRINT_OFF;
+				continue;
 			}
 			EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_MESS_NEW, EVENT_PRIORITY_HIGH);
 			return;
@@ -317,8 +303,8 @@ static subapp_result_t lcd_app_init(subapp_t* self)
 	lcd_ctx.startup = 1;
 	lcd_ctx.print_type = LCD_PRINT_STARTUP;
 	lcd_ctx.enable =1;
-	lcd_ctx.row0_mess_num = 0;
-	lcd_ctx.row1_mess_num = 1;
+	lcd_ctx.row0_mess_num = -1;
+	lcd_ctx.row1_mess_num = 0;
 
 	return SUBAPP_OK;
 }
@@ -367,74 +353,44 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 			{
 				if(get_data.is_mode_actic())
 				{
-					lcd_app_set_message(&app_handle, 0, " Dang Trong Ca  ", 20000); //  0, timeout 10s
+					lcd_app_set_message(&app_handle, 0, "   Trong Ca     ", 15000); //  0, timeout 10s
 				}
 				else
 				{
-					lcd_app_set_message(&app_handle, 0, " Dang Chay Thu  ", 20000); //  0, timeout 10s
+					lcd_app_set_message(&app_handle, 0, "   Chay Thu     ", 15000); //  0, timeout 10s
 				}
 
-				for(int i = 0; i <= 10; i++)
-				{
-					if(i == 10)
-					{
-						lcd_app_set_message(&app_handle, 1, "Khong Co Thong Bao", 15000); //  0, timeout 10s
-						break;
-					}
-					if(memcmp(mess_zero, (uint8_t *)G_COUNTER_LCD[lcd_ctx.row0_mess_num], 20) == 0)
-					{
-						lcd_ctx.row0_mess_num = (lcd_ctx.row0_mess_num +1) % 10;
-						continue;
-					}
-					else
-					{
-						lcd_app_set_message(&app_handle, 1, (char *)(G_COUNTER_LCD[lcd_ctx.row0_mess_num]), 15000); //  1, timeout 15s
-						lcd_ctx.row0_mess_num = (lcd_ctx.row0_mess_num +1) % 10;
-						lcd_ctx.row1_mess_num = (lcd_ctx.row0_mess_num +1) % 10;
-						lcd_ctx.print_mode = 1;
-						break;
-					}
-				}
+				lcd_app_clear_row(&app_handle, 1);
+				lcd_ctx.print_mode = 1;
+				lcd_ctx.row1_mess_num = find_next_mess(-1);
+
 			}
 			else
 			{
 				lcd_app_clear_all(&app_handle);
-				
-				for( int i = 0; i < 10; i++)
+
+				if(lcd_ctx.row1_mess_num == -1)
 				{
-					if(memcmp(mess_zero, (uint8_t *)G_COUNTER_LCD[lcd_ctx.row0_mess_num], 20) == 0)
-					{
-						lcd_ctx.row0_mess_num = (lcd_ctx.row0_mess_num +1) % 10;
-						continue;
-					}
-					else
-					{
-						lcd_app_set_message(&app_handle, 0, (char *)G_COUNTER_LCD[lcd_ctx.row0_mess_num], 15000); //  1, timeout 15s
-						lcd_ctx.row0_mess_num = (lcd_ctx.row0_mess_num +1) % 10;
-						lcd_ctx.row1_mess_num = lcd_ctx.row0_mess_num;
-						break;
-					}
+					lcd_app_set_message(&app_handle, 0, "               ", 15000);
+					break;
 				}
 
-				for( int i = 0; i < 10; i++)
+				lcd_ctx.row0_mess_num = lcd_ctx.row1_mess_num;
+				lcd_app_set_message(&app_handle, 0, (char *)G_COUNTER_LCD[lcd_ctx.row0_mess_num], 15000);
+
+
+				lcd_ctx.row1_mess_num = find_next_mess(lcd_ctx.row1_mess_num);
+				if(lcd_ctx.row1_mess_num == lcd_ctx.row0_mess_num)
 				{
-					if(memcmp(mess_zero, (uint8_t *)G_COUNTER_LCD[lcd_ctx.row1_mess_num], 20) == 0)
-					{
-						lcd_ctx.row1_mess_num = (lcd_ctx.row1_mess_num +1) % 10;
-						continue;
-					}
-					else
-					{
-						lcd_app_set_message(&app_handle, 1, (char *)G_COUNTER_LCD[lcd_ctx.row1_mess_num], 15000); //  1, timeout 15s
-						lcd_ctx.row1_mess_num = (lcd_ctx.row1_mess_num +1) % 10;
-						break;
-					}
+					lcd_app_clear_row(&app_handle, 1);
+				}
+				else
+				{
+					lcd_app_set_message(&app_handle, 1, (char *)G_COUNTER_LCD[lcd_ctx.row1_mess_num], 30000);
 				}
 				
 			}
 			
-			
-            // TODO: turn LED to indicate network online
             break;
 
 		case EVENT_DATA_PASS_PRODUCT_UP:
@@ -453,7 +409,6 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 			lcd_app_set_message(&app_handle, 0, lcd_ctx.display.line1, 30000); //  0, timeout 10s
 			lcd_app_set_message(&app_handle, 1, lcd_ctx.display.line2, 15000); //  0, timeout 10s
 			
-            // TODO: turn LED to indicate network offline
             break;
 		
 		case EVENT_DATA_CALL:
@@ -463,7 +418,6 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 			lcd_app_set_message(&app_handle, 0, "    Calling   ", 0);
 			lcd_app_clear_row(&app_handle, 1);
 
-            // TODO: blink LED for call state
 			break;
 
 		case EVENT_DATA_ENDCALL:
@@ -473,7 +427,6 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 			lcd_app_set_message(&app_handle, 0, "  End Calling  ", 15000); //  0, timeout 10s
 			lcd_app_clear_row(&app_handle, 1);
 
-            // TODO: blink LED for call state
 			break;
 
 		case EVENT_LCD_PRINT_MAC:
@@ -508,17 +461,6 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 
 		case EVENT_DATA_RESET:
 			ULOGA("Handle EVENT_DATA_RESET\n");
-			// lcd_ctx.enable = 1;
-			// lcd_ctx.print_type = LCD_PRINT_RESET;
-			// lcd_app_set_message(&app_handle, 0, "    Reset OK    ", 30000); //  0, timeout 10s
-			// if(get_data.is_mode_actic())
-			// {
-			// 	lcd_app_set_message(&app_handle, 1, "    Trong Ca    ", 15000); //  0, timeout 10s
-			// }
-			// else
-			// {
-			// 	lcd_app_set_message(&app_handle, 1, "Chay Thu Nghiem ", 15000); //  0, timeout 10s
-			// }
 
 			break;
 
@@ -597,8 +539,19 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 
 			lcd_ctx.enable = 1;
 			lcd_ctx.print_type = LCD_PRINT_MESS_NEW;
-			lcd_app_set_message(&app_handle, 0, (char *)G_COUNTER_LCD[lcd_ctx.row0_mess_num], 30000); //  1, timeout 15s
-			lcd_app_set_message(&app_handle, 1, (char *)G_COUNTER_LCD[lcd_ctx.row1_mess_num], 15000); //  1, timeout 15s
+			lcd_ctx.row0_mess_num = lcd_ctx.row1_mess_num;
+			lcd_app_set_message(&app_handle, 0, (char *)G_COUNTER_LCD[lcd_ctx.row0_mess_num], 15000);
+
+
+			lcd_ctx.row1_mess_num = find_next_mess(lcd_ctx.row1_mess_num);
+			if(lcd_ctx.row1_mess_num == lcd_ctx.row0_mess_num)
+			{
+				lcd_app_clear_row(&app_handle, 1);
+			}
+			else
+			{
+				lcd_app_set_message(&app_handle, 1, (char *)G_COUNTER_LCD[lcd_ctx.row1_mess_num], 30000);
+				}
 
 			break;
 
@@ -614,23 +567,40 @@ static void LCD_MessageCheck_FlagNew(void){
 		tbs_counter_lcd_t *mess_lcd = (tbs_counter_lcd_t *)&G_COUNTER_LCD[var][0];
 		if(mess_lcd->f_new == 1)
 		{
-			lcd_ctx.row0_mess_num = var;
-			for(; var < COUNTER_LCD_MESS_MAX; ++var)
-			{
-				tbs_counter_lcd_t *mess_lcd1 = (tbs_counter_lcd_t *)&G_COUNTER_LCD[var][0];
-				if(mess_lcd1->f_new == 1)
-				{
-					lcd_ctx.row1_mess_num = var;
-					mess_lcd1->f_new = 0;
-				}
-			}
-			lcd_ctx.row1_mess_num = lcd_ctx.row0_mess_num;
-			ULOGA("lcd_ctx.row0_mess_num %d\n", lcd_ctx.row0_mess_num);
+			lcd_ctx.row1_mess_num = var;
+			// for(; var < COUNTER_LCD_MESS_MAX; ++var)
+			// {
+			// 	tbs_counter_lcd_t *mess_lcd1 = (tbs_counter_lcd_t *)&G_COUNTER_LCD[var][0];
+			// 	if(mess_lcd1->f_new == 1)
+			// 	{
+			// 		lcd_ctx.row1_mess_num = var;
+			// 		mess_lcd1->f_new = 0;
+			// 	}
+			// }
+			// lcd_ctx.row1_mess_num = find_next_mess(lcd_ctx.row0_mess_num);
+			ULOGA("lcd_ctx.row0_mess_num %d\n", lcd_ctx.row1_mess_num);
 			lcd_ctx.time_off = get_system_time_ms() + LCD_TIME_DELAY_PRINT;
 			EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_MESS_NEW, EVENT_PRIORITY_HIGH);
 			mess_lcd->f_new = 0;
 		}
 	}
+}
+
+static uint8_t find_next_mess(uint8_t index)
+{
+	index += 1;
+	for(int i = 0; i < COUNTER_LCD_MESS_MAX; i++)
+	{
+		if(memcmp(mess_zero, (uint8_t *)G_COUNTER_LCD[index], 20) == 0)
+		{
+			index = (index + 1) % COUNTER_LCD_MESS_MAX;
+		}
+		else
+		{
+			return index;
+		}
+	}
+	return -1;
 }
 
 #endif /* COUNTER_DEVICE*/

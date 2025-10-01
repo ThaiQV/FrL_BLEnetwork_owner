@@ -37,6 +37,8 @@ Led_Pin_TypeDef led_pin_map = {
 		.NWK = GPIO_PA6,
 };
 
+extern get_data_t get_data;
+
 // Static context instance
 static led_context_t led_ctx = {0};
 
@@ -182,6 +184,15 @@ static subapp_result_t led_app_loop(subapp_t* self)
 	}
 
 	led_process_all();
+
+	if(get_data.is_online() == true)
+	{
+		led_on(LED_ID_NWK);
+	}
+	else
+	{
+		led_off(LED_ID_NWK);
+	}
 
 	return SUBAPP_OK;
 }

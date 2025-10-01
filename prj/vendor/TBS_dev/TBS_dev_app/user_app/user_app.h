@@ -48,6 +48,7 @@ typedef struct {
     uint16_t (* pass_product)(void);
     uint16_t (* err_product)(void);
 	bool (*is_call)(void);
+    bool (*is_online)(void);
     bool (*is_mode_actic)(void);
 	uint8_t * (*mac)(void);
 } get_data_t;

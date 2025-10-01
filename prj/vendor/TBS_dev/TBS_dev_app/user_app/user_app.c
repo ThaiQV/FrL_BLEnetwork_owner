@@ -84,6 +84,7 @@ app_data_t g_app_data = {
 uint16_t get_data_pass_product(void){ return g_app_data.count->pass_product; }
 uint16_t get_data_err_product(void){ return g_app_data.count->err_product; }
 bool get_data_is_call(void){ return g_app_data.is_call; }
+bool get_data_is_online(void){ return g_app_data.is_online; }
 bool get_data_is_mode_actics(void){ return (g_app_data.mode == APP_MODE_TESTS) ? false : true;  }
 uint8_t * get_mac(void){ return G_COUNTER_DEV.mac; }
 uint32_t get_data_timetamp(void){ return g_app_data.timetamp; }
@@ -93,6 +94,7 @@ get_data_t get_data = {
 	.pass_product = get_data_pass_product,
 	.err_product  = get_data_err_product,
 	.is_call = get_data_is_call,
+	.is_online = get_data_is_online,
 	.is_mode_actic = get_data_is_mode_actics,
 	.mac = get_mac,
 };
@@ -247,7 +249,7 @@ static void endcall_cb_rsp(void *_data,void* _data2)
 static subapp_result_t data_app_init(subapp_t* self)
 {
 	g_app_data.timetamp = fl_rtc_get();
-	g_app_data.is_online = IsOnline();
+	// g_app_data.is_online = !IsOnline();
 	
 //	read_data_t read_cnt = read_data(g_app_data.timetamp);
 //

@@ -23,6 +23,7 @@ typedef enum {
 typedef struct {
 	ledid_mode_t leds[LED_NUMBER];
     bool is_call;
+    bool is_online;
     bool start;
 } led_context_t;
 
