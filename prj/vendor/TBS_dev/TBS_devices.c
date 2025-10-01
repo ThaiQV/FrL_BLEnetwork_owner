@@ -237,8 +237,9 @@ void TBS_Counter_init(void){
 		}
 	}
 	LOG_P(PERI,"========================\r\n");
-
 	//todo:Init Butt,lcd,7segs,.....
+	user_app_init();
+	//TEst
 	TEST_EVENT.lifetime = fl_rtc_get();
 	blt_soft_timer_add(&TEST_Counter_Event,5000*1000);
 }
@@ -257,6 +258,8 @@ void TBS_Counter_Run(void){
 //	G_COUNTER_DEV.data.pre_mode= RAND(1,1020);
 	Counter_LCD_MessageStore();
 //	Counter_LCD_MessageCheck_FlagNew();
+	//todo: TBS_Device_App
+	user_app_loop();
 }
 #endif
 #ifdef POWER_METER_DEVICE
@@ -379,7 +382,6 @@ void TBS_Device_Init(void){
 	TBS_Device_Flash_Init_n_Reload();
 #ifdef COUNTER_DEVICE
 	TBS_Counter_init();
-	user_app_init();
 #endif
 #ifdef POWER_METER_DEVICE
 	TBS_PowerMeter_init();
@@ -393,7 +395,6 @@ void TBS_Device_Init(void){
 
 void TBS_Device_Run(void){
 #ifdef COUNTER_DEVICE
-	user_app_loop();
 	TBS_Counter_Run();
 #endif
 #ifdef POWER_METER_DEVICE
