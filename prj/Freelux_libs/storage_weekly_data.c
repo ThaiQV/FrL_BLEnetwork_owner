@@ -8,13 +8,12 @@
 #define STORAGE_LOG(...)
 #endif
 
-static bool check_sector_available(uint32_t sector);
-
 /* Variables */
 uint32_t timestamp_start = 0;
 uint32_t timeslot_current = 0;
 uint32_t timeslot_unspecified = 0;
-uint8_t  timeslot_map[TIMESLOT_MAP_LENGTH];
+uint8_t  map[MAP_LENGTH];
+uint16_t storage_index = 0;
 
 /* Functions */
 
@@ -30,29 +29,8 @@ void storage_init(void)
 
 	// Init non-volatile memory
 	nvm_init();
-	// Load timestamp start
-	ret = nvm_record_read(STORAGE_TIMESTAMP_START,(uint8_t*)&timestamp_start,sizeof(timestamp_start));
-	if(ret == NVM_NO_RECORD)
-	{
-		storage_set_timestamp_start(0);
-	}
-	STORAGE_LOG("timestamp_start: %d\n",timestamp_start);
-	// Load timeslot current
-	ret = nvm_record_read(STORAGE_TIMESLOT_CURRENT,(uint8_t*)&timeslot_current,sizeof(timeslot_current));
-	if(ret == NVM_NO_RECORD)
-	{
-		storage_set_timeslot_current(0);
-	}
-	STORAGE_LOG("timeslot_current: %d\n",timeslot_current);
-	// Load timeslot unspecified
-	ret = nvm_record_read(STORAGE_TIMESLOT_UNSPECIFIED,(uint8_t*)&timeslot_unspecified,sizeof(timeslot_unspecified));
-	if(ret == NVM_NO_RECORD)
-	{
-		storage_set_timeslot_unspecified(0);
-	}
-	STORAGE_LOG("timeslot_unspecified: %d\n",timeslot_unspecified);
 	// Load timeslot map
-	ret = nvm_record_read(STORAGE_TIMESLOT_MAP,(uint8_t*)timeslot_map,sizeof(timeslot_map));
+	ret = nvm_record_read(STORAGE_MAP,(uint8_t*)map,sizeof(map));
 	if(ret == NVM_NO_RECORD)
 	{
 		// If there is no record of timeslot map, erase the whole device storage
@@ -60,16 +38,25 @@ void storage_init(void)
 		{
 			FLASH_Erase_Sector(EX_FLASH_DEVICE_STORAGE_ADDRESS + i*DEF_UDISK_SECTOR_SIZE);
 		}
-		memset(timeslot_map,0x00,sizeof(timeslot_map));
-		nvm_record_write(STORAGE_TIMESLOT_MAP,(uint8_t*)timeslot_map,sizeof(timeslot_map));
+		memset(map,0x00,sizeof(map));
+		nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
 	}
 
-	PRINTF("timeslot_map: ");
-	for(i=0;i<sizeof(timeslot_map);i++)
+//	PRINTF("map: ");
+//	for(i=0;i<sizeof(map);i++)
+//	{
+//		PRINTF("%x ",map[i]);
+//	}
+//	PRINTF("\n");
+
+	// Load storage_index
+	ret = nvm_record_read(STORAGE_INDEX,(uint8_t*)&storage_index,sizeof(storage_index));
+
+	if(ret == NVM_NO_RECORD)
 	{
-		PRINTF("%x ",timeslot_map[i]);
+		storage_index = 0;
+		nvm_record_write(STORAGE_INDEX,(uint8_t*)&storage_index,sizeof(storage_index));
 	}
-	PRINTF("\n");
 }
 
 /**
@@ -81,64 +68,16 @@ void storage_clean(void)
 {
 	uint32_t i;
 
-	// Reset timestamp start
-	storage_set_timestamp_start(0);
-	// Reset timeslot current
-	timeslot_current = 0;
-	nvm_record_write(STORAGE_TIMESLOT_CURRENT,(uint8_t*)&timeslot_current,sizeof(timeslot_current));
 	// Erase device storage area
 	for(i = 0; i < (DEVICE_STORAGE_SIZE/DEF_UDISK_SECTOR_SIZE);i++)
 	{
 		FLASH_Erase_Sector(EX_FLASH_DEVICE_STORAGE_ADDRESS + i*DEF_UDISK_SECTOR_SIZE);
 	}
 	// Reset timestamp map
-	memset(timeslot_map,0x00,sizeof(timeslot_map));
-	nvm_record_write(STORAGE_TIMESLOT_MAP,(uint8_t*)timeslot_map,sizeof(timeslot_map));
+	memset(map,0x00,sizeof(map));
+	nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
 }
 
-/**
-* @brief: Set timestamp start
-* @param: see below
-* @retval: None
-*/
-void storage_set_timestamp_start(uint32_t timestamp)
-{
-	timestamp_start = timestamp;
-	nvm_record_write(STORAGE_TIMESTAMP_START,(uint8_t*)&timestamp_start,sizeof(timestamp_start));
-}
-
-/**
-* @brief: Get timestamp start
-* @param: see below
-* @retval: see below
-*/
-uint32_t storage_get_timestamp_start(void)
-{
-	nvm_record_read(STORAGE_TIMESTAMP_START,(uint8_t*)&timestamp_start,sizeof(timestamp_start));
-	return timestamp_start;
-}
-
-/**
-* @brief: Set timeslot_current
-* @param: see below
-* @retval: None
-*/
-void storage_set_timeslot_current(uint32_t timeslot)
-{
-	timeslot_current = timeslot;
-	nvm_record_write(STORAGE_TIMESLOT_CURRENT,(uint8_t*)&timeslot_current,sizeof(timeslot_current));
-}
-
-/**
-* @brief: Set timeslot_unspecified
-* @param: see below
-* @retval: None
-*/
-void storage_set_timeslot_unspecified(uint32_t timeslot)
-{
-	timeslot_unspecified = timeslot;
-	nvm_record_write(STORAGE_TIMESLOT_UNSPECIFIED,(uint8_t*)&timeslot_unspecified,sizeof(timeslot_unspecified));
-}
 /**
 * @brief: storage time slot map
 * @param: see below
@@ -149,9 +88,9 @@ static bool check_sector_available(uint32_t sector)
 	uint32_t i,j;
 	uint8_t	 slot = 0;
 
-	for(i = 0; i < (TIMESLOT_MAP_LENGTH); i++)
+	for(i = 0; i < (MAP_LENGTH); i++)
 	{
-		slot = timeslot_map[i];
+		slot = map[i];
 		for(j = 0; j < 8; j++)
 		{
 			if(sector == (j + i*8))
@@ -173,19 +112,19 @@ static bool check_sector_available(uint32_t sector)
 }
 
 /**
-* @brief: Check the timeslot map. If a timeslot is already written in a corresponding sector, erase that sector
+* @brief: Check the storage map. If a index is already written in a corresponding sector, erase that sector
 * @param: see below
 * @retval: see below
 */
-storage_ret_t storage_timeslot_map_check(uint32_t timeslot, uint32_t len)
+storage_ret_t storage_map_check(uint16_t index, uint32_t len)
 {
 	uint32_t sector = 0;
 	uint32_t remain = 0;
 	uint8_t	 next_sector_erase = 0;
 
-	sector = ((timeslot*len)/DEF_UDISK_SECTOR_SIZE);
+	sector = ((index*len)/DEF_UDISK_SECTOR_SIZE);
 	// Remain bytes in this sector can be used to store new value
-	remain = ((timeslot*len)%DEF_UDISK_SECTOR_SIZE);
+	remain = ((index*len)%DEF_UDISK_SECTOR_SIZE);
 	// Check whether the data need next sector to store
 	if((remain + len) > DEF_UDISK_SECTOR_SIZE)
 	{
@@ -195,7 +134,8 @@ storage_ret_t storage_timeslot_map_check(uint32_t timeslot, uint32_t len)
 	{
 		// Erase the sector has this timeslot if it has full written already
 		FLASH_Erase_Sector(EX_FLASH_DEVICE_STORAGE_ADDRESS + sector*DEF_UDISK_SECTOR_SIZE);
-		timeslot_map[(sector/8)] &= (~(0x01 << (sector%8)));
+		map[(sector/8)] &= (~(0x01 << (sector%8)));
+		nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
 		STORAGE_LOG("FLASH_Erase_Sector 1: %d\n",sector);
 	}
 	if(next_sector_erase == 1)
@@ -205,7 +145,8 @@ storage_ret_t storage_timeslot_map_check(uint32_t timeslot, uint32_t len)
 		if(check_sector_available(sector) == 0)
 		{
 			FLASH_Erase_Sector(EX_FLASH_DEVICE_STORAGE_ADDRESS + sector*DEF_UDISK_SECTOR_SIZE);
-			timeslot_map[(sector/8)] &= (~(0x01 << (sector%8)));
+			map[(sector/8)] &= (~(0x01 << (sector%8)));
+			nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
 			STORAGE_LOG("FLASH_Erase_Sector 2: %d\n",sector);
 		}
 	}
@@ -213,27 +154,34 @@ storage_ret_t storage_timeslot_map_check(uint32_t timeslot, uint32_t len)
 }
 
 /**
-* @brief: write status of timeslot map sector is written if the sector is fully written
+* @brief: write status of map sector is written if the sector is fully written
 * @param: see below
 * @retval: see below
 */
-void storage_timeslot_map_fill_status(uint32_t timeslot, uint32_t len)
+void storage_map_fill_status(uint32_t index, uint32_t len)
 {
 	uint32_t sector = 0;
 
-	sector = ((timeslot*len)/DEF_UDISK_SECTOR_SIZE);
+	sector = ((index*len)/DEF_UDISK_SECTOR_SIZE);
 	// Set status of previous sector is written
 	if(sector > 0)
 	{
-		timeslot_map[(sector/8)] |= (0x01 << ((sector%8) - 1));
-//		STORAGE_LOG("storage_timeslot_map_fill_status: %d - %d\n",sector,timeslot_map[(sector/8)]);
+		if((map[(sector/8)] && (0x01 << ((sector%8) - 1))) == 0x00)
+		{
+			map[(sector/8)] |= (0x01 << ((sector%8) - 1));
+			nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
+			STORAGE_LOG("storage_map_fill_status: %d - %d\n",sector,map[(sector/8)]);
+		}
 	}
 	else if(sector == 0) // Set status of the last sector is written
 	{
-		timeslot_map[(TIMESLOT_MAP_LENGTH - 1)] |= (0x01 << (7));
-//		STORAGE_LOG("storage_timeslot_map_fill_status: %d - %d\n",sector,timeslot_map[(TIMESLOT_MAP_LENGTH - 1)]);
+		if((map[(MAP_LENGTH - 1)] && (0x01 << (7))) == 0x00)
+		{
+			map[(MAP_LENGTH - 1)] |= (0x01 << (7));
+			nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
+			STORAGE_LOG("storage_map_fill_status: %d - %d\n",sector,map[(MAP_LENGTH - 1)]);
+		}
 	}
-	nvm_record_write(STORAGE_TIMESLOT_MAP,(uint8_t*)timeslot_map,sizeof(timeslot_map));
 }
 
 /**
@@ -241,14 +189,26 @@ void storage_timeslot_map_fill_status(uint32_t timeslot, uint32_t len)
 * @param: see below
 * @retval: see below
 */
-void storage_timeslot_map_set(uint32_t timeslot, uint32_t len)
+void storage_map_set(uint32_t index, uint32_t len)
 {
 	uint32_t sector = 0;
 
-	sector = ((timeslot*len)/DEF_UDISK_SECTOR_SIZE);
-	timeslot_map[(sector/8)] |= (0x01 << ((sector%8)));
+	sector = ((index*len)/DEF_UDISK_SECTOR_SIZE);
+	map[(sector/8)] |= (0x01 << ((sector%8)));
 
-	STORAGE_LOG("storage_timeslot_map_set: %d - %d\n",sector,timeslot_map[(sector/8)]);
+	STORAGE_LOG("storage_map_set: %d - %d\n",sector,map[(sector/8)]);
+}
+
+uint8_t crc8(uint8_t *pdata,uint32_t len)
+{
+	uint8_t crc = 0;
+	uint8_t i;
+
+	for(i = 0; i < len; i++)
+	{
+		crc = crc + pdata[i];
+	}
+	return crc;
 }
 
 /**
@@ -256,58 +216,76 @@ void storage_timeslot_map_set(uint32_t timeslot, uint32_t len)
 * @param:
 * timestamp: timestamp of the pdata
 * pdata: data structure
-* len: length of data structure <= 52(= 512K/10080 minute)
+* len: length of data structure <= 40(= 512K/12288 slot)
 * @retval: storage_ret_t
+* [slot 0]: [4B timestamp + 1B type + 2B index + (pdata_len - 4 - 1 - 2)data] + CRC
+* [slot 1]: [4B timestamp + 1B type + 2B index + (pdata_len - 4 - 1 - 2)data] + CRC
+* ...
+* [slot n]: [4B timestamp + 1B type + 2B index + (pdata_len - 4 - 1 - 2)data] + CRC
+* len of [slot] = pdata_len + 1
+* CRC = crc8(pdata)
 */
-storage_ret_t storage_put_data(uint32_t timestamp, uint8_t *pdata,uint32_t len)
+storage_ret_t storage_put_data(uint8_t *pdata,uint32_t pdata_len)
 {
-	uint32_t	address;
-	uint32_t	timeslot;
-	uint32_t	sector = 0;
+	uint32_t 		address = 0;
+	uint8_t 		crc = 0;
+	uint8_t 		read[40];
+	uint8_t 		write[40];
+	uint8_t			len = 0;
+	nvm_status_t	retval;
+	uint32_t 		sector = 0;
+	uint8_t 		sector_data[DEF_UDISK_SECTOR_SIZE];
 
-	if(timestamp >= timestamp_start)
+	// Set index in byte 5,6 of pdata
+	memcpy(&pdata[5],(uint8_t*)&storage_index,sizeof(storage_index));
+	// Copy pdata to write buffer
+	memcpy(&write[len],(uint8_t*)&pdata[0],pdata_len);
+	len += pdata_len;
+	// Calculate CRC
+	crc = crc8(write,len);
+	// Put crc next to pdata
+	write[len] = crc;
+	len += sizeof(crc);
+	// Check sector before write flash
+	storage_map_fill_status(storage_index,len);
+	storage_map_check(storage_index,len);
+	// Write to flash
+	address = EX_FLASH_DEVICE_STORAGE_ADDRESS + storage_index*len;
+	W25XXX_WR_Block(write,address,len);
+	W25XXX_Read(read,address,len);
+	if(memcmp(read,write,len) == 0) // check write successfully
 	{
-		if(timestamp >= (timestamp_start + SECOND_PER_WEEK))
+		// increase index
+		storage_index++;
+		retval = nvm_record_write(STORAGE_INDEX,(uint8_t*)&storage_index,sizeof(storage_index));
+		if(retval == NVM_OK)
 		{
-			storage_timeslot_map_set(timeslot_current,len);
-			storage_set_timestamp_start(timestamp);
-			storage_set_timeslot_current(0);
-			STORAGE_LOG("Reset all\n");
-		}
-
-		if(len <= 52)
-		{
-			timeslot = ((timestamp - timestamp_start)/60);
-			if((timeslot > timeslot_current) || (timeslot_current == 0))
-			{
-				storage_set_timeslot_current(timeslot);
-				// Check the timeslot to erase corresponding sector
-				storage_timeslot_map_check(timeslot,len);
-				// Write to flash
-				address = EX_FLASH_DEVICE_STORAGE_ADDRESS + timeslot*len;
-				W25XXX_WR_Block(pdata,address,len);
-				// Write the status of sector to timeslot map
-				storage_timeslot_map_fill_status(timeslot,len);
-				return STORAGE_RET_OK;
-			}
+			return STORAGE_RET_OK;
 		}
 	}
-	else // Put data into unspecified region
+	else // write fail -> re-write the whole sector
 	{
-		// Erase page if timeslot_unspecified is in the first position of the page
-		if(((timeslot_unspecified*len) % DEF_UDISK_SECTOR_SIZE) < len)
+//		STORAGE_LOG("re-write\n");
+		sector = ((storage_index*len)/DEF_UDISK_SECTOR_SIZE);
+		// read data from sector
+		W25XXX_Read(sector_data,EX_FLASH_DEVICE_STORAGE_ADDRESS + sector*DEF_UDISK_SECTOR_SIZE,DEF_UDISK_SECTOR_SIZE);
+		// erase this sector
+		FLASH_Erase_Sector(EX_FLASH_DEVICE_STORAGE_ADDRESS + sector*DEF_UDISK_SECTOR_SIZE);
+		// write new data into sector_data
+		memcpy(&sector_data[(storage_index*len)%DEF_UDISK_SECTOR_SIZE],write,len);
+		// write sector_data into erase sector
+		W25XXX_WR_Block(sector_data,EX_FLASH_DEVICE_STORAGE_ADDRESS + sector*DEF_UDISK_SECTOR_SIZE,DEF_UDISK_SECTOR_SIZE);
+
+		W25XXX_Read(read,address,len);
+		if(memcmp(read,write,len) == 0) // check write successfully
 		{
-			sector = ((timeslot_unspecified*len)/DEF_UDISK_SECTOR_SIZE);
-			FLASH_Erase_Sector(EX_FLASH_DEVICE_STORAGE_ADDRESS + sector*DEF_UDISK_SECTOR_SIZE);
-		}
-		// Storage data into unspecified region
-		address = EX_FLASH_DEVICE_UNSTORAGE_ADDRESS + timeslot_unspecified*len;
-		W25XXX_WR_Block(pdata,address,len);
-		timeslot_unspecified++;
-		storage_set_timeslot_unspecified(timeslot_unspecified);
-		if((timeslot_unspecified*len) > DEVICE_STORAGE_SIZE)
-		{
-			storage_set_timeslot_unspecified(0);
+			// increase index
+			storage_index++;
+			retval = nvm_record_write(STORAGE_INDEX,(uint8_t*)&storage_index,sizeof(storage_index));
+			if(retval == NVM_OK)
+			{
+				return STORAGE_RET_OK;
+			}
 		}
 	}
 	return STORAGE_RET_ERROR;
@@ -318,55 +296,42 @@ storage_ret_t storage_put_data(uint32_t timestamp, uint8_t *pdata,uint32_t len)
 * @param:
 * timestamp: timestamp of the pdata
 * pdata: data structure
-* len: length of data structure <= 52(= 512K/10080 minute)
+* len: length of data structure <= 40(= 512K/12288 slot)
 * @retval: storage_ret_t
 */
-storage_ret_t storage_get_data(uint32_t timestamp, uint8_t *pdata,uint32_t len)
+storage_ret_t storage_get_data(uint8_t *pdata,uint32_t len)
 {
 	uint32_t	address;
-	uint32_t	timeslot;
+	uint16_t	pdata_index;
+	uint16_t	read_index;
+	uint8_t		crc;
+	uint8_t 	read[40];
 
-	if(len <= 52)
+	if(len <= 40)
 	{
-		timeslot = ((timestamp - timestamp_start)/60);
+		// Get index from pdata
+		memcpy((uint8_t*)&pdata_index,(uint8_t*)&pdata[5],sizeof(pdata_index));
 		// Read from flash
-		address = EX_FLASH_DEVICE_STORAGE_ADDRESS + timeslot*len;
-		W25XXX_Read(pdata,address,len);
-		return STORAGE_RET_OK;
-	}
-	return STORAGE_RET_ERROR;
-}
-
-/**
-* @brief: Get data unspecified from storage
-* @param: see below
-* index: determine position from timeslot_unspecified. (timeslot = timeslot_unspecified - index - 1)
-* @retval: storage_ret_t
-*/
-storage_ret_t storage_get_data_unspecified(uint32_t index, uint8_t *pdata,uint32_t len)
-{
-	uint32_t	address;
-
-	if(len <= 52)
-	{
-		// Read from flash
-		address = EX_FLASH_DEVICE_UNSTORAGE_ADDRESS + (timeslot_unspecified - index - 1)*len;
-		W25XXX_Read(pdata,address,len);
-		return STORAGE_RET_OK;
+		address = EX_FLASH_DEVICE_STORAGE_ADDRESS + pdata_index*(len+1); // get pdata + CRC
+		W25XXX_Read(read,address,(len+1));
+		// Get index from storage
+		memcpy((uint8_t*)&read_index,&read[5],sizeof(read_index));
+		// Get pdata from read buffer
+		memcpy((uint8_t*)pdata,read,len);
+		if(read_index == pdata_index) // Check index
+		{
+			// Check CRC
+			crc = crc8(pdata,len);
+			if(crc == read[len])
+			{
+				return STORAGE_RET_OK;
+			}
+		}
 	}
 	return STORAGE_RET_ERROR;
 }
 
 /******************************************OTA Region******************************************/
-/*
- *     Page 128  |------------------|
- *               |       OTA        |
- *               |     Firmware     |
- *     Page 1    |------------------|
- *               |     Firmware     |
- *               |      Header      |
- *     Page 0    |------------------|
- * */
 
 /**
 * @brief: Put data into OTA region
