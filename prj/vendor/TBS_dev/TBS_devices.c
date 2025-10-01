@@ -300,10 +300,10 @@ void TBS_PowerMeter_Run(void){
 /******************************************************************************/
 /******************************************************************************/
 
-void TBS_Device_Flash_Init_n_Reload(u8* db){
+void TBS_Device_Flash_Init_n_Reload(void){
 	LOGA(FLA,"TBS_Device flash init and reload !! \r\n");
 	fl_db_userdata_t userdata = fl_db_slaveuserdata_init();
-	memcpy(db,userdata.payload,userdata.len);
+	memcpy((u8*)&G_TBS_DEVICE.timetamp,userdata.payload,SIZEU8(G_TBS_DEVICE)-6);
 }
 
 /******************************************************************************/
@@ -376,7 +376,7 @@ void TBS_Device_Index_manage(void) {
 }
 
 void TBS_Device_Init(void){
-	TBS_Device_Flash_Init_n_Reload((u8*) &G_TBS_DEVICE.timetamp);
+	TBS_Device_Flash_Init_n_Reload();
 #ifdef COUNTER_DEVICE
 	TBS_Counter_init();
 //	user_app_init();
