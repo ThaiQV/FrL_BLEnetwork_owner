@@ -34,7 +34,7 @@ typedef void (*fl_rsp_callback_fnc)(void*, void*);
 typedef enum {
 	NWK_HDR_NONE = 0,
 	// slave -> req -> master -> rsp
-	NWK_HDR_RECONNECT = 0x11,
+	NWK_HDR_11_REACTIVE = 0x11, //inform to master
 	/*Frl protocols*/
 	NWK_HDR_55 = 0x55, // REQ from slave
 	NWK_HDR_A5_HIS=0xA5, //history
@@ -315,10 +315,10 @@ inline u8 fl_crc8(u8* _pdata, u8 _len) {
 	return (u8) (crc % 256);
 }
 
-#define DEBUG_TURN(x) /*do { \
+#define DEBUG_TURN(x) do { \
 							if (x) { PLOG_Start(ALL); } \
 							else   { PLOG_Stop(ALL);  }\
-						} while(0)*/
+						} while(0)
 
 static inline uint32_t swap_endian32(uint32_t val) {
     return ((val >> 24) & 0x000000FF) |

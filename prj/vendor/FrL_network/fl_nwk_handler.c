@@ -171,7 +171,7 @@ int fl_queue_REQnRSP_TimeoutStart(void){
 }
 void fl_queue_REQnRSP_TimeoutInit(void) {
 	if (blt_soft_timer_find(&fl_queue_REQnRSP_TimeoutStart) == -1) {
-		LOGA(INF,"REQcRSP initialization (%d ms)!!\r\n",QUEUQ_REQcRSP_INTERVAL);
+		LOGA(INF,"REQcRSP initialization (%d ms)!!\r\n",QUEUQ_REQcRSP_INTERVAL/1000);
 		blt_soft_timer_add(&fl_queue_REQnRSP_TimeoutStart,QUEUQ_REQcRSP_INTERVAL);
 		fl_queueREQcRSP_clear(G_QUEUE_REQ_CALL_RSP);
 	}
@@ -262,7 +262,7 @@ s8 fl_queue_REQcRSP_ScanRec(fl_pack_t _pack,void *_id)
 /***                           Private definitions                           **/
 /******************************************************************************/
 /******************************************************************************/
-fl_hdr_nwk_type_e G_NWK_HDR[] = {NWK_HDR_A5_HIS,NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN,NWK_HDR_55,NWK_HDR_RECONNECT }; // register cmdid RSP
+fl_hdr_nwk_type_e G_NWK_HDR[] = {NWK_HDR_A5_HIS,NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN,NWK_HDR_55,NWK_HDR_11_REACTIVE }; // register cmdid RSP
 #define NWK_HDR_SIZE (sizeof(G_NWK_HDR)/sizeof(G_NWK_HDR[0]))
 /******************************************************************************/
 /******************************************************************************/

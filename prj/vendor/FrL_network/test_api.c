@@ -118,10 +118,11 @@ u8 TEST_Buttons_RST(fl_exButton_states_e _state, void *_data) {
 	LOGA(USER,"BUTT RST %s (%d ms)\r\n",_state==BUTT_STATE_PRESSnHOLD?"Press & hold":"Press & Release",
 			(clock_time()-*time_tick)/SYSTEM_TIMER_TICK_1MS);
 	if(_state == BUTT_STATE_PRESSnHOLD){
-		ERR(USER,"Factory!!!!!\r\n");
-		fl_db_clearAll();
-		delay_ms(1000);
-		sys_reboot();
+		ERR(USER,"Pairing!!!!!\r\n");
+//		fl_db_clearAll();
+//		delay_ms(1000);
+//		sys_reboot();
+		fl_db_Pairing_Clear();
 	}
 	//Must to clear status if done
 	return BUTT_STATE_NONE;
