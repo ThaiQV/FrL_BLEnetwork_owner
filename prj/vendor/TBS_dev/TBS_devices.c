@@ -16,6 +16,7 @@
 
 #define TBS_DEVICE_STORE_INTERVAL 		5*1000*1000 //5s
 #define TBS_PACKET_INDEX_MAX			10000
+#include "TBS_dev_app/user_lib.h"
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -378,6 +379,7 @@ void TBS_Device_Init(void){
 	TBS_Device_Flash_Init_n_Reload((u8*) &G_TBS_DEVICE.timetamp);
 #ifdef COUNTER_DEVICE
 	TBS_Counter_init();
+//	user_app_init();
 #endif
 #ifdef POWER_METER_DEVICE
 	TBS_PowerMeter_init();
@@ -392,6 +394,7 @@ void TBS_Device_Init(void){
 void TBS_Device_Run(void){
 #ifdef COUNTER_DEVICE
 	TBS_Counter_Run();
+//	user_app_loop();
 #endif
 #ifdef POWER_METER_DEVICE
 	TBS_PowerMeter_Run();
