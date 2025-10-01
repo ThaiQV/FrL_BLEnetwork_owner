@@ -142,20 +142,14 @@ subapp_t data_app = {
 static void rst_cb_rsp(void*, void*);
 static void call_cb_rsp(void*, void*);
 static void endcall_cb_rsp(void*, void*);
+static void read_count(void);
+static void update_cont(void);
 
 void user_app_init(void)
 {
-	printf("user_app_init start\n");
-
-	// ULOGA("MAC: ");
-	// for(int i = 0; i < 6; i++)
-	// {
-	// 	ULOGA("%02x ", G_COUNTER_DEV.data.mac[i]);
-	// }
+	read_count();
 
 	user_tca9555_app_init();
-
-//	read_data_t data_read = read_data(g_app_data.timetamp);
 
 	// 2. init framework
 	app_manager_init();
@@ -253,8 +247,7 @@ static subapp_result_t data_app_init(subapp_t* self)
 	
 //	read_data_t read_cnt = read_data(g_app_data.timetamp);
 //
-//	g_app_data.count->pass_product = read_cnt.product_pass;
-//	g_app_data.count->err_product  = read_cnt.product_error;
+	
 
 	uint32_t app_data_evt_table[] = get_data_event();
 
@@ -265,10 +258,10 @@ static subapp_result_t data_app_init(subapp_t* self)
 		event_bus_subscribe(app_data_evt_table[i], data_app_event_handler, NULL, name);
 	}
 	
-	for (int i = 0; i < 10; i++) {
-	    memcpy(G_COUNTER_LCD[i], mess[i], sizeof(G_COUNTER_LCD[i]) - 1);
-	    G_COUNTER_LCD[i][sizeof(G_COUNTER_LCD[i]) - 1] = '\0';
-	}
+	// for (int i = 0; i < 10; i++) {
+	//     memcpy(G_COUNTER_LCD[i], mess[i], sizeof(G_COUNTER_LCD[i]) - 1);
+	//     G_COUNTER_LCD[i][sizeof(G_COUNTER_LCD[i]) - 1] = '\0';
+	// }
 
 
 	return SUBAPP_OK;
@@ -340,6 +333,7 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 			
 			g_app_data.count->pass_product = 0;
 			g_app_data.count->err_product = 0;
+			update_cont();
 
             break;
 
@@ -380,6 +374,7 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 			{
 				g_app_data.count->pass_product--;
 			}
+			update_cont();
 			EVENT_PUBLISH_SIMPLE(EVENT_DATA_PASS_PRODUCT_DOWN, EVENT_PRIORITY_HIGH);
 
             break;
@@ -390,6 +385,7 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 			{
 				g_app_data.count->pass_product = 0;
 			}
+			update_cont();
 			EVENT_PUBLISH_SIMPLE(EVENT_DATA_PASS_PRODUCT_UP, EVENT_PRIORITY_HIGH);
 
             break;
@@ -400,6 +396,7 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 			{
 				g_app_data.count->err_product--;
 			}
+			update_cont();
 			EVENT_PUBLISH_SIMPLE(EVENT_DATA_ERR_PRODUCT_CHANGE, EVENT_PRIORITY_HIGH);
 
             break;
@@ -410,6 +407,7 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 			{
 				g_app_data.count->err_product = 0;
 			}
+			update_cont();
 			EVENT_PUBLISH_SIMPLE(EVENT_DATA_ERR_PRODUCT_CHANGE, EVENT_PRIORITY_HIGH);
 
             break;
@@ -451,6 +449,18 @@ static void data_app_event_handler(const event_t* event, void* user_data)
             break;
     }
 
+}
+
+static void read_count(void)
+{
+	g_app_data.count->pass_product = G_COUNTER_DEV.data.pass_product;
+	g_app_data.count->err_product  = G_COUNTER_DEV.data.err_product;
+}
+
+static void update_cont(void)
+{
+	G_COUNTER_DEV.data.pass_product = g_app_data.count->pass_product;
+	G_COUNTER_DEV.data.err_product = g_app_data.count->err_product;
 }
 
 #endif /* COUNTER_DEVICE*/

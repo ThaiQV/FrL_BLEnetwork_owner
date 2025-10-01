@@ -135,7 +135,7 @@ bool et6226m_init(et6226m_handle_t *handle, const et6226m_config_t *config)
     handle->control.ET6226_CONTROL_b.Display_switch = ET6226M_DISPLAY_SWITCH_ON;
     handle->control.ET6226_CONTROL_b.Mode_select = ET6226M_MODE_SELECT_8SEGMENT;
     handle->control.ET6226_CONTROL_b.Sleep_command = ET6226M_SLEEP_COMMAND_OPERATION;
-    handle->control.ET6226_CONTROL_b.Brightness_adjust = ET6226M_BRIGHTNESS_MAX;
+    handle->control.ET6226_CONTROL_b.Brightness_adjust = handle->config.brightness;
 
     et6226m_send_command(handle, ET6226M_SEND_COMMAND, handle->control.ET6226_CONTROL);
 

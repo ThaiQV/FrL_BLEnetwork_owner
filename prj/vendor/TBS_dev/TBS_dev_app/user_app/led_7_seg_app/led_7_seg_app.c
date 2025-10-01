@@ -93,7 +93,7 @@ static et6226m_config_t config = {
 	    .cs_pin_set = cs_pin_set,
 	    .clk_pin_set = clk_pin_set,
 	    .data_pin_set = data_pin_set,
-	    .brightness = 6,
+	    .brightness = ET6226M_BRIGHTNESS_3,
 	    .scan_mode = true,
 	    .decode_mode = false,
 	};

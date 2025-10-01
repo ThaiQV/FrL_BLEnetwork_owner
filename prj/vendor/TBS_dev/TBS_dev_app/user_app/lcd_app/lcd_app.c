@@ -362,14 +362,15 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 
 				lcd_app_clear_row(&app_handle, 1);
 				lcd_ctx.print_mode = 1;
-				lcd_ctx.row1_mess_num = find_next_mess(-1);
+				lcd_ctx.row1_mess_num = find_next_mess(COUNTER_LCD_MESS_MAX);
+				printf("row1_mess_num: %d\n", lcd_ctx.row1_mess_num);
 
 			}
 			else
 			{
 				lcd_app_clear_all(&app_handle);
 
-				if(lcd_ctx.row1_mess_num == -1)
+				if(lcd_ctx.row1_mess_num == COUNTER_LCD_MESS_MAX)
 				{
 					lcd_app_set_message(&app_handle, 0, "               ", 15000);
 					break;
@@ -588,7 +589,7 @@ static void LCD_MessageCheck_FlagNew(void){
 
 static uint8_t find_next_mess(uint8_t index)
 {
-	index += 1;
+	index = index % COUNTER_LCD_MESS_MAX;
 	for(int i = 0; i < COUNTER_LCD_MESS_MAX; i++)
 	{
 		if(memcmp(mess_zero, (uint8_t *)G_COUNTER_LCD[index], 20) == 0)
@@ -600,7 +601,7 @@ static uint8_t find_next_mess(uint8_t index)
 			return index;
 		}
 	}
-	return -1;
+	return COUNTER_LCD_MESS_MAX;
 }
 
 #endif /* COUNTER_DEVICE*/
