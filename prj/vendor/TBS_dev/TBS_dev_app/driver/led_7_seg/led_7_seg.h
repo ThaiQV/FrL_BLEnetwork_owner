@@ -8,6 +8,8 @@
 #ifndef ET6226M_H
 #define ET6226M_H
 
+#ifndef MASTER_CORE
+
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -233,4 +235,5 @@ bool et6226m_update_display(et6226m_handle_t *handle);
 }
 #endif
 
+#endif /* MASTER_CORE*/
 #endif /* ET6226M_H */

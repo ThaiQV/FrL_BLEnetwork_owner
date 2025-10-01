@@ -5,6 +5,9 @@
  * @date 2025
  */
 
+
+#ifndef MASTER_CORE
+
 #include "lcd16x2.h"
 #include <stdarg.h>
 #include <stdio.h>
@@ -794,3 +797,5 @@ lcd16x2_error_t lcd16x2_get_cursor_position(lcd16x2_handle_t *handle, uint8_t *r
 
     return LCD16X2_OK;
 }
+
+#endif /* MASTER_CORE*/

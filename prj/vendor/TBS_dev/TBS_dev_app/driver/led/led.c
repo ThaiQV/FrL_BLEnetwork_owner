@@ -5,6 +5,8 @@
  * @date 2025
  */
 
+#ifndef MASTER_CORE
+
 #include "led.h"
 #include <string.h>
 
@@ -840,3 +842,5 @@ static void led_interrupt_current_operation(uint8_t led_id)
     // Clear any completion flags
     led->operation_complete = false;
 }
+
+#endif /* MASTER_CORE*/

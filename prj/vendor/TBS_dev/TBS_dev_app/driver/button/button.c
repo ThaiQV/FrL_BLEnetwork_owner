@@ -4,6 +4,9 @@
  * @author Nghia Hoang
  * @date 2025
  */
+
+#ifndef MASTER_CORE
+
 #include "../../user_lib.h"
 
 #include "button.h"
@@ -1498,3 +1501,5 @@ static bool button_check_pattern_step(uint8_t pattern_id, uint8_t button_id) {
     
     return (pattern->pattern[pattern->current_position] == button_id);
 }
+
+#endif /* MASTER_CORE*/

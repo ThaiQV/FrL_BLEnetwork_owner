@@ -8,6 +8,8 @@
 #ifndef TCA9555_H
 #define TCA9555_H
 
+#ifndef MASTER_CORE
+
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -292,4 +294,5 @@ uint8_t tca9555_calculate_address(tca9555_address_t addr_select);
 }
 #endif
 
+#endif /* MASTER_CORE*/
 #endif /* TCA9555_H */

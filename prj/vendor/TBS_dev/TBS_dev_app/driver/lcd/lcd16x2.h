@@ -8,6 +8,8 @@
 #ifndef LCD16X2_H
 #define LCD16X2_H
 
+#ifndef MASTER_CORE
+
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -344,4 +346,5 @@ lcd16x2_error_t lcd16x2_get_cursor_position(lcd16x2_handle_t *handle, uint8_t *r
 }
 #endif
 
+#endif /* MASTER_CORE*/
 #endif /* LCD16X2_H */

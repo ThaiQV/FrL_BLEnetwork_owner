@@ -5,6 +5,7 @@
  * @date 2025
  */
 
+#ifndef MASTER_CORE
 
 #include "led_7_seg.h"
 #include <stdarg.h>
@@ -365,3 +366,5 @@ bool et6226m_update_display(et6226m_handle_t *handle)
 
     return true;
 }
+
+#endif /* MASTER_CORE*/

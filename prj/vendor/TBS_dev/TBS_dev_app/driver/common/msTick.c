@@ -5,6 +5,8 @@
  *      Author: hoang
  */
 
+#ifndef MASTER_CORE
+
 #include "tl_common.h"
 #include "stdio.h"
 #include "msTick.h"
@@ -43,3 +45,4 @@ uint64_t get_system_time_ms(void)
     return tick64 / SYSTEM_TIMER_TICK_1MS;
 }
 
+#endif /* MASTER_CORE*/

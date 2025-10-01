@@ -8,6 +8,8 @@
 #ifndef APPS_USER_MSTICK_H_
 #define APPS_USER_MSTICK_H_
 
+#ifndef MASTER_CORE
+
 /*  System tick
 enum{
 	SYSTEM_TIMER_TICK_1US 		= 16,
@@ -22,4 +24,5 @@ enum{
 uint64_t get_system_time_us(void);
 uint64_t get_system_time_ms(void);
 
+#endif /* MASTER_CORE*/
 #endif /* APPS_USER_MSTICK_H_ */

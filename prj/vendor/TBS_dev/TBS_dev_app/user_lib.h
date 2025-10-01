@@ -24,7 +24,6 @@
 #include "driver/tca9555/tca9555.h"
 #include "driver/button/button.h"
 #include "driver/led/led.h"
-#include "user_app/app_config.h"
 #include "user_app/user_app.h"
 #include "user_app/core/include/event_bus.h"
 #include "user_app/core/include/sub_app.h"

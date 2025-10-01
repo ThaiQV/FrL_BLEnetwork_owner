@@ -4,6 +4,9 @@
  * @author Nghia Hoang
  * @date 2025
  */
+
+#ifndef MASTER_CORE
+
 #include "stdio.h"
 #include "tca9555.h"
 
@@ -494,3 +497,5 @@ tca9555_error_t tca9555_get_port_config(tca9555_handle_t *handle, tca9555_port_t
 
     return tca9555_read_register(handle, reg, config_data);
 }
+
+#endif /* MASTER_CORE*/

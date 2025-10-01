@@ -20,6 +20,8 @@
 #ifndef BUTTON_H
 #define BUTTON_H
 
+#ifndef MASTER_CORE
+
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -643,5 +645,5 @@ void button_get_pattern_stats(uint8_t *total_patterns, uint8_t *active_patterns)
 #ifdef __cplusplus
 }
 #endif
-
+#endif /* MASTER_CORE*/
 #endif // BUTTON_DRIVER_H

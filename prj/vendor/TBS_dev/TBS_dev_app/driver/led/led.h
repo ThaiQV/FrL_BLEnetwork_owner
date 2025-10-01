@@ -18,6 +18,8 @@
 #ifndef LED_DRIVER_H
 #define LED_DRIVER_H
 
+#ifndef MASTER_CORE
+
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -431,4 +433,5 @@ void led_all_stop(void);
 }
 #endif
 
+#endif /* MASTER_CORE*/
 #endif // LED_DRIVER_H
