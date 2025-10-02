@@ -375,7 +375,8 @@ void TBS_Device_Index_manage(void) {
 	if (G_TBS_DEVICE.data.index >= TBS_PACKET_INDEX_MAX) {
 		G_TBS_DEVICE.data.index = 0;
 	}
-	//todo:
+	//todo:store to flash
+	TBS_History_StoreToFlash(G_TBS_DEVICE.timetamp,(u8*)&G_TBS_DEVICE.data);
 }
 
 void TBS_Device_Init(void){
@@ -400,6 +401,6 @@ void TBS_Device_Run(void){
 #ifdef POWER_METER_DEVICE
 	TBS_PowerMeter_Run();
 #endif
-	TBS_History_Run();
+	TBS_History_Proc();
 }
 #endif

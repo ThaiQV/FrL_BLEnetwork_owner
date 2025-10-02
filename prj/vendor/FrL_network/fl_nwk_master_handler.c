@@ -49,7 +49,7 @@ volatile u8 MASTER_INSTALL_STATE = 0;
 //Period of the heartbeat
 u16 PERIOD_HEARTBEAT = (16+1)*100; // 16 slots sending and 100ms interval adv
 //flag debug of the network
-volatile u8 NWK_DEBUG_STT = 1; // it will be assigned into endpoint byte (dbg :1bit)
+volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into endpoint byte (dbg :1bit)
 volatile u8 NWK_REPEAT_MODE = 0; // 1: level | 0 : non-level
 volatile u8 NWK_REPEAT_LEVEL = 3;
 

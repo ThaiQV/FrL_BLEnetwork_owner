@@ -162,7 +162,6 @@ void user_app_init(void)
 	// app_manager_register(&data_storage_app);
 	app_manager_register(&data_app);
 
-
 	app_manager_start_all();
 
 }

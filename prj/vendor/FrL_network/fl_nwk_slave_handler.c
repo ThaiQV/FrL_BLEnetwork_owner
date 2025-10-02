@@ -150,17 +150,18 @@ int _nwk_slave_backup(void){
 	if(crc32 != pre_crc32){
 		pre_crc32 = crc32;
 		fl_db_slaveprofile_save(G_INFORMATION.profile);
-		LOGA(INF,"** MAC     :%02X%02X%02X%02X%02X%02X\r\n",G_INFORMATION.mac[0],G_INFORMATION.mac[1],G_INFORMATION.mac[2],
+		LOGA(FLA,"** MAC     :%02X%02X%02X%02X%02X%02X\r\n",G_INFORMATION.mac[0],G_INFORMATION.mac[1],G_INFORMATION.mac[2],
 				G_INFORMATION.mac[3],G_INFORMATION.mac[4],G_INFORMATION.mac[5]);
-		LOGA(INF,"** SlaveID :%d\r\n",G_INFORMATION.slaveID.id_u8);
-		LOGA(INF,"** grpID   :%d\r\n",G_INFORMATION.slaveID.grpID);
-		LOGA(INF,"** memID   :%d\r\n",G_INFORMATION.slaveID.memID);
-		LOGA(INF,"** JoinNWK :%d\r\n",G_INFORMATION.profile.run_stt.join_nwk);
-		LOGA(INF,"** RstFac  :%d\r\n",G_INFORMATION.profile.run_stt.rst_factory);
-		LOGA(INF,"** Channels:%d |%d |%d\r\n",G_INFORMATION.profile.nwk.chn[0],G_INFORMATION.profile.nwk.chn[1],G_INFORMATION.profile.nwk.chn[2])
+		LOGA(FLA,"** SlaveID :%d\r\n",G_INFORMATION.slaveID.id_u8);
+		LOGA(FLA,"** grpID   :%d\r\n",G_INFORMATION.slaveID.grpID);
+		LOGA(FLA,"** memID   :%d\r\n",G_INFORMATION.slaveID.memID);
+		LOGA(FLA,"** JoinNWK :%d\r\n",G_INFORMATION.profile.run_stt.join_nwk);
+		LOGA(FLA,"** RstFac  :%d\r\n",G_INFORMATION.profile.run_stt.rst_factory);
+		LOGA(FLA,"** Channels:%d |%d |%d\r\n",G_INFORMATION.profile.nwk.chn[0],G_INFORMATION.profile.nwk.chn[1],G_INFORMATION.profile.nwk.chn[2])
 		LOGA(FLA,"** NWK Key :%s(%02X%02X)\r\n",(G_INFORMATION.profile.nwk.private_key[0] != 0xFF && G_INFORMATION.profile.nwk.private_key[1] != 0xFF )?"*****":"NULL",
 				G_INFORMATION.profile.nwk.private_key[0],G_INFORMATION.profile.nwk.private_key[1]);
-
+		LOGA(FLA,"** MAC GW :%02X%02X%02X%02X\r\n",U32_BYTE0( G_INFORMATION.profile.nwk.mac_parent),U32_BYTE1( G_INFORMATION.profile.nwk.mac_parent),
+				U32_BYTE2( G_INFORMATION.profile.nwk.mac_parent),U32_BYTE3( G_INFORMATION.profile.nwk.mac_parent));
 //		LOGA(INF,"** Key     :0x%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X\r\n",
 //				G_INFORMATION.profile.nwk.private_key[0],G_INFORMATION.profile.nwk.private_key[1],G_INFORMATION.profile.nwk.private_key[2],G_INFORMATION.profile.nwk.private_key[3],
 //				G_INFORMATION.profile.nwk.private_key[4],G_INFORMATION.profile.nwk.private_key[5],G_INFORMATION.profile.nwk.private_key[6],G_INFORMATION.profile.nwk.private_key[7],
@@ -216,7 +217,8 @@ void fl_nwk_slave_init(void) {
 	LOGA(INF,"** memID  :%d\r\n",G_INFORMATION.slaveID.memID);
 	LOGA(INF,"** JoinNWK:%d\r\n",G_INFORMATION.profile.run_stt.join_nwk);
 	LOGA(INF,"** RstFac :%d\r\n",G_INFORMATION.profile.run_stt.rst_factory);
-
+	LOGA(INF,"** MAC GW :%02X%02X%02X%02X\r\n",U32_BYTE0( G_INFORMATION.profile.nwk.mac_parent),U32_BYTE1( G_INFORMATION.profile.nwk.mac_parent),
+			U32_BYTE2( G_INFORMATION.profile.nwk.mac_parent),U32_BYTE3( G_INFORMATION.profile.nwk.mac_parent));
 	//test
 	if(G_INFORMATION.slaveID.id_u8 == G_INFORMATION.profile.slaveid && G_INFORMATION.slaveID.id_u8 == 0xFF){
 		ERR(APP,"Turn on install mode\r\n");
