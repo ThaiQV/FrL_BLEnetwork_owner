@@ -202,7 +202,6 @@ void my_timeout_callback(uint8_t row) {
 			lcd_off();
 //			fl_db_clearAll();
 			fl_db_Pairing_Clear();
-//			fl_db_clearAll();
 			sys_reboot();
 			break;
 
@@ -363,7 +362,7 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 				lcd_app_clear_row(&app_handle, 1);
 				lcd_ctx.print_mode = 1;
 				lcd_ctx.row1_mess_num = find_next_mess(COUNTER_LCD_MESS_MAX);
-				printf("row1_mess_num: %d\n", lcd_ctx.row1_mess_num);
+				
 
 			}
 			else
@@ -426,7 +425,7 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 			lcd_ctx.enable = 1;
 			lcd_ctx.print_type = LCD_PRINT_ENDCALL;
 			lcd_app_set_message(&app_handle, 0, "  End Calling  ", 15000); //  0, timeout 10s
-			lcd_app_clear_row(&app_handle, 1);
+			lcd_app_set_message(&app_handle, 1, "               ", 0);
 
 			break;
 
@@ -462,6 +461,10 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 
 		case EVENT_DATA_RESET:
 			ULOGA("Handle EVENT_DATA_RESET\n");
+			lcd_ctx.enable = 1;
+			lcd_ctx.print_type = LCD_PRINT_RESET;
+			lcd_app_set_message(&app_handle, 0, "    Reset OK    ", 30000); //  0, timeout 10s
+			lcd_app_set_message(&app_handle, 1, "                ", 5000); //  0, timeout 10s	
 
 			break;
 
@@ -530,7 +533,15 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 
 			lcd_ctx.enable = 1;
 			lcd_ctx.print_type = LCD_PRINT_CALL_FAIL;
-			lcd_app_set_message(&app_handle, 0, "  Call......    ", 30000); //  0, timeout 10s
+			if(get_data.is_call())
+			{
+				lcd_app_set_message(&app_handle, 0, " EndCall......  ", 30000);
+			}
+			else
+			{
+				lcd_app_set_message(&app_handle, 0, "  Call......    ", 30000);
+			}
+			 //  0, timeout 10s
 			lcd_app_set_message(&app_handle, 1, "                ", 3000); //  0, timeout 10s	
 
 			break;
@@ -569,16 +580,6 @@ static void LCD_MessageCheck_FlagNew(void){
 		if(mess_lcd->f_new == 1)
 		{
 			lcd_ctx.row1_mess_num = var;
-			// for(; var < COUNTER_LCD_MESS_MAX; ++var)
-			// {
-			// 	tbs_counter_lcd_t *mess_lcd1 = (tbs_counter_lcd_t *)&G_COUNTER_LCD[var][0];
-			// 	if(mess_lcd1->f_new == 1)
-			// 	{
-			// 		lcd_ctx.row1_mess_num = var;
-			// 		mess_lcd1->f_new = 0;
-			// 	}
-			// }
-			// lcd_ctx.row1_mess_num = find_next_mess(lcd_ctx.row0_mess_num);
 			ULOGA("lcd_ctx.row0_mess_num %d\n", lcd_ctx.row1_mess_num);
 			lcd_ctx.time_off = get_system_time_ms() + LCD_TIME_DELAY_PRINT;
 			EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_MESS_NEW, EVENT_PRIORITY_HIGH);
@@ -589,7 +590,7 @@ static void LCD_MessageCheck_FlagNew(void){
 
 static uint8_t find_next_mess(uint8_t index)
 {
-	index = index % COUNTER_LCD_MESS_MAX;
+	index = (index == COUNTER_LCD_MESS_MAX) ? 0 : ((index + 1) % COUNTER_LCD_MESS_MAX);
 	for(int i = 0; i < COUNTER_LCD_MESS_MAX; i++)
 	{
 		if(memcmp(mess_zero, (uint8_t *)G_COUNTER_LCD[index], 20) == 0)
@@ -598,9 +599,11 @@ static uint8_t find_next_mess(uint8_t index)
 		}
 		else
 		{
+			ULOGA("mess index: %d\n", index);
 			return index;
 		}
 	}
+	ULOGA("mess index: %d\n", COUNTER_LCD_MESS_MAX);
 	return COUNTER_LCD_MESS_MAX;
 }
 

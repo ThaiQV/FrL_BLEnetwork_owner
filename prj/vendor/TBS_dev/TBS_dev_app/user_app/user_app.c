@@ -138,8 +138,6 @@ subapp_t data_app = {
 /**
  * App
  */
-//static void user_app_data_init(void);
-static void rst_cb_rsp(void*, void*);
 static void call_cb_rsp(void*, void*);
 static void endcall_cb_rsp(void*, void*);
 static void read_count(void);
@@ -189,31 +187,6 @@ typedef struct {
 
 test_sendevent1_t TEST_EVENT1 ={0,0,0};
 
-static void rst_cb_rsp(void *_data,void* _data2)
-{
-	fl_rsp_container_t *data =  (fl_rsp_container_t*)_data;
-//	LOGA(API,"Timeout:%d\r\n",data->timeout);
-//	LOGA(API,"cmdID  :%0X\r\n",data->rsp_check.hdr_cmdid);
-//	LOGA(API,"SlaveID:%0X\r\n",data->rsp_check.slaveID);
-	//rsp data
-	if(data->timeout > 0){
-//		fl_pack_t *packet = (fl_pack_t *)_data2;
-//		P_PRINTFHEX_A(API,packet->data_arr,packet->length,"RSP: ");
-//		P_INFO("Master RSP:%c%c\r\n",packet->data_arr[7],packet->data_arr[8]);
-		TEST_EVENT1.rsp_num++;
-	}else{
-//		P_INFO("Master RSP: NON-RSP \r\n");
-	}
-//	u32 lifetime = (fl_rtc_get() - TEST_EVENT1.lifetime);
-//	P_INFO("==============================\r\n");
-//	P_INFO("* LifeTime:%dh%dm%ds\r\n",lifetime / 3600,(lifetime % 3600) / 60,lifetime % 60);
-//	P_INFO("* RTT     :%d ms\r\n",data->timeout>0?((clock_time()-TEST_EVENT1.rtt)/SYSTEM_TIMER_TICK_1MS):0);
-//	P_INFO("* REQ/RSP :%d/%d\r\n",TEST_EVENT1.req_num,TEST_EVENT1.rsp_num);
-//	P_INFO("* LOSS    :%d\r\n",abs(TEST_EVENT1.req_num-TEST_EVENT1.rsp_num));
-//	P_INFO("==============================\r\n");
-
-}
-
 static void call_cb_rsp(void *_data,void* _data2)
 {
 	fl_rsp_container_t *data =  (fl_rsp_container_t*)_data;
@@ -243,11 +216,6 @@ static void endcall_cb_rsp(void *_data,void* _data2)
 static subapp_result_t data_app_init(subapp_t* self)
 {
 	g_app_data.timetamp = fl_rtc_get();
-	// g_app_data.is_online = !IsOnline();
-	
-//	read_data_t read_cnt = read_data(g_app_data.timetamp);
-//
-	
 
 	uint32_t app_data_evt_table[] = get_data_event();
 
@@ -295,19 +263,14 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 		if(event->type == EVENT_BUTTON_PPD_HOLD_3S)
 		{
 			data_ctx.mode = APP_MODE_ACTICS;
-			// g_app_data.count = &count_actic_app;
-			// EVENT_PUBLISH_SIMPLE(EVENT_DATA_PASS_PRODUCT_UP, EVENT_PRIORITY_HIGH);
 		}
 		else 
 		{
 			data_ctx.mode = APP_MODE_TESTS;
-			// g_app_data.count = &count_test_app;
-			// g_app_data.count->err_product = count_actic_app.err_product;
-			// g_app_data.count->pass_product = count_actic_app.pass_product;
 		}
 		g_app_data.mode = data_ctx.mode;
 		G_COUNTER_DEV.data.mode = g_app_data.mode;
-		fl_api_slave_req(NWK_HDR_55, (u8*)&G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data), rst_cb_rsp, TIME_OUT_CHECK_RSP, NUM_RETRY);
+		// fl_api_slave_req(NWK_HDR_55, (u8*)&G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data), 0, TIME_OUT_CHECK_RSP, NUM_RETRY);
 		EVENT_PUBLISH_SIMPLE(EVENT_DATA_SWITCH_MODE, EVENT_PRIORITY_HIGH);
 		return;
 	}
@@ -323,7 +286,7 @@ static void data_app_event_handler(const event_t* event, void* user_data)
             ULOGA("Handle EVENT_BUTTON_RST_HOLD_3S\n");
 
 			G_COUNTER_DEV.data.bt_rst = 1;
-			fl_api_slave_req(NWK_HDR_55, (u8*)&G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data), rst_cb_rsp, TIME_OUT_CHECK_RSP, NUM_RETRY);
+			fl_api_slave_req(NWK_HDR_55, (u8*)&G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data), 0, TIME_OUT_CHECK_RSP, NUM_RETRY);
 			G_COUNTER_DEV.data.bt_rst = 0;
 			EVENT_PUBLISH_SIMPLE(EVENT_DATA_RESET, EVENT_PRIORITY_HIGH);
 			
@@ -333,6 +296,7 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 			
 			g_app_data.count->pass_product = 0;
 			g_app_data.count->err_product = 0;
+			g_app_data.is_call = false;
 			update_cont();
 
             break;
