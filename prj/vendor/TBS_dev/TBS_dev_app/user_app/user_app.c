@@ -191,27 +191,27 @@ test_sendevent1_t TEST_EVENT1 ={0,0,0};
 
 static void rst_cb_rsp(void *_data,void* _data2)
 {
-		fl_rsp_container_t *data =  (fl_rsp_container_t*)_data;
-	LOGA(API,"Timeout:%d\r\n",data->timeout);
-	LOGA(API,"cmdID  :%0X\r\n",data->rsp_check.hdr_cmdid);
-	LOGA(API,"SlaveID:%0X\r\n",data->rsp_check.slaveID);
+	fl_rsp_container_t *data =  (fl_rsp_container_t*)_data;
+//	LOGA(API,"Timeout:%d\r\n",data->timeout);
+//	LOGA(API,"cmdID  :%0X\r\n",data->rsp_check.hdr_cmdid);
+//	LOGA(API,"SlaveID:%0X\r\n",data->rsp_check.slaveID);
 	//rsp data
 	if(data->timeout > 0){
-		fl_pack_t *packet = (fl_pack_t *)_data2;
-		P_PRINTFHEX_A(API,packet->data_arr,packet->length,"RSP: ");
+//		fl_pack_t *packet = (fl_pack_t *)_data2;
+//		P_PRINTFHEX_A(API,packet->data_arr,packet->length,"RSP: ");
 //		P_INFO("Master RSP:%c%c\r\n",packet->data_arr[7],packet->data_arr[8]);
 		TEST_EVENT1.rsp_num++;
 	}else{
 //		P_INFO("Master RSP: NON-RSP \r\n");
 	}
-	u32 lifetime = (fl_rtc_get() - TEST_EVENT1.lifetime);
-	P_INFO("==============================\r\n");
-	P_INFO("* LifeTime:%dh%dm%ds\r\n",lifetime / 3600,(lifetime % 3600) / 60,lifetime % 60);
-	P_INFO("* RTT     :%d ms\r\n",data->timeout>0?((clock_time()-TEST_EVENT1.rtt)/SYSTEM_TIMER_TICK_1MS):0);
-	P_INFO("* REQ/RSP :%d/%d\r\n",TEST_EVENT1.req_num,TEST_EVENT1.rsp_num);
-	P_INFO("* LOSS    :%d\r\n",abs(TEST_EVENT1.req_num-TEST_EVENT1.rsp_num));
-	P_INFO("==============================\r\n");
-	
+//	u32 lifetime = (fl_rtc_get() - TEST_EVENT1.lifetime);
+//	P_INFO("==============================\r\n");
+//	P_INFO("* LifeTime:%dh%dm%ds\r\n",lifetime / 3600,(lifetime % 3600) / 60,lifetime % 60);
+//	P_INFO("* RTT     :%d ms\r\n",data->timeout>0?((clock_time()-TEST_EVENT1.rtt)/SYSTEM_TIMER_TICK_1MS):0);
+//	P_INFO("* REQ/RSP :%d/%d\r\n",TEST_EVENT1.req_num,TEST_EVENT1.rsp_num);
+//	P_INFO("* LOSS    :%d\r\n",abs(TEST_EVENT1.req_num-TEST_EVENT1.rsp_num));
+//	P_INFO("==============================\r\n");
+
 }
 
 static void call_cb_rsp(void *_data,void* _data2)

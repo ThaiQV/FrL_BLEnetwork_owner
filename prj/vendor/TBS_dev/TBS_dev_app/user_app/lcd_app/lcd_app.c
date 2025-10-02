@@ -202,7 +202,7 @@ void my_timeout_callback(uint8_t row) {
 			lcd_off();
 //			fl_db_clearAll();
 			fl_db_Pairing_Clear();
-			fl_db_clearAll();
+//			fl_db_clearAll();
 			sys_reboot();
 			break;
 
