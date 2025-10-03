@@ -247,8 +247,8 @@ void TBS_History_LoadFromFlash(void){
 	for (u16 i = 0; i < NUM_HISTORY ; i++) {
 		if(G_HISTORY_CONTAINER[i].indx != U16_MAX && G_HISTORY_CONTAINER[i].status_proc == 0){
 			//todo: read flash and fill in the G_HISTORY
-//			memcpy(G_HISTORY_CONTAINER[i].data,sample_history_database[G_HISTORY_CONTAINER[i].indx],DATA_HISTORY_SIZE);
-			tbs_history_load(G_HISTORY_CONTAINER[i].indx,G_HISTORY_CONTAINER[i].data,DATA_HISTORY_SIZE);
+			memcpy(G_HISTORY_CONTAINER[i].data,sample_history_database[G_HISTORY_CONTAINER[i].indx],DATA_HISTORY_SIZE);
+//			tbs_history_load(G_HISTORY_CONTAINER[i].indx,G_HISTORY_CONTAINER[i].data,DATA_HISTORY_SIZE);
 			G_HISTORY_CONTAINER[i].status_proc = 1;
 #ifdef COUNTER_DEVICE
 	tbs_history_counter_t* his_dev = (tbs_history_counter_t*)G_HISTORY_CONTAINER[i].data;
@@ -258,7 +258,7 @@ void TBS_History_LoadFromFlash(void){
 #endif
 			P_PRINTFHEX_A(APP,G_HISTORY_CONTAINER[i].data,DATA_HISTORY_SIZE,"LOAD|[%d]%d:",his_dev->data.index,his_dev->timetamp);
 			//Send to Master
-			//fl_adv_sendFIFO_add(tbs_history_create_pack(G_HISTORY_CONTAINER[i].data));
+			fl_adv_sendFIFO_add(tbs_history_create_pack(G_HISTORY_CONTAINER[i].data));
 			//exit to step-one-step
 			return;
 		}
@@ -285,8 +285,8 @@ void TBS_History_StoreToFlash(u32 _timetamp,u8* _data_struct){
 void TBS_History_Init(void){
 	//clear G_HISTORY
 	_CLEAR_G_HISTORY();
-//	TBS_history_createSample();
-	tbs_history_flash_init();
+	TBS_history_createSample();
+//	tbs_history_flash_init();
 }
 
 void TBS_History_Proc(void){
