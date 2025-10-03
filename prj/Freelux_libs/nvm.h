@@ -17,7 +17,6 @@
 
 /* For NVM KEY ID FOR DEVICE WEEKLY STORAGE */
 #define STORAGE_MAP						0x0100
-#define STORAGE_INDEX					0x0101
 
 #define OTA_FW_HEADER_KEY				0x0200
 

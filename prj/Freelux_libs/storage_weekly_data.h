@@ -28,6 +28,13 @@ typedef enum
 
 typedef enum
 {
+	OTA_PACKET_BEGIN = 0,
+	OTA_PACKET_DATA,
+	OTA_PACKET_END
+}ota_packet_type_t;
+
+typedef enum
+{
 	OTA_DEVICE_GATEWAY = 0,
 	OTA_DEVICE_PRODUCT_COUNTER,
 	OTA_DEVICE_POWER_METER
