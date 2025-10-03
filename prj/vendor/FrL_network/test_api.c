@@ -125,7 +125,7 @@ u8 TEST_Buttons_RST(fl_exButton_states_e _state, void *_data) {
 		fl_db_Pairing_Clear();
 	}
 	//Must to clear status if done
-	return         ;
+	return BUTT_STATE_NONE;
 	//else return _state;
 }
 //#endif
