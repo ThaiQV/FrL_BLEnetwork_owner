@@ -40,7 +40,7 @@ u8 GETINFO_FLAG_EVENTTEST = 0;
 #define RECONNECT_TIME				55*1000*1000		//s
 #define INFORM_MASTER				5*1000*1000
 fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_A5_HIS,NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
-fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_A5_HIS,NWK_HDR_55,NWK_HDR_11_REACTIVE}; // register cmdid REQ
+fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_A5_HIS,NWK_HDR_55,NWK_HDR_11_REACTIVE,NWK_HDR_22_PING}; // register cmdid REQ
 
 #define NWK_HDR_SIZE (sizeof(G_NWK_HDR_LIST)/sizeof(G_NWK_HDR_LIST[0]))
 #define NWK_HDR_REQ_SIZE (sizeof(G_NWK_HDR_REQLIST)/sizeof(G_NWK_HDR_REQLIST[0]))
@@ -232,7 +232,7 @@ void fl_nwk_slave_init(void) {
 	blt_soft_timer_add(fl_nwk_slave_reconnect,RECONNECT_TIME);//s -> send information online to master
 
 	//inform to master
-//	blt_soft_timer_add(&_informMaster,INFORM_MASTER);
+	blt_soft_timer_add(&_informMaster,INFORM_MASTER);
 
 	G_INFORMATION.active = false;
 	//test random send req
@@ -384,6 +384,9 @@ u32 fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 	fl_adv_sendFIFO_add(rslt);
 	fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(rslt);
 	u32 seq_timetamp = fl_rtc_timetamp2milltampStep(timetamp_inpack);
+	//Synch original time
+	SYNC_ORIGIN_MASTER(timetamp_inpack.timetamp,timetamp_inpack.milstep);
+
 	return seq_timetamp;
 }
 /***************************************************
@@ -587,6 +590,27 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 					}
 				}
 #endif
+			}
+		}
+		break;
+		case NWK_HDR_22_PING: {
+			if (IsJoinedNetwork()) {
+				//check packet_slaveid
+				if (packet.frame.slaveID.id_u8 == G_INFORMATION.slaveID.id_u8) {
+					if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
+						u8 ok[2] = { 'o', 'k' };
+						memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
+						memcpy(packet.frame.payload,ok,SIZEU8(ok));
+						//change endpoint to node source
+						packet.frame.endpoint.master = FL_FROM_SLAVE;
+						//add repeat_cnt
+						packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
+					} else {
+						//Non-rsp
+						packet_built.length = 0;
+						return packet_built;
+					}
+				}
 			}
 		}
 		break;

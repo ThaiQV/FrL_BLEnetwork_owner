@@ -53,7 +53,7 @@ volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into endpoint byte (dbg :1
 volatile u8 NWK_REPEAT_MODE = 0; // 1: level | 0 : non-level
 volatile u8 NWK_REPEAT_LEVEL = 3;
 
-fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_A5_HIS, NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET}; // register cmdid REQ
+fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_A5_HIS, NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_22_PING}; // register cmdid REQ
 
 #define NWK_HDR_REQ_SIZE (sizeof(G_NWK_HDR_REQLIST)/sizeof(G_NWK_HDR_REQLIST[0]))
 
@@ -594,6 +594,10 @@ u32 fl_req_master_packet_createNsend(u8* _slave_mac,u8 _cmdid,u8* _data, u8 _len
 			}
 		}
 		break;
+		case NWK_HDR_22_PING: {
+			req_pack.frame.endpoint.master = FL_FROM_MASTER_ACK;
+		}
+		break;
 		default:
 			return 0;
 		break;
@@ -618,7 +622,7 @@ u32 fl_req_master_packet_createNsend(u8* _slave_mac,u8 _cmdid,u8* _data, u8 _len
 
 s8 fl_api_master_req(u8* _mac_slave,u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry) {
 	//register timeout cb
-	if (_cb != 0 && _timeout_ms*1000 >= 2*QUEUQ_REQcRSP_INTERVAL) {
+	if (_cb != 0 && ( _timeout_ms*1000 >= 2*QUEUQ_REQcRSP_INTERVAL || _timeout_ms==0)) {
 		u32 seq_timetamp = fl_req_master_packet_createNsend(_mac_slave,_cmdid,_data,_len);
 		if(seq_timetamp){
 			return fl_queueREQcRSP_add(fl_master_Node_find(_mac_slave),_cmdid,seq_timetamp,_data,_len,&_cb,_timeout_ms,_retry);
@@ -789,6 +793,23 @@ int fl_master_ProccesRSP_cbk(void) {
 						memcpy(seq_timetamp,packet.frame.timetamp,SIZEU8(packet.frame.timetamp));
 						seq_timetamp[SIZEU8(packet.frame.timetamp)] = packet.frame.milltamp;
 						fl_adv_sendFIFO_add(fl_master_packet_RSP_TimetampREQ_build(NWK_HDR_11_REACTIVE,slave_id,seq_timetamp));
+					}
+				} else {
+					ERR(INF,"ID not foud:%02X\r\n",slave_id);
+					return -1;
+				}
+			}
+			break;
+			case NWK_HDR_22_PING: {
+				u8 slave_id = packet.frame.slaveID.id_u8;
+				u8 node_indx = fl_master_SlaveID_find(slave_id);
+				if (node_indx != -1) {
+					if (packet.frame.endpoint.master == FL_FROM_SLAVE_ACK) {
+						//Send rsp to slave
+						u8 seq_timetamp[5];
+						memcpy(seq_timetamp,packet.frame.timetamp,SIZEU8(packet.frame.timetamp));
+						seq_timetamp[SIZEU8(packet.frame.timetamp)] = packet.frame.milltamp;
+						fl_adv_sendFIFO_add(fl_master_packet_RSP_TimetampREQ_build(NWK_HDR_22_PING,slave_id,seq_timetamp));
 					}
 				} else {
 					ERR(INF,"ID not foud:%02X\r\n",slave_id);

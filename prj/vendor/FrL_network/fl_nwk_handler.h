@@ -35,6 +35,7 @@ typedef enum {
 	NWK_HDR_NONE = 0,
 	// slave -> req -> master -> rsp
 	NWK_HDR_11_REACTIVE = 0x11, //inform to master
+	NWK_HDR_22_PING = 0x22, //master ping to slave
 	/*Frl protocols*/
 	NWK_HDR_55 = 0x55, // REQ from slave
 	NWK_HDR_A5_HIS=0xA5, //history

@@ -12,6 +12,7 @@
 #include "fl_nwk_protocol.h"
 #include "fl_nwk_database.h"
 #include "fl_nwk_handler.h"
+#include <ctype.h>
 
 /******************************************************************************/
 /******************************************************************************/
@@ -91,6 +92,7 @@ void CMD_ADVINTERVAL(u8* _data);
 void CMD_ADVSCAN(u8* _data);
 void CMD_CLEARDB(u8* _data);
 void CMD_CHANNELCONFIG(u8* _data);
+void CMD_PING(u8* _data);
 /********************* Functions GET CMD declare ********************/
 void CMD_GETSLALIST(u8* _data);
 void CMD_GETINFOSLAVE(u8* _data);
@@ -106,6 +108,8 @@ fl_cmdlines_t G_CMDSET[] = { { { 'u', 't', 'c' }, 3, CMD_SETUTC }, 			// p set u
 		{ { 's', 'c', 'a', 'n' }, 4, CMD_ADVSCAN },							// p set scan <window> <interval> : use to set scanner adv settings
 		{ { 'c', 'l', 'e', 'a', 'r' }, 5, CMD_CLEARDB },					// p set clear <nodelist>
 		{ { 'c', 'h', 'n' }, 3, CMD_CHANNELCONFIG },						// p set chn <chn1> <chn2> <chn3>
+		{ { 'p', 'i', 'n','g' }, 4, CMD_PING },								// p set ping <mac> <times>
+
 		};
 
 fl_cmdlines_t G_CMDGET[] = { { { 's', 'l', 'a', 'l', 'i', 's', 't' }, 7, CMD_GETSLALIST },	// p get list
@@ -457,6 +461,66 @@ void CMD_CHANNELCONFIG(u8* _data) {
 		return;
 	}
 	ERR(DRV,"ERR Channels setting (%d)\r\n",rslt);
+}
+uint16_t parse_u16(const char* str) {
+    uint16_t result = 0;
+    while (*str) {
+        if (*str < '0' || *str > '9') return 0; // lỗi nếu không phải số
+        result = result * 10 + (*str - '0');
+        str++;
+    }
+    return result;
+}
+
+
+void _ping_rsp_callback(void *_data,void* _data2){
+	fl_rsp_container_t *data =  (fl_rsp_container_t*)_data;
+	LOGA(API,"Timeout:%d\r\n",data->timeout);
+	LOGA(API,"cmdID  :%0X\r\n",data->rsp_check.hdr_cmdid);
+	LOGA(API,"SlaveID:%0X\r\n",data->rsp_check.slaveID);
+	//rsp data
+	if(data->timeout >= 0){
+		fl_pack_t *packet = (fl_pack_t *)_data2;
+		P_PRINTFHEX_A(API,packet->data_arr,packet->length,"RSP: ");
+	}
+}
+
+void CMD_PING(u8* _data) {
+	char mac_str[13]; //
+	uint8_t mac[6];
+	char value_str[6]; //
+	//
+	int rslt = sscanf((char*) _data,"ping %12s %5s",mac_str,value_str);
+	if (rslt != 2) {
+		return;
+	}
+	for (int i = 0; i < 12; ++i) {
+		if (!isxdigit(mac_str[i])) {
+			return;
+		}
+	}
+	for (int i = 0; i < 6; ++i) {
+		char byte_str[3] = { mac_str[i * 2], mac_str[i * 2 + 1], '\0' };
+		uint8_t byte = 0;
+		for (int j = 0; j < 2; ++j) {
+			char c = byte_str[j];
+			byte <<= 4;
+			if (c >= '0' && c <= '9')
+				byte += c - '0';
+			else if (c >= 'A' && c <= 'F')
+				byte += c - 'A' + 10;
+			else if (c >= 'a' && c <= 'f')
+				byte += c - 'a' + 10;
+			else
+				return;
+		}
+		mac[i] = byte;
+	}
+	//p set ping 803948775fd8 3
+	uint16_t value = parse_u16(value_str);
+	LOGA(DRV,"MAC:0x%02X%02X%02X%02X%02X%02X, times:%d\r\n",mac[0],mac[1],mac[2],mac[3],mac[4],mac[5],value);
+	fl_api_master_req(mac,NWK_HDR_22_PING,mac,SIZEU8(mac),_ping_rsp_callback,0,0);
+
 }
 /********************* Functions GET CMD ********************/
 void CMD_GETSLALIST(u8* _data) {
