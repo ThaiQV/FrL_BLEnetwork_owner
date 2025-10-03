@@ -15,7 +15,7 @@
 #include "../FrL_Network/fl_nwk_api.h"
 
 #define TBS_DEVICE_STORE_INTERVAL 		5*1000*1000 //5s
-#define TBS_PACKET_INDEX_MAX			10000
+#define TBS_PACKET_INDEX_MAX			12288
 #include "TBS_dev_app/user_lib.h"
 /******************************************************************************/
 /******************************************************************************/
