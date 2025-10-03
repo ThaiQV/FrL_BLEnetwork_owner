@@ -31,7 +31,7 @@ void TBS_Device_Init(void);
 void TBS_Device_Run(void);
 void TBS_Device_Index_manage(void);
 void TBS_history_createSample(void);
-void TBS_History_StoreToFlash(u32 _timetamp,u8* _data_struct);
+void TBS_History_StoreToFlash(u8* _data_struct);
 s8 TBS_History_Get(u16 _from, u16 _to) ;
 void TBS_History_Init(void);
 void TBS_History_Proc(void);

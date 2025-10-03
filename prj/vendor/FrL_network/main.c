@@ -173,7 +173,7 @@ void proto_task( void *pvParameters );
  * @return      none
  */
 fl_version_t _bootloader = { 0, 0, 0 };
-fl_version_t _fw = { 1, 2, 2 };
+fl_version_t _fw = { 1, 3, 2 };
 fl_version_t _hw = { 1, 0, 0 };
 
 _attribute_ram_code_ int main(void)   //must on ramcode
