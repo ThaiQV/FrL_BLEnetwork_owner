@@ -54,6 +54,7 @@ typedef struct {
 		u16 pre_pass_product;
 		u16 pre_err_product;
 		u8 pre_mode;
+		u32 pre_timetamp;
 	//reverse
 	//		u8 reverse[7];
 	} data;
@@ -157,7 +158,9 @@ void TBS_history_createSample(void) {
 						.mode = 1,
 						.pre_pass_product = 7,
 						.pre_err_product=8,
-						.pre_mode =0
+						.pre_mode =0,
+						.pre_timetamp =0,
+						.pre_timetamp = 1758639600 + ((i!=0)?i-1:0)*60
 						}
 		};
 		u8 *dst = sample_history_database[i];

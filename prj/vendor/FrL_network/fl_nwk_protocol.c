@@ -115,7 +115,7 @@ fl_cmdlines_t G_CMDGET[] = { { { 's', 'l', 'a', 'l', 'i', 's', 't' }, 7, CMD_GET
 		};
 
 
-static u8 FIRST_PROTOCOL_START = 0;
+//static u8 FIRST_PROTOCOL_START = 0;
 #endif
 
 /******************************************************************************/
@@ -632,77 +632,77 @@ void CMD_GETALLNODES(u8* _data) {
 }
 
 void CMD_GETINFOSLAVE(u8* _data) {
-	extern fl_adv_settings_t G_ADV_SETTINGS ;
-	u8 slaveID[GETINFO_1_TIMES_MAX]; //Max 20 slaves
-	int slave_num = sscanf((char*) _data,"info %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd",&slaveID[0],
-			&slaveID[1],&slaveID[2],&slaveID[3],&slaveID[4],&slaveID[5],&slaveID[6],&slaveID[7],&slaveID[8],&slaveID[9],&slaveID[10],&slaveID[11],
-			&slaveID[12],&slaveID[13],&slaveID[14],&slaveID[15],&slaveID[16],&slaveID[17],&slaveID[18],&slaveID[19]);
-/*
-//	int slave_num = sscanf((char*) _data,
-//	    "info %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu",
-//	    &slaveID[0], &slaveID[1], &slaveID[2], &slaveID[3], &slaveID[4], &slaveID[5], &slaveID[6], &slaveID[7],
-//	    &slaveID[8], &slaveID[9], &slaveID[10], &slaveID[11], &slaveID[12], &slaveID[13], &slaveID[14], &slaveID[15],
-//	    &slaveID[16], &slaveID[17], &slaveID[18], &slaveID[19]);
-
-//	int slave_num = sscanf((char*) _data,
-//	    "info %hhd %hhd %hhd %hhd %hhd %hhd %hhd %hhd %hhd %hhd %hhd %hhd %hhd %hhd %hhd %hhd %hhd %hhd %hhd %hhd",
-//	    &slaveID[0], &slaveID[1], &slaveID[2], &slaveID[3], &slaveID[4], &slaveID[5], &slaveID[6], &slaveID[7],
-//	    &slaveID[8], &slaveID[9], &slaveID[10], &slaveID[11], &slaveID[12], &slaveID[13], &slaveID[14], &slaveID[15],
-//	    &slaveID[16], &slaveID[17], &slaveID[18], &slaveID[19]);
-*/
-
-	//p get info 255 <Period get again> <num slave for each> <num virtual slave> <timeout rsp>
-	if(G_NODE_LIST.slot_inused == 0xFF) return;
-	if (slave_num >= 6 && slaveID[0] == 0xFF) {
-		CLEAR_INFO_RSP();
-		G_SLA_INFO_RSP.settings.time_interval = slaveID[1];
-
-		G_SLA_INFO_RSP.settings.num_1_times = slaveID[2];
-		G_SLA_INFO_RSP.num_1_times = G_SLA_INFO_RSP.settings.num_1_times;
-
-		G_SLA_INFO_RSP.settings.total_slaves = slaveID[3] > MAX_NODES ? MAX_NODES : slaveID[3];
-		if(slaveID[3] == 0xFF && G_NODE_LIST.slot_inused != 0xFF){
-			G_SLA_INFO_RSP.settings.total_slaves = G_NODE_LIST.slot_inused;
-		}
-		G_SLA_INFO_RSP.total_slaves = G_SLA_INFO_RSP.settings.total_slaves;
-
-		G_SLA_INFO_RSP.settings.timeout_rsp = slaveID[4]+(u8 )(G_ADV_SETTINGS.adv_interval_max * 0.625);
-		G_SLA_INFO_RSP.settings.num_retry = slaveID[5];
-
-		//SETTING global
-		G_ADV_SETTINGS.time_wait_rsp = G_SLA_INFO_RSP.settings.timeout_rsp;
-		G_ADV_SETTINGS.retry_times = G_SLA_INFO_RSP.settings.num_retry;
-
-		//TEST SIMULATE creating event from slaves
-		GETINFO_FLAG_EVENTTEST = slave_num>6?slaveID[6]:0;
-
-		LOGA(DRV,"GET ALL INFO AUTORUN (Test:%d|interval:%d s|NumOfTimes:%d |Total:%d |Timeout:%d ms|Retry:%d)!!\r\n",
-				GETINFO_FLAG_EVENTTEST,
-				G_SLA_INFO_RSP.settings.time_interval,
-				G_SLA_INFO_RSP.settings.num_1_times,
-				G_SLA_INFO_RSP.settings.total_slaves,
-				G_ADV_SETTINGS.time_wait_rsp,
-				G_ADV_SETTINGS.retry_times);
-		//create timer checking to manage response
-		//Clear and re-start
-		blt_soft_timer_delete(&_getInfo_autorun);
-		blt_soft_timer_add(&_getInfo_autorun,((FIRST_PROTOCOL_START == 0 || G_SLA_INFO_RSP.settings.time_interval != 0) ? 1000 : GETINFO_FIRST_DUTY) * 1000); //ms
-	} else if (slave_num >= 1) {
-		//Clear and re-start
-		blt_soft_timer_delete(&_getInfo_autorun);
-		CLEAR_INFO_RSP();
-		P_PRINTFHEX_A(DRV,slaveID,slave_num,"num(%d):",slave_num);
-		fl_pack_t info_pack = fl_master_packet_GetInfo_build(slaveID,slave_num);
-		P_PRINTFHEX_A(DRV,info_pack.data_arr,info_pack.length,"%s(%d):","Info Pack",info_pack.length);
-		fl_adv_sendFIFO_add(info_pack);
-		G_SLA_INFO.num_sla = slave_num;
-		G_SLA_INFO.timetamp = clock_time();
-		memcpy(G_SLA_INFO.id,slaveID,slave_num);
-		//create timer checking to manage response
-		if (blt_soft_timer_find(&_RSP_CMD_GETINFOSLAVE) == -1) {
-			blt_soft_timer_add(&_RSP_CMD_GETINFOSLAVE,GETINFO_FREQUENCY * 1000); //ms
-		}
-	}
+//	extern fl_adv_settings_t G_ADV_SETTINGS ;
+//	u8 slaveID[GETINFO_1_TIMES_MAX]; //Max 20 slaves
+//	int slave_num = sscanf((char*) _data,"info %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd",&slaveID[0],
+//			&slaveID[1],&slaveID[2],&slaveID[3],&slaveID[4],&slaveID[5],&slaveID[6],&slaveID[7],&slaveID[8],&slaveID[9],&slaveID[10],&slaveID[11],
+//			&slaveID[12],&slaveID[13],&slaveID[14],&slaveID[15],&slaveID[16],&slaveID[17],&slaveID[18],&slaveID[19]);
+///*
+////	int slave_num = sscanf((char*) _data,
+////	    "info %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu",
+////	    &slaveID[0], &slaveID[1], &slaveID[2], &slaveID[3], &slaveID[4], &slaveID[5], &slaveID[6], &slaveID[7],
+////	    &slaveID[8], &slaveID[9], &slaveID[10], &slaveID[11], &slaveID[12], &slaveID[13], &slaveID[14], &slaveID[15],
+////	    &slaveID[16], &slaveID[17], &slaveID[18], &slaveID[19]);
+//
+////	int slave_num = sscanf((char*) _data,
+////	    "info %hhd %hhd %hhd %hhd %hhd %hhd %hhd %hhd %hhd %hhd %hhd %hhd %hhd %hhd %hhd %hhd %hhd %hhd %hhd %hhd",
+////	    &slaveID[0], &slaveID[1], &slaveID[2], &slaveID[3], &slaveID[4], &slaveID[5], &slaveID[6], &slaveID[7],
+////	    &slaveID[8], &slaveID[9], &slaveID[10], &slaveID[11], &slaveID[12], &slaveID[13], &slaveID[14], &slaveID[15],
+////	    &slaveID[16], &slaveID[17], &slaveID[18], &slaveID[19]);
+//*/
+//
+//	//p get info 255 <Period get again> <num slave for each> <num virtual slave> <timeout rsp>
+//	if(G_NODE_LIST.slot_inused == 0xFF) return;
+//	if (slave_num >= 6 && slaveID[0] == 0xFF) {
+//		CLEAR_INFO_RSP();
+//		G_SLA_INFO_RSP.settings.time_interval = slaveID[1];
+//
+//		G_SLA_INFO_RSP.settings.num_1_times = slaveID[2];
+//		G_SLA_INFO_RSP.num_1_times = G_SLA_INFO_RSP.settings.num_1_times;
+//
+//		G_SLA_INFO_RSP.settings.total_slaves = slaveID[3] > MAX_NODES ? MAX_NODES : slaveID[3];
+//		if(slaveID[3] == 0xFF && G_NODE_LIST.slot_inused != 0xFF){
+//			G_SLA_INFO_RSP.settings.total_slaves = G_NODE_LIST.slot_inused;
+//		}
+//		G_SLA_INFO_RSP.total_slaves = G_SLA_INFO_RSP.settings.total_slaves;
+//
+//		G_SLA_INFO_RSP.settings.timeout_rsp = slaveID[4]+(u8 )(G_ADV_SETTINGS.adv_interval_max * 0.625);
+//		G_SLA_INFO_RSP.settings.num_retry = slaveID[5];
+//
+//		//SETTING global
+//		G_ADV_SETTINGS.time_wait_rsp = G_SLA_INFO_RSP.settings.timeout_rsp;
+//		G_ADV_SETTINGS.retry_times = G_SLA_INFO_RSP.settings.num_retry;
+//
+//		//TEST SIMULATE creating event from slaves
+//		GETINFO_FLAG_EVENTTEST = slave_num>6?slaveID[6]:0;
+//
+//		LOGA(DRV,"GET ALL INFO AUTORUN (Test:%d|interval:%d s|NumOfTimes:%d |Total:%d |Timeout:%d ms|Retry:%d)!!\r\n",
+//				GETINFO_FLAG_EVENTTEST,
+//				G_SLA_INFO_RSP.settings.time_interval,
+//				G_SLA_INFO_RSP.settings.num_1_times,
+//				G_SLA_INFO_RSP.settings.total_slaves,
+//				G_ADV_SETTINGS.time_wait_rsp,
+//				G_ADV_SETTINGS.retry_times);
+//		//create timer checking to manage response
+//		//Clear and re-start
+//		blt_soft_timer_delete(&_getInfo_autorun);
+//		blt_soft_timer_add(&_getInfo_autorun,((FIRST_PROTOCOL_START == 0 || G_SLA_INFO_RSP.settings.time_interval != 0) ? 1000 : GETINFO_FIRST_DUTY) * 1000); //ms
+//	} else if (slave_num >= 1) {
+//		//Clear and re-start
+//		blt_soft_timer_delete(&_getInfo_autorun);
+//		CLEAR_INFO_RSP();
+//		P_PRINTFHEX_A(DRV,slaveID,slave_num,"num(%d):",slave_num);
+//		fl_pack_t info_pack = fl_master_packet_GetInfo_build(slaveID,slave_num);
+//		P_PRINTFHEX_A(DRV,info_pack.data_arr,info_pack.length,"%s(%d):","Info Pack",info_pack.length);
+//		fl_adv_sendFIFO_add(info_pack);
+//		G_SLA_INFO.num_sla = slave_num;
+//		G_SLA_INFO.timetamp = clock_time();
+//		memcpy(G_SLA_INFO.id,slaveID,slave_num);
+//		//create timer checking to manage response
+//		if (blt_soft_timer_find(&_RSP_CMD_GETINFOSLAVE) == -1) {
+//			blt_soft_timer_add(&_RSP_CMD_GETINFOSLAVE,GETINFO_FREQUENCY * 1000); //ms
+//		}
+//	}
 }
 #endif
 /******************************************************************************/

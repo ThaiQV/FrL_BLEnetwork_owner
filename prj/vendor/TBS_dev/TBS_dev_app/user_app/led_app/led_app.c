@@ -128,7 +128,7 @@ void led_callback(uint8_t led_id)
 	switch (led_id)
 	{
 	case LED_ID_CALL:
-		if(led_ctx.is_call)
+		if(get_data.is_call())
 		{
 			led_on(LED_ID_CALL);
 		}
@@ -237,14 +237,12 @@ static void led_app_event_handler(const event_t* event, void* user_data)
 
 		case EVENT_DATA_CALL:
             ULOGA("Handle EVENT_DATA_CALL\n");
-			led_ctx.is_call = 1;
 			led_on(LED_ID_CALL);
             // TODO: blink LED for call state
 			break;
 
 		case EVENT_DATA_ENDCALL:
             ULOGA("Handle EVENT_DATA_ENDCALL\n");
-			led_ctx.is_call = 0;
 			led_off(LED_ID_CALL);
             // TODO: blink LED for call state
 			break;

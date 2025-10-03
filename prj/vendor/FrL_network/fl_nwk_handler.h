@@ -113,6 +113,7 @@ typedef struct {
 		u16 pre_pass_product;
 		u16 pre_err_product;
 		u8 pre_mode;
+		u32 pre_timetamp;
 	//reverse
 //		u8 reverse[7];
 	} data;

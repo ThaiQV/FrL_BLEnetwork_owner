@@ -20,7 +20,7 @@
 #ifdef MASTER_CORE
 #define QUANTITY_FIELD_STORED_DB		3 //RTC + NODELIST(master) + MASTER PROFILE
 #else
-#define QUANTITY_FIELD_STORED_DB			2 //RTC + SLAVE PROFILE
+#define QUANTITY_FIELD_STORED_DB		2 //RTC + SLAVE PROFILE
 #endif
 #define ADDR_DATABASE_INITIALIZATION	(ADDR_USERAREA_END - QUANTITY_FIELD_STORED_DB)	//initialization db
 //////// ======================================================================

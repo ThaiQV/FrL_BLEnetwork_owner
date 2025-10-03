@@ -26,18 +26,19 @@ void tbs_counter_printf(type_debug_t _plog_type,void* _p){
 	tbs_device_counter_t *data = (tbs_device_counter_t*)_p;
 	LOGA(_plog_type,"COUNTER STRUCT SIZE :%d/%d\r\n",SIZEU8(tbs_device_counter_t),SIZEU8(data->data));
 	LOGA(_plog_type,"MAC:0x%02X%02X%02X%02X%02X%02X\r\n",data->mac[0],data->mac[1],data->mac[2],data->mac[3],data->mac[4],data->mac[5]);
-	LOGA(_plog_type,"Timetamp  :%d\r\n",data->timetamp);
-	LOGA(_plog_type,"Type      :%d\r\n",data->type);
-	LOGA(_plog_type,"Index     :%d\r\n",data->data.index);
-	LOGA(_plog_type,"BT_Call   :%d\r\n",data->data.bt_call);
-	LOGA(_plog_type,"BT_EndCall:%d\r\n",data->data.bt_endcall);
-	LOGA(_plog_type,"BT_Rst    :%d\r\n",data->data.bt_rst);
-	LOGA(_plog_type,"BT_Pass   :%d\r\n",data->data.pass_product);
-	LOGA(_plog_type,"BT_Err    :%d\r\n",data->data.err_product);
-	LOGA(_plog_type,"Mode      :%d\r\n",data->data.mode);
-	LOGA(_plog_type,"pre_pass  :%d\r\n",data->data.pre_pass_product);
-	LOGA(_plog_type,"pre_err   :%d\r\n",data->data.pre_err_product);
-	LOGA(_plog_type,"pre_mode  :%d\r\n",data->data.pre_mode);
+	LOGA(_plog_type,"Timetamp    :%d\r\n",data->timetamp);
+	LOGA(_plog_type,"Type        :%d\r\n",data->type);
+	LOGA(_plog_type,"Index       :%d\r\n",data->data.index);
+	LOGA(_plog_type,"BT_Call     :%d\r\n",data->data.bt_call);
+	LOGA(_plog_type,"BT_EndCall  :%d\r\n",data->data.bt_endcall);
+	LOGA(_plog_type,"BT_Rst      :%d\r\n",data->data.bt_rst);
+	LOGA(_plog_type,"BT_Pass     :%d\r\n",data->data.pass_product);
+	LOGA(_plog_type,"BT_Err      :%d\r\n",data->data.err_product);
+	LOGA(_plog_type,"Mode        :%d\r\n",data->data.mode);
+	LOGA(_plog_type,"pre_pass    :%d\r\n",data->data.pre_pass_product);
+	LOGA(_plog_type,"pre_err     :%d\r\n",data->data.pre_err_product);
+	LOGA(_plog_type,"pre_mode    :%d\r\n",data->data.pre_mode);
+	LOGA(_plog_type,"pre_timetamp:%d\r\n",data->data.pre_timetamp);
 }
 
 void tbs_power_meter_printf(type_debug_t _plog_type,void* _p) {
@@ -78,7 +79,8 @@ tbs_device_counter_t G_COUNTER_DEV = {  .timetamp = 0,
 												.mode = 1,
 												.pre_pass_product = 7,
 												.pre_err_product=8,
-												.pre_mode =0
+												.pre_mode =0,
+												.pre_timetamp =0
 												}
 									};
 
@@ -136,12 +138,12 @@ void Counter_LCD_MessageStore(void){
 	static u32 crc32 = 0;
 	u32 crc32_curr = fl_db_crc32((u8*)G_COUNTER_LCD,SIZEU8(G_COUNTER_LCD[0])*COUNTER_LCD_MESS_MAX);
 	if (crc32 != crc32_curr) {
-//		LOGA(PERI,"========================\r\n");
-//		for (u8 i = 0; i < COUNTER_LCD_MESS_MAX; i++) {
-//			if (G_COUNTER_LCD[i][0] != 0xFF)
-//				LOGA(PERI,"0x%02X[%d]%s\r\n",G_COUNTER_LCD[i][LCD_MESSAGE_SIZE-1],i,(char* )G_COUNTER_LCD[i]);
-//		}
-//		LOGA(PERI,"========================\r\n");
+		LOGA(PERI,"========================\r\n");
+		for (u8 i = 0; i < COUNTER_LCD_MESS_MAX; i++) {
+			if (G_COUNTER_LCD[i][0] != 0xFF)
+				LOGA(PERI,"0x%02X[%d]%s\r\n",G_COUNTER_LCD[i][LCD_MESSAGE_SIZE-1],i,(char* )G_COUNTER_LCD[i]);
+		}
+		LOGA(PERI,"========================\r\n");
 		crc32=crc32_curr;
 		//Store message
 		fl_db_slavesettings_save((u8*)G_COUNTER_LCD,SIZEU8(G_COUNTER_LCD[0])*COUNTER_LCD_MESS_MAX);
@@ -206,7 +208,8 @@ int TEST_Counter_Event(void){
 		G_COUNTER_DEV.data.mode = 1;
 		G_COUNTER_DEV.data.pre_err_product = RAND(1,1020);
 		G_COUNTER_DEV.data.pre_pass_product = RAND(1,1020);
-		G_COUNTER_DEV.data.pre_mode = RAND(1,1020);
+		G_COUNTER_DEV.data.pre_mode = RAND(0,1);
+
 		//
 		G_COUNTER_DEV.data.bt_call = RAND(0,1);
 		G_COUNTER_DEV.data.bt_endcall = G_COUNTER_DEV.data.bt_call ? 0 : 1;
