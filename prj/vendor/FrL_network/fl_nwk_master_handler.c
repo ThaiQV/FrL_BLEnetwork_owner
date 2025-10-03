@@ -43,7 +43,7 @@ fl_data_container_t G_HANDLE_MASTER_CONTAINER = {.data = g_handle_master_array, 
 
 fl_slaves_list_t G_NODE_LIST = { .slot_inused = 0xFF };
 //fl_slaves_list_t G_OFFLINE_LIST = { .slot_inused = 0xFF };
-fl_master_config_t G_MASTER_INFO = { .nwk = { .chn = { 10, 11, 12 }, .collect_chn = { 0, 1, 2 } } };
+fl_master_config_t G_MASTER_INFO = { .nwk = { .chn = { 37, 39, 39 }, .collect_chn = { 37, 38, 39 } } };
 
 volatile u8 MASTER_INSTALL_STATE = 0;
 //Period of the heartbeat
