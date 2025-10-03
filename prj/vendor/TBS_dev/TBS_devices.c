@@ -15,7 +15,7 @@
 #include "../FrL_Network/fl_nwk_api.h"
 
 #define TBS_DEVICE_STORE_INTERVAL 		5*1000*1000 //5s
-#define TBS_PACKET_INDEX_MAX			10000
+#define TBS_PACKET_INDEX_MAX			12288
 #include "TBS_dev_app/user_lib.h"
 /******************************************************************************/
 /******************************************************************************/
@@ -249,16 +249,6 @@ void TBS_Counter_init(void){
 
 void TBS_Counter_Run(void){
 	G_COUNTER_DEV.timetamp = fl_rtc_get();
-//	//For testing : randon valid of fields
-//	G_COUNTER_DEV.data.bt_call = RAND(0,1);
-//	G_COUNTER_DEV.data.bt_endcall = G_COUNTER_DEV.data.bt_call?0:1;
-//	G_COUNTER_DEV.data.bt_rst = RAND(0,1);
-//	G_COUNTER_DEV.data.pass_product = RAND(1,1020);
-//	G_COUNTER_DEV.data.err_product = RAND(1,500);
-//	G_COUNTER_DEV.data.mode = 1;
-//	G_COUNTER_DEV.data.pre_err_product= RAND(1,1020);
-//	G_COUNTER_DEV.data.pre_pass_product= RAND(1,1020);
-//	G_COUNTER_DEV.data.pre_mode= RAND(1,1020);
 	Counter_LCD_MessageStore();
 //	Counter_LCD_MessageCheck_FlagNew();
 	//todo: TBS_Device_App
@@ -374,11 +364,12 @@ int TBS_Device_Store_run(void) {
 }
 
 void TBS_Device_Index_manage(void) {
+	//todo:store to flash
+	TBS_History_StoreToFlash((u8*)&G_TBS_DEVICE);
 	G_TBS_DEVICE.data.index++;
 	if (G_TBS_DEVICE.data.index >= TBS_PACKET_INDEX_MAX) {
 		G_TBS_DEVICE.data.index = 0;
 	}
-	//todo:
 }
 
 void TBS_Device_Init(void){
@@ -403,6 +394,6 @@ void TBS_Device_Run(void){
 #ifdef POWER_METER_DEVICE
 	TBS_PowerMeter_Run();
 #endif
-	TBS_History_Run();
+	TBS_History_Proc();
 }
 #endif

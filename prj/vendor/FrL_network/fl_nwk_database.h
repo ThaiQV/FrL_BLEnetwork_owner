@@ -94,7 +94,6 @@ typedef struct {
 		u8 private_key[NWK_PRIVATE_KEY_SIZE];//todo: encrypt
 		u32 mac_parent;
 	} nwk;
-//	u16 parameters[4]; //change size if we need more parametes
 	struct {
 		u8 rst_factory;
 		u8 join_nwk;

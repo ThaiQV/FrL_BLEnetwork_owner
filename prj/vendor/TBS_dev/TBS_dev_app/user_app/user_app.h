@@ -18,7 +18,7 @@
 #define TIME_BUTTON_TASK_MS				(10)
 #define TIME_LED_TASK_MS				(10)
 #define TIME_DATA_TASK_MS				(1000)
-#define TIME_DTATSTORAGE_TASK_MS		(30 * 1000) //60s
+//#define TIME_DTATSTORAGE_TASK_MS		(30 * 1000) //60s
 #define TIME_OUT_PRINTF_ERR_MS			(10 * 1000) //60s
 
 typedef enum{

@@ -26,6 +26,9 @@
 #include "stack/ble/ble.h"
 #include "app.h"
 #include "fl_input_ext.h"
+#include "../Freelux_libs/SPI_FLASH.h"
+#include "../Freelux_libs/nvm.h"
+#include "../Freelux_libs/storage_weekly_data.h"
 
 #if(FREERTOS_ENABLE)
 #include <FreeRTOS.h>
@@ -170,7 +173,7 @@ void proto_task( void *pvParameters );
  * @return      none
  */
 fl_version_t _bootloader = { 0, 0, 0 };
-fl_version_t _fw = { 1, 2, 2 };
+fl_version_t _fw = { 1, 3, 2 };
 fl_version_t _hw = { 1, 0, 0 };
 
 _attribute_ram_code_ int main(void)   //must on ramcode

@@ -17,18 +17,30 @@
 
 #ifndef MASTER_CORE
 
-#define NUM_HISTORY			20
+/******************************************************************************/
+/******************************************************************************/
+/***                                External-libs		                     **/
+/******************************************************************************/
+/******************************************************************************/
+#include "../Freelux_libs/storage_weekly_data.h"
+#define tbs_history_flash_init()				{nvm_init();storage_init();}
+#define tbs_history_store						storage_put_data
+#define tbs_history_load						storage_get_data
+
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
 /******************************************************************************/
 /******************************************************************************/
+#define NUM_HISTORY								16
+
 extern volatile u8 NWK_DEBUG_STT; // it will be assigned into end-point byte (dbg :1bit)
 extern volatile u8 NWK_REPEAT_MODE; // 1: level | 0 : non-level
 extern volatile u8  NWK_REPEAT_LEVEL;
 //
 typedef struct {
 	u32 timetamp;     // timetamp (32 bits)
+	u8 type;
 	struct {
 		//add new index of packet
 		u16 index;
@@ -236,37 +248,53 @@ void TBS_History_LoadFromFlash(void){
 	for (u16 i = 0; i < NUM_HISTORY ; i++) {
 		if(G_HISTORY_CONTAINER[i].indx != U16_MAX && G_HISTORY_CONTAINER[i].status_proc == 0){
 			//todo: read flash and fill in the G_HISTORY
-			//Example:
-			memcpy(G_HISTORY_CONTAINER[i].data,sample_history_database[G_HISTORY_CONTAINER[i].indx],DATA_HISTORY_SIZE);
+//			memcpy(G_HISTORY_CONTAINER[i].data,sample_history_database[G_HISTORY_CONTAINER[i].indx],DATA_HISTORY_SIZE);
 			G_HISTORY_CONTAINER[i].status_proc = 1;
-			P_PRINTFHEX_A(APP,G_HISTORY_CONTAINER[i].data,DATA_HISTORY_SIZE,"[%d]HIS:",G_HISTORY_CONTAINER[i].indx);
+#ifdef COUNTER_DEVICE
+	tbs_history_counter_t* his_dev = (tbs_history_counter_t*)G_HISTORY_CONTAINER[i].data;
+#endif
+#ifdef POWER_METER_DEVICE
+	tbs_history_powermeter_t* his_dev = (tbs_history_powermeter_t*)G_HISTORY_CONTAINER[i].data;
+#endif
+			his_dev->data.index = G_HISTORY_CONTAINER[i].indx;
+			tbs_history_load(G_HISTORY_CONTAINER[i].data,DATA_HISTORY_SIZE);
+			P_PRINTFHEX_A(FLA,G_HISTORY_CONTAINER[i].data,DATA_HISTORY_SIZE,"LOAD|[%d]%d:",his_dev->data.index,his_dev->timetamp);
 			//Send to Master
 			fl_adv_sendFIFO_add(tbs_history_create_pack(G_HISTORY_CONTAINER[i].data));
+			//exit to step-one-step
+			return;
 		}
 	}
 }
+
+void TBS_History_StoreToFlash(u8* _data_struct){
+#ifdef COUNTER_DEVICE
+	tbs_history_counter_t his_dev;
+#endif
+#ifdef POWER_METER_DEVICE
+	tbs_history_powermeter_t his_dev;
+#endif
+
+	memcpy((u8*)&his_dev,&_data_struct[6],DATA_HISTORY_SIZE);
+
+	tbs_history_store((u8*)&his_dev,DATA_HISTORY_SIZE);
+
+	P_PRINTFHEX_A(FLA,his_dev,DATA_HISTORY_SIZE,"STORE|[%d]%d:",his_dev.data.index,his_dev.timetamp);
+}
+
 /******************************************************************************/
 /******************************************************************************/
 /***                      Processing functions 					             **/
 /******************************************************************************/
 /******************************************************************************/
-
 void TBS_History_Init(void){
 	//clear G_HISTORY
 	_CLEAR_G_HISTORY();
-	TBS_history_createSample();
-//	for(u8 i=0;i<8;i++){
-//		fl_adv_sendFIFO_add(tbs_history_create_pack(G_HISTORY_CONTAINER[i].data));
-//	}
+//	TBS_history_createSample();
+	tbs_history_flash_init();
 }
 
-void TBS_History_Run(void){
-//	static u8 add_his_slot = 0;
-//	fl_adv_sendFIFO_add(tbs_history_create_pack(G_HISTORY_CONTAINER[add_his_slot].data));
-//	add_his_slot++;
-//	if(add_his_slot>=NUM_HISTORY){
-//		add_his_slot = 0;
-//	}
+void TBS_History_Proc(void){
 	TBS_History_LoadFromFlash();
 }
 #endif

@@ -85,7 +85,7 @@ tbs_device_powermeter_t G_POWER_METER;
 //flag debug of the network
 volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into end-point byte (dbg :1bit)
 volatile u8 NWK_REPEAT_MODE = 0; // 1: level | 0 : non-level
-volatile u8  NWK_REPEAT_LEVEL = 2;
+volatile u8  NWK_REPEAT_LEVEL = 3;
 /******************************************************************************/
 /******************************************************************************/
 /***                           Private definitions                           **/
@@ -150,17 +150,18 @@ int _nwk_slave_backup(void){
 	if(crc32 != pre_crc32){
 		pre_crc32 = crc32;
 		fl_db_slaveprofile_save(G_INFORMATION.profile);
-		LOGA(INF,"** MAC     :%02X%02X%02X%02X%02X%02X\r\n",G_INFORMATION.mac[0],G_INFORMATION.mac[1],G_INFORMATION.mac[2],
+		LOGA(FLA,"** MAC     :%02X%02X%02X%02X%02X%02X\r\n",G_INFORMATION.mac[0],G_INFORMATION.mac[1],G_INFORMATION.mac[2],
 				G_INFORMATION.mac[3],G_INFORMATION.mac[4],G_INFORMATION.mac[5]);
-		LOGA(INF,"** SlaveID :%d\r\n",G_INFORMATION.slaveID.id_u8);
-		LOGA(INF,"** grpID   :%d\r\n",G_INFORMATION.slaveID.grpID);
-		LOGA(INF,"** memID   :%d\r\n",G_INFORMATION.slaveID.memID);
-		LOGA(INF,"** JoinNWK :%d\r\n",G_INFORMATION.profile.run_stt.join_nwk);
-		LOGA(INF,"** RstFac  :%d\r\n",G_INFORMATION.profile.run_stt.rst_factory);
-		LOGA(INF,"** Channels:%d |%d |%d\r\n",G_INFORMATION.profile.nwk.chn[0],G_INFORMATION.profile.nwk.chn[1],G_INFORMATION.profile.nwk.chn[2])
+		LOGA(FLA,"** SlaveID :%d\r\n",G_INFORMATION.slaveID.id_u8);
+		LOGA(FLA,"** grpID   :%d\r\n",G_INFORMATION.slaveID.grpID);
+		LOGA(FLA,"** memID   :%d\r\n",G_INFORMATION.slaveID.memID);
+		LOGA(FLA,"** JoinNWK :%d\r\n",G_INFORMATION.profile.run_stt.join_nwk);
+		LOGA(FLA,"** RstFac  :%d\r\n",G_INFORMATION.profile.run_stt.rst_factory);
+		LOGA(FLA,"** Channels:%d |%d |%d\r\n",G_INFORMATION.profile.nwk.chn[0],G_INFORMATION.profile.nwk.chn[1],G_INFORMATION.profile.nwk.chn[2])
 		LOGA(FLA,"** NWK Key :%s(%02X%02X)\r\n",(G_INFORMATION.profile.nwk.private_key[0] != 0xFF && G_INFORMATION.profile.nwk.private_key[1] != 0xFF )?"*****":"NULL",
 				G_INFORMATION.profile.nwk.private_key[0],G_INFORMATION.profile.nwk.private_key[1]);
-
+		LOGA(FLA,"** MAC GW :%02X%02X%02X%02X\r\n",U32_BYTE0( G_INFORMATION.profile.nwk.mac_parent),U32_BYTE1( G_INFORMATION.profile.nwk.mac_parent),
+				U32_BYTE2( G_INFORMATION.profile.nwk.mac_parent),U32_BYTE3( G_INFORMATION.profile.nwk.mac_parent));
 //		LOGA(INF,"** Key     :0x%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X\r\n",
 //				G_INFORMATION.profile.nwk.private_key[0],G_INFORMATION.profile.nwk.private_key[1],G_INFORMATION.profile.nwk.private_key[2],G_INFORMATION.profile.nwk.private_key[3],
 //				G_INFORMATION.profile.nwk.private_key[4],G_INFORMATION.profile.nwk.private_key[5],G_INFORMATION.profile.nwk.private_key[6],G_INFORMATION.profile.nwk.private_key[7],
@@ -216,7 +217,8 @@ void fl_nwk_slave_init(void) {
 	LOGA(INF,"** memID  :%d\r\n",G_INFORMATION.slaveID.memID);
 	LOGA(INF,"** JoinNWK:%d\r\n",G_INFORMATION.profile.run_stt.join_nwk);
 	LOGA(INF,"** RstFac :%d\r\n",G_INFORMATION.profile.run_stt.rst_factory);
-
+	LOGA(INF,"** MAC GW :%02X%02X%02X%02X\r\n",U32_BYTE0( G_INFORMATION.profile.nwk.mac_parent),U32_BYTE1( G_INFORMATION.profile.nwk.mac_parent),
+			U32_BYTE2( G_INFORMATION.profile.nwk.mac_parent),U32_BYTE3( G_INFORMATION.profile.nwk.mac_parent));
 	//test
 	if(G_INFORMATION.slaveID.id_u8 == G_INFORMATION.profile.slaveid && G_INFORMATION.slaveID.id_u8 == 0xFF){
 		ERR(APP,"Turn on install mode\r\n");
@@ -230,7 +232,7 @@ void fl_nwk_slave_init(void) {
 	blt_soft_timer_add(fl_nwk_slave_reconnect,RECONNECT_TIME);//s -> send information online to master
 
 	//inform to master
-	blt_soft_timer_add(&_informMaster,INFORM_MASTER);
+//	blt_soft_timer_add(&_informMaster,INFORM_MASTER);
 
 	G_INFORMATION.active = false;
 	//test random send req
@@ -277,7 +279,7 @@ void _nwk_slave_syncFromPack(fl_dataframe_format_t *packet){
 
 s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry) {
 	//register timeout cb
-	if (_cb != 0 &&( _timeout_ms*1000 >= 2*QUEUQ_REQcRSP_INTERVAL || _timeout_ms==0)) {
+	if (_cb != 0 && ( _timeout_ms*1000 >= 2*QUEUQ_REQcRSP_INTERVAL || _timeout_ms==0)) {
 		u32 seq_timetamp=fl_req_slave_packet_createNsend(_cmdid,_data,_len);
 		if(seq_timetamp){
 			return fl_queueREQcRSP_add(G_INFORMATION.slaveID.id_u8,_cmdid,seq_timetamp,_data,_len,&_cb,_timeout_ms,_retry);
