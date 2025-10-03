@@ -138,12 +138,12 @@ void Counter_LCD_MessageStore(void){
 	static u32 crc32 = 0;
 	u32 crc32_curr = fl_db_crc32((u8*)G_COUNTER_LCD,SIZEU8(G_COUNTER_LCD[0])*COUNTER_LCD_MESS_MAX);
 	if (crc32 != crc32_curr) {
-//		LOGA(PERI,"========================\r\n");
-//		for (u8 i = 0; i < COUNTER_LCD_MESS_MAX; i++) {
-//			if (G_COUNTER_LCD[i][0] != 0xFF)
-//				LOGA(PERI,"0x%02X[%d]%s\r\n",G_COUNTER_LCD[i][LCD_MESSAGE_SIZE-1],i,(char* )G_COUNTER_LCD[i]);
-//		}
-//		LOGA(PERI,"========================\r\n");
+		LOGA(PERI,"========================\r\n");
+		for (u8 i = 0; i < COUNTER_LCD_MESS_MAX; i++) {
+			if (G_COUNTER_LCD[i][0] != 0xFF)
+				LOGA(PERI,"0x%02X[%d]%s\r\n",G_COUNTER_LCD[i][LCD_MESSAGE_SIZE-1],i,(char* )G_COUNTER_LCD[i]);
+		}
+		LOGA(PERI,"========================\r\n");
 		crc32=crc32_curr;
 		//Store message
 		fl_db_slavesettings_save((u8*)G_COUNTER_LCD,SIZEU8(G_COUNTER_LCD[0])*COUNTER_LCD_MESS_MAX);
