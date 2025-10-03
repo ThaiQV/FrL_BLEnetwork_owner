@@ -164,7 +164,7 @@ void my_timeout_callback(uint8_t row) {
 			continue;
 
 		case LCD_PRINT_MESS:
-			lcd_ctx.print_type = LCD_PRINT_NONE;
+			lcd_ctx.print_type = LCD_PRINT_OFF;
 			lcd_ctx.print_mode = 0;
 			continue;
 		
@@ -371,7 +371,8 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 
 				if(lcd_ctx.row1_mess_num == COUNTER_LCD_MESS_MAX)
 				{
-					lcd_app_set_message(&app_handle, 0, "               ", 15000);
+					lcd_app_set_message(&app_handle, 0, "               ", 1);
+					lcd_app_set_message(&app_handle, 1, "               ", 1);
 					break;
 				}
 
@@ -579,11 +580,15 @@ static void LCD_MessageCheck_FlagNew(void){
 		tbs_counter_lcd_t *mess_lcd = (tbs_counter_lcd_t *)&G_COUNTER_LCD[var][0];
 		if(mess_lcd->f_new == 1)
 		{
-			lcd_ctx.row1_mess_num = var;
-			ULOGA("lcd_ctx.row0_mess_num %d\n", lcd_ctx.row1_mess_num);
-			lcd_ctx.time_off = get_system_time_ms() + LCD_TIME_DELAY_PRINT;
-			EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_MESS_NEW, EVENT_PRIORITY_HIGH);
-			mess_lcd->f_new = 0;
+			if(memcmp(mess_zero, (uint8_t *)G_COUNTER_LCD[var], 20) != 0)
+			{
+				lcd_ctx.row1_mess_num = var;
+				ULOGA("lcd_ctx.row0_mess_num %d\n", lcd_ctx.row1_mess_num);
+				lcd_ctx.time_off = get_system_time_ms() + LCD_TIME_DELAY_PRINT;
+				EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_MESS_NEW, EVENT_PRIORITY_HIGH);
+				mess_lcd->f_new = 0;
+			}
+			
 		}
 	}
 }
