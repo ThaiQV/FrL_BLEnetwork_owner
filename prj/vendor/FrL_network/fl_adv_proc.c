@@ -166,22 +166,6 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 			{
 				//after controller is set to scan state, it will report all the adv packet it received by this event
 				event_adv_report_t *pa = (event_adv_report_t *) p;
-
-//				//For testing
-//=============================================================
-//				PLOG_Start(ALL);
-//				s8 rssi = (s8) pa->data[pa->len];
-//				u8 HDR[4] ={'5','5','A','B'};
-//				s8 AAHDR = plog_IndexOf(pa->data,HDR,SIZEU8(HDR),pa->len);
-//				if (rssi > -50 && pa->len > 18 ) {
-//					LOGA(BLE,"ADV rec:rssi(%d)-55aa:(%d)!!!\r\n",rssi,AAHDR);
-//					P_PRINTFHEX_A(BLE,pa->data,pa->len+1,"DATA:");
-//					return 0 ;
-////				u32 test_adv_cnt = MAKE_U32(pa->data[3],pa->data[2],pa->data[1],pa->data[0]);
-////				LOGA(BLE,"ADV rec:%d!!!\r\n",test_adv_cnt);
-//				}
-//				return 0;
-//=============================================================
 				fl_pack_t incomming_data;
 				incomming_data.length = pa->len + 1; //add rssi byte
 				//memcpy(incomming_data.data_arr,pa->data,incomming_data.length);
@@ -196,7 +180,7 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 					if (-1 != plog_IndexOf(delete_network,MASTER_CLEARNETWORK,SIZEU8(MASTER_CLEARNETWORK),incomming_data.length)) {
 						extern int REBOOT_DEV(void);
 						ERR(APP,"DETELE NETWORK!!!!\r\n");
-						fl_db_clearAll();
+						fl_db_Pairing_Clear();
 						delay_ms(1000);
 						REBOOT_DEV();
 					}

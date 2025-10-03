@@ -148,7 +148,8 @@ void TBS_history_createSample(void) {
 						.pre_pass_product = 7,
 						.pre_err_product=8,
 						.pre_mode =0,
-						.pre_timetamp =0
+						.pre_timetamp =0,
+						.pre_timetamp = 1758639600 + ((i!=0)?i-1:0)*60
 						}
 		};
 		u8 *dst = sample_history_database[i];

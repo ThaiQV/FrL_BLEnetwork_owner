@@ -523,6 +523,7 @@ void fl_db_clearAll(void){
 	flash_erase_sector(ADDR_SLAVE_PROFILE_START);
 	flash_erase_sector(ADDR_SLAVE_SETTINGS_START);
 	flash_erase_sector(ADDR_SLAVE_USERDATA_START);
+	flash_erase_sector(ADDR_USERAREA_END - SECTOR_FLASH_SIZE);
 #endif
 }
 /******************************************************************************/
