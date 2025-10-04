@@ -176,7 +176,7 @@ void blt_soft_timer_process(int type) {
 
 	u32 now = clock_time();
 	if (!blt_timer.currentNum) {
-		//bls_pm_setAppWakeupLowPower(0,0);  //disable
+		bls_pm_setAppWakeupLowPower(0,0);  //disable
 		return;
 	}
 
@@ -217,12 +217,12 @@ void blt_soft_timer_process(int type) {
 			bls_pm_setAppWakeupLowPower(blt_timer.timer[0].t,1);
 		} else {
 			//ERR(DRV,"blt>soft-timer :disable\r\n");
-			//bls_pm_setAppWakeupLowPower(0,0);  //disable
+			bls_pm_setAppWakeupLowPower(0,0);  //disable
 		}
 
 	} else {
 		ERR(DRV,"blt>soft-timer :disable\r\n");
-		//bls_pm_setAppWakeupLowPower(0,0);  //disable
+		bls_pm_setAppWakeupLowPower(0,0);  //disable
 	}
 
 }

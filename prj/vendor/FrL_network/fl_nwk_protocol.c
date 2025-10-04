@@ -503,7 +503,7 @@ void _ping_rsp_callback(void *_data,void* _data2){
 		P_INFO("Request timed out.\r\n");
 	}
 
-	if(G_NWK_PING.times) blt_soft_timer_restart(ping_process,10*1000);
+	if(G_NWK_PING.times) blt_soft_timer_restart(ping_process,19*1031);
 	else{
 		if (G_NWK_PING.rslt.sent ==(G_NWK_PING.rslt.lost+G_NWK_PING.rslt.received)) {
 			P_INFO("Ping statistics for 0x%02X%02X%02X%02X%02X%02X: ",G_NWK_PING.mac[0],G_NWK_PING.mac[1],G_NWK_PING.mac[2],G_NWK_PING.mac[3],
@@ -515,7 +515,7 @@ void _ping_rsp_callback(void *_data,void* _data2){
 
 int ping_process(void){
 	G_NWK_PING.rslt.sent++;
-	fl_api_master_req(G_NWK_PING.mac,NWK_HDR_22_PING,G_NWK_PING.mac,SIZEU8(G_NWK_PING.mac),_ping_rsp_callback,0,0);
+	fl_api_master_req(G_NWK_PING.mac,NWK_HDR_22_PING,G_NWK_PING.mac,SIZEU8(G_NWK_PING.mac),_ping_rsp_callback,0,1);
 	if(G_NWK_PING.times>0){
 		G_NWK_PING.times--;
 	}
@@ -561,7 +561,7 @@ void CMD_PING(u8* _data) {
 
 	LOGA(DRV,"MAC:0x%02X%02X%02X%02X%02X%02X, times:%d\r\n",G_NWK_PING.mac[0],G_NWK_PING.mac[1],G_NWK_PING.mac[2],G_NWK_PING.mac[3],G_NWK_PING.mac[4],G_NWK_PING.mac[5],value);
 	P_INFO("Ping 0x%02X%02X%02X%02X%02X%02X with 22 bytes of data:\r\n",G_NWK_PING.mac[0],G_NWK_PING.mac[1],G_NWK_PING.mac[2],G_NWK_PING.mac[3],G_NWK_PING.mac[4],G_NWK_PING.mac[5]);
- 	blt_soft_timer_restart(ping_process,10*1000);
+ 	blt_soft_timer_restart(ping_process,22*1003);
 }
 
 /********************* Functions GET CMD ********************/

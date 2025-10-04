@@ -103,8 +103,8 @@ s8 fl_queueREQcRSP_add(u8 slaveid,u8 cmdid,u32 _SeqTimetamp,u8* _payloadreq,u8 _
 		LOGA(API,"queueREQcRSP Add [%d]SeqTimetamp(%u):%d ms|retry: %d \r\n",avai_slot,_SeqTimetamp,_timeout_ms,_retry);
 		//check fl_queue_REQnRSP_TimeoutStart running
 		if (blt_soft_timer_find(&fl_queue_REQnRSP_TimeoutStart) == -1) {
-			LOGA(INF,"REQcRSP RE-Initialization (%d ms)!!\r\n",QUEUQ_REQcRSP_INTERVAL);
-			blt_soft_timer_add(&fl_queue_REQnRSP_TimeoutStart,QUEUQ_REQcRSP_INTERVAL);
+			ERR(INF,"REQcRSP RE-Initialization (%d us)!!\r\n",QUEUQ_REQcRSP_INTERVAL);
+			blt_soft_timer_restart(&fl_queue_REQnRSP_TimeoutStart,QUEUQ_REQcRSP_INTERVAL);
 		}
 		return avai_slot;
 	}
@@ -153,6 +153,7 @@ int fl_queue_REQnRSP_TimeoutStart(void){
 //							}
 							G_QUEUE_REQ_CALL_RSP[i].timeout = G_QUEUE_REQ_CALL_RSP[i].timeout_set; //refesh timeout for next retry;
 							G_QUEUE_REQ_CALL_RSP[i].retry --;
+							continue;
 						}
 #else
 //						if(-1!=fl_api_slave_req(REQ_BUF.rsp_check.hdr_cmdid,REQ_BUF.req_payload.payload,REQ_BUF.req_payload.len,

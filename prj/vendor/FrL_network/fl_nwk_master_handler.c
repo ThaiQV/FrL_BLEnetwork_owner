@@ -542,9 +542,10 @@ u32 fl_req_master_packet_createNsend(u8* _slave_mac,u8 _cmdid,u8* _data, u8 _len
 		return 0;
 	}
 	fl_send_heartbeat();
+	delay_ms(5);
 	//generate seqtimetamp
 	fl_timetamp_withstep_t timetampStep = fl_rtc_getWithMilliStep();
-	timetampStep.milstep++;
+//	timetampStep.milstep++;
 	fl_data_frame_u req_pack;
 	/*Create common packet */
 	req_pack.frame.hdr = cmdid;
