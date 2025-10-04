@@ -462,6 +462,20 @@ void CMD_CHANNELCONFIG(u8* _data) {
 	}
 	ERR(DRV,"ERR Channels setting (%d)\r\n",rslt);
 }
+
+/***************************************************
+ * @brief 		:Ping cmd
+ *
+ * @param[in] 	:none
+ *
+ * @return	  	:
+ *
+ ***************************************************/
+typedef struct {
+	u8 mac[6];
+	u16 times;
+} fl_nkw_ping_t;
+fl_nkw_ping_t G_NWK_PING;
 uint16_t parse_u16(const char* str) {
     uint16_t result = 0;
     while (*str) {
@@ -472,7 +486,7 @@ uint16_t parse_u16(const char* str) {
     return result;
 }
 
-
+int ping_process(void);
 void _ping_rsp_callback(void *_data,void* _data2){
 	fl_rsp_container_t *data =  (fl_rsp_container_t*)_data;
 	LOGA(API,"Timeout:%d\r\n",data->timeout);
@@ -483,15 +497,23 @@ void _ping_rsp_callback(void *_data,void* _data2){
 		fl_pack_t *packet = (fl_pack_t *)_data2;
 		P_PRINTFHEX_A(API,packet->data_arr,packet->length,"RSP: ");
 	}
+	if(G_NWK_PING.times) blt_soft_timer_restart(ping_process,10*1000);
 }
 
+int ping_process(void){
+	fl_api_master_req(G_NWK_PING.mac,NWK_HDR_22_PING,G_NWK_PING.mac,SIZEU8(G_NWK_PING.mac),_ping_rsp_callback,0,0);
+	if(G_NWK_PING.times>0){
+		G_NWK_PING.times--;
+	}
+	return -1;
+}
 void CMD_PING(u8* _data) {
 	char mac_str[13]; //
 	uint8_t mac[6];
-	char value_str[6]; //
-	//
-	int rslt = sscanf((char*) _data,"ping %12s %5s",mac_str,value_str);
-	if (rslt != 2) {
+	u16 value=0 ;//
+	////p set ping 803948775fd8 3
+	int rslt = sscanf((char*) _data,"ping %12s %hd",mac_str,&value);
+	if (rslt < 1) {
 		return;
 	}
 	for (int i = 0; i < 12; ++i) {
@@ -516,12 +538,14 @@ void CMD_PING(u8* _data) {
 		}
 		mac[i] = byte;
 	}
-	//p set ping 803948775fd8 3
-	uint16_t value = parse_u16(value_str);
-	LOGA(DRV,"MAC:0x%02X%02X%02X%02X%02X%02X, times:%d\r\n",mac[0],mac[1],mac[2],mac[3],mac[4],mac[5],value);
-	fl_api_master_req(mac,NWK_HDR_22_PING,mac,SIZEU8(mac),_ping_rsp_callback,0,0);
 
+	G_NWK_PING.times = value;
+	memcpy(G_NWK_PING.mac,mac,SIZEU8(mac));
+
+	LOGA(DRV,"MAC:0x%02X%02X%02X%02X%02X%02X, times:%d\r\n",G_NWK_PING.mac[0],G_NWK_PING.mac[1],G_NWK_PING.mac[2],G_NWK_PING.mac[3],G_NWK_PING.mac[4],G_NWK_PING.mac[5],value);
+	blt_soft_timer_restart(ping_process,10*1000);
 }
+
 /********************* Functions GET CMD ********************/
 void CMD_GETSLALIST(u8* _data) {
 	fl_nodeinnetwork_t _node;
