@@ -476,15 +476,16 @@ typedef struct {
 	u16 times;
 } fl_nkw_ping_t;
 fl_nkw_ping_t G_NWK_PING;
-uint16_t parse_u16(const char* str) {
-    uint16_t result = 0;
-    while (*str) {
-        if (*str < '0' || *str > '9') return 0; // lỗi nếu không phải số
-        result = result * 10 + (*str - '0');
-        str++;
-    }
-    return result;
-}
+//
+//uint16_t parse_u16(const char* str) {
+//    uint16_t result = 0;
+//    while (*str) {
+//        if (*str < '0' || *str > '9') return 0;
+//        result = result * 10 + (*str - '0');
+//        str++;
+//    }
+//    return result;
+//}
 
 int ping_process(void);
 void _ping_rsp_callback(void *_data,void* _data2){
@@ -543,7 +544,7 @@ void CMD_PING(u8* _data) {
 	memcpy(G_NWK_PING.mac,mac,SIZEU8(mac));
 
 	LOGA(DRV,"MAC:0x%02X%02X%02X%02X%02X%02X, times:%d\r\n",G_NWK_PING.mac[0],G_NWK_PING.mac[1],G_NWK_PING.mac[2],G_NWK_PING.mac[3],G_NWK_PING.mac[4],G_NWK_PING.mac[5],value);
-	blt_soft_timer_restart(ping_process,10*1000);
+ 	blt_soft_timer_restart(ping_process,10*1000);
 }
 
 /********************* Functions GET CMD ********************/
