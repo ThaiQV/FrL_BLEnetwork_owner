@@ -168,7 +168,7 @@ void FLASH_Port_Init(void)
  */
 uint8_t SPI1_ReadWriteByte(uint8_t TxData)
 {
-
+	return 0;
 }
 
 /*******************************************************************************

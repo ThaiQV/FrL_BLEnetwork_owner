@@ -20,7 +20,7 @@
 typedef void (*fl_rsp_callback_fnc)(void*, void*);
 
 #define QUEUE_RSP_SLOT_MAX			16
-#define QUEUQ_REQcRSP_INTERVAL  	20*1000 //ms
+#define QUEUQ_REQcRSP_INTERVAL  	21*1021 //ms
 
 #define RAND(min, max)				((rand() % ((max) - (min) + 1)) + (min))
 #define RAND_INT(min, max)  		((rand() % ((min) + (max) + 1)) - (min))

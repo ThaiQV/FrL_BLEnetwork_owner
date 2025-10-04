@@ -414,3 +414,4 @@ void PLOG_Start(type_debug_t _type);
 void PLOG_HELP(void);
 void PLOG_DEVICE_PROFILE(fl_version_t _bootloader, fl_version_t _fw, fl_version_t _hw);
 void PLOG_RegisterCbk(FncPassing _fnc);
+u16 PLOG_GETSTATE(void);

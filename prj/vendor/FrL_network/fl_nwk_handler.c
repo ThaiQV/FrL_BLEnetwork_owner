@@ -17,7 +17,8 @@
 /***                                Global Parameters                        **/
 /******************************************************************************/
 /******************************************************************************/
-
+void fl_queue_REQnRSP_TimeoutInit(void);
+int fl_queue_REQnRSP_TimeoutStart(void);
 /***************************************************
  * @brief 		: API for user send req and receive rsp
  *
@@ -100,6 +101,11 @@ s8 fl_queueREQcRSP_add(u8 slaveid,u8 cmdid,u32 _SeqTimetamp,u8* _payloadreq,u8 _
 		G_QUEUE_REQ_CALL_RSP[avai_slot].req_payload.len = _len;
 		memcpy(G_QUEUE_REQ_CALL_RSP[avai_slot].req_payload.payload,_payloadreq,_len);
 		LOGA(API,"queueREQcRSP Add [%d]SeqTimetamp(%u):%d ms|retry: %d \r\n",avai_slot,_SeqTimetamp,_timeout_ms,_retry);
+		//check fl_queue_REQnRSP_TimeoutStart running
+		if (blt_soft_timer_find(&fl_queue_REQnRSP_TimeoutStart) == -1) {
+			LOGA(INF,"REQcRSP RE-Initialization (%d ms)!!\r\n",QUEUQ_REQcRSP_INTERVAL);
+			blt_soft_timer_add(&fl_queue_REQnRSP_TimeoutStart,QUEUQ_REQcRSP_INTERVAL);
+		}
 		return avai_slot;
 	}
 	ERR(API,"queueREQcRSP Add [%d]SeqTimetamp(%u):%d ms|retry: %d \r\n",avai_slot,_SeqTimetamp,_timeout_ms,_retry);

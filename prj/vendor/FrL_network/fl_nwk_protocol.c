@@ -474,18 +474,13 @@ void CMD_CHANNELCONFIG(u8* _data) {
 typedef struct {
 	u8 mac[6];
 	u16 times;
+	struct {
+		u8 sent;
+		u8 received;
+		u8 lost;
+	} rslt;
 } fl_nkw_ping_t;
 fl_nkw_ping_t G_NWK_PING;
-//
-//uint16_t parse_u16(const char* str) {
-//    uint16_t result = 0;
-//    while (*str) {
-//        if (*str < '0' || *str > '9') return 0;
-//        result = result * 10 + (*str - '0');
-//        str++;
-//    }
-//    return result;
-//}
 
 int ping_process(void);
 void _ping_rsp_callback(void *_data,void* _data2){
@@ -493,15 +488,33 @@ void _ping_rsp_callback(void *_data,void* _data2){
 	LOGA(API,"Timeout:%d\r\n",data->timeout);
 	LOGA(API,"cmdID  :%0X\r\n",data->rsp_check.hdr_cmdid);
 	LOGA(API,"SlaveID:%0X\r\n",data->rsp_check.slaveID);
+	u32 rtt= 0;
 	//rsp data
-	if(data->timeout >= 0){
+	if(data->timeout > 0){
+		G_NWK_PING.rslt.received++;
 		fl_pack_t *packet = (fl_pack_t *)_data2;
 		P_PRINTFHEX_A(API,packet->data_arr,packet->length,"RSP: ");
+		rtt = (data->timeout_set - data->timeout)/1000;
+		P_INFO("Reply from 0x%02X%02X%02X%02X%02X%02X: bytes=22 time=%dms\r\n",G_NWK_PING.mac[0],G_NWK_PING.mac[1],
+				G_NWK_PING.mac[2],G_NWK_PING.mac[3],G_NWK_PING.mac[4],G_NWK_PING.mac[5],rtt);
 	}
+	else {
+		G_NWK_PING.rslt.lost++;
+		P_INFO("Request timed out.\r\n");
+	}
+
 	if(G_NWK_PING.times) blt_soft_timer_restart(ping_process,10*1000);
+	else{
+		if (G_NWK_PING.rslt.sent ==(G_NWK_PING.rslt.lost+G_NWK_PING.rslt.received)) {
+			P_INFO("Ping statistics for 0x%02X%02X%02X%02X%02X%02X: ",G_NWK_PING.mac[0],G_NWK_PING.mac[1],G_NWK_PING.mac[2],G_NWK_PING.mac[3],
+					G_NWK_PING.mac[4],G_NWK_PING.mac[5]);
+			P_INFO("Packets: Sent = %d,Rec = %d,Lost = %d\r\n",G_NWK_PING.rslt.sent,G_NWK_PING.rslt.received,G_NWK_PING.rslt.lost);
+		}
+	}
 }
 
 int ping_process(void){
+	G_NWK_PING.rslt.sent++;
 	fl_api_master_req(G_NWK_PING.mac,NWK_HDR_22_PING,G_NWK_PING.mac,SIZEU8(G_NWK_PING.mac),_ping_rsp_callback,0,0);
 	if(G_NWK_PING.times>0){
 		G_NWK_PING.times--;
@@ -540,10 +553,14 @@ void CMD_PING(u8* _data) {
 		mac[i] = byte;
 	}
 
-	G_NWK_PING.times = value;
+	G_NWK_PING.times = (value==0?4:value);
+	G_NWK_PING.rslt.sent = 0;
+	G_NWK_PING.rslt.received = 0;
+	G_NWK_PING.rslt.lost = 0;
 	memcpy(G_NWK_PING.mac,mac,SIZEU8(mac));
 
 	LOGA(DRV,"MAC:0x%02X%02X%02X%02X%02X%02X, times:%d\r\n",G_NWK_PING.mac[0],G_NWK_PING.mac[1],G_NWK_PING.mac[2],G_NWK_PING.mac[3],G_NWK_PING.mac[4],G_NWK_PING.mac[5],value);
+	P_INFO("Ping 0x%02X%02X%02X%02X%02X%02X with 22 bytes of data:\r\n",G_NWK_PING.mac[0],G_NWK_PING.mac[1],G_NWK_PING.mac[2],G_NWK_PING.mac[3],G_NWK_PING.mac[4],G_NWK_PING.mac[5]);
  	blt_soft_timer_restart(ping_process,10*1000);
 }
 

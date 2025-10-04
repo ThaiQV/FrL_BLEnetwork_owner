@@ -156,7 +156,7 @@ void storage_map_fill_status(uint32_t index, uint32_t len)
 	// Set status of previous sector is written
 	if(sector > 0)
 	{
-		if((map[(sector/8)] && (0x01 << ((sector%8) - 1))) == 0x00)
+		if((map[(sector/8)] & (0x01 << ((sector%8) - 1))) == 0x00)
 		{
 			map[(sector/8)] |= (0x01 << ((sector%8) - 1));
 			nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));

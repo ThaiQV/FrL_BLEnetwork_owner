@@ -40,6 +40,7 @@ typedef struct {
 //	void (*Cbk_fnc)(bool,type_debug_t);
 	void (*Cbk_fnc)(type_debug_t, void * arg);
 } plog_cmd_t;
+
 volatile uint16_t FmDebug = PL_ALL;
 
 const plog_cmd_t plog_cmd[] = {
@@ -91,6 +92,9 @@ bool bool_dbg_fnc(char *_input) {
 		return true;
 //	else if(strncmp(_input,"off",3) == 0)
 	return false;
+}
+u16 PLOG_GETSTATE(void){
+	return FmDebug;
 }
 /******************************************************************************/
 /******************************************************************************/
