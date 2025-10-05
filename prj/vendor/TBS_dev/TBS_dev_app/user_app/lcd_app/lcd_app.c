@@ -31,6 +31,7 @@ typedef enum {
 	LCD_PRINT_FACTORY_RESET,
 	LCD_PRINT_CALL_FAIL,
 	LCD_PRINT_MESS_NEW,
+	LCD_PRINT_REMOVE_GW,
 } lcd_print_type_t;
 
 // SubApp context structure
@@ -200,7 +201,6 @@ void my_timeout_callback(uint8_t row) {
 			lcd_ctx.print_type = LCD_PRINT_OFF;
 			lcd_app_clear_all(&app_handle);
 			lcd_off();
-//			fl_db_clearAll();
 			fl_db_Pairing_Clear();
 			sys_reboot();
 			break;
@@ -210,7 +210,14 @@ void my_timeout_callback(uint8_t row) {
 			lcd_app_clear_all(&app_handle);
 			lcd_off();
 			fl_db_clearAll();
-			// storage_clean();
+			sys_reboot();
+			break;
+
+		case LCD_PRINT_REMOVE_GW:
+			lcd_ctx.print_type = LCD_PRINT_OFF;
+			lcd_app_clear_all(&app_handle);
+			lcd_off();
+			
 			sys_reboot();
 			break;
 
@@ -495,6 +502,16 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 			lcd_ctx.enable = 1;
 			lcd_ctx.print_type = LCD_PRINT_FACTORY_RESET;
 			lcd_app_set_message(&app_handle, 0, " Factory Reset  ", 30000); //  0, timeout 10s
+			lcd_app_set_message(&app_handle, 1, "                ", 3000); //  0, timeout 10s		
+
+			break;
+
+		case EVENT_LCD_PRINT_REMOVE_GW:
+			ULOGA("Handler EVENT_LCD_PRINT_REMOVE_GW\n");
+
+			lcd_ctx.enable = 1;
+			lcd_ctx.print_type = LCD_PRINT_REMOVE_GW;
+			lcd_app_set_message(&app_handle, 0, " Remove From GW ", 30000); //  0, timeout 10s
 			lcd_app_set_message(&app_handle, 1, "                ", 3000); //  0, timeout 10s		
 
 			break;

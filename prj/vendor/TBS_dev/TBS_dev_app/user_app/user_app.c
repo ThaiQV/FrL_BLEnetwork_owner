@@ -385,12 +385,13 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 			EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_FACTORY_RESET, EVENT_PRIORITY_HIGH);
 
 			break;
-        case EVENT_BUTTON_RST_PPU_HOLD_5S:
-            ULOGA("Handle EVENT_BUTTON_RST_PPU_HOLD_5S\n");
-			data_ctx.mode = APP_MODE_SELEC;
-			EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_SELECT_MODE, EVENT_PRIORITY_HIGH);
 
-            break;
+		case EVENT_BUTTON_CALL_HOLD_3S:
+            ULOGA("Handle EVENT_BUTTON_CALL_HOLD_3S\n");
+			ULOGA("remove network\n");
+			EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_REMOVE_GW, EVENT_PRIORITY_HIGH);
+
+			break;
 
 		case EVENT_BUTTON_ENDCALL_HOLD_5S:
             ULOGA("Handle EVENT_BUTTON_ENDCALL_HOLD_5S\n");
