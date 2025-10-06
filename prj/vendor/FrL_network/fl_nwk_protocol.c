@@ -12,6 +12,7 @@
 #include "fl_nwk_protocol.h"
 #include "fl_nwk_database.h"
 #include "fl_nwk_handler.h"
+#include "fl_ble_wifi.h"
 #include <ctype.h>
 
 /******************************************************************************/
@@ -506,9 +507,16 @@ void _ping_rsp_callback(void *_data,void* _data2){
 	if(G_NWK_PING.times) blt_soft_timer_restart(ping_process,19*1031);
 	else{
 		if (G_NWK_PING.rslt.sent ==(G_NWK_PING.rslt.lost+G_NWK_PING.rslt.received)) {
-			P_INFO("Ping statistics for 0x%02X%02X%02X%02X%02X%02X: ",G_NWK_PING.mac[0],G_NWK_PING.mac[1],G_NWK_PING.mac[2],G_NWK_PING.mac[3],
-					G_NWK_PING.mac[4],G_NWK_PING.mac[5]);
-			P_INFO("Packets: Sent = %d,Rec = %d,Lost = %d\r\n",G_NWK_PING.rslt.sent,G_NWK_PING.rslt.received,G_NWK_PING.rslt.lost);
+			u8 mqtt_debug[72];
+			memset(mqtt_debug,0,SIZEU8(mqtt_debug));
+			sprintf((char*)mqtt_debug,"Ping statistics for 0x%02X%02X%02X%02X%02X%02X: \r\n"
+					"Packets: Sent = %d,Rec = %d,Lost = %d\r\n",G_NWK_PING.mac[0],G_NWK_PING.mac[1],G_NWK_PING.mac[2],G_NWK_PING.mac[3],
+					G_NWK_PING.mac[4],G_NWK_PING.mac[5],G_NWK_PING.rslt.sent,G_NWK_PING.rslt.received,G_NWK_PING.rslt.lost);
+//			P_INFO("Ping statistics for 0x%02X%02X%02X%02X%02X%02X: ",G_NWK_PING.mac[0],G_NWK_PING.mac[1],G_NWK_PING.mac[2],G_NWK_PING.mac[3],
+//					G_NWK_PING.mac[4],G_NWK_PING.mac[5]);
+//			P_INFO("Packets: Sent = %d,Rec = %d,Lost = %d\r\n",G_NWK_PING.rslt.sent,G_NWK_PING.rslt.received,G_NWK_PING.rslt.lost);
+			P_INFO("%s",mqtt_debug);
+			fl_ble2wifi_DEBUG2MQTT(mqtt_debug,strlen((char*)mqtt_debug));
 		}
 	}
 }
@@ -561,7 +569,8 @@ void CMD_PING(u8* _data) {
 
 	LOGA(DRV,"MAC:0x%02X%02X%02X%02X%02X%02X, times:%d\r\n",G_NWK_PING.mac[0],G_NWK_PING.mac[1],G_NWK_PING.mac[2],G_NWK_PING.mac[3],G_NWK_PING.mac[4],G_NWK_PING.mac[5],value);
 	P_INFO("Ping 0x%02X%02X%02X%02X%02X%02X with 22 bytes of data:\r\n",G_NWK_PING.mac[0],G_NWK_PING.mac[1],G_NWK_PING.mac[2],G_NWK_PING.mac[3],G_NWK_PING.mac[4],G_NWK_PING.mac[5]);
- 	blt_soft_timer_restart(ping_process,22*1003);
+
+	blt_soft_timer_restart(ping_process,22*1003);
 }
 
 /********************* Functions GET CMD ********************/

@@ -51,6 +51,7 @@ typedef enum {
 	GF_CMD_SENDMESS_RESPONSE = 0x06,
 	GF_CMD_TIMESTAMP_REQUEST = 0x08,
 	GF_CMD_TIMESTAMP_RESPONSE = 0x08,
+	GF_CMD_DEBUG_RESPONSE =0x09,
 	GF_CMD_RSTFACTORY_REQUEST = 0x0A,
 	GF_CMD_RSTFACTORY_RESPONSE = 0x0A,
 	GF_CMD_RSTPWMETER_REQUEST = 0x0D,
@@ -555,7 +556,16 @@ void fl_ble2wifi_EVENT_SEND(u8* _slave_mac){
 	memcpy(&cmd_data[1],(u8*)&wfdata,cmd_data[0]);
 	REPORT_RESPONSE(cmd_data);
 }
-
+void fl_ble2wifi_DEBUG2MQTT(u8* _payload,u8 _size){
+	fl_datawifi2ble_t wfdata;
+	wfdata.cmd = GF_CMD_DEBUG_RESPONSE;
+	memset(wfdata.data,0,SIZEU8(wfdata.data));
+	memcpy(wfdata.data,_payload,_size);
+	wfdata.len_data = _size;
+	wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
+	P_PRINTFHEX_A(MCU,wfdata,wfdata.len_data+3,"DEBUG MQTT(%d):",wfdata.len_data+3);
+	fl_ble_send_wifi((u8*)&wfdata,wfdata.len_data+3);//len_data + id_cmd + crc
+}
 void fl_wifi2ble_Excute(fl_wifi2ble_exc_e cmd) {
 	extern fl_slaves_list_t G_NODE_LIST;
 //	extern fl_adv_settings_t G_ADV_SETTINGS;
