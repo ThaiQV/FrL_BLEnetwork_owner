@@ -37,7 +37,7 @@ volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME = {.timetamp = 0,.milstep =
 u8 GETINFO_FLAG_EVENTTEST = 0;
 #define JOIN_NETWORK_TIME 			30*1000 			//ms
 #define RECHECKING_NETWOK_TIME 		30*1000 		    //ms
-#define RECONNECT_TIME				55*1000*1000		//s
+#define RECONNECT_TIME				75*1000*1000		//s
 #define INFORM_MASTER				5*1000*1000
 fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_A5_HIS,NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
 fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_A5_HIS,NWK_HDR_55,NWK_HDR_11_REACTIVE,NWK_HDR_22_PING}; // register cmdid REQ
@@ -343,7 +343,7 @@ u32 fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 			//Create packet from slave
 			req_pack.frame.endpoint.master = FL_FROM_SLAVE_ACK;
 			//tbs index manage
-			TBS_Device_Index_manage();
+			TBS_Device_Index_manage(NWK_HDR_55);
 		}
 		break;
 		case NWK_HDR_11_REACTIVE: {
@@ -386,7 +386,6 @@ u32 fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 	u32 seq_timetamp = fl_rtc_timetamp2milltampStep(timetamp_inpack);
 	//Synch original time
 	SYNC_ORIGIN_MASTER(timetamp_inpack.timetamp,timetamp_inpack.milstep);
-
 	return seq_timetamp;
 }
 /***************************************************
@@ -469,7 +468,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 					//CRC
 					packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
 					//increase index tbs
-					TBS_Device_Index_manage();
+					TBS_Device_Index_manage(NWK_HDR_F5_INFO);
 					//Restart timeout reconnect
 					blt_soft_timer_restart(fl_nwk_slave_reconnect,RECONNECT_TIME);
 				} else {

@@ -829,6 +829,8 @@ int fl_master_ProccesRSP_cbk(void) {
 				u8 node_indx = fl_master_SlaveID_find(slave_id);
 				if (node_indx != -1) {
 					if (packet.frame.endpoint.master == FL_FROM_SLAVE_ACK) {
+					//send to WIFI the previous data
+					fl_ble2wifi_EVENT_SEND(G_NODE_LIST.sla_info[node_indx].mac);
 //					G_NODE_LIST.sla_info[node_indx].active = true;
 //					G_NODE_LIST.sla_info[node_indx].timelife = (clock_time() - G_NODE_LIST.sla_info[node_indx].timelife);
 //					u32 cnt_inpack = MAKE_U32(packet.frame.payload[3],packet.frame.payload[2],packet.frame.payload[1],packet.frame.payload[0]);

@@ -364,9 +364,10 @@ int TBS_Device_Store_run(void) {
 	return 0;
 }
 
-void TBS_Device_Index_manage(void) {
+void TBS_Device_Index_manage(u8 _cmdID) {
+	ERR(FLA,"0x%02X callback (indx:%d)!!\r\n",_cmdID,G_TBS_DEVICE.data.index);
 	//todo:store to flash
-	TBS_History_StoreToFlash((u8*)&G_TBS_DEVICE);
+	TBS_History_StoreToFlash((u8*) &G_TBS_DEVICE);
 	G_TBS_DEVICE.data.index++;
 	if (G_TBS_DEVICE.data.index >= TBS_PACKET_INDEX_MAX) {
 		G_TBS_DEVICE.data.index = 0;
