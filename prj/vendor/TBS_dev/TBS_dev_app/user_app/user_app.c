@@ -214,8 +214,6 @@ static void endcall_cb_rsp(void *_data,void* _data2)
 
 static subapp_result_t data_app_init(subapp_t* self)
 {
-	g_app_data.timetamp = fl_rtc_get();
-
 	uint32_t app_data_evt_table[] = get_data_event();
 
 	for(int i = 0; i < (sizeof(app_data_evt_table)/sizeof(app_data_evt_table[0])); i++)
@@ -244,7 +242,6 @@ static subapp_result_t data_app_loop(subapp_t* self)
 		return SUBAPP_OK;
 	}
 
-	g_app_data.timetamp = fl_rtc_get();
 	g_app_data.is_online = IsOnline();
 
 	return SUBAPP_OK;
@@ -292,6 +289,7 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 			G_COUNTER_DEV.data.pre_err_product = G_COUNTER_DEV.data.err_product;
 			G_COUNTER_DEV.data.pre_pass_product = G_COUNTER_DEV.data.pass_product;
 			G_COUNTER_DEV.data.pre_mode = G_COUNTER_DEV.data.mode;
+			G_COUNTER_DEV.data.pre_timetamp = G_COUNTER_DEV.timetamp;
 			
 			g_app_data.count->pass_product = 0;
 			g_app_data.count->err_product = 0;
@@ -387,12 +385,13 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 			EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_FACTORY_RESET, EVENT_PRIORITY_HIGH);
 
 			break;
-        case EVENT_BUTTON_RST_PPU_HOLD_5S:
-            ULOGA("Handle EVENT_BUTTON_RST_PPU_HOLD_5S\n");
-			data_ctx.mode = APP_MODE_SELEC;
-			EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_SELECT_MODE, EVENT_PRIORITY_HIGH);
 
-            break;
+		case EVENT_BUTTON_CALL_HOLD_3S:
+            ULOGA("Handle EVENT_BUTTON_CALL_HOLD_3S\n");
+			ULOGA("remove network\n");
+			EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_REMOVE_GW, EVENT_PRIORITY_HIGH);
+
+			break;
 
 		case EVENT_BUTTON_ENDCALL_HOLD_5S:
             ULOGA("Handle EVENT_BUTTON_ENDCALL_HOLD_5S\n");

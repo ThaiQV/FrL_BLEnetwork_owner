@@ -18,8 +18,8 @@
  */
 
 #define BUTTON_ID_RESET			0
-#define BUTTON_ID_MAIN			1
-#define BUTTON_ID_CMAIN			2
+#define BUTTON_ID_CALL			1
+#define BUTTON_ID_ENDCALL		2
 #define BUTTON_ID_PEU			3
 #define BUTTON_ID_PED			4
 #define BUTTON_ID_PPD			5
@@ -29,14 +29,22 @@
 
 extern tca9555_handle_t tca9555_handle;
 
+typedef enum {
+	BUTTON_MODE_NORMAL,
+	BUTTON_MODE_HOLD_MASTER_COUNTER,
+} button_mode_app_t;
+
 // SubApp context structure
 typedef struct {
 	bool start;
-	uint8_t combo_rst;
+	button_mode_app_t mode;
 } button_context_t;
 
 // Static context instance
-static button_context_t button_ctx = {0};
+static button_context_t button_ctx = {
+	.start = 0,
+	.mode = BUTTON_MODE_NORMAL,
+};
 
 // Forward declarations
 static subapp_result_t button_app_init(subapp_t* self);
@@ -121,21 +129,13 @@ static uint64_t bt_MsTick_get(void)
 	return get_system_time_ms();
 }
 
-static void main_on_lick(uint8_t button_id);
-static void cmain_on_lick(uint8_t button_id);
-static void peu_on_lick(uint8_t button_id);
-static void ped_on_lick(uint8_t button_id);
-static void ppd_on_lick(uint8_t button_id);
-static void ppu_on_lick(uint8_t button_id);
-static void reset_on_lick(uint8_t button_id);
-static void reset_hold_3s(uint8_t button_id, uint32_t actual_hold_time);
-static void reset_hold_5s(uint8_t button_id, uint32_t actual_hold_time);
-static void ppu_hold_3s(uint8_t button_id, uint32_t actual_hold_time);
-//static void reset_hold_3ss(uint8_t button_id, uint32_t actual_hold_time);
+static void button_press(uint8_t button_id);
+static void button_release(uint8_t button_id, uint32_t actual_hold_time);
+static void button_on_click(uint8_t button_id);
+static void button_hold_time(uint8_t button_id, uint32_t actual_hold_time);
+//static void button_combo_hold_time(uint8_t *button_id, uint32_t actual_hold_time);
 static void peu_rst_hold_5s(uint8_t *button_ids, uint8_t count, uint32_t hold_time);
 static void ped_rst_hold_5s(uint8_t *button_ids, uint8_t count, uint32_t hold_time);
-static void ppu_rst_hold_5s(uint8_t *button_ids, uint8_t count, uint32_t hold_time);
-static void endcall_hold_5s(uint8_t button_id, uint32_t actual_hold_time);
 
 button_hal_t button_hal = {
     .button_pin_init_all = button_pin_init_all,
@@ -151,29 +151,13 @@ static subapp_result_t button_app_init(subapp_t* self)
         return SUBAPP_ERROR;
     }
 
-    // button_set_click_callback(BUTTON_ID_PED, ped_on_lick);
-    // button_set_click_callback(BUTTON_ID_PEU, peu_on_lick);
-    // button_set_click_callback(BUTTON_ID_PPD, ppd_on_lick);
-    // button_set_click_callback(BUTTON_ID_PPU, ppu_on_lick);
-    // button_set_click_callback(BUTTON_ID_MAIN, main_on_lick);
-    // button_set_click_callback(BUTTON_ID_CMAIN, cmain_on_lick);
-    // button_set_click_callback(BUTTON_ID_RESET, reset_on_lick);
-    // button_add_hold_level(BUTTON_ID_RESET, 5000, reset_hold_3s);
-	// button_add_hold_level(BUTTON_ID_CMAIN, 5000, endcall_hold_5s);
+	button_set_press_callback(BUTTON_ID_PPU, button_press);
+	button_set_release_callback(BUTTON_ID_PPU, button_release);
 	
     // // Combo:
     uint8_t combo_buttons1[] = {BUTTON_ID_PEU, BUTTON_ID_RESET};
     uint8_t combo_id1 = button_add_combo(combo_buttons1, 2, 500); // 500ms detection window
     button_set_combo_hold_callback(combo_id1, 5000, peu_rst_hold_5s);
-	button_ctx.combo_rst = combo_id1;
-
-    // uint8_t combo_buttons2[] = {BUTTON_ID_PEU, BUTTON_ID_RESET};
-    // uint8_t combo_id2 = button_add_combo(combo_buttons2, 2, 500); // 500ms detection window
-    // button_set_combo_hold_callback(combo_id2, 5000, peu_rst_hold_5s);
-
-	// uint8_t combo_buttons3[] = {BUTTON_ID_PPU, BUTTON_ID_RESET};
-    // uint8_t combo_id3 = button_add_combo(combo_buttons3, 2, 500); // 500ms detection window
-    // button_set_combo_hold_callback(combo_id3, 5000, ppu_rst_hold_5s);
 
     uint32_t app_button_evt_table[] = get_button_event();
 
@@ -219,30 +203,27 @@ static void button_app_event_handler(const event_t* event, void* user_data)
         case EVENT_DATA_START_DONE:
             ULOGA("button Handle EVENT_DATA_START_DONE\n");
             button_ctx.start = 1;
-			// button_remove_combo(button_ctx.combo_rst);
-			// button_set_combo_enabled(button_ctx.combo_rst, false);
 
-			button_set_click_callback(BUTTON_ID_PED, ped_on_lick);
-			button_set_click_callback(BUTTON_ID_PEU, peu_on_lick);
-			button_set_click_callback(BUTTON_ID_PPD, ppd_on_lick);
-			button_set_click_callback(BUTTON_ID_PPU, ppu_on_lick);
-			button_set_click_callback(BUTTON_ID_MAIN, main_on_lick);
-			button_set_click_callback(BUTTON_ID_CMAIN, cmain_on_lick);
-			button_set_click_callback(BUTTON_ID_RESET, reset_on_lick);
-			button_add_hold_level(BUTTON_ID_RESET, 3000, reset_hold_3s);
-			button_add_hold_level(BUTTON_ID_RESET, 5000, reset_hold_5s);
-			button_add_hold_level(BUTTON_ID_CMAIN, 5000, endcall_hold_5s);
-			button_add_hold_level(BUTTON_ID_PPD, 3000, ppu_hold_3s);
+			button_set_click_callback(BUTTON_ID_PED, button_on_click);
+			button_set_click_callback(BUTTON_ID_PEU, button_on_click);
+			button_set_click_callback(BUTTON_ID_PPD, button_on_click);
+			button_set_click_callback(BUTTON_ID_PPU, button_on_click);
+			button_set_click_callback(BUTTON_ID_CALL, button_on_click);
+			button_set_click_callback(BUTTON_ID_ENDCALL, button_on_click);
+			button_set_click_callback(BUTTON_ID_RESET, button_on_click);
+
+			button_add_hold_level(BUTTON_ID_RESET, 3000, button_hold_time);
+			button_add_hold_level(BUTTON_ID_RESET, 5000, button_hold_time);
+			button_add_hold_level(BUTTON_ID_CALL, 3000, button_hold_time);
+			button_add_hold_level(BUTTON_ID_ENDCALL, 3000, button_hold_time);
+			button_add_hold_level(BUTTON_ID_ENDCALL, 5000, button_hold_time);
+			button_add_hold_level(BUTTON_ID_PPD, 3000, button_hold_time);
 			
 			// Combo:
 
 			uint8_t combo_buttons2[] = {BUTTON_ID_PED, BUTTON_ID_RESET};
 			uint8_t combo_id2 = button_add_combo(combo_buttons2, 2, 500); // 500ms detection window
 			button_set_combo_hold_callback(combo_id2, 5000, ped_rst_hold_5s);
-
-			 uint8_t combo_buttons3[] = {BUTTON_ID_PPU, BUTTON_ID_RESET};
-			 uint8_t combo_id3 = button_add_combo(combo_buttons3, 2, 500); // 500ms detection window
-			 button_set_combo_hold_callback(combo_id3, 5000, ppu_rst_hold_5s);
 
             break;
         default:
@@ -252,66 +233,245 @@ static void button_app_event_handler(const event_t* event, void* user_data)
 }
 
 /*****************************************************************/
-
-static void main_on_lick(uint8_t button_id)
+/**
+ *   Button process event
+ */
+static void button_press(uint8_t button_id)
 {
-	ULOGA("main_on_lick\n");
-	EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_CALL_ONCLICK, EVENT_PRIORITY_HIGH);
+	ULOGA("button pressed id: %d\n", button_id);
+	switch (button_id)
+	{
+	case BUTTON_ID_ENDCALL:
+
+		break;
+	
+	case BUTTON_ID_CALL:
+
+		break;
+
+	case BUTTON_ID_PED:
+		break;
+
+	case BUTTON_ID_PEU:
+
+		break;
+
+	case BUTTON_ID_PPD:
+
+		break;
+
+	case BUTTON_ID_PPU:
+		button_ctx.mode = BUTTON_MODE_HOLD_MASTER_COUNTER;
+
+		break;
+
+	case BUTTON_ID_RESET:
+
+		break;
+
+	default:
+		break;
+	}
 }
 
-static void cmain_on_lick(uint8_t button_id)
+static void button_release(uint8_t button_id, uint32_t actual_hold_time)
 {
-	ULOGA("cmain_on_lick\n");
-	EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_ENDCALL_ONCLICK, EVENT_PRIORITY_HIGH);
+	ULOGA("button release id: %d\n", button_id);
+	switch (button_id)
+	{
+	case BUTTON_ID_ENDCALL:
+
+		break;
+	
+	case BUTTON_ID_CALL:
+
+		break;
+
+	case BUTTON_ID_PED:
+		break;
+
+	case BUTTON_ID_PEU:
+
+		break;
+
+	case BUTTON_ID_PPD:
+
+		break;
+
+	case BUTTON_ID_PPU:
+		button_ctx.mode = BUTTON_MODE_NORMAL;
+
+		break;
+
+	case BUTTON_ID_RESET:
+
+		break;
+
+	default:
+		break;
+	}
 }
 
-static void peu_on_lick(uint8_t button_id)
+static void button_on_click(uint8_t button_id)
 {
-	ULOGA("peu_on_lick\n");
-	EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_PEU_ONCLICK, EVENT_PRIORITY_HIGH);
+	ULOGA("button onclick id: %d\n", button_id);
+
+	switch (button_ctx.mode)
+	{
+	case BUTTON_MODE_HOLD_MASTER_COUNTER:
+		switch (button_id)
+		{
+		case BUTTON_ID_RESET:
+			EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_RST_HOLD_3S, EVENT_PRIORITY_HIGH);
+			EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_RST_HOLD_5S, EVENT_PRIORITY_HIGH);
+			break;
+		
+		case BUTTON_ID_CALL:
+			EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_PPD_HOLD_3S, EVENT_PRIORITY_HIGH);
+			break;
+
+		default:
+			EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_NONE, EVENT_PRIORITY_HIGH);
+			break;
+		}	
+
+		break;
+	
+	default:
+		switch (button_id)
+		{
+		case BUTTON_ID_ENDCALL:
+			EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_ENDCALL_ONCLICK, EVENT_PRIORITY_HIGH);
+
+			break;
+		
+		case BUTTON_ID_CALL:
+			EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_CALL_ONCLICK, EVENT_PRIORITY_HIGH);
+
+			break;
+
+		case BUTTON_ID_PED:
+			EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_PED_ONCLICK, EVENT_PRIORITY_HIGH);
+			break;
+
+		case BUTTON_ID_PEU:
+			EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_PEU_ONCLICK, EVENT_PRIORITY_HIGH);
+			break;
+
+		case BUTTON_ID_PPD:
+			EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_PPD_ONCLICK, EVENT_PRIORITY_HIGH);
+			break;
+
+		case BUTTON_ID_PPU:
+			EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_PPU_ONCLICK, EVENT_PRIORITY_HIGH);
+			break;
+
+		case BUTTON_ID_RESET:
+			EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_RST_ONCLICK, EVENT_PRIORITY_HIGH);
+			break;
+
+		default:
+			EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_NONE, EVENT_PRIORITY_HIGH);
+			break;
+		}
+
+		break;
+	}
+
+	
 }
 
-static void ped_on_lick(uint8_t button_id)
+static void button_hold_time(uint8_t button_id, uint32_t actual_hold_time)
 {
-	ULOGA("ped_on_lick\n");
-	EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_PED_ONCLICK, EVENT_PRIORITY_HIGH);
+	ULOGA("button hold time id: %d\n", button_id);
+	
+	switch (button_ctx.mode)
+	{
+	case BUTTON_MODE_HOLD_MASTER_COUNTER:
+		switch (button_id)
+		{
+		case BUTTON_ID_CALL:
+			EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_CALL_HOLD_3S, EVENT_PRIORITY_HIGH);
+
+			break;
+
+		case BUTTON_ID_ENDCALL:
+			EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_ENDCALL_HOLD_5S, EVENT_PRIORITY_HIGH);
+
+			break;
+
+		case BUTTON_ID_PPD:
+			EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_RST_PEU_HOLD_5S, EVENT_PRIORITY_HIGH);
+
+			break;
+
+		case BUTTON_ID_RESET:
+			switch (actual_hold_time)
+			{
+			case 3000:
+				EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_RST_PED_HOLD_5S, EVENT_PRIORITY_HIGH);
+
+				break;
+
+			default:
+				break;
+			}
+
+			break;
+
+		default:
+			EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_NONE, EVENT_PRIORITY_HIGH);
+			break;
+		}
+
+		break;
+	
+	default:
+		switch (button_id)
+		{
+		case BUTTON_ID_ENDCALL:
+			EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_ENDCALL_HOLD_5S, EVENT_PRIORITY_HIGH);
+
+			break;
+
+		case BUTTON_ID_PPD:
+			EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_PPD_HOLD_3S, EVENT_PRIORITY_HIGH);
+
+			break;
+
+		case BUTTON_ID_RESET:
+			switch (actual_hold_time)
+			{
+			case 3000:
+				EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_RST_HOLD_3S, EVENT_PRIORITY_HIGH);
+
+				break;
+				
+			case 5000:
+				EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_RST_HOLD_5S, EVENT_PRIORITY_HIGH);
+
+				break;
+
+			default:
+				break;
+			}
+
+			break;
+
+		default:
+			EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_NONE, EVENT_PRIORITY_HIGH);
+			break;
+		}
+
+		break;
+	}
+
 }
 
-static void ppd_on_lick(uint8_t button_id)
-{
-	ULOGA("ppd_on_lick\n");
-	EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_PPD_ONCLICK, EVENT_PRIORITY_HIGH);
-}
-
-static void ppu_on_lick(uint8_t button_id)
-{
-	ULOGA("ppu_on_lick\n");
-	EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_PPU_ONCLICK, EVENT_PRIORITY_HIGH);
-}
-
-static void reset_on_lick(uint8_t button_id)
-{
-	ULOGA("reset_on_lick\n");
-	EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_RST_ONCLICK, EVENT_PRIORITY_HIGH);
-}
-
-static void reset_hold_3s(uint8_t button_id, uint32_t actual_hold_time)
-{
-	ULOGA("reset_hold_3s: %d\n", actual_hold_time);
-	EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_RST_HOLD_3S, EVENT_PRIORITY_HIGH);
-}
-
-static void reset_hold_5s(uint8_t button_id, uint32_t actual_hold_time)
-{
-	ULOGA("reset_hold_5s: %d\n", actual_hold_time);
-	EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_RST_HOLD_5S, EVENT_PRIORITY_HIGH);
-}
-
-static void ppu_hold_3s(uint8_t button_id, uint32_t actual_hold_time)
-{
-	ULOGA("ppu_hold_3s: %d\n", actual_hold_time);
-	EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_PPD_HOLD_3S, EVENT_PRIORITY_HIGH);
-}
+//static void button_combo_hold_time(uint8_t *button_id, uint32_t actual_hold_time)
+//{
+//
+//}
 
 static void ped_rst_hold_5s(uint8_t *button_ids, uint8_t count, uint32_t hold_time)
 {
@@ -329,17 +489,6 @@ static void peu_rst_hold_5s(uint8_t *button_ids, uint8_t count, uint32_t hold_ti
 	EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_RST_PEU_HOLD_5S, EVENT_PRIORITY_HIGH);
 }
 
-static void ppu_rst_hold_5s(uint8_t *button_ids, uint8_t count, uint32_t hold_time)
-{
-	ULOGA("ppu_rst_hold_5s\n");
-	 EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_RST_PPU_HOLD_5S, EVENT_PRIORITY_HIGH);
-}
-
-static void endcall_hold_5s(uint8_t button_id, uint32_t actual_hold_time)
-{
-	ULOGA("endcall_hold_5s\n");
-	EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_ENDCALL_HOLD_5S, EVENT_PRIORITY_HIGH);
-}
 
 #endif /* COUNTER_DEVICE*/
 #endif /* MASTER_CORE*/

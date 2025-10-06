@@ -58,6 +58,7 @@ void user_app_loop(void);
 void user_app_run(void);
 
 #define get_data_event()   {\
+    EVENT_BUTTON_NONE,\
     EVENT_BUTTON_RST_ONCLICK,\
     EVENT_BUTTON_RST_HOLD_3S,\
     EVENT_BUTTON_RST_HOLD_5S,\
@@ -70,7 +71,7 @@ void user_app_run(void);
     EVENT_BUTTON_PEU_ONCLICK,\
     EVENT_BUTTON_RST_PED_HOLD_5S,\
     EVENT_BUTTON_RST_PEU_HOLD_5S,\
-    EVENT_BUTTON_RST_PPU_HOLD_5S,\
+    EVENT_BUTTON_CALL_HOLD_3S,\
 	EVENT_BUTTON_ENDCALL_HOLD_5S,\
     EVENT_LCD_PRINT_SELECT_MODE_TIMEOUT,\
 }

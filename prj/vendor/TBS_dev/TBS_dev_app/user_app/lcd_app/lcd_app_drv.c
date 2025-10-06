@@ -477,10 +477,8 @@ static lcd_app_error_t lcd_app_update_row_display(lcd_app_handle_t *handle, uint
 
         // Fill remaining space with spaces or wrap-around text
         for (uint8_t i = chars_to_copy; i < LCD_APP_MAX_DISPLAY_WIDTH; i++) {
-            if (start_pos == handle->rows[row].message_length && i < 3) {
-                display_buffer[i] = ' '; // Add some space before wrap-around
-            } else if (start_pos == handle->rows[row].message_length && i >= 3) {
-                uint8_t wrap_idx = i - 3;
+            if (start_pos == handle->rows[row].message_length ) {
+                uint8_t wrap_idx = i - chars_to_copy;
                 if (wrap_idx < handle->rows[row].message_length) {
                     display_buffer[i] = handle->rows[row].message[wrap_idx];
                 } else {

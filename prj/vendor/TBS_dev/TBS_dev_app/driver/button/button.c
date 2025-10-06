@@ -990,11 +990,11 @@ static void button_process_state_machine(uint8_t button_id) {
                         // Transition to hold state on first level
                         if (btn->state == BUTTON_STATE_PRESSED && i == 0) {
                             btn->state = BUTTON_STATE_HOLD;
-                            button_trigger_event(button_id, BUTTON_EVENT_HOLD_START, hold_time);
+                            button_trigger_event(button_id, BUTTON_EVENT_HOLD_START, btn->hold_levels[i].hold_time);
                         }
 
 
-                        button_trigger_event(button_id, BUTTON_EVENT_HOLD_LEVEL, hold_time);
+                        button_trigger_event(button_id, BUTTON_EVENT_HOLD_LEVEL, btn->hold_levels[i].hold_time);
                     }
                 }
             }
@@ -1020,7 +1020,7 @@ static void button_process_state_machine(uint8_t button_id) {
                         btn->last_hold_level = i + 1;
                         btn->hold_level_index = i;
 
-                        button_trigger_event(button_id, BUTTON_EVENT_HOLD_LEVEL, hold_time);
+                        button_trigger_event(button_id, BUTTON_EVENT_HOLD_LEVEL, btn->hold_levels[i].hold_time);
                     }
                 }
             }

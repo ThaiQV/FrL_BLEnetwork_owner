@@ -208,7 +208,8 @@ int TEST_Counter_Event(void){
 		G_COUNTER_DEV.data.mode = 1;
 		G_COUNTER_DEV.data.pre_err_product = RAND(1,1020);
 		G_COUNTER_DEV.data.pre_pass_product = RAND(1,1020);
-		G_COUNTER_DEV.data.pre_mode = RAND(0,1);
+		G_COUNTER_DEV.data.pre_mode = RAND(0,1);;
+//		G_COUNTER_DEV.data.pre_timetamp
 
 		//
 		G_COUNTER_DEV.data.bt_call = RAND(0,1);
