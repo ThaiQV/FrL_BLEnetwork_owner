@@ -42,7 +42,7 @@ extern "C" {
 #define MAX_PATTERN_LENGTH  8        ///< Maximum buttons in a sequence pattern
 #define MAX_PATTERNS        4        ///< Maximum number of patterns
 #define DEFAULT_DEBOUNCE_TIME   20   ///< Default debounce time (ms)
-#define DEFAULT_CLICK_TIMEOUT   500  ///< Default click timeout (ms)
+#define DEFAULT_CLICK_TIMEOUT   1000  ///< Default click timeout (ms)
 #define DEFAULT_MULTICLICK_TIMEOUT  500  ///< Default multi-click timeout (ms)
 #define DEFAULT_CLICK_SEPARATION 150   ///< Default time between clicks (ms)
 #define DEFAULT_COMBO_TIMEOUT   1000 ///< Default combo detection timeout (ms)
