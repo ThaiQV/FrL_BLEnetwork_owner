@@ -121,7 +121,7 @@ typedef struct {
 }__attribute__((packed)) tbs_device_counter_t;
 
 #define COUNTER_STRUCT_SIZE			(SIZEU8(tbs_device_counter_t))
-#define COUNTER_DATA_INSTRUCT		15
+#define COUNTER_DATA_INSTRUCT		19
 
 //For POWER-METER DEVICEs
 /*
