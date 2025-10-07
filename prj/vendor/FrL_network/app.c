@@ -35,7 +35,7 @@
 #include "fl_adv_proc.h"
 #include "fl_input_ext.h"
 #include "fl_nwk_database.h"
-#define SYNCHRONIZE_SYSTIME			5000*1000 //5s
+#define SYNCHRONIZE_SYSTIME			3010*1003 //3s
 
 _attribute_data_retention_ own_addr_type_t app_own_address_type = OWN_ADDRESS_PUBLIC;
 
@@ -53,7 +53,12 @@ int app_system_time_sync(void) {
 	u32 cur_timetamp = fl_rtc_get();
 	fl_rtc_timestamp_to_datetime(cur_timetamp,&cur_dt);
 	LOGA(APP,"SYSTIME:%02d/%02d/%02d - %02d:%02d:%02d\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second);
+#ifdef MASTER_CORE
 	//fl_rtc_set(0);
+#else
+	extern bool IsOnline(void);
+	if(!IsOnline())fl_rtc_set(0);
+#endif
 	return 0;
 }
 
@@ -131,6 +136,9 @@ _attribute_no_inline_ void user_init_normal(void) {
 	//blc_ll_initPowerManagement_module();
 	blt_soft_timer_init();
 	///////////////////// TIME SYSTEM initialization///////////////////
+	//TEST
+//	PLOG_Start(ALL);
+
 	fl_rtc_init();
 
 	blt_soft_timer_add(&app_system_time_sync,SYNCHRONIZE_SYSTIME);

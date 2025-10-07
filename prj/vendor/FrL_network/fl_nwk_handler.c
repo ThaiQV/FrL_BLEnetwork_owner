@@ -233,20 +233,18 @@ s8 fl_queue_REQcRSP_ScanRec(fl_pack_t _pack,void *_id)
 				memcpy(slaveID_rsp,&packet.frame.payload[SIZEU8(fl_timetamp_withstep_t)+SIZEU8(timetamp_delta)],SIZEU8(slaveID_rsp));
 				u8 my_slaveID_inrspcom = plog_IndexOf(slaveID_rsp,&G_QUEUE_REQ_CALL_RSP[i].rsp_check.slaveID,1,SIZEU8(slaveID_rsp));
 
-				P_PRINTFHEX_A(API,slaveID_rsp,SIZEU8(slaveID_rsp),"SlaveID(%d):",SIZEU8(slaveID_rsp));
-				LOGA(API,"REQ Timetmap  :%d\r\n",G_QUEUE_REQ_CALL_RSP[i].rsp_check.seqTimetamp);
-				LOGA(API,"TimeTamp_Seq  :%d\r\n",seq_timetamp);
-				LOGA(API,"TimeTamp_delta:%d\r\n",timetamp_delta);
-				LOGA(API,"MyID:%02X,Found:%d\r\n",G_QUEUE_REQ_CALL_RSP[i].rsp_check.slaveID,my_slaveID_inrspcom);
-
 				if ((G_QUEUE_REQ_CALL_RSP[i].rsp_check.slaveID != 0xFF && packet.frame.slaveID.id_u8 ==0xFF && my_slaveID_inrspcom != -1
 						&& G_QUEUE_REQ_CALL_RSP[i].rsp_check.seqTimetamp <= (seq_timetamp + (u32)timetamp_delta)) //Check RSP common
 					|| (G_QUEUE_REQ_CALL_RSP[i].rsp_check.slaveID == packet.frame.slaveID.id_u8
 							&& G_QUEUE_REQ_CALL_RSP[i].rsp_check.seqTimetamp==seq_timetamp)
 					)
-
 				{
 					_myID->active = true;
+					P_PRINTFHEX_A(API,slaveID_rsp,SIZEU8(slaveID_rsp),"SlaveID(%d):",SIZEU8(slaveID_rsp));
+					LOGA(API,"REQ Timetmap  :%d\r\n",G_QUEUE_REQ_CALL_RSP[i].rsp_check.seqTimetamp);
+					LOGA(API,"TimeTamp_Seq  :%d\r\n",seq_timetamp);
+					LOGA(API,"TimeTamp_delta:%d\r\n",timetamp_delta);
+					LOGA(API,"MyID:%02X,Found:%d\r\n",G_QUEUE_REQ_CALL_RSP[i].rsp_check.slaveID,my_slaveID_inrspcom);
 #endif
 					rslt = i;
 					LOGA(API,"RSP(%d|%d):%d/%d\r\n",G_QUEUE_REQ_CALL_RSP[i].rsp_check.seqTimetamp,seq_timetamp,packet.frame.hdr,packet.frame.slaveID.id_u8);
