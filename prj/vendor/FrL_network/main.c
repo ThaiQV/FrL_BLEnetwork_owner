@@ -35,7 +35,7 @@
 #include <task.h>
 #endif
 
-#define WDT_RST_INTERVAL				5000		//ms
+#define WDT_RST_INTERVAL				5011		//ms
 
 /**
  * @brief      uart1 irq code for application

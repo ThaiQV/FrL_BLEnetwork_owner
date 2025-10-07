@@ -513,6 +513,7 @@ void fl_ble_wifi_proc(u8* _pdata) {
 		len_cmd = data->len_data + SIZEU8(data->cmd) + SIZEU8(data->crc8) + SIZEU8(data->len_data);
 	}
 }
+
 void fl_ble2wifi_HISTORY_SEND(u8* mac,u8* timetamp,u8* _data){
 	extern fl_slaves_list_t G_NODE_LIST;
 	u8 payload[BLE_WIFI_MAXLEN];
@@ -566,6 +567,7 @@ void fl_ble2wifi_DEBUG2MQTT(u8* _payload,u8 _size){
 	P_PRINTFHEX_A(MCU,wfdata,wfdata.len_data+3,"DEBUG MQTT(%d):",wfdata.len_data+3);
 	fl_ble_send_wifi((u8*)&wfdata,wfdata.len_data+3);//len_data + id_cmd + crc
 }
+
 void fl_wifi2ble_Excute(fl_wifi2ble_exc_e cmd) {
 	extern fl_slaves_list_t G_NODE_LIST;
 //	extern fl_adv_settings_t G_ADV_SETTINGS;

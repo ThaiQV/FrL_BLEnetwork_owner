@@ -37,7 +37,7 @@ volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME = {.timetamp = 0,.milstep =
 u8 GETINFO_FLAG_EVENTTEST = 0;
 #define JOIN_NETWORK_TIME 			30*1000 			//ms
 #define RECHECKING_NETWOK_TIME 		30*1000 		    //ms
-#define RECONNECT_TIME				75*1000*1000		//s
+#define RECONNECT_TIME				58*1000*1020		//s
 #define INFORM_MASTER				5*1000*1000
 fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_A5_HIS,NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
 fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_A5_HIS,NWK_HDR_55,NWK_HDR_11_REACTIVE,NWK_HDR_22_PING}; // register cmdid REQ
@@ -173,7 +173,7 @@ int _nwk_slave_backup(void){
 }
 
 void fl_nwk_slave_init(void) {
-//	PLOG_Start(ALL);
+	PLOG_Start(ALL);
 	DEBUG_TURN(NWK_DEBUG_STT);
 //	fl_input_external_init();
 	FL_QUEUE_CLEAR(&G_HANDLE_CONTAINER,PACK_HANDLE_SIZE);

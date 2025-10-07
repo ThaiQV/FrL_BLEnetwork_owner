@@ -91,7 +91,7 @@ s8 fl_queueREQcRSP_add(u8 slaveid,u8 cmdid,u32 _SeqTimetamp,u8* _payloadreq,u8 _
 	extern fl_adv_settings_t G_ADV_SETTINGS;
 	u8 avai_slot= 0xFF;
 	if(fl_queueREQcRSP_find(_cb,_SeqTimetamp,&avai_slot) == -1 && avai_slot < QUEUE_RSP_SLOT_MAX){
-		G_QUEUE_REQ_CALL_RSP[avai_slot].timeout = (_timeout_ms!=0?(_timeout_ms + 8*G_ADV_SETTINGS.adv_duration):16*G_ADV_SETTINGS.adv_duration)*1000;
+		G_QUEUE_REQ_CALL_RSP[avai_slot].timeout = ((_timeout_ms!=0?(_timeout_ms + 8*G_ADV_SETTINGS.adv_duration):16*G_ADV_SETTINGS.adv_duration)*1000);
 		G_QUEUE_REQ_CALL_RSP[avai_slot].timeout_set = G_QUEUE_REQ_CALL_RSP[avai_slot].timeout;
 		G_QUEUE_REQ_CALL_RSP[avai_slot].rsp_cb = *_cb;
 		G_QUEUE_REQ_CALL_RSP[avai_slot].rsp_check.seqTimetamp = _SeqTimetamp;
@@ -174,7 +174,7 @@ int fl_queue_REQnRSP_TimeoutStart(void){
 			}
 		}
 	}
-	return 0;
+	return QUEUQ_REQcRSP_INTERVAL + RAND(1,100);
 }
 void fl_queue_REQnRSP_TimeoutInit(void) {
 	if (blt_soft_timer_find(&fl_queue_REQnRSP_TimeoutStart) == -1) {

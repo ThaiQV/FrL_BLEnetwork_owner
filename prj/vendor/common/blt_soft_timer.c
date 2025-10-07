@@ -76,7 +76,7 @@ int blt_soft_timer_add(blt_timer_callback_t func, u32 interval_us) {
 		return 0;
 	} else {
 		blt_timer.timer[blt_timer.currentNum].cb = func;
-		blt_timer.timer[blt_timer.currentNum].interval = interval_us * SYSTEM_TIMER_TICK_1US;
+		blt_timer.timer[blt_timer.currentNum].interval = (interval_us + (rand() % 1000) + 10) * SYSTEM_TIMER_TICK_1US;
 		blt_timer.timer[blt_timer.currentNum].t = now + blt_timer.timer[blt_timer.currentNum].interval;
 		blt_timer.currentNum++;
 

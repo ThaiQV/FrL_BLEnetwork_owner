@@ -14,7 +14,7 @@
 #include "../FrL_Network/fl_nwk_handler.h"
 #include "../FrL_Network/fl_nwk_api.h"
 
-#define TBS_DEVICE_STORE_INTERVAL 		5*1000*1000 //5s
+#define TBS_DEVICE_STORE_INTERVAL 		2*1000*1000 //5s
 #define TBS_PACKET_INDEX_MAX			12288
 #include "TBS_dev_app/user_lib.h"
 /******************************************************************************/
@@ -353,7 +353,7 @@ int TBS_Device_Store_run(void) {
 #endif
 	data_size = SIZEU8(data) - 6;//skip mac
 	static u32 crc_check_change = 0;
-	u32 crc = fl_db_crc32(data+6+4,data_size);
+	u32 crc = fl_db_crc32(data+6+4,data_size); //skip mac + timestamp
 	if (crc_check_change != crc) {
 		LOGA(FLA,"%s store currently data !!\r\n",dev_str);
 		if(G_TBS_DEVICE.type == TBS_COUNTER) tbs_counter_printf(FLA,(void*)&data);
@@ -361,7 +361,7 @@ int TBS_Device_Store_run(void) {
 		fl_db_slaveuserdata_save(data+6,data_size);
 		crc_check_change = crc;
 	}
-	return 0;
+	return TBS_DEVICE_STORE_INTERVAL;
 }
 
 void TBS_Device_Index_manage(u8 _cmdID) {
