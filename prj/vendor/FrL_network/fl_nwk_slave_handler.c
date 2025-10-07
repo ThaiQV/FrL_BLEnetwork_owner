@@ -37,7 +37,7 @@ volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME = {.timetamp = 0,.milstep =
 u8 GETINFO_FLAG_EVENTTEST = 0;
 #define JOIN_NETWORK_TIME 			30*1000 			//ms
 #define RECHECKING_NETWOK_TIME 		30*1000 		    //ms
-#define RECONNECT_TIME				58*1000*1020		//s
+#define RECONNECT_TIME				61*1000*1020		//s
 #define INFORM_MASTER				5*1000*1000
 fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_A5_HIS,NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
 fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_A5_HIS,NWK_HDR_55,NWK_HDR_11_REACTIVE,NWK_HDR_22_PING}; // register cmdid REQ
@@ -228,7 +228,7 @@ void fl_nwk_slave_init(void) {
 	blt_soft_timer_add(_nwk_slave_backup,2*1000*1000);
 
 	//Interval checking network
-	blt_soft_timer_add(fl_nwk_slave_reconnect,RECONNECT_TIME);//s -> send information online to master
+	fl_nwk_slave_reconnectNstoragedata();
 
 	//inform to master
 	blt_soft_timer_add(&_informMaster,INFORM_MASTER);
@@ -470,8 +470,8 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 					packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
 					//increase index tbs
 					TBS_Device_Index_manage(NWK_HDR_F5_INFO);
-					//Restart timeout reconnect
-					blt_soft_timer_restart(fl_nwk_slave_reconnect,RECONNECT_TIME);
+					//start period storage data
+					fl_nwk_slave_reconnectNstoragedata();
 				} else {
 					packet_built.length = 0;
 					return packet_built;
@@ -744,7 +744,7 @@ void fl_nwk_slave_joinnwk_exc(void) {
  * @return	  	:none
  *
  ***************************************************/
-int fl_nwk_slave_reconnect(void){
+int _slave_reconnect(void){
 	if(IsJoinedNetwork()){
 		LOGA(INF,"Reconnect network (%d s)!!!\r\n",RECONNECT_TIME/1000/1000);
 		//
@@ -762,6 +762,10 @@ int fl_nwk_slave_reconnect(void){
 	return 0;
 }
 
+void fl_nwk_slave_reconnectNstoragedata(void){
+	//Restart timeout reconnect
+	blt_soft_timer_restart(_slave_reconnect,RECONNECT_TIME);
+}
 
 /******************************************************************************/
 /******************************************************************************/

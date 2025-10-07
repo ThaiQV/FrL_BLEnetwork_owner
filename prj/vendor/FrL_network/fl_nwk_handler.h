@@ -317,10 +317,10 @@ inline u8 fl_crc8(u8* _pdata, u8 _len) {
 	return (u8) (crc % 256);
 }
 
-#define DEBUG_TURN(x) /*do { \
+#define DEBUG_TURN(x) do { \
 							if (x) { PLOG_Start(ALL); } \
 							else   { PLOG_Stop(ALL);  }\
-						} while(0)*/
+						} while(0)
 
 static inline uint32_t swap_endian32(uint32_t val) {
     return ((val >> 24) & 0x000000FF) |
@@ -356,7 +356,7 @@ void fl_nwk_slave_process(void);
 bool fl_nwk_slave_checkHDR(u8 _hdr);
 u32 fl_req_slave_packet_createNsend(u8 _cmdid, u8* _data, u8 _len);
 s8 fl_queue_REQcRSP_ScanRec(fl_pack_t _pack,void *_id);
-int fl_nwk_slave_reconnect(void);
+void fl_nwk_slave_reconnectNstoragedata(void);
 s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry);
 #endif
 u32 fl_adv_timetampInPack(fl_pack_t _pack);
