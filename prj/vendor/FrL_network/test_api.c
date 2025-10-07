@@ -53,7 +53,7 @@ int TEST_slave_sendREQ(void) {
 			test_u8[1] = U32_BYTE1(test_pack_cnt);
 			test_u8[2] = U32_BYTE2(test_pack_cnt);
 			test_u8[3] = U32_BYTE3(test_pack_cnt);
-//			fl_api_slave_req(NWK_HDR_55,test_u8,SIZEU8(test_u8),&_rsp_callback,1029,0);
+			fl_api_slave_req(NWK_HDR_55,test_u8,SIZEU8(test_u8),&_rsp_callback,1029,0);
 //			test_pack_cnt++;
 //			test_u8[0] = U32_BYTE0(test_pack_cnt);
 //			test_u8[1] = U32_BYTE1(test_pack_cnt);

@@ -121,7 +121,7 @@ u32 fl_rtc_timetamp2milltampStep(fl_timetamp_withstep_t _timetamp_step){
 
 void fl_rtc_sync(u32 timetamp_sync) {
 	int time_spread = timetamp_sync - fl_rtc_get();
-	if (abs(time_spread) > (int) RTC_SYNC_SPREAD) {
+	if (abs(time_spread) >= (int) RTC_SYNC_SPREAD) {
 		ERR(FLA,"Synchronize system time (spread:%d)!!!\r\n",time_spread);
 		datetime_t last_dt, cur_dt;
 		u32 last_timetamp = fl_rtc_get();

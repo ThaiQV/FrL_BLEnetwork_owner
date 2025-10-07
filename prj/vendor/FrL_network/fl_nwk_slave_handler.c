@@ -440,8 +440,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 			if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK && IsJoinedNetwork()) {
 				//Process rsp
 				s8 memid_idx = plog_IndexOf(packet.frame.payload,(u8*)&G_INFORMATION.slaveID.id_u8,1,sizeof(packet.frame.payload)-1); //skip lastbyte int the payload
-				u32 master_timetamp; //, slave_timetamp;
-				master_timetamp = MAKE_U32(packet.frame.timetamp[3],packet.frame.timetamp[2],packet.frame.timetamp[1],packet.frame.timetamp[0]);
+				u32 master_timetamp = MAKE_U32(packet.frame.timetamp[3],packet.frame.timetamp[2],packet.frame.timetamp[1],packet.frame.timetamp[0]);
 				datetime_t cur_dt;
 				fl_rtc_timestamp_to_datetime(master_timetamp,&cur_dt);
 				u8 _payload[POWER_METER_STRUCT_BYTESIZE];
@@ -451,14 +450,17 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 				packet.frame.endpoint.dbg = NWK_DEBUG_STT;
 				u8 indx_data = 0;
 				if (memid_idx != -1) {
+					fl_rtc_sync(master_timetamp);
 #ifdef COUNTER_DEVICE
 					tbs_device_counter_t *counter_data = (tbs_device_counter_t*)G_INFORMATION.data;
+					counter_data->timetamp = master_timetamp;
 					memcpy(_payload,(u8*)&counter_data->data,SIZEU8(counter_data->data));
 					tbs_counter_printf(APP,(void*)counter_data);
 #endif
 #ifdef POWER_METER_DEVICE
 					tbs_power_meter_printf(APP,(void*)G_INFORMATION.data);
 					tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*)G_INFORMATION.data;
+					pwmeter_data->timetamp = master_timetamp;
 					tbs_pack_powermeter_data(pwmeter_data,_payload);
 					indx_data = SIZEU8(pwmeter_data->type) + SIZEU8(pwmeter_data->mac) + SIZEU8(pwmeter_data->timetamp);
 #endif
