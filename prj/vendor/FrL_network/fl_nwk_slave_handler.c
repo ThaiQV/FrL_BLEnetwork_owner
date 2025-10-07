@@ -138,7 +138,7 @@ int _informMaster(void){
 	return -1;
 }
 int _isOnline_check(void) {
-//	ERR(INF,"Device -> offline\r\n");
+	ERR(INF,"Device -> offline\r\n");
 	G_INFORMATION.active = false;
 	blt_soft_timer_restart(_informMaster,INFORM_MASTER);
 	return -1;
