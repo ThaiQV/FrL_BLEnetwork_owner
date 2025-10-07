@@ -365,7 +365,7 @@ int TBS_Device_Store_run(void) {
 }
 
 void TBS_Device_Index_manage(u8 _cmdID) {
-	ERR(FLA,"0x%02X callback (indx:%d)!!\r\n",_cmdID,G_TBS_DEVICE.data.index);
+//	ERR(FLA,"0x%02X callback (indx:%d)!!\r\n",_cmdID,G_TBS_DEVICE.data.index);
 	//todo:store to flash
 	TBS_History_StoreToFlash((u8*) &G_TBS_DEVICE);
 	G_TBS_DEVICE.data.index++;
