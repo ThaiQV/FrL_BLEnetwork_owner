@@ -192,6 +192,7 @@ static void _getnsend_data_report(u8 var, u8 rspcmd) {
 		}
 	}
 }
+
 void REPORT_REQUEST(u8* _pdata, RspFunc rspfnc) {
 	extern fl_slaves_list_t G_NODE_LIST;
 	fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[1];
@@ -200,6 +201,7 @@ void REPORT_REQUEST(u8* _pdata, RspFunc rspfnc) {
 	LOGA(MCU,"CRC8:0x%02X\r\n",data->crc8);
 	P_PRINTFHEX_A(MCU,data->data,data->len_data,"Data:");
 	u8 crc8_cal = fl_crc8(data->data,data->len_data);
+
 	if (crc8_cal != data->crc8) {
 		ERR(MCU,"ERR >> CRC8:0x%02X | 0x%02X\r\n",data->crc8,crc8_cal);
 		return;

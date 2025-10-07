@@ -790,7 +790,8 @@ int fl_master_ProccesRSP_cbk(void) {
 				u8 node_indx = fl_master_SlaveID_find(slave_id);
 				if (node_indx != -1) {
 					if (packet.frame.endpoint.master == FL_FROM_SLAVE_ACK) {
-						_master_updateDB_for_Node(node_indx,&packet);
+//						_master_updateDB_for_Node(node_indx,&packet);
+						G_NODE_LIST.sla_info[node_indx].active = true;
 						//Send rsp to slave
 						u8 seq_timetamp[5];
 						memcpy(seq_timetamp,packet.frame.timetamp,SIZEU8(packet.frame.timetamp));
