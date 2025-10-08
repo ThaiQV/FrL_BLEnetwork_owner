@@ -734,7 +734,7 @@ void CMD_GETALLNODES(u8* _data) {
 		p_ALLNODES.sort_list.numOfOnl = onl_msb_indx;
 		if(p_ALLNODES.sort_list.numOfOnl==0) return;
 		//Register timeout
-		p_ALLNODES.timeout = timeout==0?p_ALLNODES.sort_list.numOfOnl*8*GETALL_TIMEOUT_1_NODE:timeout*1000; //default num*durationADV
+		p_ALLNODES.timeout = timeout==0?p_ALLNODES.sort_list.numOfOnl*16*GETALL_TIMEOUT_1_NODE:timeout*1000; //default num*durationADV
 		p_ALLNODES.timeout = (p_ALLNODES.timeout>20*1000)?20*1000:p_ALLNODES.timeout;
 		//clear all previous status of the all
 		for (u8 var = 0; var < G_NODE_LIST.slot_inused; ++var) {

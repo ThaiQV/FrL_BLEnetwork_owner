@@ -718,12 +718,13 @@ static void _master_updateDB_for_Node(u8 node_indx ,fl_data_frame_u *packet)  {
 	u8 size_mac = SIZEU8(G_NODE_LIST.sla_info[node_indx].mac);
 	memcpy(&G_NODE_LIST.sla_info[node_indx].data[0],G_NODE_LIST.sla_info[node_indx].mac,size_mac); //update mac to pointer data
 	/*Timetamp*/
-	fl_timetamp_withstep_t timetampStep = fl_rtc_getWithMilliStep();
-	//	u32 timetamp = fl_rtc_get();
-	G_NODE_LIST.sla_info[node_indx].data[size_mac] = U32_BYTE0(timetampStep.timetamp);
-	G_NODE_LIST.sla_info[node_indx].data[size_mac + 1] = U32_BYTE1(timetampStep.timetamp);
-	G_NODE_LIST.sla_info[node_indx].data[size_mac + 2] = U32_BYTE2(timetampStep.timetamp);
-	G_NODE_LIST.sla_info[node_indx].data[size_mac + 3] = U32_BYTE3(timetampStep.timetamp);
+//	fl_timetamp_withstep_t timetampStep = fl_rtc_getWithMilliStep();
+//	//	u32 timetamp = fl_rtc_get();
+//	G_NODE_LIST.sla_info[node_indx].data[size_mac] = U32_BYTE0(timetampStep.timetamp);
+//	G_NODE_LIST.sla_info[node_indx].data[size_mac + 1] = U32_BYTE1(timetampStep.timetamp);
+//	G_NODE_LIST.sla_info[node_indx].data[size_mac + 2] = U32_BYTE2(timetampStep.timetamp);
+//	G_NODE_LIST.sla_info[node_indx].data[size_mac + 3] = U32_BYTE3(timetampStep.timetamp);
+	memcpy(&G_NODE_LIST.sla_info[node_indx].data[size_mac],packet->frame.timetamp,SIZEU8(packet->frame.timetamp));
 	/*Dev type*/
 	G_NODE_LIST.sla_info[node_indx].data[size_mac + 4] = G_NODE_LIST.sla_info[node_indx].dev_type;
 	/*Data*/
@@ -789,7 +790,8 @@ int fl_master_ProccesRSP_cbk(void) {
 				u8 node_indx = fl_master_SlaveID_find(slave_id);
 				if (node_indx != -1) {
 					if (packet.frame.endpoint.master == FL_FROM_SLAVE_ACK) {
-						_master_updateDB_for_Node(node_indx,&packet);
+//						_master_updateDB_for_Node(node_indx,&packet);
+						G_NODE_LIST.sla_info[node_indx].active = true;
 						//Send rsp to slave
 						u8 seq_timetamp[5];
 						memcpy(seq_timetamp,packet.frame.timetamp,SIZEU8(packet.frame.timetamp));

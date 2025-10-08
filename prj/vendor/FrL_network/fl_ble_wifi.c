@@ -192,6 +192,7 @@ static void _getnsend_data_report(u8 var, u8 rspcmd) {
 		}
 	}
 }
+
 void REPORT_REQUEST(u8* _pdata, RspFunc rspfnc) {
 	extern fl_slaves_list_t G_NODE_LIST;
 	fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[1];
@@ -200,6 +201,7 @@ void REPORT_REQUEST(u8* _pdata, RspFunc rspfnc) {
 	LOGA(MCU,"CRC8:0x%02X\r\n",data->crc8);
 	P_PRINTFHEX_A(MCU,data->data,data->len_data,"Data:");
 	u8 crc8_cal = fl_crc8(data->data,data->len_data);
+
 	if (crc8_cal != data->crc8) {
 		ERR(MCU,"ERR >> CRC8:0x%02X | 0x%02X\r\n",data->crc8,crc8_cal);
 		return;
@@ -327,7 +329,9 @@ void TIMETAMP_REQUEST(u8* _pdata, RspFunc rspfnc) {
 		datetime_t cur_dt;
 		fl_rtc_timestamp_to_datetime(timetamp_wifi_set,&cur_dt);
 		LOGA(MCU,"TIME SET:%02d/%02d/%02d - %02d:%02d:%02d\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second);
+		//fl_rtc_sync(timetamp_wifi_set);
 		fl_rtc_set(timetamp_wifi_set);
+//		fl_rtc_set(timetamp_wifi_set);
 //		/*todo: send heartbeat to network so synchronize timetamp*/
 //		extern int fl_send_heartbeat(void);
 //		fl_send_heartbeat();
@@ -513,6 +517,7 @@ void fl_ble_wifi_proc(u8* _pdata) {
 		len_cmd = data->len_data + SIZEU8(data->cmd) + SIZEU8(data->crc8) + SIZEU8(data->len_data);
 	}
 }
+
 void fl_ble2wifi_HISTORY_SEND(u8* mac,u8* timetamp,u8* _data){
 	extern fl_slaves_list_t G_NODE_LIST;
 	u8 payload[BLE_WIFI_MAXLEN];
@@ -566,6 +571,7 @@ void fl_ble2wifi_DEBUG2MQTT(u8* _payload,u8 _size){
 	P_PRINTFHEX_A(MCU,wfdata,wfdata.len_data+3,"DEBUG MQTT(%d):",wfdata.len_data+3);
 	fl_ble_send_wifi((u8*)&wfdata,wfdata.len_data+3);//len_data + id_cmd + crc
 }
+
 void fl_wifi2ble_Excute(fl_wifi2ble_exc_e cmd) {
 	extern fl_slaves_list_t G_NODE_LIST;
 //	extern fl_adv_settings_t G_ADV_SETTINGS;

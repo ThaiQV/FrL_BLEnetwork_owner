@@ -35,10 +35,10 @@ volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME = {.timetamp = 0,.milstep =
 												ORIGINAL_MASTER_TIME.milstep = y;\
 											}while(0) //Sync original time-master req
 u8 GETINFO_FLAG_EVENTTEST = 0;
-#define JOIN_NETWORK_TIME 			30*1000 			//ms
-#define RECHECKING_NETWOK_TIME 		30*1000 		    //ms
-#define RECONNECT_TIME				75*1000*1000		//s
-#define INFORM_MASTER				5*1000*1000
+#define JOIN_NETWORK_TIME 			30*1012 			//ms
+#define RECHECKING_NETWOK_TIME 		30*1021 		    //ms
+#define RECONNECT_TIME				62*1000*1020		//s
+#define INFORM_MASTER				5*1001*1004
 fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_A5_HIS,NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
 fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_A5_HIS,NWK_HDR_55,NWK_HDR_11_REACTIVE,NWK_HDR_22_PING}; // register cmdid REQ
 
@@ -93,6 +93,7 @@ volatile u8  NWK_REPEAT_LEVEL = 3;
 /******************************************************************************/
 int fl_nwk_joinnwk_timeout(void) ;
 int _informMaster(void);
+int _slave_reconnect(void);
 /******************************************************************************/
 /******************************************************************************/
 /***                       Functions declare                   		         **/
@@ -173,7 +174,6 @@ int _nwk_slave_backup(void){
 }
 
 void fl_nwk_slave_init(void) {
-//	PLOG_Start(ALL);
 	DEBUG_TURN(NWK_DEBUG_STT);
 //	fl_input_external_init();
 	FL_QUEUE_CLEAR(&G_HANDLE_CONTAINER,PACK_HANDLE_SIZE);
@@ -227,13 +227,11 @@ void fl_nwk_slave_init(void) {
 	}
 
 	blt_soft_timer_add(_nwk_slave_backup,2*1000*1000);
-
 	//Interval checking network
-	blt_soft_timer_add(fl_nwk_slave_reconnect,RECONNECT_TIME);//s -> send information online to master
-
-	//inform to master
+	fl_nwk_slave_reconnectNstoragedata();
+	//inform to master I'm online
+//	blt_soft_timer_add(&_slave_reconnect,2*1000*1000);
 	blt_soft_timer_add(&_informMaster,INFORM_MASTER);
-
 	G_INFORMATION.active = false;
 	//test random send req
 //	TEST_slave_sendREQ();
@@ -440,8 +438,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 			if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK && IsJoinedNetwork()) {
 				//Process rsp
 				s8 memid_idx = plog_IndexOf(packet.frame.payload,(u8*)&G_INFORMATION.slaveID.id_u8,1,sizeof(packet.frame.payload)-1); //skip lastbyte int the payload
-				u32 master_timetamp; //, slave_timetamp;
-				master_timetamp = MAKE_U32(packet.frame.timetamp[3],packet.frame.timetamp[2],packet.frame.timetamp[1],packet.frame.timetamp[0]);
+				u32 master_timetamp = MAKE_U32(packet.frame.timetamp[3],packet.frame.timetamp[2],packet.frame.timetamp[1],packet.frame.timetamp[0]);
 				datetime_t cur_dt;
 				fl_rtc_timestamp_to_datetime(master_timetamp,&cur_dt);
 				u8 _payload[POWER_METER_STRUCT_BYTESIZE];
@@ -451,14 +448,17 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 				packet.frame.endpoint.dbg = NWK_DEBUG_STT;
 				u8 indx_data = 0;
 				if (memid_idx != -1) {
+					fl_rtc_sync(master_timetamp);
 #ifdef COUNTER_DEVICE
 					tbs_device_counter_t *counter_data = (tbs_device_counter_t*)G_INFORMATION.data;
+					counter_data->timetamp = master_timetamp;
 					memcpy(_payload,(u8*)&counter_data->data,SIZEU8(counter_data->data));
 					tbs_counter_printf(APP,(void*)counter_data);
 #endif
 #ifdef POWER_METER_DEVICE
 					tbs_power_meter_printf(APP,(void*)G_INFORMATION.data);
 					tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*)G_INFORMATION.data;
+					pwmeter_data->timetamp = master_timetamp;
 					tbs_pack_powermeter_data(pwmeter_data,_payload);
 					indx_data = SIZEU8(pwmeter_data->type) + SIZEU8(pwmeter_data->mac) + SIZEU8(pwmeter_data->timetamp);
 #endif
@@ -469,8 +469,8 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 					packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
 					//increase index tbs
 					TBS_Device_Index_manage(NWK_HDR_F5_INFO);
-					//Restart timeout reconnect
-					blt_soft_timer_restart(fl_nwk_slave_reconnect,RECONNECT_TIME);
+					//start period storage data
+					fl_nwk_slave_reconnectNstoragedata();
 				} else {
 					packet_built.length = 0;
 					return packet_built;
@@ -743,7 +743,7 @@ void fl_nwk_slave_joinnwk_exc(void) {
  * @return	  	:none
  *
  ***************************************************/
-int fl_nwk_slave_reconnect(void){
+int _slave_reconnect(void){
 	if(IsJoinedNetwork()){
 		LOGA(INF,"Reconnect network (%d s)!!!\r\n",RECONNECT_TIME/1000/1000);
 		//
@@ -761,6 +761,10 @@ int fl_nwk_slave_reconnect(void){
 	return 0;
 }
 
+void fl_nwk_slave_reconnectNstoragedata(void){
+	//Restart timeout reconnect
+	blt_soft_timer_restart(_slave_reconnect,RECONNECT_TIME);
+}
 
 /******************************************************************************/
 /******************************************************************************/
