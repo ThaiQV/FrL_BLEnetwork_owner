@@ -114,7 +114,8 @@ void fl_master_nodelist_AddRefesh(fl_nodeinnetwork_t _node) {
 		u8 slot_ins = G_NODE_LIST.slot_inused++;
 		G_NODE_LIST.sla_info[slot_ins] = _node;
 		G_NODE_LIST.sla_info[slot_ins].slaveID.id_u8 = slot_ins;
-//		G_NODE_LIST.slot_inused++;
+		//Clear data in the first joinning
+		memset(G_NODE_LIST.sla_info[slot_ins].data,0,SIZEU8(G_NODE_LIST.sla_info[slot_ins].data));
 		LOGA(FLA,"Update Node [%d]slaveID:%d\r\n",slot_ins,G_NODE_LIST.sla_info[slot_ins].slaveID.id_u8);
 		fl_nwk_master_nodelist_store();
 	}
@@ -1019,6 +1020,7 @@ void fl_nwk_master_CLEARALL_NETWORK(void) {
 	fl_data_frame_u packet;
 	memset(packet.bytes,0,SIZEU8(packet.bytes));
 	memcpy(packet.bytes,MASTER_CLEARNETWORK,SIZEU8(MASTER_CLEARNETWORK));
+	memcpy(&packet.bytes[SIZEU8(MASTER_CLEARNETWORK)],blc_ll_get_macAddrPublic(),6);
 	packet_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
 	memcpy(packet_built.data_arr,packet.bytes,packet_built.length);
 	fl_adv_sendFIFO_add(packet_built);
