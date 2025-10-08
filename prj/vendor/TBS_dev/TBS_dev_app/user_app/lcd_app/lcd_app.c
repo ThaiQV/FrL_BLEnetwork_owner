@@ -210,6 +210,7 @@ void my_timeout_callback(uint8_t row) {
 			lcd_app_clear_all(&app_handle);
 			lcd_off();
 			fl_db_clearAll();
+			TBS_History_ClearAll();
 			sys_reboot();
 			break;
 

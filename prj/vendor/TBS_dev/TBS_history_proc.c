@@ -26,7 +26,7 @@
 #define tbs_history_flash_init()				{nvm_init();storage_init();}
 #define tbs_history_store						storage_put_data
 #define tbs_history_load						storage_get_data
-
+#define tbs_history_cleanAll					storage_clean
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -281,7 +281,9 @@ void TBS_History_StoreToFlash(u8* _data_struct){
 
 	P_PRINTFHEX_A(FLA,his_dev,DATA_HISTORY_SIZE,"STORE|[%d]%d:",his_dev.data.index,his_dev.timetamp);
 }
-
+void TBS_History_ClearAll(void){
+	tbs_history_cleanAll();
+}
 /******************************************************************************/
 /******************************************************************************/
 /***                      Processing functions 					             **/

@@ -35,10 +35,10 @@ volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME = {.timetamp = 0,.milstep =
 												ORIGINAL_MASTER_TIME.milstep = y;\
 											}while(0) //Sync original time-master req
 u8 GETINFO_FLAG_EVENTTEST = 0;
-#define JOIN_NETWORK_TIME 			30*1000 			//ms
-#define RECHECKING_NETWOK_TIME 		30*1000 		    //ms
-#define RECONNECT_TIME				61*1000*1020		//s
-#define INFORM_MASTER				5*1000*1000
+#define JOIN_NETWORK_TIME 			30*1012 			//ms
+#define RECHECKING_NETWOK_TIME 		30*1021 		    //ms
+#define RECONNECT_TIME				62*1000*1020		//s
+#define INFORM_MASTER				5*1001*1004
 fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_A5_HIS,NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
 fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_A5_HIS,NWK_HDR_55,NWK_HDR_11_REACTIVE,NWK_HDR_22_PING}; // register cmdid REQ
 
@@ -93,6 +93,7 @@ volatile u8  NWK_REPEAT_LEVEL = 3;
 /******************************************************************************/
 int fl_nwk_joinnwk_timeout(void) ;
 int _informMaster(void);
+int _slave_reconnect(void);
 /******************************************************************************/
 /******************************************************************************/
 /***                       Functions declare                   		         **/
@@ -226,13 +227,11 @@ void fl_nwk_slave_init(void) {
 	}
 
 	blt_soft_timer_add(_nwk_slave_backup,2*1000*1000);
-
 	//Interval checking network
 	fl_nwk_slave_reconnectNstoragedata();
-
-	//inform to master
+	//inform to master I'm online
+//	blt_soft_timer_add(&_slave_reconnect,2*1000*1000);
 	blt_soft_timer_add(&_informMaster,INFORM_MASTER);
-
 	G_INFORMATION.active = false;
 	//test random send req
 //	TEST_slave_sendREQ();
