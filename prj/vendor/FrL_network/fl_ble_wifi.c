@@ -462,7 +462,7 @@ void PWMETER_RUNNING_SET_REQUEST(u8* _pdata, RspFunc rspfnc) {
 	memcpy(mac,data->data,SIZEU8(mac));
 	u8 message[22]; //max payload adv
 	memset(message,0,SIZEU8(message));
-	memcpy(message,&data->data[SIZEU8(mac)],3*2);
+	memcpy(message,&data->data[SIZEU8(mac)],3*2);//3 channels - 2 bytes for each
 	fl_api_master_req(mac,NWK_HDR_F8_PWMETER_SET,message,3*2,&_PWMETER_SET_slave_rsp_callback,200,1);
 	if (rspfnc != 0) {
 		//don't reponse in here => wait slave rsp or timeout
@@ -486,9 +486,8 @@ void RSTFACTORY_REQUEST(u8* _pdata, RspFunc rspfnc){
 	}
 	ERR(APP,"Clear and reset factory.....\r\n");
 	fl_db_clearAll();
-	delay_ms(1000);
+//	delay_ms(1000);
 	sys_reboot();
-
 	return;
 	//don'ts send rsp
 	if (rspfnc != 0) {
