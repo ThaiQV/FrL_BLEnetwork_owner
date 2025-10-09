@@ -19,6 +19,7 @@
 #include "Freelux_libs/fl_sys_datetime.h"
 #include "fl_input_ext.h"
 #include "fl_nwk_protocol.h"
+#include "fl_ext_adv_proc.h"
 
 //Public Key for the freelux network
 u8 MASTER_CLEARNETWORK[18] = {'F','R','E','E','L','U','X','M','A','S','T','E','R','C','L','E','A','R'};
@@ -161,7 +162,9 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 	{
 		u8 evtCode = h & 0xff;
 		if (evtCode == HCI_EVT_LE_META) {
+
 			u8 subEvt_code = p[0];
+			ERR(APP,"CALLBACK:%d\r\n",subEvt_code);
 			if (subEvt_code == HCI_SUB_EVT_LE_ADVERTISING_REPORT)		// ADV packet
 			{
 				//after controller is set to scan state, it will report all the adv packet it received by this event
@@ -509,6 +512,7 @@ void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms) {
 		/**/
 		bls_ll_setAdvData(encrypted,_size);
 		bls_ll_setAdvDuration(_timeout_ms * 1000,1); // ms->us
+
 		bls_app_registerEventCallback(BLT_EV_FLAG_ADV_DURATION_TIMEOUT,&fl_durationADV_timeout_proccess);
 
 		bls_ll_setAdvEnable(BLC_ADV_ENABLE);
@@ -553,7 +557,9 @@ void fl_adv_init(void) {
 	//
 	rf_set_power_level_index(MY_RF_POWER_INDEX);
 	blc_ll_setAdvCustomedChannel(*G_ADV_SETTINGS.nwk_chn.chn1,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3);
+
 	fl_adv_scanner_init();
+
 #ifdef MASTER_CORE
 	//Start network
 	fl_nwk_protocol_InitnRun();
@@ -568,6 +574,8 @@ void fl_adv_init(void) {
  *
  ***************************************************/
 void fl_adv_collection_channel_init(void){
+	fl_ext_adv_init();
+	return;
 //	while ((blc_ll_getCurrentState() == BLS_LINK_STATE_SCAN && blc_ll_getCurrentState() == BLS_LINK_STATE_ADV)) {
 //	};
 //	while(F_SENDING_STATE){bls_ll_setAdvEnable(BLC_ADV_DISABLE); }; //adv disable
