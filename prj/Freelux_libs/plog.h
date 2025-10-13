@@ -122,7 +122,7 @@ enum {
                                             TERMINAL_FONT_GREEN();  		\
 											break;                  		\
 											case INF_FILE:          		\
-                                            TERMINAL_FONT_BLUE();   		\
+											TERMINAL_FONT_YELLOW();   		\
                                             break;                  		\
                                             case FLA:               		\
                                             TERMINAL_FONT_YELLOW(); 		\

@@ -19,6 +19,7 @@
 #include "Freelux_libs/fl_sys_datetime.h"
 #include "fl_input_ext.h"
 #include "fl_nwk_protocol.h"
+#include "fl_wifi2ble_fota.h"
 
 //Public Key for the freelux network
 u8 MASTER_CLEARNETWORK[18] = {'F','R','E','E','L','U','X','M','A','S','T','E','R','C','L','E','A','R'};
@@ -756,7 +757,10 @@ void fl_adv_run(void) {
 #endif
 	/* SEND ADV */
 	if(fl_adv_sendFIFO_run()==0){
+#ifdef MASTER_CORE
+		fl_wifi2ble_fota_run();
+#else
 		fl_adv_sendFIFO_History_run();
+#endif
 	}
-
 }
