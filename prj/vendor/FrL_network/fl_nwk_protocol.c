@@ -458,7 +458,11 @@ void CMD_CHANNELCONFIG(u8* _data) {
 		G_MASTER_INFO.nwk.chn[0] = channels[0];
 		G_MASTER_INFO.nwk.chn[1] = channels[1];
 		G_MASTER_INFO.nwk.chn[2] = channels[2];
+		char dbug[50];
+		memset(dbug,0,SIZEU8(dbug));
+		sprintf(dbug,"Channels setting:%d |%d |%d\r\n",G_MASTER_INFO.nwk.chn[0],G_MASTER_INFO.nwk.chn[1],G_MASTER_INFO.nwk.chn[2]);
 		LOGA(DRV,"Channels setting:%d |%d |%d\r\n",G_MASTER_INFO.nwk.chn[0],G_MASTER_INFO.nwk.chn[1],G_MASTER_INFO.nwk.chn[2]);
+		fl_ble2wifi_DEBUG2MQTT((u8*)dbug,strlen(dbug));
 		return;
 	}
 	ERR(DRV,"ERR Channels setting (%d)\r\n",rslt);
@@ -594,6 +598,14 @@ void CMD_GETADVSETTING(u8* _data) {
 	P_INFO("Channels    :%d |%d |%d \r\n",*G_ADV_SETTINGS.nwk_chn.chn1,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3);
 	P_INFO("REPEAT mode :%d(%d)\r\n",NWK_REPEAT_MODE,NWK_REPEAT_LEVEL);
 	P_INFO("************************\r\n");
+	char dbug[200];
+	memset(dbug,0,SIZEU8(dbug));
+	sprintf(dbug,"ADV interval:%d-%d|%d\r\nADV scanner :%d-%d\r\nChannels    :%d |%d |%d \r\n",(u8 )(G_ADV_SETTINGS.adv_interval_min * 0.625),(u8 )(G_ADV_SETTINGS.adv_interval_max * 0.625),G_ADV_SETTINGS.adv_duration,
+			(u8 )(G_ADV_SETTINGS.scan_window * 0.625),(u8 )(G_ADV_SETTINGS.scan_window * 0.625),
+			*G_ADV_SETTINGS.nwk_chn.chn1,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3);
+
+	fl_ble2wifi_DEBUG2MQTT((u8*)dbug,strlen(dbug));
+
 }
 
 #define MAX_NODES 	200

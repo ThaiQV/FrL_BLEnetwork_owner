@@ -19,6 +19,7 @@
 #include "Freelux_libs/fl_sys_datetime.h"
 #include "fl_input_ext.h"
 #include "fl_nwk_protocol.h"
+#include "fl_ext_adv_proc.h"
 
 //Public Key for the freelux network
 u8 MASTER_CLEARNETWORK[18] = {'F','R','E','E','L','U','X','M','A','S','T','E','R','C','L','E','A','R'};
@@ -26,6 +27,8 @@ unsigned char FL_NWK_PB_KEY[16] = "freeluxnetw0rk25";
 const u32 ORIGINAL_TIME_TRUST = 1735689600; //00:00:00 UTC - 1/1/2025
 unsigned char FL_NWK_USE_KEY[16]; //this key used to encrypt -> decrypt
 volatile u8* FL_NWK_COLLECTION_MODE; //
+
+
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -72,7 +75,40 @@ fl_hdr_nwk_type_e FL_NWK_HDR[]={NWK_HDR_11_REACTIVE,NWK_HDR_22_PING,NWK_HDR_A5_H
 /***                           Private definitions                           **/
 /******************************************************************************/
 /******************************************************************************/
+/**
+ * @brief      callback function of LinkLayer Event "BLT_EV_FLAG_TERMINATE"
+ * @param[in]  e - LinkLayer Event type
+ * @param[in]  p - data pointer of event
+ * @param[in]  n - data length of event
+ * @return     none
+ */
+void task_scanRSP(u8 e, u8 *p, int n) //*p is terminate reason
+{
+	ERR(APP,"SCAN RSP CALLBACK!!\r\n");
+	//test add rspadv
+	u8 thisisScanRsp[31];
+	memset(thisisScanRsp,'D',SIZEU8(thisisScanRsp));
+	bls_ll_setScanRspData(thisisScanRsp,SIZEU8(thisisScanRsp));
+//	event_adv_report_t *pa = (event_adv_report_t *) p;
+//	u8 mac[6] = { 0xFA, 0x59, 0x77, 0x77, 0x5F, 0xD8 };
+//	u8 mac2[6] = { 0x03, 0x5B, 0x1B, 0x77, 0x5F, 0xD8 };
+//	//				u8 mac3[6]={0x42,0x36,0xc4,0xe7,0x46,0xc1};
+//	if ((memcmp(pa->mac,mac,6) == 0 || memcmp(pa->mac,mac2,6) == 0)) {
+//		P_PRINTFHEX_A(INF,pa->data,n,"(num:%d|type:%d)SCAN_RSP(%d|n:%d):",pa->nreport,pa->event_type,pa->len,n);
+//	}
+}
 
+#define ADV_SCANNER_CONFFIG()	{\
+									blc_hci_le_setEventMask_cmd(HCI_LE_EVT_MASK_ADVERTISING_REPORT);\
+									blc_hci_registerControllerEventHandler(fl_controller_event_callback);\
+									/*	bls_hci_mod_setEventMask_cmd(BLT_EV_FLAG_SCAN_RSP);*/\
+									bls_app_registerEventCallback (BLT_EV_FLAG_SCAN_RSP, &task_scanRSP);\
+									/*report all adv*/\
+									blc_ll_setScanParameter(SCAN_TYPE_PASSIVE,G_ADV_SETTINGS.scan_interval,G_ADV_SETTINGS.scan_window,OWN_ADDRESS_PUBLIC,SCAN_FP_ALLOW_ADV_ANY);\
+									blc_ll_addScanningInAdvState();  \
+									blc_ll_setScanEnable(1,0);\
+									bls_ll_setAdvEnable(BLC_ADV_ENABLE); \
+								}
 /******************************************************************************/
 /******************************************************************************/
 /***                       Functions declare                   		         **/
@@ -160,8 +196,10 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 	if (h & HCI_FLAG_EVENT_BT_STD)		//ble controller hci event
 	{
 		u8 evtCode = h & 0xff;
+//		LOGA(INF,"Event Callback:0x%0X - 0x%0X\r\n",evtCode,p[0]);
 		if (evtCode == HCI_EVT_LE_META) {
 			u8 subEvt_code = p[0];
+//			LOGA(BLE,"Event Callback: %d - %d - %d\r\n",subEvt_code,p[1],p[2]);
 			if (subEvt_code == HCI_SUB_EVT_LE_ADVERTISING_REPORT)		// ADV packet
 			{
 				//after controller is set to scan state, it will report all the adv packet it received by this event
@@ -170,7 +208,20 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 				incomming_data.length = pa->len + 1; //add rssi byte
 				//memcpy(incomming_data.data_arr,pa->data,incomming_data.length);
 //				incomming_data.data_arr[0] = pa->data[0];
-
+//				if(pa->len + 1>32)P_PRINTFHEX_A(BLE,pa->data,pa->len + 1,"%s(%d):","RSP PACK",pa->len + 1);
+//				if (pa->event_type == ADV_REPORT_EVENT_TYPE_SCAN_RSP) {
+//				    P_PRINTFHEX_A(INF, pa->data, pa->len, "(%d)SCAN_RSP(%d):", pa->event_type,pa->len);
+//				}
+				u8 mac[6]={0xFA,0x59,0x77,0x77,0x5F,0xD8};
+				u8 mac2[6]={0x03,0x5B,0x1B,0x77,0x5F,0xD8};
+//				u8 mac3[6]={0x42,0x36,0xc4,0xe7,0x46,0xc1};
+//				if ((memcmp(pa->mac,mac,6)==0 || memcmp(pa->mac,mac2,6)==0) )
+				u8 check[4]={'D','D','D','D'};
+				if(-1 != plog_IndexOf(pa->data,check,4,pa->len))
+				{
+					P_PRINTFHEX_A(INF,pa->data,n,"(num:%d|type:%d)SCAN_RSP(%d|n:%d):",pa->nreport,pa->event_type,pa->len,n);
+				}
+				//return;
 #ifndef MASTER_CORE
 				//IMPORTANT DELETE NETWORK
 //				if(MASTER_DELETE_NETWORK_FLAG)
@@ -195,6 +246,7 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 					return 0;
 				}
 #else
+
 				if (!fl_nwk_slave_checkHDR(incomming_data.data_arr[0])) {
 					return 0;
 				}
@@ -206,7 +258,7 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 					} else {
 //						LOGA(APP,"QUEUE ADD (len:%d|RSSI:%d): (%d)%d-%d\r\n",pa->len,rssi,G_DATA_CONTAINER.count,G_DATA_CONTAINER.head_index,
 //								G_DATA_CONTAINER.tail_index);
-						P_PRINTFHEX_A(BLE,incomming_data.data_arr,incomming_data.length,"%s(%d):","PACK",incomming_data.length);
+						P_PRINTFHEX_A(BLE,incomming_data.data_arr,incomming_data.length,"(%d)PACK(%d)",pa->event_type,incomming_data.length);
 					}
 				} else {
 //					ERR(BLE,"Err <QUEUE ALREADY>!!\r\n");
@@ -215,6 +267,12 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 			}
 		}
 	}
+//	else{
+//		if((h&HCI_FLAG_EVENT_TLK_MODULE)!= 0 )//module events
+//		{
+//			ERR(APP,"TELINK CALLBACK !!! \r\n");
+//		}
+//	}
 	return 0;
 }
 /**
@@ -227,8 +285,8 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 void fl_durationADV_timeout_proccess(u8 e, u8 *p, int n) {
 	//todo: Time sending expired
 	F_SENDING_STATE = 0;
-	blc_ll_addScanningInAdvState();  //add scan in adv state
-	blc_ll_setScanEnable(1,0); //
+//	blc_ll_addScanningInAdvState();  //add scan in adv state
+//	blc_ll_setScanEnable(1,0); //
 	bls_ll_setAdvEnable(BLC_ADV_ENABLE);  // adv
 //	TICK_GET_PROCESSING_TIME = clock_time();
 //	LOGA(BLE,"Duration time:%d\r\n",(clock_time()-TICK_GET_PROCESSING_TIME)/SYSTEM_TIMER_TICK_1MS);
@@ -482,18 +540,20 @@ void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms) {
 //	while (blc_ll_getCurrentState() == BLS_LINK_STATE_SCAN && blc_ll_getCurrentState() == BLS_LINK_STATE_ADV) {
 //	};
 	if (_data && _size >= 1) {
+		blc_ll_setAdvCustomedChannel(*G_ADV_SETTINGS.nwk_chn.chn1,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3);
 		rf_set_power_level_index(MY_RF_POWER_INDEX);
 		u8 mac[6];
 		own_addr_type_t app_own_address_type = OWN_ADDRESS_PUBLIC;
 		memcpy(mac,(app_own_address_type == OWN_ADDRESS_PUBLIC) ? blc_ll_get_macAddrPublic() : blc_ll_get_macAddrRandom(),6);
+
 		u8 status = bls_ll_setAdvParam(G_ADV_SETTINGS.adv_interval_min,G_ADV_SETTINGS.adv_interval_max,ADV_TYPE_SCANNABLE_UNDIRECTED,
 				app_own_address_type,0,NULL,BLT_ENABLE_ADV_ALL,ADV_FP_NONE);
+
 		if (status != BLE_SUCCESS) {
 			ERR(BLE,"Set ADV param is FAIL !!!\r\n")
-			while (1);
+			while (1)
+				;
 		}  //debug: adv setting err
-
-
 		/*Encryt data*/
 		u8 encrypted[_size];
 		memset(encrypted,0,SIZEU8(encrypted));
@@ -501,12 +561,14 @@ void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms) {
 		fl_nwk_encrypt16(FL_NWK_USE_KEY,_data,_size,encrypted);
 		/*todo: IMPORTANT FOR CLEAR ALL NETWORK*/
 		extern u8 MASTER_CLEARNETWORK[18];
-		if(-1 != plog_IndexOf(_data,MASTER_CLEARNETWORK,SIZEU8(MASTER_CLEARNETWORK),_size)){
+		if (-1 != plog_IndexOf(_data,MASTER_CLEARNETWORK,SIZEU8(MASTER_CLEARNETWORK),_size)){
 			ERR(APP,"DELETE NETWORK!!!!!\r\n");
 			memset(encrypted,0,SIZEU8(encrypted));
 			fl_nwk_encrypt16(FL_NWK_PB_KEY,_data,_size,encrypted);
 		}
-		/**/
+		u8 thisisScanRsp[31];
+		memset(thisisScanRsp,'D',SIZEU8(thisisScanRsp));
+		bls_ll_setScanRspData(thisisScanRsp,SIZEU8(thisisScanRsp));
 		bls_ll_setAdvData(encrypted,_size);
 		bls_ll_setAdvDuration(_timeout_ms * 1000,1); // ms->us
 		bls_app_registerEventCallback(BLT_EV_FLAG_ADV_DURATION_TIMEOUT,&fl_durationADV_timeout_proccess);
@@ -525,6 +587,8 @@ void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms) {
  * @return	  	:none
  *
  ***************************************************/
+
+
 void fl_adv_init(void) {
 	fl_db_init();
 #ifdef MASTER_CORE
@@ -553,7 +617,9 @@ void fl_adv_init(void) {
 	//
 	rf_set_power_level_index(MY_RF_POWER_INDEX);
 	blc_ll_setAdvCustomedChannel(*G_ADV_SETTINGS.nwk_chn.chn1,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3);
+
 	fl_adv_scanner_init();
+
 #ifdef MASTER_CORE
 	//Start network
 	fl_nwk_protocol_InitnRun();
@@ -578,13 +644,7 @@ void fl_adv_collection_channel_init(void){
 	FL_QUEUE_CLEAR(&G_QUEUE_SENDING,QUEUE_SENDING_SIZE);
 	blc_ll_setAdvCustomedChannel(0,1,2);
 
-	blc_hci_le_setEventMask_cmd(HCI_LE_EVT_MASK_ADVERTISING_REPORT);
-	blc_hci_registerControllerEventHandler(fl_controller_event_callback);
-	//report all adv
-	blc_ll_setScanParameter(SCAN_TYPE_ACTIVE,G_ADV_SETTINGS.scan_interval,G_ADV_SETTINGS.scan_window,OWN_ADDRESS_PUBLIC,SCAN_FP_ALLOW_ADV_ANY);
-	blc_ll_addScanningInAdvState();  //add scan in adv state
-	blc_ll_setScanEnable(1,0);
-	bls_ll_setAdvEnable(BLC_ADV_ENABLE);  //adv enable
+	ADV_SCANNER_CONFFIG();
 	FL_QUEUE_CLEAR(&G_DATA_CONTAINER,IN_DATA_SIZE);
 
 	P_INFO("Collection Init(%d): %d| %d| %d\r\n",bls_ll_setAdvEnable(BLC_ADV_ENABLE),*G_ADV_SETTINGS.nwk_chn.chn1,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3);  //adv enable
@@ -608,20 +668,13 @@ void fl_adv_collection_channel_deinit(void){
 	FL_QUEUE_CLEAR(&G_QUEUE_SENDING,QUEUE_SENDING_SIZE);
 
 	blc_ll_setAdvCustomedChannel(*G_ADV_SETTINGS.nwk_chn.chn1,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3);
-
-	blc_hci_le_setEventMask_cmd(HCI_LE_EVT_MASK_ADVERTISING_REPORT);
-	blc_hci_registerControllerEventHandler(fl_controller_event_callback);
-	//report all adv
-	blc_ll_setScanParameter(SCAN_TYPE_ACTIVE,G_ADV_SETTINGS.scan_interval,G_ADV_SETTINGS.scan_window,OWN_ADDRESS_PUBLIC,SCAN_FP_ALLOW_ADV_ANY);
-	blc_ll_addScanningInAdvState();  //add scan in adv state
-	blc_ll_setScanEnable(1,0);
-	bls_ll_setAdvEnable(BLC_ADV_ENABLE);  //adv enable
+	ADV_SCANNER_CONFFIG();
 	FL_QUEUE_CLEAR(&G_DATA_CONTAINER,IN_DATA_SIZE);
 	P_INFO("Collection Deinit(%d):%d |%d |%d\r\n",bls_ll_setAdvEnable(BLC_ADV_ENABLE),*G_ADV_SETTINGS.nwk_chn.chn1,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3)
 }
 
 void fl_adv_setting_update(void) {
-	blc_ll_setScanParameter(SCAN_TYPE_ACTIVE,G_ADV_SETTINGS.scan_interval,G_ADV_SETTINGS.scan_window,OWN_ADDRESS_PUBLIC,SCAN_FP_ALLOW_ADV_ANY);
+	blc_ll_setScanParameter(SCAN_TYPE_PASSIVE,G_ADV_SETTINGS.scan_interval,G_ADV_SETTINGS.scan_window,OWN_ADDRESS_PUBLIC,SCAN_FP_ALLOW_ADV_ANY);
 }
 /***************************************************
  * @brief 		:init adv scanner
@@ -633,13 +686,7 @@ void fl_adv_setting_update(void) {
  ***************************************************/
 void fl_adv_scanner_init(void) {
 	LOG_P(ZIG,"FL scanner initialization !\r\n");
-	blc_hci_le_setEventMask_cmd(HCI_LE_EVT_MASK_ADVERTISING_REPORT);
-	blc_hci_registerControllerEventHandler(fl_controller_event_callback);
-	//report all adv
-	blc_ll_setScanParameter(SCAN_TYPE_ACTIVE,G_ADV_SETTINGS.scan_interval,G_ADV_SETTINGS.scan_window,OWN_ADDRESS_PUBLIC,SCAN_FP_ALLOW_ADV_ANY);
-	blc_ll_addScanningInAdvState();  //add scan in adv state
-	blc_ll_setScanEnable(1,0);
-	bls_ll_setAdvEnable(BLC_ADV_ENABLE);  //adv enable
+	ADV_SCANNER_CONFFIG();
 	FL_QUEUE_CLEAR(&G_DATA_CONTAINER,IN_DATA_SIZE);
 }
 /***************************************************
