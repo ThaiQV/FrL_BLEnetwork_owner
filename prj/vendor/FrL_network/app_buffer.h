@@ -52,7 +52,7 @@
  * 2. at least 4; recommended value: 8, 16
  */
 #define ACL_RX_FIFO_SIZE				CAL_LL_ACL_RX_FIFO_SIZE(ACL_CONN_MAX_RX_OCTETS)  // ACL_CONN_MAX_RX_OCTETS + 21, then 16 Byte align
-#define ACL_RX_FIFO_NUM					8	// must be: 2^n
+#define ACL_RX_FIFO_NUM					16	// must be: 2^n
 
 /**
  * @brief	ACL TX buffer size & number
