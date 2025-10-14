@@ -24,5 +24,6 @@ void fl_adv_scanner_init(void);
 void fl_adv_init(void);
 void fl_adv_run(void);
 int fl_adv_sendFIFO_add(fl_pack_t _pack);
+void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms);
 
 #endif /* VENDOR_FRL_NETWORK_FL_ADV_PROC_H_ */

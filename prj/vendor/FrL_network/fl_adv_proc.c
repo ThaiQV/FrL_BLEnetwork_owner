@@ -240,11 +240,10 @@ void fl_durationADV_timeout_proccess(u8 e, u8 *p, int n) {
 /***                      Processing functions 					             **/
 /******************************************************************************/
 /******************************************************************************/
-
 /***************************************************
  * @brief 		: add data payload adv into queue fifo
  *
- * @param[in] 	:packet
+ * @param[in] 	: packet
  *
  * @return	  	:-1 false otherwise true
  *
@@ -274,6 +273,7 @@ int fl_adv_sendFIFO_add(fl_pack_t _pack) {
 		return -1;
 	}
 #endif
+
 	if (FL_QUEUE_FIND(&G_QUEUE_SENDING,&_pack,_pack.length - master_send_skip_LSB /* - 1 skip LSB (master)*/) == -1) {
 		if (FL_QUEUE_ADD(&G_QUEUE_SENDING,&_pack) < 0) {
 			ERR(BLE,"Err FULL <QUEUE ADD ADV SENDING>!!\r\n");
@@ -303,7 +303,6 @@ u8 fl_adv_sendFIFO_History_run(void) {
 }
 
 #ifdef MASTER_CORE
-
 void fl_master_adv_55_RSPCommon_Create(void) {
 	u8 SlaveID[22-5-2]; //22 bytes paloay - 4 bytes timetamps - delta timetamps
 	u32 timetamp_com[22-5-2]; // for testing list
@@ -396,7 +395,7 @@ u8 fl_adv_sendFIFO_run(void) {
 	u32 origin_pack = 0;
 	static u8 check_inused = 0;
 	if (!F_SENDING_STATE) {
-		/* Get busy slot*/
+		/* Get busy slot */
 		for (u8 slot = 0; slot < G_QUEUE_SENDING.mask + 1; ++slot) {
 			fl_pack_t check_busy_slot;
 			FL_QUEUE_GET_LOOP(&G_QUEUE_SENDING,&check_busy_slot);
@@ -493,7 +492,6 @@ void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms) {
 			ERR(BLE,"Set ADV param is FAIL !!!\r\n")
 			while (1);
 		}  //debug: adv setting err
-
 
 		/*Encryt data*/
 		u8 encrypted[_size];
