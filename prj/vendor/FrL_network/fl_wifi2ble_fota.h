@@ -12,6 +12,7 @@
 #define VENDOR_FRL_NETWORK_FL_WIFI2BLE_FOTA_H_
 
 #ifdef MASTER_CORE
+u8 FL_NWK_FOTA_IsReady(void);
 u8 fl_wifi2ble_fota_push(u8 *_fw, u8 _len);
 void fl_wifi2ble_fota_init(void);
 void fl_wifi2ble_fota_run(void);

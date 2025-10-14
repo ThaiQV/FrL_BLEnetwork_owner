@@ -355,6 +355,7 @@ u8 fl_nwk_mySlaveID(void);
 void fl_nwk_slave_init(void);
 void fl_nwk_slave_run(fl_pack_t *_pack_handle);
 void fl_nwk_slave_process(void);
+void fl_slave_fota_proc(fl_pack_t _fota_pack);
 bool fl_nwk_slave_checkHDR(u8 _hdr);
 u32 fl_req_slave_packet_createNsend(u8 _cmdid, u8* _data, u8 _len);
 s8 fl_queue_REQcRSP_ScanRec(fl_pack_t _pack,void *_id);

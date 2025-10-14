@@ -65,7 +65,7 @@ fl_pack_t g_history_sending_array[QUEUE_HISTORY_SENDING_SIZE];
 fl_data_container_t G_QUEUE_HISTORY_SENDING = { .data = g_history_sending_array, .head_index = 0, .tail_index = 0, .mask = QUEUE_HISTORY_SENDING_SIZE - 1, .count = 0 };
 /*-----------------------------------------------------------*/
 
-fl_hdr_nwk_type_e FL_NWK_HDR[]={NWK_HDR_11_REACTIVE,NWK_HDR_22_PING,NWK_HDR_A5_HIS,NWK_HDR_55,NWK_HDR_F5_INFO,NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_ASSIGN,NWK_HDR_HEARTBEAT,NWK_HDR_COLLECT};
+fl_hdr_nwk_type_e FL_NWK_HDR[]={NWK_HDR_FOTA,NWK_HDR_11_REACTIVE,NWK_HDR_22_PING,NWK_HDR_A5_HIS,NWK_HDR_55,NWK_HDR_F5_INFO,NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_ASSIGN,NWK_HDR_HEARTBEAT,NWK_HDR_COLLECT};
 #define FL_NWK_HDR_SIZE	(sizeof(FL_NWK_HDR)/sizeof(FL_NWK_HDR[0]))
 
 /******************************************************************************/
@@ -116,6 +116,11 @@ static bool fl_nwk_decrypt16(unsigned char * key,u8* _data,u8 _size, u8* decrypt
 	memcpy(data_buffer,_data,SIZEU8(data_buffer));
 	aes_decrypt(key,headbytes,data_buffer);
 	memcpy(decrypted,data_buffer,_size);
+	//Todo: Skip check crc with FOTA pack
+	if(decrypted[0] == NWK_HDR_FOTA){
+		return 1;
+	}
+
 /*Checking result decrypt*/
 	u32 timetamp_hdr = MAKE_U32(decrypted[3],decrypted[2],decrypted[1],decrypted[0]);
 	fl_data_frame_u packet_frame;
@@ -212,6 +217,15 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 				} else {
 //					ERR(BLE,"Err <QUEUE ALREADY>!!\r\n");
 //					P_PRINTFHEX_A(BLE,incomming_data.data_arr,incomming_data.length,"%s(%d):","PACK",incomming_data.length);
+#ifndef MASTER_CORE
+					if (incomming_data.data_arr[0] == NWK_HDR_FOTA) {
+						if (FL_QUEUE_FIND(&G_DATA_CONTAINER,&incomming_data,3) == -1) { //only check location bin
+							if (FL_QUEUE_ADD(&G_DATA_CONTAINER,&incomming_data) < 0) {
+								ERR(BLE,"Err <QUEUE FOTA ADD>!!\r\n");
+							}
+						}
+					}
+#endif
 				}
 			}
 		}
@@ -432,7 +446,7 @@ u8 fl_adv_sendFIFO_run(void) {
 			loop_check++;
 			if ( inpack < origin_pack || data_in_queue.length < 10 )
 			{
-				if (loop_check <= G_QUEUE_SENDING.mask)
+				if (loop_check <= G_QUEUE_SENDING.mask+1)
 					continue;
 				else{
 //					ERR(INF,"NULL ADV SENDING!! \r\n");
@@ -452,7 +466,6 @@ u8 fl_adv_sendFIFO_run(void) {
 			}
 #else //for master
 			//
-//			u16 cur_slot = ((G_QUEUE_SENDING.head_index - 1) &G_QUEUE_SENDING.mask);
 			if (check_heartbeat.frame.hdr == NWK_HDR_HEARTBEAT) {
 //				check_hb_slot = cur_slot;
 				u32 origin = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
@@ -462,11 +475,13 @@ u8 fl_adv_sendFIFO_run(void) {
 				}
 				//TODO: IMPORTANT SYNCHRONIZATION TIMESTAMP
 				fl_master_SYNC_ORIGINAL_TIMETAMP(timetamp_inpack);
+				// CLEAR HB => only send 1 times IF have a new FW need to update for slaves
+				if(inused_slot == 1 && FL_NWK_FOTA_IsReady() > 0){
+					LOGA(INF_FILE,"FOTA Ready:%d\r\n",FL_NWK_FOTA_IsReady() );
+					G_QUEUE_SENDING.data[indx_head_cur].length = 0;
+				}
 			}
 #endif
-//			if (cur_slot != check_hb_slot) {
-//				LOGA(APP,"slot of adv in SENDING QUEUE :%d|%d\r\n",cur_slot , check_hb_slot);
-//			}
 			return inused_slot;
 		}
 	}
@@ -731,15 +746,20 @@ void fl_adv_run(void) {
 #ifdef MASTER_CORE
 			fl_nwk_master_run(&data_in_queue); //process reponse from the slaves
 #else //SLAVE
-			//Todo: Repeat process
-			if (fl_adv_IsFromMe(data_in_queue) == false && data_parsed.endpoint.repeat_cnt > 0) {
-				//check repeat_mode
-				fl_repeat_run(&data_in_queue);
+			//Todo: FOTA packet -> this is a special format don't use standard frl adv
+			if (data_parsed.hdr == NWK_HDR_FOTA) {
+				fl_slave_fota_proc(data_in_queue);
 			}
-			//Todo: Handle FORM MASTER REQ
-			if(fl_adv_MasterToMe(data_in_queue))
-			{
-				fl_nwk_slave_run(&data_in_queue);
+			else{
+				//Todo: Repeat process
+				if (fl_adv_IsFromMe(data_in_queue) == false && data_parsed.endpoint.repeat_cnt > 0) {
+					//check repeat_mode
+					fl_repeat_run(&data_in_queue);
+				}
+				//Todo: Handle FORM MASTER REQ
+				if (fl_adv_MasterToMe(data_in_queue)) {
+					fl_nwk_slave_run(&data_in_queue);
+				}
 			}
 #endif
 		} else {

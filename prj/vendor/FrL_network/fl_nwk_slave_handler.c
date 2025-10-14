@@ -39,8 +39,8 @@ u8 GETINFO_FLAG_EVENTTEST = 0;
 #define RECHECKING_NETWOK_TIME 		30*1021 		    //ms
 #define RECONNECT_TIME				62*1000*1020		//s
 #define INFORM_MASTER				5*1001*1004
-fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_A5_HIS,NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
-fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_A5_HIS,NWK_HDR_55,NWK_HDR_11_REACTIVE,NWK_HDR_22_PING}; // register cmdid REQ
+fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_FOTA,NWK_HDR_A5_HIS,NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
+fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_FOTA,NWK_HDR_A5_HIS,NWK_HDR_55,NWK_HDR_11_REACTIVE,NWK_HDR_22_PING}; // register cmdid REQ
 
 #define NWK_HDR_SIZE (sizeof(G_NWK_HDR_LIST)/sizeof(G_NWK_HDR_LIST[0]))
 #define NWK_HDR_REQ_SIZE (sizeof(G_NWK_HDR_REQLIST)/sizeof(G_NWK_HDR_REQLIST[0]))
@@ -664,6 +664,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 			return packet_built;
 		}
 		break;
+
 		default:
 			return packet_built;
 		break;
@@ -680,6 +681,23 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 /***                            Functions callback                           **/
 /******************************************************************************/
 /******************************************************************************/
+
+void fl_slave_fota_proc(fl_pack_t _fota_pack){
+	extern u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
+	fl_data_frame_u packet;
+	if(!fl_packet_parse(_fota_pack,&packet.frame)){
+		ERR(INF,"Packet parse fail!!!\r\n");
+		return;
+	}
+	if (packet.frame.hdr == NWK_HDR_FOTA) {
+		/*=====================================================================
+		 *** FOTA
+		 *=====================================================================*/
+		u16 ordinal = MAKE_U16(packet.bytes[2],packet.bytes[1]);
+		P_INFO_HEX(packet.bytes+1+2,27,"FW[%d]:",ordinal);
+	}
+}
+
 /***************************************************
  * @brief 		:soft-timer callback for the processing response
  *
