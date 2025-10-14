@@ -94,6 +94,7 @@ void CMD_ADVSCAN(u8* _data);
 void CMD_CLEARDB(u8* _data);
 void CMD_CHANNELCONFIG(u8* _data);
 void CMD_PING(u8* _data);
+void CMD_TESTFOTA(u8* _data);
 /********************* Functions GET CMD declare ********************/
 void CMD_GETSLALIST(u8* _data);
 void CMD_GETINFOSLAVE(u8* _data);
@@ -110,7 +111,7 @@ fl_cmdlines_t G_CMDSET[] = { { { 'u', 't', 'c' }, 3, CMD_SETUTC }, 			// p set u
 		{ { 'c', 'l', 'e', 'a', 'r' }, 5, CMD_CLEARDB },					// p set clear <nodelist>
 		{ { 'c', 'h', 'n' }, 3, CMD_CHANNELCONFIG },						// p set chn <chn1> <chn2> <chn3>
 		{ { 'p', 'i', 'n','g' }, 4, CMD_PING },								// p set ping <mac> <times>
-
+		{ { 't','e','s','t' ,'f', 'o', 't','a' }, 8, CMD_TESTFOTA },		// p set testfota <size>
 		};
 
 fl_cmdlines_t G_CMDGET[] = { { { 's', 'l', 'a', 'l', 'i', 's', 't' }, 7, CMD_GETSLALIST },	// p get list
@@ -382,6 +383,17 @@ void CMD_HEARTBEAT(u8* _data) {
 	ERR(DRV,"ERR HeartBeat Period (%d):%d\r\n",rslt,period_hb);
 
 }
+
+void CMD_TESTFOTA(u8* _data) {
+	extern void TEST_virtual_fw(u32 _fwsize);
+	u32 fw_size = 0;
+	//p set testfota <fw size>
+	int rslt = sscanf((char*) _data,"testfota %d",&fw_size);
+	if (rslt == 1) {
+		TEST_virtual_fw(fw_size);
+	}
+}
+
 void CMD_REPEAT(u8* _data) {
 	extern volatile u8  NWK_REPEAT_LEVEL;
 	extern volatile u8  NWK_REPEAT_MODE;

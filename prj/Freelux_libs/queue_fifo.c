@@ -35,12 +35,11 @@
 /***                      Processing functions 					             **/
 /******************************************************************************/
 /******************************************************************************/
-
 void FL_QUEUE_CLEAR(fl_data_container_t *pCont, u16 _size) {
 	for (u16 var = 0; var  < _size; ++var) {
-		memset(&pCont->data[var],0,sizeof(fl_pack_t));
+		memset(&pCont->data[var].data_arr,0,sizeof(fl_pack_t));
+		pCont->data[var].length=0;
 	}
-
 //	pCont->data->
 	pCont->mask = _size - 1;
 	pCont->tail_index = 0;
