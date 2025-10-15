@@ -417,6 +417,7 @@ static void read_count(void)
 {
 	g_app_data.count->pass_product = G_COUNTER_DEV.data.pass_product;
 	g_app_data.count->err_product  = G_COUNTER_DEV.data.err_product;
+	g_app_data.mode 				= G_COUNTER_DEV.data.mode;
 }
 
 static void update_cont(void)
