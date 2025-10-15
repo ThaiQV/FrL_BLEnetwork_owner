@@ -323,7 +323,6 @@ static void button_on_click(uint8_t button_id)
 		{
 		case BUTTON_ID_RESET:
 			EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_RST_HOLD_3S, EVENT_PRIORITY_HIGH);
-			EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_RST_HOLD_5S, EVENT_PRIORITY_HIGH);
 			break;
 		
 		case BUTTON_ID_CALL:
@@ -444,11 +443,6 @@ static void button_hold_time(uint8_t button_id, uint32_t actual_hold_time)
 			{
 			case 3000:
 				EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_RST_HOLD_3S, EVENT_PRIORITY_HIGH);
-
-				break;
-				
-			case 5000:
-				EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_RST_HOLD_5S, EVENT_PRIORITY_HIGH);
 
 				break;
 

@@ -193,6 +193,8 @@ static void call_cb_rsp(void *_data,void* _data2)
 	if(data->timeout > 0){
 		EVENT_PUBLISH_SIMPLE(EVENT_DATA_CALL, EVENT_PRIORITY_HIGH);
 		g_app_data.is_call = true;
+		u8 tbs_profile[1] = {1} ;
+		fl_db_tbsprofile_save(tbs_profile,SIZEU8(tbs_profile));
 	}else{
 		EVENT_PUBLISH_SIMPLE(EVENT_DATA_CALL_FAIL_NORSP, EVENT_PRIORITY_HIGH);
 	}
@@ -206,6 +208,8 @@ static void endcall_cb_rsp(void *_data,void* _data2)
 	if(data->timeout > 0){
 		EVENT_PUBLISH_SIMPLE(EVENT_DATA_ENDCALL, EVENT_PRIORITY_HIGH);
 		g_app_data.is_call = false;
+		u8 tbs_profile[1] = {0} ;
+		fl_db_tbsprofile_save(tbs_profile,SIZEU8(tbs_profile));
 	}else{
 		EVENT_PUBLISH_SIMPLE(EVENT_DATA_ENDCALL_FAIL_NORSP, EVENT_PRIORITY_HIGH);
 	}
@@ -295,6 +299,8 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 			g_app_data.count->err_product = 0;
 			g_app_data.is_call = false;
 			update_cont();
+			data_ctx.mode = APP_MODE_SELEC;
+			EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_SELECT_MODE, EVENT_PRIORITY_HIGH);
 
             break;
 
@@ -399,13 +405,6 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 
             break;
 
-		case EVENT_BUTTON_RST_HOLD_5S:
-			ULOGA("Handle EVENT_BUTTON_RST_HOLD_5S\n");
-			data_ctx.mode = APP_MODE_SELEC;
-			EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_SELECT_MODE, EVENT_PRIORITY_HIGH);
-
-            break;
-
         default:
             ULOGA("Unknown event: 0x%lx\n", (uint32_t)event);
             break;
@@ -415,8 +414,14 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 
 static void read_count(void)
 {
-	g_app_data.count->pass_product = G_COUNTER_DEV.data.pass_product;
-	g_app_data.count->err_product  = G_COUNTER_DEV.data.err_product;
+	g_app_data.count->pass_product 	= G_COUNTER_DEV.data.pass_product;
+	g_app_data.count->err_product  	= G_COUNTER_DEV.data.err_product;
+	g_app_data.mode 			 	= G_COUNTER_DEV.data.mode;
+	g_app_data.bt_call 				= G_COUNTER_DEV.data.bt_call;
+	g_app_data.bt_endcall 			= G_COUNTER_DEV.data.bt_endcall;
+	fl_tbs_data_t tbs_load = fl_db_tbsprofile_load();
+	P_INFO_HEX(tbs_load.data,12,"TBS PROFILE(max:%d):",12);
+	g_app_data.is_call = tbs_load.data[0];
 }
 
 static void update_cont(void)
