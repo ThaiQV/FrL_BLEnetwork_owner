@@ -32,17 +32,17 @@ volatile u8* FL_NWK_COLLECTION_MODE; //
 /***                                Global Parameters                        **/
 /******************************************************************************/
 /******************************************************************************/
-#define SEND_TIMEOUT_MS		50 //ms
+#define SEND_TIMEOUT_MS		40 //ms
 extern _attribute_data_retention_ volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME;
 
 volatile u8 F_SENDING_STATE = 0;
 
 fl_adv_settings_t G_ADV_SETTINGS = {
 		.adv_interval_min = ADV_INTERVAL_20MS,
-		.adv_interval_max = ADV_INTERVAL_30MS,
+		.adv_interval_max = ADV_INTERVAL_25MS,
 		.adv_duration = SEND_TIMEOUT_MS,
-		.scan_interval = SCAN_INTERVAL_60MS,
-		.scan_window = SCAN_WINDOW_60MS,
+		.scan_interval = SCAN_INTERVAL_40MS,
+		.scan_window = SCAN_INTERVAL_40MS,
 		.time_wait_rsp = 10,
 		.retry_times = 2,
 		//.nwk_chn = {10,11,12}
@@ -746,16 +746,15 @@ void fl_adv_run(void) {
 #ifdef MASTER_CORE
 			fl_nwk_master_run(&data_in_queue); //process reponse from the slaves
 #else //SLAVE
+			//Todo: Repeat process
+			if (fl_adv_IsFromMe(data_in_queue) == false && data_parsed.endpoint.repeat_cnt > 0) {
+				//check repeat_mode
+				fl_repeat_run(&data_in_queue);
+			}
 			//Todo: FOTA packet -> this is a special format don't use standard frl adv
 			if (data_parsed.hdr == NWK_HDR_FOTA) {
 				fl_slave_fota_proc(data_in_queue);
-			}
-			else{
-				//Todo: Repeat process
-				if (fl_adv_IsFromMe(data_in_queue) == false && data_parsed.endpoint.repeat_cnt > 0) {
-					//check repeat_mode
-					fl_repeat_run(&data_in_queue);
-				}
+			} else {
 				//Todo: Handle FORM MASTER REQ
 				if (fl_adv_MasterToMe(data_in_queue)) {
 					fl_nwk_slave_run(&data_in_queue);

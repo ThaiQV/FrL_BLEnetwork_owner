@@ -100,7 +100,7 @@ s8 fl_queueREQcRSP_add(u8 slaveid,u8 cmdid,u32 _SeqTimetamp,u8* _payloadreq,u8 _
 		G_QUEUE_REQ_CALL_RSP[avai_slot].retry = _retry;
 		G_QUEUE_REQ_CALL_RSP[avai_slot].req_payload.len = _len;
 		memcpy(G_QUEUE_REQ_CALL_RSP[avai_slot].req_payload.payload,_payloadreq,_len);
-		LOGA(API,"queueREQcRSP Add [%d]SeqTimetamp(%u):%d ms|retry: %d \r\n",avai_slot,_SeqTimetamp,_timeout_ms,_retry);
+		LOGA(API,"queueREQcRSP Add [%d]SeqTimetamp(%d):%d ms|retry: %d \r\n",avai_slot,_SeqTimetamp,_timeout_ms,_retry);
 		//check fl_queue_REQnRSP_TimeoutStart running
 		if (blt_soft_timer_find(&fl_queue_REQnRSP_TimeoutStart) == -1) {
 			ERR(INF,"REQcRSP RE-Initialization (%d us)!!\r\n",QUEUQ_REQcRSP_INTERVAL);
@@ -108,7 +108,7 @@ s8 fl_queueREQcRSP_add(u8 slaveid,u8 cmdid,u32 _SeqTimetamp,u8* _payloadreq,u8 _
 		}
 		return avai_slot;
 	}
-	ERR(API,"queueREQcRSP Add [%d]SeqTimetamp(%u):%d ms|retry: %d \r\n",avai_slot,_SeqTimetamp,_timeout_ms,_retry);
+	ERR(API,"queueREQcRSP Add [%d]SeqTimetamp(%d):%d ms|retry: %d \r\n",avai_slot,_SeqTimetamp,_timeout_ms,_retry);
 	return -1;
 }
 /***************************************************
@@ -251,6 +251,9 @@ s8 fl_queue_REQcRSP_ScanRec(fl_pack_t _pack,void *_id)
 					G_QUEUE_REQ_CALL_RSP[i].rsp_cb((void*)&G_QUEUE_REQ_CALL_RSP[i],(void*)&_pack); //timeout
 					//clear event
 					_queue_REQcRSP_clear(&G_QUEUE_REQ_CALL_RSP[i]);
+				}
+				else{
+					LOGA(API,"RSP(%d|%d):%02X/%d\r\n",G_QUEUE_REQ_CALL_RSP[i].rsp_check.seqTimetamp,seq_timetamp,packet.frame.hdr,packet.frame.slaveID.id_u8);
 				}
 			}
 			//else return;

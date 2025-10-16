@@ -608,8 +608,15 @@ void fl_ble2wifi_EVENT_SEND(u8* _slave_mac){
 	memcpy(&cmd_data[1],(u8*)&wfdata,cmd_data[0]);
 	REPORT_RESPONSE(cmd_data);
 }
-void fl_ble2wifi_send_FOTA_BROADCAST_RSP(u8 *_rsl,u8 _size){
-	P_PRINTFHEX_A(INF_FILE,_rsl,_size,"FOTA Broadcast RSP(%d):",_size);
+void fl_ble2wifi_send_FOTA_BROADCAST_RSP(u8 *_rslt,u8 _size){
+	fl_datawifi2ble_t wfdata;
+	wfdata.cmd = GF_CMD_FOTA_RESPONSE;
+	memset(wfdata.data,0,SIZEU8(wfdata.data));
+	memcpy(wfdata.data,_rslt,_size);
+	wfdata.len_data = _size;
+	wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
+	P_INFO_HEX(wfdata,wfdata.len_data+3,"FOTA RSP(%d):",wfdata.len_data+3);
+	fl_ble_send_wifi((u8*)&wfdata,wfdata.len_data+3);//len_data + id_cmd + crc
 }
 void fl_ble2wifi_DEBUG2MQTT(u8* _payload,u8 _size){
 	fl_datawifi2ble_t wfdata;

@@ -10,6 +10,9 @@
 
 #include "tl_common.h"
 #include "fl_wifi2ble_fota.h"
+#include "fl_ble_wifi.h"
+
+#ifdef MASTER_CORE
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -40,11 +43,19 @@ int _send_fw(void){
 /***                            Functions callback                           **/
 /******************************************************************************/
 /******************************************************************************/
-
 void TEST_virtual_fw(u32 _fwsize) {
 	if (blt_soft_timer_find(_send_fw) == -1) {
-		ERR(APP,"TEST FOTA (%d bytes)!!!\r\n",_fwsize);
 		VIRTUAL_FW_SIZE = _fwsize;
+		if(VIRTUAL_FW_SIZE==0){
+			P_INFO("[TEST] Fota broadcast !!\r\n");
+			u8 broadcast_data[20];
+			memset(broadcast_data,0x55,sizeof(broadcast_data));
+			fl_wifi2ble_fota_Broadcast_REQwACK(broadcast_data,sizeof(broadcast_data),&fl_ble2wifi_send_FOTA_BROADCAST_RSP);
+			return;
+		}
+		else{
+			P_INFO("[TEST] Fota load virtual fw (%d bytes) !!\r\n",VIRTUAL_FW_SIZE);
+		}
 		blt_soft_timer_add(&_send_fw,50 * 1003);
 	}
 }
@@ -54,3 +65,4 @@ void TEST_virtual_fw(u32 _fwsize) {
 /***                      Processing functions 					             **/
 /******************************************************************************/
 /******************************************************************************/
+#endif

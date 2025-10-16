@@ -851,8 +851,8 @@ void _Passing_CmdLine(type_debug_t _type, u8 *_data) {
 	} else if (_type == GETCMD) {
 		CMD_EXCUTE_FUNC(G_CMDGET,sizeof(G_CMDGET) / sizeof(fl_cmdlines_t),_data);
 	} else if (_type == RSTCMD) {
-		ERR(APP,"Device will reset after 3s !!!!\r\n");
-		blt_soft_timer_add(&REBOOT_DEV,3 * 1000 * 1000);
+		ERR(APP,"Device will reset after 1s !!!!\r\n");
+		blt_soft_timer_add(&REBOOT_DEV,1 * 1000 * 1000);
 	}else if (_type == FACTORYCMD) {
 		ERR(APP,"Clear and reset factory.....\r\n");
 		fl_db_clearAll();

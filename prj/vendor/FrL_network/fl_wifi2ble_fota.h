@@ -12,9 +12,10 @@
 #define VENDOR_FRL_NETWORK_FL_WIFI2BLE_FOTA_H_
 
 #ifdef MASTER_CORE
+typedef void (*fota_broadcast_rsp_cbk)(u8*, u8);
 u8 FL_NWK_FOTA_IsReady(void);
 s16 fl_wifi2ble_fota_fwpush(u8 *_fw, u8 _len);
-s8 fl_wifi2ble_fota_Broadcast_REQwACK(u8* _fw, u8 _len,void* _fncbk );
+s8 fl_wifi2ble_fota_Broadcast_REQwACK(u8* _fw, u8 _len,fota_broadcast_rsp_cbk _fncbk );
 void fl_wifi2ble_fota_init(void);
 void fl_wifi2ble_fota_run(void);
 #endif

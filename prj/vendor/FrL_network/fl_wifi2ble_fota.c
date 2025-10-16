@@ -20,6 +20,7 @@
 #include "fl_adv_proc.h"
 #include "fl_nwk_handler.h"
 #include "fl_ble_wifi.h"
+#include "fl_wifi2ble_fota.h"
 #ifdef MASTER_CORE
 /******************************************************************************/
 /******************************************************************************/
@@ -106,7 +107,7 @@ fl_pack_t _fota_fw_packet_build(u8* _slave_mac,u8* _data, u8 _len,bool _ack){
 	memcpy(rslt.data_arr,req_pack.bytes,rslt.length );
 //	LOGA(FILE,"Send %02X REQ to Slave %d:%d/%d\r\n",req_pack.frame.hdr,slaveID,timetampStep.timetamp,timetampStep.milstep);
 	P_PRINTFHEX_A(INF_FILE,rslt.data_arr,rslt.length,"REQ %X(%s)->%d(0x%02X):",
-				req_pack.frame.hdr,req_pack.frame.endpoint.master==1?"ack":"non-ack",slaveID,slaveID);
+				req_pack.frame.hdr,req_pack.frame.endpoint.master==FL_FROM_MASTER_ACK?"ack":"non-ack",slaveID,slaveID);
 	return rslt;
 }
 /***************************************************
@@ -127,7 +128,7 @@ s16 fl_wifi2ble_fota_fwpush(u8 *_fw, u8 _len) {
 		ERR(INF_FILE,"Err FULL <QUEUE ADD FW FOTA>!!\r\n");
 		return -1;
 	} else {
-		P_PRINTFHEX_A(INF_FILE,fw_pack.data_arr,fw_pack.length,"PUSH(cnt:%d)=>FW[%d]",FL_NWK_FOTA_IsReady(),MAKE_U16(fw_pack.data_arr[1],fw_pack.data_arr[0]));
+//		P_PRINTFHEX_A(INF_FILE,fw_pack.data_arr,fw_pack.length,"PUSH(cnt:%d)=>FW[%d]",FL_NWK_FOTA_IsReady(),MAKE_U16(fw_pack.data_arr[1],fw_pack.data_arr[0]));
 //		P_INFO("Add FW: %d\r\n",MAKE_U16(fw_pack.data_arr[1],fw_pack.data_arr[0]));
 		return G_FW_CONTAINER.tail_index;
 	}
@@ -162,10 +163,12 @@ s8 fl_wifi2ble_fota_ReqWack(u8 _slaveID,u8* _fw,u8 _len,fl_rsp_callback_fnc _cb,
 			ERR(INF_FILE,"Err FULL <QUEUE ADD FW FOTA>!!\r\n");
 			return -1;
 		} else {
-			P_PRINTFHEX_A(INF_FILE,fw_pack.data_arr,fw_pack.length,"PUSH(cnt:%d)=>FW[%d]",FL_NWK_FOTA_IsReady(),
-					MAKE_U16(fw_pack.data_arr[1],fw_pack.data_arr[0]));
+//			P_PRINTFHEX_A(INF_FILE,fw_pack.data_arr,fw_pack.length,"PUSH(cnt:%d)=>FW[%d]",FL_NWK_FOTA_IsReady(),
+//					MAKE_U16(fw_pack.data_arr[1],fw_pack.data_arr[0]));
 			//		P_INFO("Add FW: %d\r\n",MAKE_U16(fw_pack.data_arr[1],fw_pack.data_arr[0]));
-			return fl_queueREQcRSP_add(_slaveID,NWK_HDR_FOTA,fl_adv_timetampStepInPack(fw_pack).timetamp,_fw,_len,&_cb,_timeout_ms,_retry);
+			fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(fw_pack);
+			u32 seq_timetamp =fl_rtc_timetamp2milltampStep(timetamp_inpack);
+			return fl_queueREQcRSP_add(_slaveID,NWK_HDR_FOTA,seq_timetamp,_fw,_len,&_cb,_timeout_ms,_retry);
 		}
 	}
 	ERR(INF_FILE,"FOTA Req <Err>!!\r\n");
@@ -186,7 +189,7 @@ s8 fl_wifi2ble_fota_ReqWack(u8 _slaveID,u8* _fw,u8 _len,fl_rsp_callback_fnc _cb,
  * @return	  	:-1: false, otherwise true
  *
  ***************************************************/
-typedef void (*fota_broadcast_rsp_cbk)(u8*, u8);
+
 typedef struct {
 	fl_pack_t payload;
 	struct {
@@ -196,6 +199,7 @@ typedef struct {
 	struct {
 		u8 sent;
 		u8 rec;
+		u8 list_rsp[30];
 		fota_broadcast_rsp_cbk rspcbk;
 	} rslt;
 	u32 period_ms; //time for getting each slave
@@ -213,16 +217,16 @@ void _fota_Broadcast_RSP_cb(void* _data, void* _data2){
 	if(data->timeout > 0){
 		G_FOTA_BROADCAST_REQ.rslt.rec++;
 		LOGA(INF_FILE,"Slave %d(0x%02X) reponsed \r\n",data->rsp_check.slaveID,data->rsp_check.slaveID);
+		G_FOTA_BROADCAST_REQ.rslt.list_rsp[data->rsp_check.slaveID / 8] |= (1 << (data->rsp_check.slaveID  % 8));
 	}
 	else
 	{
 		//toto: someting timed-out
 	}
-	G_FOTA_BROADCAST_REQ.rslt.sent++;
 	if(G_FOTA_BROADCAST_REQ.rslt.sent >= G_FOTA_BROADCAST_REQ.slave_list.total){
 		LOGA(INF_FILE,"FOTA Broadcast REQ done (%d/%d)!!\r\n",G_FOTA_BROADCAST_REQ.rslt.sent,G_FOTA_BROADCAST_REQ.rslt.rec);
-		u8 rslt[2]={G_FOTA_BROADCAST_REQ.rslt.sent,G_FOTA_BROADCAST_REQ.rslt.rec};
-		G_FOTA_BROADCAST_REQ.rslt.rspcbk(rslt,SIZEU8(rslt));
+//		P_PRINTFHEX_A(INF_FILE,G_FOTA_BROADCAST_REQ.rslt.list_rsp,SIZEU8(G_FOTA_BROADCAST_REQ.rslt.list_rsp),"FOTA Broadcast RSP(%d):",SIZEU8(G_FOTA_BROADCAST_REQ.rslt.list_rsp));
+		G_FOTA_BROADCAST_REQ.rslt.rspcbk(G_FOTA_BROADCAST_REQ.rslt.list_rsp,SIZEU8(G_FOTA_BROADCAST_REQ.rslt.list_rsp));
 	}
 	else
 	{
@@ -238,12 +242,12 @@ int _fota_Broadcast_process(void){
 	}
 	else {
 		LOGA(INF_FILE,"FOTA Broadcast REQ FAIL (%d/%d)!!\r\n",G_FOTA_BROADCAST_REQ.rslt.sent,G_FOTA_BROADCAST_REQ.rslt.rec);
-		u8 rslt[2]={G_FOTA_BROADCAST_REQ.rslt.sent,G_FOTA_BROADCAST_REQ.rslt.rec};
-		G_FOTA_BROADCAST_REQ.rslt.rspcbk(rslt,SIZEU8(rslt));
+//		P_PRINTFHEX_A(INF_FILE,G_FOTA_BROADCAST_REQ.rslt.list_rsp,SIZEU8(G_FOTA_BROADCAST_REQ.rslt.list_rsp),"FOTA Broadcast RSP(%d):",SIZEU8(G_FOTA_BROADCAST_REQ.rslt.list_rsp));
+		G_FOTA_BROADCAST_REQ.rslt.rspcbk(G_FOTA_BROADCAST_REQ.rslt.list_rsp,SIZEU8(G_FOTA_BROADCAST_REQ.rslt.list_rsp));
 	}
 	return -1;
 }
-s8 fl_wifi2ble_fota_Broadcast_REQwACK(u8* _fw, u8 _len,void* _fncbk ) {
+s8 fl_wifi2ble_fota_Broadcast_REQwACK(u8* _fw, u8 _len,fota_broadcast_rsp_cbk _fncbk ) {
 	extern fl_slaves_list_t G_NODE_LIST;
 	u8 slave_mac[6];
 	if (-1 != fl_master_SlaveMAC_get(0xFF,slave_mac) && _fncbk != NULL){
@@ -251,6 +255,7 @@ s8 fl_wifi2ble_fota_Broadcast_REQwACK(u8* _fw, u8 _len,void* _fncbk ) {
 		G_FOTA_BROADCAST_REQ.rslt.sent = 0;
 		G_FOTA_BROADCAST_REQ.payload.length=0;
 		memset(G_FOTA_BROADCAST_REQ.payload.data_arr,0,SIZEU8(G_FOTA_BROADCAST_REQ.payload.data_arr));
+		memset(G_FOTA_BROADCAST_REQ.rslt.list_rsp,0,SIZEU8(G_FOTA_BROADCAST_REQ.rslt.list_rsp));
 		//add payload
 		G_FOTA_BROADCAST_REQ.payload.length = _len;
 		memcpy(G_FOTA_BROADCAST_REQ.payload.data_arr,_fw,_len);
@@ -268,7 +273,7 @@ s8 fl_wifi2ble_fota_Broadcast_REQwACK(u8* _fw, u8 _len,void* _fncbk ) {
 		}
 		//end sort
 		G_FOTA_BROADCAST_REQ.period_ms = 21*999;
-		G_FOTA_BROADCAST_REQ.rslt.rspcbk = (fota_broadcast_rsp_cbk)_fncbk;
+		G_FOTA_BROADCAST_REQ.rslt.rspcbk = _fncbk;
 		blt_soft_timer_add(&_fota_Broadcast_process,G_FOTA_BROADCAST_REQ.period_ms);
 	}
 	else{
@@ -298,6 +303,7 @@ void fl_wifi2ble_fota_run(void) {
 	if (!F_SENDING_STATE) {
 		if (FL_QUEUE_GET(&G_FW_CONTAINER,&fw_in_queue)) {
 			F_SENDING_STATE = 1;
+			P_PRINTFHEX_A(INF_FILE,fw_in_queue.data_arr,fw_in_queue.length,"FOTA SEND:");
 			fl_adv_send(fw_in_queue.data_arr,fw_in_queue.length,G_ADV_SETTINGS.adv_duration);
 		}
 		else{

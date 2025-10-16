@@ -760,8 +760,11 @@ int fl_master_ProccesRSP_cbk(void) {
 		if(!fl_packet_parse(data_in_queue,&packet.frame)) return -1;
 		if(!MASTER_INSTALL_STATE && G_NODE_LIST.slot_inused == 0xFF){return -1;}
 		//LOGA(APP,"NumOfRSP:%d\r\n",numofrsp);
-		LOGA(INF,"HDR_RSP ID: %02X\r\n",packet.frame.hdr);
-		P_PRINTFHEX_A(INF,packet.frame.payload,SIZEU8(packet.frame.payload),"%d:",packet.frame.slaveID.id_u8);
+		P_PRINTFHEX_A(INF,packet.bytes,SIZEU8(packet.bytes),"Slave(%d|0x%02X)-hdr(%02X):",packet.frame.slaveID.id_u8,packet.frame.slaveID.id_u8,
+				packet.frame.hdr);
+		fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(data_in_queue);
+		u32 seq_timetamp =fl_rtc_timetamp2milltampStep(timetamp_inpack);
+		LOGA(INF,"TT inpack:%d\r\n",seq_timetamp);
 		//Todo:Process RSP with API REQ registered
 		fl_queue_REQcRSP_ScanRec(data_in_queue);
 

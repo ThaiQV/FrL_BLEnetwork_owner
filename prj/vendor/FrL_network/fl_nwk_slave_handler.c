@@ -681,7 +681,38 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 /***                            Functions callback                           **/
 /******************************************************************************/
 /******************************************************************************/
+fl_pack_t fl_slave_fota_rsp_packet_build(u8* _data, u8 _len,fl_data_frame_u _REQpack){
+	/**************************************************************************/
+	/* | HDR | Timetamp | Mill_time | SlaveID | payload | crc8_payload | Ep | */
+	/* | 1B  |   4Bs    |    1B     |    1B   |   22Bs  |   	1B	   | 1B | -> .master = FL_FROM_SLAVE */
+	/**************************************************************************/
+	fl_pack_t rslt = {.length = 0};
+	fl_data_frame_u rsp_pack;
+	/*Create common packet */
+	rsp_pack.frame.hdr = NWK_HDR_FOTA;
+	memcpy(rsp_pack.frame.timetamp,_REQpack.frame.timetamp,SIZEU8(rsp_pack.frame.timetamp));
+	//Add new mill-step
+	rsp_pack.frame.milltamp = _REQpack.frame.milltamp;
 
+	rsp_pack.frame.slaveID.id_u8 = G_INFORMATION.slaveID.id_u8;
+	//Create payload
+	memset(rsp_pack.frame.payload,0x0,SIZEU8(rsp_pack.frame.payload));
+	memcpy(rsp_pack.frame.payload,_data,_len);
+	//crc
+	rsp_pack.frame.crc8 = fl_crc8(rsp_pack.frame.payload,SIZEU8(rsp_pack.frame.payload));
+
+	//create endpoint => always set below
+	rsp_pack.frame.endpoint = _REQpack.frame.endpoint;
+	//Create packet from slave
+	rsp_pack.frame.endpoint.master = FL_FROM_SLAVE;
+
+	//copy to resutl data struct
+	rslt.length = SIZEU8(rsp_pack.bytes) - 1; //skip rssi
+	memcpy(rslt.data_arr,rsp_pack.bytes,rslt.length );
+//	LOGA(FILE,"Send %02X REQ to Slave %d:%d/%d\r\n",rsp_pack.frame.hdr,slaveID,timetampStep.timetamp,timetampStep.milstep);
+	P_PRINTFHEX_A(INF_FILE,rslt.data_arr,rslt.length,"RSP %X:",rsp_pack.frame.hdr);
+	return rslt;
+}
 void fl_slave_fota_proc(fl_pack_t _fota_pack){
 	extern u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
 	fl_data_frame_u packet;
@@ -690,11 +721,13 @@ void fl_slave_fota_proc(fl_pack_t _fota_pack){
 		return;
 	}
 	if (packet.frame.hdr == NWK_HDR_FOTA) {
-		/*=====================================================================
-		 *** FOTA
-		 *=====================================================================*/
-		u16 ordinal = MAKE_U16(packet.bytes[2],packet.bytes[1]);
-		P_INFO_HEX(packet.bytes+1+2,27,"FW[%d]:",ordinal);
+		if(packet.frame.endpoint.master == FL_FROM_MASTER_ACK){
+			//TEST
+			u8 version_typefw[4]={'1','2','3',G_INFORMATION.dev_type};
+			fl_adv_sendFIFO_add(fl_slave_fota_rsp_packet_build(version_typefw,SIZEU8(version_typefw),packet));
+		}else{
+
+		}
 	}
 }
 
