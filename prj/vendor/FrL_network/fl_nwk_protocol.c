@@ -492,8 +492,8 @@ typedef struct {
 		u8 received;
 		u8 lost;
 	} rslt;
-} fl_nkw_ping_t;
-fl_nkw_ping_t G_NWK_PING;
+} fl_nwk_ping_t;
+fl_nwk_ping_t G_NWK_PING;
 
 int ping_process(void);
 void _ping_rsp_callback(void *_data,void* _data2){

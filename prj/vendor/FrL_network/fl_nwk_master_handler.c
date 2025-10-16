@@ -508,6 +508,12 @@ u8 fl_master_SlaveID_get(u8* _mac) {
 
 s8 fl_master_SlaveMAC_get(u8 _slaveid,u8* mac){
 	s8 indx = fl_master_SlaveID_find(_slaveid);
+	//broadcast mac
+	if(_slaveid==0xFF && G_NODE_LIST.slot_inused != 0xFF ){
+		memset(mac,0xFF,6);
+		return 1;
+	}
+	//slave mac
 	if(indx != -1){
 		memcpy(mac,G_NODE_LIST.sla_info[indx].mac,SIZEU8(G_NODE_LIST.sla_info[indx].mac));
 		return 1;

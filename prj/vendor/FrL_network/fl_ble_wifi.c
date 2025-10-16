@@ -112,6 +112,7 @@ void PWMETER_RUNNING_SET_RESPONSE(u8* _pdata){};
 //FOTA
 void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc);
 void FOTA_RESPONSE(u8* _pdata);
+
 fl_wifiprotocol_proc_t G_WIFI_CON[] = {
 			{ { GF_CMD_PING, PING_REQ }, { GF_CMD_PING, PING_RSP } }, //ping
 			{ { GF_CMD_REPORT_REQUEST, REPORT_REQUEST }, { GF_CMD_REPORT_RESPONSE, REPORT_RESPONSE } },
@@ -526,20 +527,20 @@ void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 	}
 }
 void FOTA_RESPONSE(u8* _pdata){
-#define CONTANST_FW_SIZE	(2+26+1) //ordinal (2bytes) + fw (26bytes)+ crc (1bytes)
-	// push to fota processor
-	extern u8 fl_wifi2ble_fota_push(u8 *_fw, u8 _len);
-	s8 rslt = fl_wifi2ble_fota_push(_pdata,CONTANST_FW_SIZE);
-	//build rsp wifi
-	fl_datawifi2ble_t wfdata;
-	wfdata.cmd = G_WIFI_CON[_wf_CMD_find(GF_CMD_FOTA_REQUEST)].rsp.cmd;
-	memset(wfdata.data,0,SIZEU8(wfdata.data));
-	memcpy(wfdata.data,_pdata,2);
-	wfdata.data[2] = (rslt!=-1)?0:1;
-	wfdata.len_data = 3; ///ordinal (2bytes) + <OK/ERR> 1 byte
-	wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
-	u8 payload_len = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
-	fl_ble_send_wifi((u8*) &wfdata,payload_len);
+//#define CONTANST_FW_SIZE	(2+26+1) //ordinal (2bytes) + fw (26bytes)+ crc (1bytes)
+//	// push to fota processor
+//	extern s16 fl_wifi2ble_fota_push(u8 *_fw, u8 _len);
+//	s8 rslt = fl_wifi2ble_fota_push(_pdata,CONTANST_FW_SIZE);
+//	//build rsp wifi
+//	fl_datawifi2ble_t wfdata;
+//	wfdata.cmd = G_WIFI_CON[_wf_CMD_find(GF_CMD_FOTA_REQUEST)].rsp.cmd;
+//	memset(wfdata.data,0,SIZEU8(wfdata.data));
+//	memcpy(wfdata.data,_pdata,2);
+//	wfdata.data[2] = (rslt!=-1)?0:1;
+//	wfdata.len_data = 3; ///ordinal (2bytes) + <OK/ERR> 1 byte
+//	wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
+//	u8 payload_len = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
+//	fl_ble_send_wifi((u8*) &wfdata,payload_len);
 }
 
 /******************************************************************************/
@@ -606,6 +607,9 @@ void fl_ble2wifi_EVENT_SEND(u8* _slave_mac){
 	cmd_data[0] = wfdata.len_data + SIZEU8(wfdata.cmd)+SIZEU8(wfdata.crc8)+SIZEU8(wfdata.len_data);
 	memcpy(&cmd_data[1],(u8*)&wfdata,cmd_data[0]);
 	REPORT_RESPONSE(cmd_data);
+}
+void fl_ble2wifi_send_FOTA_BROADCAST_RSP(u8 *_rsl,u8 _size){
+	P_PRINTFHEX_A(INF_FILE,_rsl,_size,"FOTA Broadcast RSP(%d):",_size);
 }
 void fl_ble2wifi_DEBUG2MQTT(u8* _payload,u8 _size){
 	fl_datawifi2ble_t wfdata;

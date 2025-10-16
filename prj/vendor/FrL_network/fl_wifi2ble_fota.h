@@ -13,7 +13,8 @@
 
 #ifdef MASTER_CORE
 u8 FL_NWK_FOTA_IsReady(void);
-u8 fl_wifi2ble_fota_push(u8 *_fw, u8 _len);
+s16 fl_wifi2ble_fota_fwpush(u8 *_fw, u8 _len);
+s8 fl_wifi2ble_fota_Broadcast_REQwACK(u8* _fw, u8 _len,void* _fncbk );
 void fl_wifi2ble_fota_init(void);
 void fl_wifi2ble_fota_run(void);
 #endif

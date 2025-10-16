@@ -22,4 +22,5 @@ void fl_ble2wifi_HISTORY_SEND(u8* mac,u8* timetamp,u8* _data);
 void fl_ble2wifi_EVENT_SEND(u8* _slave_mac);
 void fl_wifi2ble_Excute(fl_wifi2ble_exc_e cmd);
 void fl_ble2wifi_DEBUG2MQTT(u8* _payload,u8 _size);
+void fl_ble2wifi_send_FOTA_BROADCAST_RSP(u8 *_rsl,u8 _size);
 #endif /* VENDOR_FRL_NETWORK_FL_BLE_WIFI_H_ */

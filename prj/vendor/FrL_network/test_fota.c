@@ -31,34 +31,7 @@ u32 VIRTUAL_FW_SIZE =0;
 /******************************************************************************/
 /******************************************************************************/
 int _send_fw(void){
-	static u32 bin_test=0;
-	static u32 count=0;
-	u8 fota_cmd_test[40];
-	memset(fota_cmd_test,0,sizeof(fota_cmd_test));
-//	fota_cmd_test[0] = U16_LO(bin_test);
-//	fota_cmd_test[1] = U16_HI(bin_test);
-	fota_cmd_test[0] = U16_LO(count);
-	fota_cmd_test[1] = U16_HI(count);
-	memset(fota_cmd_test+2,(u8)bin_test,27);
-	if (bin_test >= VIRTUAL_FW_SIZE) {
-		ERR(APP,"TEST FOTA (%d bytes)=> END %d\r\n",VIRTUAL_FW_SIZE,bin_test);
-		bin_test=0;
-		count=0;
-		return -1;
-	}
-	count++;
-	if(bin_test + 27 > VIRTUAL_FW_SIZE){
-		bin_test = VIRTUAL_FW_SIZE-bin_test;
-		memset(fota_cmd_test,0,sizeof(fota_cmd_test));
-		fota_cmd_test[0] = U16_LO(count);
-		fota_cmd_test[1] = U16_HI(count);
-		memset(fota_cmd_test+2,(u8)bin_test,27);
-	}
-	else
-	{
-		bin_test+=27;
-	}
-	fl_wifi2ble_fota_push(fota_cmd_test,29);
+
 	return 0;
 }
 
