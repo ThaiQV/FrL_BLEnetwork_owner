@@ -159,16 +159,20 @@ s8 fl_wifi2ble_fota_ReqWack(u8 _slaveID,u8* _fw,u8 _len,fl_rsp_callback_fnc _cb,
 	u8 slave_mac[6];
 	if (-1 != fl_master_SlaveMAC_get(_slaveID,slave_mac)) {
 		fl_pack_t fw_pack = _fota_fw_packet_build(slave_mac,_fw,_len,1);
-		if (FL_QUEUE_ADD(&G_FW_CONTAINER,&fw_pack) < 0) {
-			ERR(INF_FILE,"Err FULL <QUEUE ADD FW FOTA>!!\r\n");
-			return -1;
-		} else {
+		if (fw_pack.length > 5) {
+			int fl_send_heartbeat();
+
+			if (FL_QUEUE_ADD(&G_FW_CONTAINER,&fw_pack) < 0) {
+				ERR(INF_FILE,"Err FULL <QUEUE ADD FW FOTA>!!\r\n");
+				return -1;
+			} else {
 //			P_PRINTFHEX_A(INF_FILE,fw_pack.data_arr,fw_pack.length,"PUSH(cnt:%d)=>FW[%d]",FL_NWK_FOTA_IsReady(),
 //					MAKE_U16(fw_pack.data_arr[1],fw_pack.data_arr[0]));
-			//		P_INFO("Add FW: %d\r\n",MAKE_U16(fw_pack.data_arr[1],fw_pack.data_arr[0]));
-			fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(fw_pack);
-			u32 seq_timetamp =fl_rtc_timetamp2milltampStep(timetamp_inpack);
-			return fl_queueREQcRSP_add(_slaveID,NWK_HDR_FOTA,seq_timetamp,_fw,_len,&_cb,_timeout_ms,_retry);
+				//		P_INFO("Add FW: %d\r\n",MAKE_U16(fw_pack.data_arr[1],fw_pack.data_arr[0]));
+				fl_timetamp_withstep_t timetamp_inpack = fl_adv_timetampStepInPack(fw_pack);
+				u32 seq_timetamp = fl_rtc_timetamp2milltampStep(timetamp_inpack);
+				return fl_queueREQcRSP_add(_slaveID,NWK_HDR_FOTA,seq_timetamp,_fw,_len,&_cb,_timeout_ms,_retry);
+			}
 		}
 	}
 	ERR(INF_FILE,"FOTA Req <Err>!!\r\n");

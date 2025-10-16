@@ -206,7 +206,7 @@ void fl_nwk_slave_init(void) {
 	G_INFORMATION.data =(u8*)&G_POWER_METER;
 #endif
 	//todo: TBS Device initialization
-	TBS_Device_Init();
+//	TBS_Device_Init();
 
 	LOG_P(INF,"Freelux network SLAVE init\r\n");
 	LOGA(INF,"** MAC     :%02X%02X%02X%02X%02X%02X\r\n",G_INFORMATION.mac[0],G_INFORMATION.mac[1],G_INFORMATION.mac[2],
@@ -856,7 +856,7 @@ void fl_nwk_slave_process(void){
 	//todo : join- network
 	fl_nwk_slave_joinnwk_exc();
 	//todo TBS_device process
-	TBS_Device_Run();
+//	TBS_Device_Run();
 	//For debuging
 	static bool debug_on_offline = false;
 	if(debug_on_offline != G_INFORMATION.active){
