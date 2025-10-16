@@ -123,7 +123,8 @@ Freelux_libs/counter_libs/dfu.d Freelux_libs/counter_libs/dfu.o: \
  /cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/plog.h \
  /cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/queue_fifo.h \
  /cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/fl_sys_datetime.h \
- ../Freelux_libs/counter_libs/SPI_FLASH.h
+ ../Freelux_libs/counter_libs/SPI_FLASH.h \
+ ../Freelux_libs/counter_libs/nvm.h
 
 ../Freelux_libs/counter_libs/dfu.h:
 
@@ -390,3 +391,5 @@ Freelux_libs/counter_libs/dfu.d Freelux_libs/counter_libs/dfu.o: \
 /cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/fl_sys_datetime.h:
 
 ../Freelux_libs/counter_libs/SPI_FLASH.h:
+
+../Freelux_libs/counter_libs/nvm.h:

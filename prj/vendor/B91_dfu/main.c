@@ -173,81 +173,12 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 //		user_init_normal();
 
 		/* Test code */
-		LOG_P(APP,"DFU\n");
-//		firmware_check();
-		storage_init();
+		LOG_P(APP,"DFU Test\n");
+		firmware_check();
+//		storage_init();
 
-		int time;
-
-//		time = clock_time();
-//		LOGA(APP,"delay: %d\n",time);
-//		delay_ms(1000);
-//		LOGA(APP,"delay: %d\n",clock_time() - time);
-//
-//		time = clock_time();
-//		LOGA(APP,"time begin: %d\n",time);
-//		storage_clean();
-//		LOGA(APP,"time end: %d\n",clock_time() - time);
-
-		memset(buff,0x00,sizeof(buff));
-		retval = storage_put_data(buff,sizeof(buff));
-		LOGA(APP,"retval put: %d\n",retval);
-		memset(buff,0x01,sizeof(buff));
-		buff[5] = 0;
-		buff[6] = 0;
-		retval = storage_get_data(buff,sizeof(buff));
-		LOGA(APP,"retval get: %d\n",retval);
-
-		int i = 0;
-		for(i=0;i<sizeof(buff);i++)
-		{
-			printf("%d ",buff[i]);
-		}
-		printf("\n");
-
-		memset(buff,0x01,sizeof(buff));
-		buff[5] = 1;
-		buff[6] = 0;
-		retval = storage_put_data(buff,sizeof(buff));
-		LOGA(APP,"retval put: %d\n",retval);
-		memset(buff,0x00,sizeof(buff));
-		buff[5] = 1;
-		retval = storage_get_data(buff,sizeof(buff));
-		LOGA(APP,"retval get: %d\n",retval);
-
-		for(i=0;i<sizeof(buff);i++)
-		{
-			printf("%d ",buff[i]);
-		}
-		printf("\n");
-
-		memset(buff,0x02,sizeof(buff));
-		buff[5] = 2;
-		buff[6] = 0;
-		retval = storage_put_data(buff,sizeof(buff));
-		LOGA(APP,"retval put: %d\n",retval);
-		memset(buff,0x00,sizeof(buff));
-		buff[5] = 2;
-		retval = storage_get_data(buff,sizeof(buff));
-		LOGA(APP,"retval get: %d\n",retval);
-
-		for(i=0;i<sizeof(buff);i++)
-		{
-			printf("%d ",buff[i]);
-		}
-		printf("\n");
-
-
-		memset(buff,0x00,sizeof(buff));
-		buff[5] = 3;
-		retval = storage_get_data(buff,sizeof(buff));
-		LOGA(APP,"retval get: %d\n",retval);
-
-		for(i=0;i<sizeof(buff);i++)
-		{
-			printf("%d ",buff[i]);
-		}
-		printf("\n");
+//		ota_init();
+//		test_ota();
 
 		irq_enable();
 		// wdt init

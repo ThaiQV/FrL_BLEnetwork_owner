@@ -27,7 +27,7 @@
 #include "app.h"
 #include "fl_input_ext.h"
 
-#include "product_counter.h"
+//#include "product_counter.h"
 
 #if(FREERTOS_ENABLE)
 #include <FreeRTOS.h>

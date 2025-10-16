@@ -169,8 +169,8 @@ vendor/B91_dfu/main.d vendor/B91_dfu/main.o: ../vendor/B91_dfu/main.c \
  ../vendor/B91_dfu/app.h \
  /cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/counter_libs/dfu.h \
  /cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/counter_libs/SPI_FLASH.h \
- /cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/counter_libs/storage_weekly_data.h \
- /cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/counter_libs/nvm.h
+ /cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/counter_libs/nvm.h \
+ /cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/counter_libs/storage_weekly_data.h
 
 /cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/tl_common.h:
 
@@ -528,6 +528,6 @@ vendor/B91_dfu/main.d vendor/B91_dfu/main.o: ../vendor/B91_dfu/main.c \
 
 /cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/counter_libs/SPI_FLASH.h:
 
-/cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/counter_libs/storage_weekly_data.h:
-
 /cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/counter_libs/nvm.h:
+
+/cygdrive/E/All_projects/TELINK/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/counter_libs/storage_weekly_data.h:
