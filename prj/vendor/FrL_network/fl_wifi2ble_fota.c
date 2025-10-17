@@ -42,7 +42,6 @@ u8 FL_NWK_FOTA_IsReady(void){
 	return G_FW_CONTAINER.count;
 }
 
-
 /******************************************************************************/
 /******************************************************************************/
 /***                            Functions callback                           **/
@@ -158,21 +157,12 @@ s8 fl_wifi2ble_fota_ReqWack(u8 _slaveID,u8* _fw,u8 _len,fl_rsp_callback_fnc _cb,
 	}
 	u8 slave_mac[6];
 	if (-1 != fl_master_SlaveMAC_get(_slaveID,slave_mac)) {
+		fl_send_heartbeat();
 		fl_pack_t fw_pack = _fota_fw_packet_build(slave_mac,_fw,_len,1);
-		if (fw_pack.length > 5) {
-			int fl_send_heartbeat();
-
-			if (FL_QUEUE_ADD(&G_FW_CONTAINER,&fw_pack) < 0) {
-				ERR(INF_FILE,"Err FULL <QUEUE ADD FW FOTA>!!\r\n");
-				return -1;
-			} else {
-//			P_PRINTFHEX_A(INF_FILE,fw_pack.data_arr,fw_pack.length,"PUSH(cnt:%d)=>FW[%d]",FL_NWK_FOTA_IsReady(),
-//					MAKE_U16(fw_pack.data_arr[1],fw_pack.data_arr[0]));
-				//		P_INFO("Add FW: %d\r\n",MAKE_U16(fw_pack.data_arr[1],fw_pack.data_arr[0]));
-				fl_timetamp_withstep_t timetamp_inpack = fl_adv_timetampStepInPack(fw_pack);
-				u32 seq_timetamp = fl_rtc_timetamp2milltampStep(timetamp_inpack);
-				return fl_queueREQcRSP_add(_slaveID,NWK_HDR_FOTA,seq_timetamp,_fw,_len,&_cb,_timeout_ms,_retry);
-			}
+		if (-1 != fl_adv_sendFIFO_add(fw_pack)) {
+			fl_timetamp_withstep_t timetamp_inpack = fl_adv_timetampStepInPack(fw_pack);
+			u32 seq_timetamp = fl_rtc_timetamp2milltampStep(timetamp_inpack);
+			return fl_queueREQcRSP_add(_slaveID,NWK_HDR_FOTA,seq_timetamp,_fw,_len,&_cb,_timeout_ms,_retry);
 		}
 	}
 	ERR(INF_FILE,"FOTA Req <Err>!!\r\n");
@@ -193,7 +183,6 @@ s8 fl_wifi2ble_fota_ReqWack(u8 _slaveID,u8* _fw,u8 _len,fl_rsp_callback_fnc _cb,
  * @return	  	:-1: false, otherwise true
  *
  ***************************************************/
-
 typedef struct {
 	fl_pack_t payload;
 	struct {
@@ -205,12 +194,17 @@ typedef struct {
 		u8 rec;
 		u8 list_rsp[30];
 		fota_broadcast_rsp_cbk rspcbk;
+		u32 rtt;
 	} rslt;
-	u32 period_ms; //time for getting each slave
+	u32 scan_period_ms; //time for getting each slave
+	//variable use to broadcast group
+	struct{
+		u32 timeout1times;
+	}var;
 }__attribute__((packed)) fl_fota_broadcast_req_t;
 
 fl_fota_broadcast_req_t G_FOTA_BROADCAST_REQ;
-int _fota_Broadcast_process(void);
+int _fota_Broadcast_polling_process(void);
 
 void _fota_Broadcast_RSP_cb(void* _data, void* _data2){
 	fl_rsp_container_t *data =  (fl_rsp_container_t*)_data;
@@ -234,14 +228,14 @@ void _fota_Broadcast_RSP_cb(void* _data, void* _data2){
 	}
 	else
 	{
-		blt_soft_timer_restart(_fota_Broadcast_process,G_FOTA_BROADCAST_REQ.period_ms);
+		blt_soft_timer_restart(_fota_Broadcast_polling_process,G_FOTA_BROADCAST_REQ.scan_period_ms);
 	}
 }
 
-int _fota_Broadcast_process(void){
+int _fota_Broadcast_polling_process(void){
 	u8 slave_slot = G_FOTA_BROADCAST_REQ.rslt.sent;
 	u8 slaveID = G_FOTA_BROADCAST_REQ.slave_list.sla_info[slave_slot]->slaveID.id_u8;
-	if (-1 != fl_wifi2ble_fota_ReqWack(slaveID,G_FOTA_BROADCAST_REQ.payload.data_arr,G_FOTA_BROADCAST_REQ.payload.length,_fota_Broadcast_RSP_cb,0,1)) {
+	if (-1 != fl_wifi2ble_fota_ReqWack(slaveID,G_FOTA_BROADCAST_REQ.payload.data_arr,G_FOTA_BROADCAST_REQ.payload.length,_fota_Broadcast_RSP_cb,100,1)) {
 		G_FOTA_BROADCAST_REQ.rslt.sent++;
 	}
 	else {
@@ -251,7 +245,65 @@ int _fota_Broadcast_process(void){
 	}
 	return -1;
 }
-s8 fl_wifi2ble_fota_Broadcast_REQwACK(u8* _fw, u8 _len,fota_broadcast_rsp_cbk _fncbk ) {
+/***************************************************
+ * @brief 		:send req to all network group by group
+ *
+ * @param[in] 	:...
+ *
+ * @return	  	:none
+ *
+ ***************************************************/
+int _fota_Broadcast_group_process(void) {
+extern fl_adv_settings_t G_ADV_SETTINGS;
+#define NUMOFTIMES			8
+#define TIMEOUT_1_TIMES 	(G_ADV_SETTINGS.adv_duration*NUMOFTIMES*1000)
+	//generate req group fmt
+	int next_index = MSB_BIT_SET(G_FOTA_BROADCAST_REQ.rslt.list_rsp,SIZEU8(G_FOTA_BROADCAST_REQ.rslt.list_rsp));
+	u8 data_payload[22]; //max size of the payload in the adv packet
+	if (next_index < 0) {next_index = 0;}
+	else next_index+=1;
+	//scan and collect slave has rsped
+	G_FOTA_BROADCAST_REQ.rslt.rec=0;
+	for (u8 rsp=0;rsp<G_FOTA_BROADCAST_REQ.slave_list.total;rsp++) {
+		if(G_FOTA_BROADCAST_REQ.slave_list.sla_info[rsp]->active == true){
+			G_FOTA_BROADCAST_REQ.rslt.rec+=1;
+		}
+	}
+	if (G_FOTA_BROADCAST_REQ.var.timeout1times <= TIMEOUT_1_TIMES && next_index > 0) {
+		G_FOTA_BROADCAST_REQ.var.timeout1times += G_FOTA_BROADCAST_REQ.scan_period_ms;
+		if(G_FOTA_BROADCAST_REQ.rslt.rec == G_FOTA_BROADCAST_REQ.rslt.sent){
+			goto NEXT_GET;
+		}
+	}
+	else {
+		NEXT_GET:
+		if (next_index < G_FOTA_BROADCAST_REQ.slave_list.total) {
+			memset(data_payload,0xFF,SIZEU8(data_payload));
+			u8 index = 0;
+			for (index=0; index < NUMOFTIMES && next_index + index < G_FOTA_BROADCAST_REQ.slave_list.total; ++index) {
+				data_payload[index] = G_FOTA_BROADCAST_REQ.slave_list.sla_info[next_index + index]->slaveID.id_u8;
+				G_FOTA_BROADCAST_REQ.slave_list.sla_info[next_index + index]->active = false; //clear currently status
+				//update location have sent yet
+				G_FOTA_BROADCAST_REQ.rslt.list_rsp[(next_index + index) / 8] |= (1 << ((next_index + index) % 8));
+				//
+			}
+			LOGA(INF_FILE,"Currently slot:%d/%d\r\n",next_index,MSB_BIT_SET(G_FOTA_BROADCAST_REQ.rslt.list_rsp,SIZEU8(G_FOTA_BROADCAST_REQ.rslt.list_rsp)))
+//			u8 broadcast_mac[6] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+//			_fota_fw_packet_build(broadcast_mac,data_payload,SIZEU8(data_payload),1);
+			fl_master_packet_F5_CreateNSend(data_payload,index);
+			G_FOTA_BROADCAST_REQ.rslt.sent+=index;
+			G_FOTA_BROADCAST_REQ.var.timeout1times = 0;
+		}else{
+
+			LOGA(INF_FILE,"FOTA Broadcast REQ done (%d/%d),RTT:%d ms!!\r\n",G_FOTA_BROADCAST_REQ.rslt.sent,G_FOTA_BROADCAST_REQ.rslt.rec,
+					(clock_time()-G_FOTA_BROADCAST_REQ.rslt.rtt)/SYSTEM_TIMER_TICK_1MS);
+			return -1;
+		}
+	}
+	return 0;
+}
+
+s8 fl_wifi2ble_fota_Broadcast_REQwACK(u8* _fw, u8 _len,fota_broadcast_rsp_cbk _fncbk,fl_fota_broadcast_mode_e _mode ) {
 	extern fl_slaves_list_t G_NODE_LIST;
 	u8 slave_mac[6];
 	if (-1 != fl_master_SlaveMAC_get(0xFF,slave_mac) && _fncbk != NULL){
@@ -260,6 +312,7 @@ s8 fl_wifi2ble_fota_Broadcast_REQwACK(u8* _fw, u8 _len,fota_broadcast_rsp_cbk _f
 		G_FOTA_BROADCAST_REQ.payload.length=0;
 		memset(G_FOTA_BROADCAST_REQ.payload.data_arr,0,SIZEU8(G_FOTA_BROADCAST_REQ.payload.data_arr));
 		memset(G_FOTA_BROADCAST_REQ.rslt.list_rsp,0,SIZEU8(G_FOTA_BROADCAST_REQ.rslt.list_rsp));
+//		memset(G_FOTA_BROADCAST_REQ.slave_list.flag_send,0,SIZEU8(G_FOTA_BROADCAST_REQ.slave_list.flag_send));
 		//add payload
 		G_FOTA_BROADCAST_REQ.payload.length = _len;
 		memcpy(G_FOTA_BROADCAST_REQ.payload.data_arr,_fw,_len);
@@ -276,9 +329,25 @@ s8 fl_wifi2ble_fota_Broadcast_REQwACK(u8* _fw, u8 _len,fota_broadcast_rsp_cbk _f
 			}
 		}
 		//end sort
-		G_FOTA_BROADCAST_REQ.period_ms = 21*999;
+		//Clear status
+		for (u8 var = 0; var < G_NODE_LIST.slot_inused; ++var) {
+			G_NODE_LIST.sla_info[var].active = false;
+		}
+
+		G_FOTA_BROADCAST_REQ.scan_period_ms = 11*999;
 		G_FOTA_BROADCAST_REQ.rslt.rspcbk = _fncbk;
-		blt_soft_timer_add(&_fota_Broadcast_process,G_FOTA_BROADCAST_REQ.period_ms);
+		switch (_mode) {
+			case BroadCast_POLLING: {
+				blt_soft_timer_restart(&_fota_Broadcast_polling_process,G_FOTA_BROADCAST_REQ.scan_period_ms);
+			}
+			break;
+			case BroadCast_GROUP :{
+				G_FOTA_BROADCAST_REQ.rslt.rtt = clock_time();
+				blt_soft_timer_restart(&_fota_Broadcast_group_process,G_FOTA_BROADCAST_REQ.scan_period_ms);
+			}break;
+			default:
+			break;
+		}
 	}
 	else{
 		ERR(INF_FILE,"Null slave of the network!!!\r\n");
@@ -286,6 +355,8 @@ s8 fl_wifi2ble_fota_Broadcast_REQwACK(u8* _fw, u8 _len,fota_broadcast_rsp_cbk _f
 	}
 	return 0;
 }
+
+
 /*************************************************************************************************************************************************
  *    BROADCAST REQ PROCESSOR - END
  *************************************************************************************************************************************************/

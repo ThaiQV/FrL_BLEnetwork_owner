@@ -390,15 +390,6 @@ fl_pack_t fl_master_packet_GetInfo_build(u8 *_slave_mac_arr, u8 _slave_num) {
 	fl_pack_t packet_built;
 	fl_data_frame_u packet;
 
-	//clear lastest time rec
-//	for (int var = 0; var < _slave_num; ++var) {
-//		s16 idx = fl_master_SlaveID_find(_slave_mac_arr[var]);
-//		if (idx != -1) {
-//			G_NODE_LIST.sla_info[idx].timelife = clock_time();
-//			G_NODE_LIST.sla_info[idx].active = false;
-//		}
-//	}
-
 	/* F5|timetamp|slaveID 1|slaveID 2.......|CRC|TTL */
 	/* 1B|  4Bs   |  1Bs  	|     18Bs  	 |1B |1B  */
 	memset(packet.bytes,0,SIZEU8(packet.bytes));

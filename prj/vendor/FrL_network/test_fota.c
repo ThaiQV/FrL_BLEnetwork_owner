@@ -50,7 +50,7 @@ void TEST_virtual_fw(u32 _fwsize) {
 			P_INFO("[TEST] Fota broadcast !!\r\n");
 			u8 broadcast_data[20];
 			memset(broadcast_data,0x55,sizeof(broadcast_data));
-			fl_wifi2ble_fota_Broadcast_REQwACK(broadcast_data,sizeof(broadcast_data),&fl_ble2wifi_send_FOTA_BROADCAST_RSP);
+			fl_wifi2ble_fota_Broadcast_REQwACK(broadcast_data,sizeof(broadcast_data),&fl_ble2wifi_send_FOTA_BROADCAST_RSP,BroadCast_GROUP);
 			return;
 		}
 		else{
