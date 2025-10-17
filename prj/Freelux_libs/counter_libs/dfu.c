@@ -214,7 +214,8 @@ void put_fw_into_ex_flash(uint32_t fw_addr)
 	uint8_t		buff[1024];
 	fw_header_t	header = {0};
 	uint32_t	header_addr;
-	uint32_t	image_size = 0x18000;//APP_IMAGE_SIZE_MAX;
+//	uint32_t	image_size = 0x18000;//APP_IMAGE_SIZE_MAX;
+	uint32_t	image_size = 0x40000;//APP_IMAGE_SIZE_MAX;
 
 	// Erase OTA region in ex-flash
 	if(fw_addr == OTA_FW_ADDRESS)
@@ -433,41 +434,45 @@ ota_ret_t ota_fw_put(uint8_t *pdata)
 		packet_header.version = pdata[2];
 		packet_header.size = (uint32_t)pdata[3] + (uint32_t)(pdata[4] << 8) + (uint32_t)(pdata[5] << 16);
 		memcpy((uint8_t*)packet_header.signature,(uint8_t*)&pdata[6],OTA_PACKET_LENGTH);
-		ota_fw_header_set(&packet_header);
+		ota_packet_header_set(&packet_header);
 		DFU_PRINTF("OTA Begin\n");
 	}
 	else if(packet_type == OTA_PACKET_END)
 	{
-		packet_header.state = OTA_FW_STATE_COMPLETE;
-		packet_header.type = pdata[1];
-		packet_header.version = pdata[2];
-		packet_header.size = (uint32_t)pdata[3] + (uint32_t)(pdata[4] << 8) + (uint32_t)(pdata[5] << 16);
-		memcpy((uint8_t*)packet_header.signature,(uint8_t*)&pdata[6],OTA_PACKET_LENGTH);
-		ota_fw_header_set(&packet_header);
-
-		// Write OTA header
-		ota_header.major = 0;
-		ota_header.minor = 0;
-		ota_header.patch = packet_header.version;
-		ota_header.size  = packet_header.size;
-		memcpy(ota_header.crc128,(uint8_t*)packet_header.signature,OTA_PACKET_LENGTH);
-
-		DFU_PRINTF("Signature: ");
-		for(i = 0; i < CRC128_LENGTH; i++)
+		ota_packet_header_get(&packet_header);
+		if((packet_header.state == OTA_FW_STATE_EMPTY) || (packet_header.state == OTA_FW_STATE_WRITING))
 		{
-			printf("%x ",ota_header.crc128[i]);
+			packet_header.state = OTA_FW_STATE_COMPLETE;
+			packet_header.type = pdata[1];
+			packet_header.version = pdata[2];
+			packet_header.size = (uint32_t)pdata[3] + (uint32_t)(pdata[4] << 8) + (uint32_t)(pdata[5] << 16);
+			memcpy((uint8_t*)packet_header.signature,(uint8_t*)&pdata[6],OTA_PACKET_LENGTH);
+			ota_packet_header_set(&packet_header);
+
+			// Write OTA header
+			ota_header.major = 0;
+			ota_header.minor = 0;
+			ota_header.patch = packet_header.version;
+			ota_header.size  = packet_header.size;
+			memcpy(ota_header.crc128,(uint8_t*)packet_header.signature,OTA_PACKET_LENGTH);
+
+			DFU_PRINTF("Signature: ");
+			for(i = 0; i < CRC128_LENGTH; i++)
+			{
+				printf("%x ",ota_header.crc128[i]);
+			}
+			printf("\n");
+
+			// Erase OTA Header sector before write
+			FLASH_Erase_Sector(OTA_FW_HEADER);
+			// Write OTA Header
+			W25XXX_WR_Block((uint8_t *)&ota_header,OTA_FW_HEADER,sizeof(ota_header));
+			// Write OTA Map
+			memset(ota_map,0xFF,sizeof(ota_map));
+			nvm_record_write(OTA_MEMORY_MAP,(uint8_t*)ota_map,sizeof(ota_map));
+
+			DFU_PRINTF("OTA End\n");
 		}
-		printf("\n");
-
-		// Erase OTA Header sector before write
-		FLASH_Erase_Sector(OTA_FW_HEADER);
-		// Write OTA Header
-		W25XXX_WR_Block((uint8_t *)&ota_header,OTA_FW_HEADER,sizeof(ota_header));
-		// Write OTA Map
-		memset(ota_map,0xFF,sizeof(ota_map));
-		nvm_record_write(OTA_MEMORY_MAP,(uint8_t*)ota_map,sizeof(ota_map));
-
-		DFU_PRINTF("OTA End\n");
 	}
 	else if(packet_type == OTA_PACKET_DATA)
 	{
@@ -475,7 +480,7 @@ ota_ret_t ota_fw_put(uint8_t *pdata)
 		version		= pdata[2];
 		memory_addr	= (uint32_t)pdata[3] + (uint32_t)(pdata[4] << 8) + (uint32_t)(pdata[5] << 16);
 
-		ota_fw_header_get(&packet_header);
+		ota_packet_header_get(&packet_header);
 		if((packet_header.state == OTA_FW_STATE_EMPTY) || (packet_header.state == OTA_FW_STATE_WRITING))
 		{
 			if((device_type == packet_header.type) && (version == packet_header.version))
@@ -509,7 +514,7 @@ ota_ret_t ota_fw_put(uint8_t *pdata)
 	return OTA_RET_ERROR;
 }
 
-ota_ret_t ota_fw_header_set(ota_fw_header_t *header)
+ota_ret_t ota_packet_header_set(ota_fw_header_t *header)
 {
 	nvm_status_t nvm_ret;
 
@@ -521,7 +526,7 @@ ota_ret_t ota_fw_header_set(ota_fw_header_t *header)
 	return OTA_RET_ERROR;
 }
 
-ota_ret_t ota_fw_header_get(ota_fw_header_t *header)
+ota_ret_t ota_packet_header_get(ota_fw_header_t *header)
 {
 	nvm_status_t nvm_ret;
 

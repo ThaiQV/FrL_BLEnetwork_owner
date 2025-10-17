@@ -113,7 +113,7 @@
 	/* For OTA */
 	void ota_init(void);
 	ota_ret_t ota_fw_put(uint8_t *pdata);
-	ota_ret_t ota_fw_header_set(ota_fw_header_t *header);
-	ota_ret_t ota_fw_header_get(ota_fw_header_t *header);
+	ota_ret_t ota_packet_header_set(ota_fw_header_t *header);
+	ota_ret_t ota_packet_header_get(ota_fw_header_t *header);
 	void test_ota(void);
 #endif //__DFU_H__
