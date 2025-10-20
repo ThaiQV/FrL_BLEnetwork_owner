@@ -15,6 +15,14 @@
 #ifdef MASTER_CORE
 #include "fl_ble_wifi.h"
 #include "fl_nwk_protocol.h"
+
+/******************************************************************************/
+/***                 DFU configuration        				                 **/
+/******************************************************************************/
+#include "../Freelux_libs/dfu.h"
+#define DFU_FW_PUT						ota_fw_put
+/******************************************************************************/
+
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -59,8 +67,8 @@ typedef enum {
 	GF_CMD_PWMETER_RUNNING_SET_REQUEST = 0x0E,
 	GF_CMD_PWMETER_RUNNING_SET_RESPONSE = 0x0E,
 	///FOTA cmd
-	GF_CMD_FOTA_REQUEST = 0xFA,
-	GF_CMD_FOTA_RESPONSE = 0xFA,
+	GF_CMD_FOTA_REQUEST = 0xA0,
+	GF_CMD_FOTA_RESPONSE = 0xA0,
 }fl_wifi_cmd_e;
 
 typedef void (*RspFunc)(u8*);
@@ -516,7 +524,6 @@ void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 	LOGA(MCU,"CRC8:0x%02X\r\n",data->crc8);
 	P_PRINTFHEX_A(MCU,data->data,data->len_data,"Data:");
 	u8 crc8_cal = fl_crc8(data->data,data->len_data);
-
 	if (crc8_cal != data->crc8) {
 		ERR(MCU,"ERR >> CRC8:0x%02X | 0x%02X\r\n",data->crc8,crc8_cal);
 		return;
@@ -526,21 +533,18 @@ void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 		rspfnc(data->data);
 	}
 }
+
 void FOTA_RESPONSE(u8* _pdata){
-//#define CONTANST_FW_SIZE	(2+26+1) //ordinal (2bytes) + fw (26bytes)+ crc (1bytes)
-//	// push to fota processor
-//	extern s16 fl_wifi2ble_fota_push(u8 *_fw, u8 _len);
-//	s8 rslt = fl_wifi2ble_fota_push(_pdata,CONTANST_FW_SIZE);
-//	//build rsp wifi
-//	fl_datawifi2ble_t wfdata;
-//	wfdata.cmd = G_WIFI_CON[_wf_CMD_find(GF_CMD_FOTA_REQUEST)].rsp.cmd;
-//	memset(wfdata.data,0,SIZEU8(wfdata.data));
-//	memcpy(wfdata.data,_pdata,2);
-//	wfdata.data[2] = (rslt!=-1)?0:1;
-//	wfdata.len_data = 3; ///ordinal (2bytes) + <OK/ERR> 1 byte
-//	wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
-//	u8 payload_len = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
-//	fl_ble_send_wifi((u8*) &wfdata,payload_len);
+//	Build rsp wifi
+	fl_datawifi2ble_t wfdata;
+	wfdata.cmd = G_WIFI_CON[_wf_CMD_find(GF_CMD_FOTA_REQUEST)].rsp.cmd;
+	memset(wfdata.data,0,SIZEU8(wfdata.data));
+	//DFU put to flash
+	wfdata.data[0] = DFU_FW_PUT(_pdata);
+	wfdata.len_data = 1; //<OK/ERR> 1 byte
+	wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
+	u8 payload_len = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
+	fl_ble_send_wifi((u8*) &wfdata,payload_len);
 }
 
 /******************************************************************************/

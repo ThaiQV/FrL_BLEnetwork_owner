@@ -25,8 +25,8 @@
 ENTRY(_RESET_ENTRY)
 SECTIONS
 {
-	NDS_SAG_LMA_FLASH = 0x20010000 ;
-	. = 0x20010000;	
+	NDS_SAG_LMA_FLASH = 0x20000000 ;
+	. = 0x20000000;	
 	PROVIDE (BIN_BEGIN = .);
 	.vectors 		: { KEEP(*(.vectors )) }
 	. = 0x00000000;
