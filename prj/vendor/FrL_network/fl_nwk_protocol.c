@@ -679,7 +679,6 @@ int _GETALLNODES(void) {
 			}
 		}
 	}
-
 	//check timeout
 	if (p_ALLNODES.timeout == 0) {
 		P_INFO("GET ALL TIMEOUT: %d ms\r\n",(clock_time()- p_ALLNODES.rtt)/SYSTEM_TIMER_TICK_1MS);
@@ -691,11 +690,8 @@ int _GETALLNODES(void) {
 	u8 diff = _count_diff_elements(pre_slaveID,slaveID,SIZEU8(slaveID));
 	if ((diff >= 3 )&& slave_num > 0) {
 		//update tail and send req
-//		u8 new_tail = slaveID[slave_num - 1] + GETALL_NUMOF1TIMES;
-//		p_ALLNODES.tail_nodes = new_tail > p_ALLNODES.sort_list.numOfOnl ? p_ALLNODES.sort_list.numOfOnl : new_tail;
 		memcpy(pre_slaveID,slaveID,SIZEU8(slaveID));
-		LOGA(DRV,"Total:%d,Diff:%d,Curr_num:%d,head:%d\r\n",p_ALLNODES.sort_list.numOfOnl,
-				diff,slave_num,p_ALLNODES.head_nodes);
+		LOGA(DRV,"Total:%d,Diff:%d,Curr_num:%d,head:%d\r\n",p_ALLNODES.sort_list.numOfOnl,diff,slave_num,p_ALLNODES.head_nodes);
 		P_PRINTFHEX_A(DRV,slaveID,slave_num,"SlaveID(%d):",slave_num);
 		//Send ADV
 		s8 add_rslt = fl_master_packet_F5_CreateNSend(slaveID,slave_num);
@@ -705,7 +701,7 @@ int _GETALLNODES(void) {
 			goto EXIT_GETALL;
 		}
 	}
-	return 0;
+	return GETALL_TIMEOUT_1_NODE*1000;
 	EXIT_GETALL:
 	fl_send_heartbeat();
 	memset(pre_slaveID,0xFE,SIZEU8(pre_slaveID));
@@ -754,7 +750,7 @@ void CMD_GETALLNODES(u8* _data) {
 		}
 		p_ALLNODES.rtt = clock_time();
 		P_INFO("Get %d/%d nodes (timeout:%d ms)(%d)\r\n",p_ALLNODES.sort_list.numOfOnl,G_NODE_LIST.slot_inused,p_ALLNODES.timeout,GETINFO_FLAG_EVENTTEST);
-		blt_soft_timer_restart(&_GETALLNODES,GETALL_TIMEOUT_1_NODE*1000);
+		blt_soft_timer_restart(&_GETALLNODES,11*999);
 	}
 }
 

@@ -269,6 +269,7 @@ extern fl_adv_settings_t G_ADV_SETTINGS;
 			G_FOTA_BROADCAST_REQ.rslt.rec+=1;
 		}
 	}
+
 	if (G_FOTA_BROADCAST_REQ.var.timeout1times <= TIMEOUT_1_TIMES && next_index > 0) {
 		G_FOTA_BROADCAST_REQ.var.timeout1times += G_FOTA_BROADCAST_REQ.scan_period_ms;
 		if(G_FOTA_BROADCAST_REQ.rslt.rec == G_FOTA_BROADCAST_REQ.rslt.sent){
@@ -282,6 +283,7 @@ extern fl_adv_settings_t G_ADV_SETTINGS;
 			u8 index = 0;
 			for (index=0; index < NUMOFTIMES && next_index + index < G_FOTA_BROADCAST_REQ.slave_list.total; ++index) {
 				data_payload[index] = G_FOTA_BROADCAST_REQ.slave_list.sla_info[next_index + index]->slaveID.id_u8;
+
 				G_FOTA_BROADCAST_REQ.slave_list.sla_info[next_index + index]->active = false; //clear currently status
 				//update location have sent yet
 				G_FOTA_BROADCAST_REQ.rslt.list_rsp[(next_index + index) / 8] |= (1 << ((next_index + index) % 8));
@@ -333,7 +335,6 @@ s8 fl_wifi2ble_fota_Broadcast_REQwACK(u8* _fw, u8 _len,fota_broadcast_rsp_cbk _f
 		for (u8 var = 0; var < G_NODE_LIST.slot_inused; ++var) {
 			G_NODE_LIST.sla_info[var].active = false;
 		}
-
 		G_FOTA_BROADCAST_REQ.scan_period_ms = 11*999;
 		G_FOTA_BROADCAST_REQ.rslt.rspcbk = _fncbk;
 		switch (_mode) {
