@@ -40,13 +40,6 @@ void storage_init(void)
 		memset(map,0x00,sizeof(map));
 		nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
 	}
-
-//	PRINTF("map: ");
-//	for(i=0;i<sizeof(map);i++)
-//	{
-//		PRINTF("%x ",map[i]);
-//	}
-//	PRINTF("\n");
 }
 
 /**
@@ -73,7 +66,7 @@ void storage_clean(void)
 * @param: see below
 * @retval: see below
 */
-bool check_sector_available(uint32_t sector)
+static bool check_sector_available(uint32_t sector)
 {
 	uint32_t i,j;
 	uint8_t	 slot = 0;
@@ -156,7 +149,7 @@ void storage_map_fill_status(uint32_t index, uint32_t len)
 	// Set status of previous sector is written
 	if(sector > 0)
 	{
-		if((map[(sector/8)] & (0x01 << ((sector%8) - 1))) == 0x00)
+		if((map[(sector/8)] && (0x01 << ((sector%8) - 1))) == 0x00)
 		{
 			map[(sector/8)] |= (0x01 << ((sector%8) - 1));
 			nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
@@ -308,100 +301,4 @@ storage_ret_t storage_get_data(uint8_t *pdata,uint32_t len)
 	}
 	return STORAGE_RET_ERROR;
 }
-
-/******************************************OTA Region******************************************/
-
-/**
-* @brief: Put data into OTA region
-* @param: see below
-* -------------------------------------------------------------------------
-* |                           Packet BEGIN/END                            |
-* -------------------------------------------------------------------------
-* | Packet type | Device type | Version |      Size      |   Signature    |
-* -------------------------------------------------------------------------
-* |    1 byte   |    1 byte   | 1 byte  |     3 bytes    |    16 bytes    |
-* -------------------------------------------------------------------------
-* -------------------------------------------------------------------------
-* |                              Packet DATA                              |
-* -------------------------------------------------------------------------
-* | Packet type | Device type | Version | Memory address |      Data      |
-* -------------------------------------------------------------------------
-* |    1 byte   |    1 byte   | 1 byte  |     3 bytes    |    16 bytes    |
-* -------------------------------------------------------------------------
-* @retval: ota_ret_t
-*/
-ota_ret_t ota_fw_put(uint8_t *pdata)
-{
-	ota_packet_type_t	packet_type;
-	ota_device_type_t 	device_type;
-	uint8_t 			version;
-	uint32_t 			memory_addr;
-	ota_fw_header_t		header;
-	uint32_t			i;
-
-	packet_type = pdata[0];
-
-	if(packet_type == OTA_PACKET_BEGIN)
-	{
-		header.state = OTA_FW_STATE_EMPTY;
-		header.type = pdata[1];
-		header.version = pdata[2];
-		header.size = (uint32_t)pdata[3] + (uint32_t)(pdata[4] << 8) + (uint32_t)(pdata[5] << 16);
-		memcpy((uint8_t*)header.signature,(uint8_t*)&pdata[6],OTA_PACKET_LENGTH);
-		ota_fw_header_set(&header);
-		// Erase the OTA region before write new FW
-		for(i = 0; i < ((EX_FLASH_NVM_ADDRESS - EX_FLASH_OTA_FW_ADDRESS)/DEF_UDISK_SECTOR_SIZE); i++)
-		{
-			FLASH_Erase_Sector(EX_FLASH_OTA_FW_ADDRESS +  i*DEF_UDISK_SECTOR_SIZE);
-		}
-	}
-	else if(packet_type == OTA_PACKET_END)
-	{
-
-	}
-	else if(packet_type == OTA_PACKET_DATA)
-	{
-		device_type = pdata[1];
-		version		= pdata[2];
-		memory_addr	= (uint32_t)pdata[3] + (uint32_t)(pdata[4] << 8) + (uint32_t)(pdata[5] << 16);
-
-		ota_fw_header_get(&header);
-		if((header.state == OTA_FW_STATE_EMPTY) || (header.state == OTA_FW_STATE_WRITING))
-		{
-			if((device_type == header.type) && (version == header.version))
-			{
-				memory_addr = EX_FLASH_OTA_FW_ADDRESS + memory_addr;
-				W25XXX_WR_Block((uint8_t*)&pdata[6],memory_addr,OTA_PACKET_LENGTH);
-				return OTA_RET_OK;
-			}
-		}
-	}
-	return OTA_RET_ERROR;
-}
-
-ota_ret_t ota_fw_header_set(ota_fw_header_t *header)
-{
-	nvm_status_t nvm_ret;
-
-	nvm_ret = nvm_record_write(OTA_FW_HEADER_KEY,(uint8_t*)header,sizeof(ota_fw_header_t));
-	if(nvm_ret == NVM_OK)
-	{
-		return OTA_RET_OK;
-	}
-	return OTA_RET_ERROR;
-}
-
-ota_ret_t ota_fw_header_get(ota_fw_header_t *header)
-{
-	nvm_status_t nvm_ret;
-
-	nvm_ret = nvm_record_read(OTA_FW_HEADER_KEY,(uint8_t*)header,sizeof(ota_fw_header_t));
-	if(nvm_ret == NVM_OK)
-	{
-		return OTA_RET_OK;
-	}
-	return OTA_RET_ERROR;
-}
-
-
 
