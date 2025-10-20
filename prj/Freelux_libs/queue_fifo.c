@@ -62,7 +62,7 @@ u16 FL_QUEUE_ISEMPTY(fl_data_container_t *pcontainer) {
  */
 u16 FL_QUEUE_ISFULL(fl_data_container_t *pcontainer) {
 	//return ((pcontainer->head_index - pcontainer->tail_index) & pcontainer->mask) == pcontainer->mask;
-	return (pcontainer->count == pcontainer->mask);
+	return (pcontainer->count >= pcontainer->mask);
 }
 
 /**

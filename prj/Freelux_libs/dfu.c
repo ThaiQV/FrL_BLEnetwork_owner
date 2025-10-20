@@ -394,6 +394,10 @@ void ota_init(void)
 	printf("\n");
 }
 
+u8* ota_cr128_get(void){
+	return &crc128[0];
+}
+
 /**
 * @brief: Put data into OTA region
 * @param: see below
@@ -545,9 +549,8 @@ void test_ota(void)
 	uint8_t		buff[1024];
 	uint8_t		packet[22];
 	uint32_t	address;
-	uint32_t	image_size = 0x18000;//APP_IMAGE_SIZE_MAX;
+	uint32_t	image_size = 0x24000;//APP_IMAGE_SIZE_MAX;
 //	uint32_t	image_size = 0x1000;//APP_IMAGE_SIZE_MAX;
-
 
 	// put packet begin
 	packet[0] = OTA_PACKET_BEGIN; 			// packet begin
@@ -560,8 +563,9 @@ void test_ota(void)
 
 	flash_read_mid();
 	flash_unlock_mid146085();
-	crc128_init();
 
+
+	crc128_init();
 	// put packet data
 	packet[0] = OTA_PACKET_DATA; 			// packet data
 	packet[1] = 0;							// device type
@@ -569,7 +573,7 @@ void test_ota(void)
 	address = 0;
 	for(i = 0; i < (image_size/sizeof(buff)); i++)
 	{
-		flash_read_page(FLASH_R_BASE_ADDR + APP_IMAGE_ADDR + i*sizeof(buff), sizeof(buff), (uint8_t *)buff);
+		flash_read_page(0x10000+FLASH_R_BASE_ADDR + APP_IMAGE_ADDR + i*sizeof(buff), sizeof(buff), (uint8_t *)buff);
 		for(j = 0; j < (sizeof(buff)/OTA_PACKET_LENGTH); j++)
 		{
 			packet[3] = (uint8_t)address;		// address
@@ -586,6 +590,7 @@ void test_ota(void)
 		}
 		DFU_PRINTF("Copy: %d%%\n",(((i+1)*100)/(image_size/sizeof(buff))));
 	}
+
 
 	// put packet begin
 	packet[0] = OTA_PACKET_END; 			// packet begin

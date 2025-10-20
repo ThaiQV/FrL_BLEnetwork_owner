@@ -21,6 +21,10 @@
 #include "fl_nwk_handler.h"
 #include "fl_ble_wifi.h"
 #include "fl_wifi2ble_fota.h"
+#include "../Freelux_libs/dfu.h"
+
+#define DFU_OTA_INIT		ota_init
+
 #ifdef MASTER_CORE
 /******************************************************************************/
 /******************************************************************************/
@@ -362,6 +366,40 @@ s8 fl_wifi2ble_fota_Broadcast_REQwACK(u8* _fw, u8 _len,fota_broadcast_rsp_cbk _f
  *    BROADCAST REQ PROCESSOR - END
  *************************************************************************************************************************************************/
 
+
+/*************************************************************************************************************************************************
+ *    SYSTEM FOTA PROCESSOR
+ *************************************************************************************************************************************************/
+
+/***************************************************
+ * @brief 		:Run step-by-step upload fw to slave
+ *
+ * @param[in] 	:none
+ *
+ * @return	  	:none
+ *
+ ***************************************************/
+//int fl_wifi2ble_fota_system_processor(void){
+//
+//}
+int fl_wifi2ble_fota_system_end(u8 *_payload_end,u8 _len){
+	P_PRINTFHEX_A(INF_FILE,_payload_end,_len,"|-> FOTA END PACKET:");
+	int rslt =  fl_wifi2ble_fota_fwpush(_payload_end,_len);
+	//todo: get rsp of the slave and recheck missing packet
+	return rslt;
+}
+
+int fl_wifi2ble_fota_system_start(u8 *_payload_start,u8 _len){
+	P_PRINTFHEX_A(INF_FILE,_payload_start,_len,"|-> FOTA START PACKET:");
+	int rslt = fl_wifi2ble_fota_fwpush(_payload_start,_len);
+	//todo: get rsp of the slave if wifi need
+	return rslt;
+}
+
+/*************************************************************************************************************************************************
+ *    SYSTEM FOTA PROCESSOR - END
+ *************************************************************************************************************************************************/
+
 /******************************************************************************/
 /******************************************************************************/
 /***                      Processing functions 					             **/
@@ -370,6 +408,7 @@ s8 fl_wifi2ble_fota_Broadcast_REQwACK(u8* _fw, u8 _len,fota_broadcast_rsp_cbk _f
 void fl_wifi2ble_fota_init(void){
 	LOG_P(INF_FILE,"FOTA Initilization!!!\r\n");
 	FL_QUEUE_CLEAR(&G_FW_CONTAINER,G_FW_CONTAINER.mask+1);
+	DFU_OTA_INIT();
 }
 
 void fl_wifi2ble_fota_run(void) {

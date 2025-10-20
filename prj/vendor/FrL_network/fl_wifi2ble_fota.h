@@ -23,6 +23,9 @@ s16 fl_wifi2ble_fota_fwpush(u8 *_fw, u8 _len);
 s8 fl_wifi2ble_fota_Broadcast_REQwACK(u8* _fw, u8 _len,fota_broadcast_rsp_cbk _fncbk,fl_fota_broadcast_mode_e _mode );
 void fl_wifi2ble_fota_init(void);
 void fl_wifi2ble_fota_run(void);
+int fl_wifi2ble_fota_system_end(u8 *_payload_end,u8 _len);
+int fl_wifi2ble_fota_system_start(u8 *_payload_start,u8 _len);
+
 #endif
 
 #endif /* VENDOR_FRL_NETWORK_FL_WIFI2BLE_FOTA_H_ */

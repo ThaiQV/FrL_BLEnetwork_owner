@@ -726,7 +726,7 @@ void fl_slave_fota_proc(fl_pack_t _fota_pack){
 			u8 version_typefw[4]={'1','2','3',G_INFORMATION.dev_type};
 			fl_adv_sendFIFO_add(fl_slave_fota_rsp_packet_build(version_typefw,SIZEU8(version_typefw),packet));
 		}else{
-
+			P_INFO_HEX(packet.frame.payload,SIZEU8(packet.frame.payload),"FW:");
 		}
 	}
 }
