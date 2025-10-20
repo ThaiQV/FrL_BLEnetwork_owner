@@ -1,7 +1,7 @@
 #include "dfu.h"
 
 /* Definition */
-#define DFU_DEBUG	1
+//#define DFU_DEBUG	0
 #ifdef DFU_DEBUG
 #define DFU_PRINTF(...)	LOGA(APP,__VA_ARGS__);
 #else
