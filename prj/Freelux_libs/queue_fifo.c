@@ -23,6 +23,7 @@
 /******************************************************************************/
 /******************************************************************************/
 #define SIZE_CONTAINER(x) ((fl_data_container_t)x->mask+1)
+
 /******************************************************************************/
 /******************************************************************************/
 /***                       Functions declare                   		         **/
@@ -52,8 +53,8 @@ void FL_QUEUE_CLEAR(fl_data_container_t *pCont, u16 _size) {
  * @return 1 if empty; 0 otherwise.
  */
 u16 FL_QUEUE_ISEMPTY(fl_data_container_t *pcontainer) {
-	//return (pcontainer->head_index == pcontainer->tail_index);
-	return (pcontainer->count == 0);
+	return (pcontainer->head_index == pcontainer->tail_index);
+	//return (pcontainer->count == 0);
 }
 /**
  * Returns whether a queue container is full.
@@ -61,8 +62,8 @@ u16 FL_QUEUE_ISEMPTY(fl_data_container_t *pcontainer) {
  * @return 1 if full; 0 otherwise.
  */
 u16 FL_QUEUE_ISFULL(fl_data_container_t *pcontainer) {
-	//return ((pcontainer->head_index - pcontainer->tail_index) & pcontainer->mask) == pcontainer->mask;
-	return (pcontainer->count >= pcontainer->mask);
+//	return ((pcontainer->head_index +1) & pcontainer->mask) == pcontainer->tail_index;
+	return (pcontainer->count > pcontainer->mask);
 }
 
 /**
@@ -73,6 +74,7 @@ u16 FL_QUEUE_ISFULL(fl_data_container_t *pcontainer) {
 s16 FL_QUEUE_ADD(fl_data_container_t *pCont, fl_pack_t *pdata) {
 	if (!FL_QUEUE_ISFULL(pCont))
 	{
+//		memset(&pCont->data[pCont->head_index], 0, sizeof(fl_pack_t));
 		pCont->data[pCont->tail_index] = *pdata;
 //		memcpy(pCont->data[pCont->tail_index].data_arr,pdata,sizeof(fl_pack_t)/sizeof(u8));
 		pCont->tail_index = (pCont->tail_index + 1) & (pCont->mask);
@@ -98,6 +100,26 @@ u16 FL_QUEUE_GET(fl_data_container_t *pCont, fl_pack_t *pdata) {
 	u16 numofcount = pCont->count;
 	pCont->count--;
 	return numofcount;
+}
+
+
+/**
+ * Returns the pack in a queue container.(FIFO)
+ * @param buffer The buffer from which the data should be returned.
+ * @param data A pointer to the location at which the data should be placed.
+ * @return 1 if data was returned; 0 otherwise.
+ */
+s16 FL_QUEUE_GET_not_NEXTHEAD(fl_data_container_t *pCont, fl_pack_t *pdata) {
+	if (FL_QUEUE_ISEMPTY(pCont)) {
+		/* No items */
+		return -1;
+	}
+	*pdata = pCont->data[pCont->head_index];
+//	u16 numofcount = pCont->count;
+	return pCont->head_index;
+}
+u16 FL_QUEUE_NEXTHEAD(fl_data_container_t *pCont, fl_pack_t *pdata) {
+	return FL_QUEUE_GET(pCont,pdata);
 }
 /**
  * Returns the pack in a queue container.(FIFO)

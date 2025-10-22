@@ -98,6 +98,7 @@ void fl_repeater_init(void) {
 	LOG_P(ZIG_GP,"Repeater init -> ok\r\n");
 	FL_QUEUE_CLEAR(&G_REPEAT_CONTAINER,PACK_REPEAT_SIZE);
 }
+
 void fl_repeat_run(fl_pack_t *_pack_repeat) {
 	extern u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt) ;
 	fl_dataframe_format_t data_parsed;

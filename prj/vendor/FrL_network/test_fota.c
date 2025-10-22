@@ -44,11 +44,10 @@ int _send_fw(void){
 	packet[1] = 0;							// device type
 	packet[2] = 2;							// version
 //	VIRTUAL_FW_ADDR = 0;
-
 	//for (i = 0; i < (image_size / sizeof(buff)); i++)
 	if(VIRTUAL_FW_INDX<(image_size / sizeof(buff)))
 	{
-		flash_read_page(address_offset+ FLASH_R_BASE_ADDR + APP_IMAGE_ADDR + VIRTUAL_FW_INDX * sizeof(buff),sizeof(buff),(uint8_t *) buff);
+		flash_read_page(address_offset+ FLASH_R_BASE_ADDR + VIRTUAL_FW_INDX * sizeof(buff),sizeof(buff),(uint8_t *) buff);
 		packet[3] = (uint8_t) VIRTUAL_FW_ADDR;		// address
 		packet[4] = (uint8_t) (VIRTUAL_FW_ADDR >> 8);	// address
 		packet[5] = (uint8_t) (VIRTUAL_FW_ADDR >> 16);	// address
@@ -58,6 +57,7 @@ int _send_fw(void){
 		{
 			return 0;
 		}
+
 		VIRTUAL_FW_NUMOFSENDING++;
 		VIRTUAL_FW_ADDR += OTA_PACKET_LENGTH;
 		// calculate crc128
@@ -78,10 +78,9 @@ int _send_fw(void){
 	packet[5] = (uint8_t)(image_size>>16);	// FW size
 	memcpy(&packet[6],ota_cr128_get(),OTA_PACKET_LENGTH);
 	///
-	fl_wifi2ble_fota_system_end(packet,sizeof(packet));
+	if(-1==fl_wifi2ble_fota_system_end(&packet[0],sizeof(packet))) return 0;
 	VIRTUAL_FW_NUMOFSENDING+=1;
-	LOGA(INF_FILE,"FOTA num : %d\r\n",VIRTUAL_FW_NUMOFSENDING);
-
+	P_INFO("FOTA num : %d\r\n",VIRTUAL_FW_NUMOFSENDING);
 	return -1;
 }
 
@@ -91,22 +90,27 @@ int _send_fw(void){
 /******************************************************************************/
 /******************************************************************************/
 void TEST_virtual_fw(u32 _fwsize ) {
-	uint32_t	image_size = VIRTUAL_FW_SIZE;		//APP_IMAGE_SIZE_MAX;
-	uint8_t		packet[22];
-	//	// put packet begin
-	packet[0] = OTA_PACKET_BEGIN; 			// packet begin
-	packet[1] = 0;							// device type
-	packet[2] = 2;							// version
-	packet[3] = (uint8_t)image_size;		// FW size
-	packet[4] = (uint8_t)(image_size>>8);	// FW size
-	packet[5] = (uint8_t)(image_size>>16);	// FW size
-	fl_wifi2ble_fota_system_start(packet,sizeof(packet));
-
+	blt_soft_timer_delete(_send_fw);
 	crc128_init();
 	if (blt_soft_timer_find(_send_fw) == -1) {
 		VIRTUAL_FW_INDX=0;
 		VIRTUAL_FW_ADDR = 0;
 		VIRTUAL_FW_NUMOFSENDING = 1;
+		fl_wifi2ble_fota_ContainerClear();
+		if (_fwsize > 0) {
+			VIRTUAL_FW_SIZE = _fwsize;
+		}
+		uint32_t	image_size = VIRTUAL_FW_SIZE;	//APP_IMAGE_SIZE_MAX;
+		uint8_t		packet[22];
+		//	// put packet begin
+		packet[0] = OTA_PACKET_BEGIN; 			// packet begin
+		packet[1] = 0;							// device type
+		packet[2] = 2;							// version
+		packet[3] = (uint8_t)image_size;		// FW size
+		packet[4] = (uint8_t)(image_size>>8);	// FW size
+		packet[5] = (uint8_t)(image_size>>16);	// FW size
+		fl_wifi2ble_fota_system_start(&packet[0],sizeof(packet));
+
 		blt_soft_timer_add(&_send_fw,19 * 1003);
 	}
 }

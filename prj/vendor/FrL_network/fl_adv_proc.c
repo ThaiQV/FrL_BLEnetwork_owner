@@ -60,7 +60,7 @@ fl_data_container_t G_DATA_CONTAINER = { .data = g_data_array, .head_index = 0, 
 fl_pack_t g_sending_array[QUEUE_SENDING_SIZE];
 fl_data_container_t G_QUEUE_SENDING = { .data = g_sending_array, .head_index = 0, .tail_index = 0, .mask = QUEUE_SENDING_SIZE - 1, .count = 0 };
 /*---------------- ADV SEND QUEUE --------------------------*/
-#define QUEUE_HISTORY_SENDING_SIZE 		16
+#define QUEUE_HISTORY_SENDING_SIZE 		1014
 fl_pack_t g_history_sending_array[QUEUE_HISTORY_SENDING_SIZE];
 fl_data_container_t G_QUEUE_HISTORY_SENDING = { .data = g_history_sending_array, .head_index = 0, .tail_index = 0, .mask = QUEUE_HISTORY_SENDING_SIZE - 1, .count = 0 };
 /*-----------------------------------------------------------*/
@@ -177,7 +177,9 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 				//memcpy(incomming_data.data_arr,pa->data,incomming_data.length);
 //				incomming_data.data_arr[0] = pa->data[0];
 
+
 #ifndef MASTER_CORE
+
 				//IMPORTANT DELETE NETWORK
 //				if(MASTER_DELETE_NETWORK_FLAG)
 				{
@@ -191,13 +193,21 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 						REBOOT_DEV();
 					}
 				}
+//				//For TESTING REPEATER
+				extern fl_nodeinnetwork_t G_INFORMATION;
+				u8 master_mac[4] = { U32_BYTE0(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE1(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE2(
+						G_INFORMATION.profile.nwk.mac_parent), U32_BYTE3(G_INFORMATION.profile.nwk.mac_parent) };
+				if (-1 != plog_IndexOf(pa->mac,master_mac,4,6)) {
+					return 0;
+				}
 #endif
 				//Add decrypt
 				NWK_MYKEY();
 				if(!fl_nwk_decrypt16(FL_NWK_USE_KEY,pa->data,incomming_data.length,incomming_data.data_arr)) return 0;
 #ifdef MASTER_CORE
-				//skip from  master
+				//skip process from  master and check rspECHO
 				if (fl_adv_IsFromMaster(incomming_data)) {
+					fl_wifi2ble_fota_recECHO(incomming_data);
 					return 0;
 				}
 #else
@@ -270,24 +280,25 @@ int fl_adv_sendFIFO_add(fl_pack_t _pack) {
 /* History process add data*/
 	fl_data_frame_u check_hdr_history;
 	memcpy(check_hdr_history.bytes,_pack.data_arr,_pack.length);
-	if (check_hdr_history.frame.hdr == NWK_HDR_A5_HIS) {
+	//ADD Repeat and ackECHO of the fota packet
+	char *str_dbg = (check_hdr_history.frame.hdr == NWK_HDR_FOTA)?"echoFOTA":"HISTORY";
+	if (check_hdr_history.frame.hdr == NWK_HDR_A5_HIS || check_hdr_history.frame.hdr == NWK_HDR_FOTA) {
 		if (FL_QUEUE_FIND(&G_QUEUE_HISTORY_SENDING,&_pack,_pack.length) == -1) {
 			if (FL_QUEUE_ADD(&G_QUEUE_HISTORY_SENDING,&_pack) < 0) {
-				ERR(BLE,"Err FULL <QUEUE ADD HISTORY SENDING>!!\r\n");
+				ERR(BLE,"Err FULL <QUEUE ADD %s SENDING>!!\r\n",str_dbg);
 				return -1;
 			} else {
-				LOGA(BLE,"QUEUE HISTORY SEND ADD: %d/%d (cnt:%d)\r\n",G_QUEUE_HISTORY_SENDING.head_index,
+				LOGA(BLE,"QUEUE %s SEND ADD: %d/%d (cnt:%d)\r\n",str_dbg,G_QUEUE_HISTORY_SENDING.head_index,
 						G_QUEUE_HISTORY_SENDING.tail_index,
 						G_QUEUE_HISTORY_SENDING.count);
-				P_PRINTFHEX_A(BLE,_pack.data_arr,_pack.length,"HISTORY QUEUE(%d):",_pack.length);
+				P_PRINTFHEX_A(BLE,_pack.data_arr,_pack.length,"%s QUEUE(%d):",str_dbg,_pack.length);
 				return G_QUEUE_HISTORY_SENDING.tail_index;
 			}
 		}
-		ERR(BLE,"Err <QUEUE ALREADY HISTORY ADV SENDING>!!\r\n");
+		ERR(BLE,"Err <QUEUE ALREADY %s ADV SENDING>!!\r\n",str_dbg);
 		return -1;
 	}
 #endif
-
 	if (FL_QUEUE_FIND(&G_QUEUE_SENDING,&_pack,_pack.length - master_send_skip_LSB /* - 1 skip LSB (master)*/) == -1) {
 		if (FL_QUEUE_ADD(&G_QUEUE_SENDING,&_pack) < 0) {
 			ERR(BLE,"Err FULL <QUEUE ADD ADV SENDING>!!\r\n");
@@ -305,8 +316,12 @@ int fl_adv_sendFIFO_add(fl_pack_t _pack) {
 u8 fl_adv_sendFIFO_History_run(void) {
 	fl_pack_t his_data_in_queue;
 	if (!F_SENDING_STATE) {
-		if(FL_QUEUE_GETnCLEAR(&G_QUEUE_HISTORY_SENDING,&his_data_in_queue)) {
-			F_SENDING_STATE = 1;
+		if(FL_QUEUE_GETnCLEAR(&G_QUEUE_HISTORY_SENDING,&his_data_in_queue))
+//		if(FL_QUEUE_GET_LOOP(&G_QUEUE_HISTORY_SENDING,&his_data_in_queue))
+		{
+//			if(his_data_in_queue.length<5){
+//				return 1;
+//			}
 			fl_adv_send(his_data_in_queue.data_arr,his_data_in_queue.length,G_ADV_SETTINGS.adv_duration);
 			P_PRINTFHEX_A(APP,his_data_in_queue.data_arr,his_data_in_queue.length,"[%d-%d/%d]HIS(%d):",
 					G_QUEUE_HISTORY_SENDING.head_index,G_QUEUE_HISTORY_SENDING.tail_index,G_QUEUE_HISTORY_SENDING.count,
@@ -407,7 +422,8 @@ u8 fl_adv_sendFIFO_run(void) {
 	u8 inused_slot = 0;
 	u32 inpack =0;
 	u32 origin_pack = 0;
-	static u8 check_inused = 0;
+	static u8 check_inused = 0; //for debuging
+
 	if (!F_SENDING_STATE) {
 		/* Get busy slot */
 		for (u8 slot = 0; slot < G_QUEUE_SENDING.mask + 1; ++slot) {
@@ -435,7 +451,6 @@ u8 fl_adv_sendFIFO_run(void) {
 			//IMPORTAN SEND DELETE NETWORK
 			if(-1 != plog_IndexOf(data_in_queue.data_arr,MASTER_CLEARNETWORK,SIZEU8(MASTER_CLEARNETWORK),data_in_queue.length)) {
 				ERR(APP,"SEND DELETE NETWORK!!!\r\n");
-				F_SENDING_STATE = 1;
 				fl_adv_send(data_in_queue.data_arr,data_in_queue.length,G_ADV_SETTINGS.adv_duration);
 				return inused_slot ;
 			}
@@ -453,7 +468,6 @@ u8 fl_adv_sendFIFO_run(void) {
 					return inused_slot;
 				}
 			}
-			F_SENDING_STATE = 1;
 			fl_adv_send(data_in_queue.data_arr,data_in_queue.length,G_ADV_SETTINGS.adv_duration);
 			/*Processor HB packet*/
 			fl_data_frame_u check_heartbeat;
@@ -496,7 +510,9 @@ u8 fl_adv_sendFIFO_run(void) {
 void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms) {
 //	while (blc_ll_getCurrentState() == BLS_LINK_STATE_SCAN && blc_ll_getCurrentState() == BLS_LINK_STATE_ADV) {
 //	};
-	if (_data && _size >= 1) {
+	if (_size >= 5)
+	{
+		bls_ll_setAdvEnable(BLC_ADV_DISABLE);
 		rf_set_power_level_index(MY_RF_POWER_INDEX);
 		u8 mac[6];
 		own_addr_type_t app_own_address_type = OWN_ADDRESS_PUBLIC;
@@ -526,8 +542,10 @@ void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms) {
 		bls_app_registerEventCallback(BLT_EV_FLAG_ADV_DURATION_TIMEOUT,&fl_durationADV_timeout_proccess);
 
 		bls_ll_setAdvEnable(BLC_ADV_ENABLE);
-	} else {
-		ERR(APP,"Err: ADV send!\r\n");
+		F_SENDING_STATE = 1;
+	}
+	else {
+		//ERR(APP,"Err: ADV send (%d)!!\r\n",_size);
 	}
 }
 
@@ -566,7 +584,7 @@ void fl_adv_init(void) {
 	fl_queue_REQnRSP_TimeoutInit();
 	//
 	rf_set_power_level_index(MY_RF_POWER_INDEX);
-	blc_ll_setAdvCustomedChannel(*G_ADV_SETTINGS.nwk_chn.chn1,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3);
+	blc_ll_setAdvCustomedChannel(*G_ADV_SETTINGS.nwk_chn.chn1 ,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3);
 	fl_adv_scanner_init();
 #ifdef MASTER_CORE
 	//Start network

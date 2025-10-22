@@ -25,6 +25,12 @@
 
 #define DFU_OTA_INIT		ota_init
 
+typedef enum{
+	STATE_ackECHO=0,
+	STATE_ADDED=1,
+	STATE_SENT=2
+}state_packet_fota_e;
+
 #ifdef MASTER_CORE
 /******************************************************************************/
 /******************************************************************************/
@@ -124,15 +130,27 @@ fl_pack_t _fota_fw_packet_build(u8* _slave_mac,u8* _data, u8 _len,bool _ack){
  *
  ***************************************************/
 s16 fl_wifi2ble_fota_fwpush(u8 *_fw, u8 _len) {
+//	//CHECK ackECHO
+//	const u8 last_byte_echo = SIZEU8(G_FW_CONTAINER.data[0].data_arr) -1;
+//	for (u16 idx = 0; idx <= G_FW_CONTAINER.mask; ++idx) {
+//		if(G_FW_CONTAINER.data[idx].data_arr[last_byte_echo] != STATE_ackECHO){
+//			return -1;
+//		}
+//	}
 	//broadcast
 	u8 broadcast_mac[6] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
 	fl_pack_t fw_pack = _fota_fw_packet_build(broadcast_mac,_fw,_len,0);
 	if (FL_QUEUE_ADD(&G_FW_CONTAINER,&fw_pack) < 0) {
-		ERR(INF_FILE,"Err FULL <QUEUE ADD FW FOTA>!!\r\n");
+//		ERR(INF_FILE,"Err FULL <QUEUE ADD FW FOTA>!!\r\n");
 		return -1;
 	} else {
 //		P_PRINTFHEX_A(INF_FILE,fw_pack.data_arr,fw_pack.length,"PUSH(cnt:%d)=>FW[%d]",FL_NWK_FOTA_IsReady(),MAKE_U16(fw_pack.data_arr[1],fw_pack.data_arr[0]));
 //		P_INFO("Add FW: %d\r\n",MAKE_U16(fw_pack.data_arr[1],fw_pack.data_arr[0]));
+		//
+		u16 cur_tail_index = (G_FW_CONTAINER.tail_index - 1) & (G_FW_CONTAINER.mask);
+		//Add ack status into the last byte of the G_FW_CONTAINER
+		G_FW_CONTAINER.data[cur_tail_index].data_arr[SIZEU8(G_FW_CONTAINER.data[cur_tail_index].data_arr)-1] = STATE_ADDED;
+		//P_INFO_HEX(_fw,_len,"FW:");
 		return G_FW_CONTAINER.tail_index;
 	}
 	return -1;
@@ -371,6 +389,7 @@ s8 fl_wifi2ble_fota_Broadcast_REQwACK(u8* _fw, u8 _len,fota_broadcast_rsp_cbk _f
  *    SYSTEM FOTA PROCESSOR
  *************************************************************************************************************************************************/
 
+
 /***************************************************
  * @brief 		:Run step-by-step upload fw to slave
  *
@@ -382,15 +401,16 @@ s8 fl_wifi2ble_fota_Broadcast_REQwACK(u8* _fw, u8 _len,fota_broadcast_rsp_cbk _f
 //int fl_wifi2ble_fota_system_processor(void){
 //
 //}
+
 int fl_wifi2ble_fota_system_end(u8 *_payload_end,u8 _len){
-	P_PRINTFHEX_A(INF_FILE,_payload_end,_len,"|-> FOTA END PACKET:");
+//	P_INFO_HEX(_payload_end,_len,"|-> FOTA END PACKET:");
 	int rslt =  fl_wifi2ble_fota_fwpush(_payload_end,_len);
 	//todo: get rsp of the slave and recheck missing packet
 	return rslt;
 }
 
 int fl_wifi2ble_fota_system_start(u8 *_payload_start,u8 _len){
-	P_PRINTFHEX_A(INF_FILE,_payload_start,_len,"|-> FOTA START PACKET:");
+//	P_INFO_HEX(_payload_start,_len,"|-> FOTA START PACKET:");
 	int rslt = fl_wifi2ble_fota_fwpush(_payload_start,_len);
 	//todo: get rsp of the slave if wifi need
 	return rslt;
@@ -399,7 +419,9 @@ int fl_wifi2ble_fota_system_start(u8 *_payload_start,u8 _len){
 /*************************************************************************************************************************************************
  *    SYSTEM FOTA PROCESSOR - END
  *************************************************************************************************************************************************/
-
+void fl_wifi2ble_fota_ContainerClear(void){
+	FL_QUEUE_CLEAR(&G_FW_CONTAINER,G_FW_CONTAINER.mask+1);
+}
 /******************************************************************************/
 /******************************************************************************/
 /***                      Processing functions 					             **/
@@ -407,8 +429,24 @@ int fl_wifi2ble_fota_system_start(u8 *_payload_start,u8 _len){
 /******************************************************************************/
 void fl_wifi2ble_fota_init(void){
 	LOG_P(INF_FILE,"FOTA Initilization!!!\r\n");
-	FL_QUEUE_CLEAR(&G_FW_CONTAINER,G_FW_CONTAINER.mask+1);
+	fl_wifi2ble_fota_ContainerClear();
 	DFU_OTA_INIT();
+}
+
+void fl_wifi2ble_fota_recECHO(fl_pack_t _pack_rec){
+//	s16 idx_packInCont=-1;
+//	if (-1!=(idx_packInCont = FL_QUEUE_FIND(&G_FW_CONTAINER,&_pack_rec,_pack_rec.length -2))) {
+////		P_PRINTFHEX_A(INF_FILE,_pack_rec.data_arr,_pack_rec.length -2,"FOTA Echo(%d):",G_FW_CONTAINER.data[idx_packInCont].data_arr[SIZEU8(G_FW_CONTAINER.data[idx_packInCont].data_arr)-1]);
+//		G_FW_CONTAINER.data[idx_packInCont].data_arr[SIZEU8(G_FW_CONTAINER.data[idx_packInCont].data_arr)-1] = STATE_ackECHO;
+////		G_FW_CONTAINER.data[idx_packInCont].length = 0;
+//	}
+//	for (int var = 0; var < G_FW_CONTAINER.mask+1; ++var) {
+//		if(memcmp(G_FW_CONTAINER.data[var].data_arr,_pack_rec.data_arr,_pack_rec.length-2) == 0){
+//			P_PRINTFHEX_A(INF_FILE,_pack_rec.data_arr,_pack_rec.length -2,"FOTA Echo:");
+//			G_FW_CONTAINER.data[var].data_arr[SIZEU8(G_FW_CONTAINER.data[var].data_arr)-1] = STATE_ackECHO;
+//			return;
+//		}
+//	}
 }
 
 void fl_wifi2ble_fota_run(void) {
@@ -416,9 +454,10 @@ void fl_wifi2ble_fota_run(void) {
 	extern volatile u8 F_SENDING_STATE;
 	fl_pack_t fw_in_queue;
 	if (!F_SENDING_STATE) {
-		if (FL_QUEUE_GET(&G_FW_CONTAINER,&fw_in_queue)) {
-			F_SENDING_STATE = 1;
-			P_PRINTFHEX_A(INF_FILE,fw_in_queue.data_arr,fw_in_queue.length,"FOTA SEND:");
+		if (FL_QUEUE_GET(&G_FW_CONTAINER,&fw_in_queue)){
+			P_PRINTFHEX_A(INF_FILE,fw_in_queue.data_arr,fw_in_queue.length,"FOTA SEND(%d):",fw_in_queue.data_arr[SIZEU8(fw_in_queue.data_arr)-1]);
+			P_INFO("FOTA(cnt:%d)%d/%d|0x00%02X%02X%02X\r\n",G_FW_CONTAINER.count,G_FW_CONTAINER.head_index,G_FW_CONTAINER.tail_index,
+					fw_in_queue.data_arr[7+3+2],fw_in_queue.data_arr[7+3+1],fw_in_queue.data_arr[7+3+0]);
 			fl_adv_send(fw_in_queue.data_arr,fw_in_queue.length,G_ADV_SETTINGS.adv_duration);
 		}
 		else{

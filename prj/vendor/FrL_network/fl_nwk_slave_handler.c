@@ -206,7 +206,7 @@ void fl_nwk_slave_init(void) {
 	G_INFORMATION.data =(u8*)&G_POWER_METER;
 #endif
 	//todo: TBS Device initialization
-//	TBS_Device_Init();
+	TBS_Device_Init();
 
 	LOG_P(INF,"Freelux network SLAVE init\r\n");
 	LOGA(INF,"** MAC     :%02X%02X%02X%02X%02X%02X\r\n",G_INFORMATION.mac[0],G_INFORMATION.mac[1],G_INFORMATION.mac[2],
@@ -713,20 +713,49 @@ fl_pack_t fl_slave_fota_rsp_packet_build(u8* _data, u8 _len,fl_data_frame_u _REQ
 	P_PRINTFHEX_A(INF_FILE,rslt.data_arr,rslt.length,"RSP %X:",rsp_pack.frame.hdr);
 	return rslt;
 }
+
 void fl_slave_fota_proc(fl_pack_t _fota_pack){
+	static u32 test_numofota =0;
+	static u32 address=0;
+	static u32 rtt_fota=0;
+	static u32 addr_miss = 0;
+
 	extern u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
-	fl_data_frame_u packet;
-	if(!fl_packet_parse(_fota_pack,&packet.frame)){
+	fl_dataframe_format_t packet;
+	if(!fl_packet_parse(_fota_pack,&packet)){
 		ERR(INF,"Packet parse fail!!!\r\n");
 		return;
 	}
-	if (packet.frame.hdr == NWK_HDR_FOTA) {
-		if(packet.frame.endpoint.master == FL_FROM_MASTER_ACK){
+	if (packet.hdr == NWK_HDR_FOTA) {
+		if(packet.endpoint.master == FL_FROM_MASTER_ACK){
 			//TEST
-			u8 version_typefw[4]={'1','2','3',G_INFORMATION.dev_type};
-			fl_adv_sendFIFO_add(fl_slave_fota_rsp_packet_build(version_typefw,SIZEU8(version_typefw),packet));
+//			u8 version_typefw[4]={'1','2','3',G_INFORMATION.dev_type};
+//			fl_adv_sendFIFO_add(fl_slave_fota_rsp_packet_build(version_typefw,SIZEU8(version_typefw),packet));
 		}else{
-			P_INFO_HEX(packet.frame.payload,SIZEU8(packet.frame.payload),"FW:");
+			u8 OTA_BEGIN[3]={0,G_INFORMATION.dev_type,2};
+			u8 OTA_END[3]={2,G_INFORMATION.dev_type,2};
+			if (plog_IndexOf(packet.payload,OTA_BEGIN,SIZEU8(OTA_BEGIN),SIZEU8(OTA_BEGIN)) != -1) {
+				P_INFO("============ FOTA BEGIN     ======\r\n");
+				test_numofota = 1;
+				address=0;
+				addr_miss=0;
+				rtt_fota = fl_rtc_get();
+			} else {
+				u32 address_cur = MAKE_U32(0,packet.payload[5],packet.payload[4],packet.payload[3]);
+				if(((address_cur-address) > 16) && address_cur>address){
+					addr_miss += ((address_cur-address)/16 -1);
+					ERR(INF_FILE,"Miss %d\r\n",(address_cur-address)/16 -1);
+				}
+				P_INFO_HEX(packet.payload,SIZEU8(packet.payload),"0x00%02X%02X%02X:",packet.payload[5],packet.payload[4],packet.payload[3]);
+				test_numofota++;
+				address= address_cur;
+				if (plog_IndexOf(packet.payload,OTA_END,SIZEU8(OTA_END),SIZEU8(OTA_END)) != -1) {
+					P_INFO("============ FOTA END(%d)%d s ======\r\n",test_numofota,(u32)(fl_rtc_get()-rtt_fota));
+					test_numofota = 0;
+					address=0;
+					addr_miss =0;
+				}
+			}
 		}
 	}
 }
@@ -856,7 +885,7 @@ void fl_nwk_slave_process(void){
 	//todo : join- network
 	fl_nwk_slave_joinnwk_exc();
 	//todo TBS_device process
-//	TBS_Device_Run();
+	TBS_Device_Run();
 	//For debuging
 	static bool debug_on_offline = false;
 	if(debug_on_offline != G_INFORMATION.active){

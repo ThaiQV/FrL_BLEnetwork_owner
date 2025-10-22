@@ -173,7 +173,7 @@ void proto_task( void *pvParameters );
  * @return      none
  */
 fl_version_t _bootloader = { 1, 0, 0 };
-fl_version_t _fw = { 1, 4, 0 };
+fl_version_t _fw = { 1, 4, 1 };
 fl_version_t _hw = { 1, 0, 0 };
 
 _attribute_ram_code_ int main(void)   //must on ramcode
@@ -197,12 +197,12 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 #endif
 	PLOG_DEVICE_PROFILE(_bootloader,_fw,_hw);
 #ifdef MASTER_CORE
-	P_INFO("Startup");
+	P_INFO("Startup from FOTA");
 	u8 wait=0;
 	extern void delay_ms(unsigned int millisec);
 	while(wait<10){
 		P_INFO(".");
-		delay_ms(300);
+		delay_ms(400);
 		wait++;
 	}
 	P_INFO("ok\r\n");
