@@ -173,7 +173,7 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 //		user_init_normal();
 
 		/* Test code */
-		LOG_P(APP,"DFU Test\n");
+		LOG_P(APP,"DFU\n");
 		firmware_check();
 //		storage_init();
 

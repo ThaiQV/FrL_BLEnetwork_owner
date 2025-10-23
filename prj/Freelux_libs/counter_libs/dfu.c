@@ -436,6 +436,7 @@ ota_ret_t ota_fw_put(uint8_t *pdata)
 		memcpy((uint8_t*)packet_header.signature,(uint8_t*)&pdata[6],OTA_PACKET_LENGTH);
 		ota_packet_header_set(&packet_header);
 		DFU_PRINTF("OTA Begin\n");
+		return OTA_RET_OK;
 	}
 	else if(packet_type == OTA_PACKET_END)
 	{
@@ -472,6 +473,7 @@ ota_ret_t ota_fw_put(uint8_t *pdata)
 			nvm_record_write(OTA_MEMORY_MAP,(uint8_t*)ota_map,sizeof(ota_map));
 
 			DFU_PRINTF("OTA End\n");
+			return OTA_RET_OK;
 		}
 	}
 	else if(packet_type == OTA_PACKET_DATA)
@@ -547,6 +549,7 @@ void test_ota(void)
 	uint32_t	address;
 	uint32_t	image_size = 0x18000;//APP_IMAGE_SIZE_MAX;
 //	uint32_t	image_size = 0x1000;//APP_IMAGE_SIZE_MAX;
+	ota_ret_t	ret;
 
 
 	// put packet begin
@@ -556,7 +559,8 @@ void test_ota(void)
 	packet[3] = (uint8_t)image_size;		// FW size
 	packet[4] = (uint8_t)(image_size>>8);	// FW size
 	packet[5] = (uint8_t)(image_size>>16);	// FW size
-	ota_fw_put(packet);
+	ret = ota_fw_put(packet);
+	DFU_PRINTF("Begin: %d\n",ret);
 
 	flash_read_mid();
 	flash_unlock_mid146085();
@@ -576,7 +580,7 @@ void test_ota(void)
 			packet[4] = (uint8_t)(address>>8);	// address
 			packet[5] = (uint8_t)(address>>16);	// address
 			memcpy(&packet[6],&buff[j*OTA_PACKET_LENGTH],OTA_PACKET_LENGTH);
-			ota_fw_put(packet);
+			ret = ota_fw_put(packet);
 			address += OTA_PACKET_LENGTH;
 		}
 		// calculate crc128
@@ -584,7 +588,7 @@ void test_ota(void)
 		{
 			crc128_calculate(&buff[j*CRC128_LENGTH]);
 		}
-		DFU_PRINTF("Copy: %d%%\n",(((i+1)*100)/(image_size/sizeof(buff))));
+		DFU_PRINTF("Copy: %d%% - %d\n",(((i+1)*100)/(image_size/sizeof(buff))),ret);
 	}
 
 	// put packet begin
@@ -595,5 +599,6 @@ void test_ota(void)
 	packet[4] = (uint8_t)(image_size>>8);	// FW size
 	packet[5] = (uint8_t)(image_size>>16);	// FW size
 	memcpy(&packet[6],crc128,OTA_PACKET_LENGTH);
-	ota_fw_put(packet);
+	ret = ota_fw_put(packet);
+	DFU_PRINTF("End: %d\n",ret);
 }
