@@ -394,7 +394,7 @@ void ota_init(void)
 	printf("\n");
 }
 
-u8* ota_cr128_get(void){
+u8* ota_crc128_get(void){
 	return &crc128[0];
 }
 
@@ -440,6 +440,7 @@ ota_ret_t ota_fw_put(uint8_t *pdata)
 		memcpy((uint8_t*)packet_header.signature,(uint8_t*)&pdata[6],OTA_PACKET_LENGTH);
 		ota_packet_header_set(&packet_header);
 		DFU_PRINTF("OTA Begin\n");
+		return OTA_RET_OK;
 	}
 	else if(packet_type == OTA_PACKET_END)
 	{
@@ -476,6 +477,7 @@ ota_ret_t ota_fw_put(uint8_t *pdata)
 			nvm_record_write(OTA_MEMORY_MAP,(uint8_t*)ota_map,sizeof(ota_map));
 
 			DFU_PRINTF("OTA End\n");
+			return OTA_RET_OK;
 		}
 	}
 	else if(packet_type == OTA_PACKET_DATA)

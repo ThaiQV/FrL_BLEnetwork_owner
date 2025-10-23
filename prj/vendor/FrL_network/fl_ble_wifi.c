@@ -15,12 +15,12 @@
 #ifdef MASTER_CORE
 #include "fl_ble_wifi.h"
 #include "fl_nwk_protocol.h"
-
+#include "fl_wifi2ble_fota.h"
 /******************************************************************************/
 /***                 DFU configuration        				                 **/
 /******************************************************************************/
-#include "../Freelux_libs/dfu.h"
-#define DFU_FW_PUT						ota_fw_put
+
+
 /******************************************************************************/
 
 /******************************************************************************/
@@ -540,7 +540,7 @@ void FOTA_RESPONSE(u8* _pdata){
 	wfdata.cmd = G_WIFI_CON[_wf_CMD_find(GF_CMD_FOTA_REQUEST)].rsp.cmd;
 	memset(wfdata.data,0,SIZEU8(wfdata.data));
 	//DFU put to flash
-	wfdata.data[0] = DFU_FW_PUT(_pdata);
+	wfdata.data[0] = DFU_OTA_FW_PUT(_pdata);
 	wfdata.len_data = 1; //<OK/ERR> 1 byte
 	wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
 	u8 payload_len = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);

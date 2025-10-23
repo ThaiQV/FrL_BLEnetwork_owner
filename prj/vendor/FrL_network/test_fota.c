@@ -76,7 +76,7 @@ int _send_fw(void){
 	packet[3] = (uint8_t)image_size;		// FW size
 	packet[4] = (uint8_t)(image_size>>8);	// FW size
 	packet[5] = (uint8_t)(image_size>>16);	// FW size
-	memcpy(&packet[6],ota_cr128_get(),OTA_PACKET_LENGTH);
+	memcpy(&packet[6],DFU_OTA_CRC128_GET(),OTA_PACKET_LENGTH);
 	///
 	if(-1==fl_wifi2ble_fota_system_end(&packet[0],sizeof(packet))) return 0;
 	VIRTUAL_FW_NUMOFSENDING+=1;
@@ -90,7 +90,7 @@ int _send_fw(void){
 /******************************************************************************/
 /******************************************************************************/
 void TEST_virtual_fw(u32 _fwsize ) {
-	blt_soft_timer_delete(_send_fw);
+//	blt_soft_timer_delete(_send_fw);
 	crc128_init();
 	if (blt_soft_timer_find(_send_fw) == -1) {
 		VIRTUAL_FW_INDX=0;
@@ -111,7 +111,7 @@ void TEST_virtual_fw(u32 _fwsize ) {
 		packet[5] = (uint8_t)(image_size>>16);	// FW size
 		fl_wifi2ble_fota_system_start(&packet[0],sizeof(packet));
 
-		blt_soft_timer_add(&_send_fw,19 * 1003);
+		blt_soft_timer_add(&_send_fw,29 * 1003);
 	}
 }
 

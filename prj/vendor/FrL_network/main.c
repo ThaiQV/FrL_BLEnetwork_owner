@@ -197,7 +197,7 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 #endif
 	PLOG_DEVICE_PROFILE(_bootloader,_fw,_hw);
 #ifdef MASTER_CORE
-	P_INFO("Startup from FOTA");
+//	P_INFO("Startup from FOTA");
 	u8 wait=0;
 	extern void delay_ms(unsigned int millisec);
 	while(wait<10){

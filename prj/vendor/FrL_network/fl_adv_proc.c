@@ -51,16 +51,16 @@ fl_adv_settings_t G_ADV_SETTINGS = {
 extern volatile u8  NWK_REPEAT_LEVEL;
 
 /*---------------- Total ADV Rec --------------------------*/
-#define IN_DATA_SIZE 		64
+
 fl_pack_t g_data_array[IN_DATA_SIZE];
 fl_data_container_t G_DATA_CONTAINER = { .data = g_data_array, .head_index = 0, .tail_index = 0, .mask = IN_DATA_SIZE - 1, .count = 0 };
 
 /*---------------- ADV SEND QUEUE --------------------------*/
-#define QUEUE_SENDING_SIZE 				32
+
 fl_pack_t g_sending_array[QUEUE_SENDING_SIZE];
 fl_data_container_t G_QUEUE_SENDING = { .data = g_sending_array, .head_index = 0, .tail_index = 0, .mask = QUEUE_SENDING_SIZE - 1, .count = 0 };
 /*---------------- ADV SEND QUEUE --------------------------*/
-#define QUEUE_HISTORY_SENDING_SIZE 		1024
+
 fl_pack_t g_history_sending_array[QUEUE_HISTORY_SENDING_SIZE];
 fl_data_container_t G_QUEUE_HISTORY_SENDING = { .data = g_history_sending_array, .head_index = 0, .tail_index = 0, .mask = QUEUE_HISTORY_SENDING_SIZE - 1, .count = 0 };
 /*-----------------------------------------------------------*/
@@ -193,7 +193,7 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 						REBOOT_DEV();
 					}
 				}
-//				//For TESTING REPEATER
+				//For TESTING REPEATER
 //				extern fl_nodeinnetwork_t G_INFORMATION;
 //				u8 master_mac[4] = { U32_BYTE0(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE1(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE2(
 //						G_INFORMATION.profile.nwk.mac_parent), U32_BYTE3(G_INFORMATION.profile.nwk.mac_parent) };
@@ -227,15 +227,15 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 				} else {
 //					ERR(BLE,"Err <QUEUE ALREADY>!!\r\n");
 //					P_PRINTFHEX_A(BLE,incomming_data.data_arr,incomming_data.length,"%s(%d):","PACK",incomming_data.length);
-#ifndef MASTER_CORE
-					if (incomming_data.data_arr[0] == NWK_HDR_FOTA) {
-						if (FL_QUEUE_FIND(&G_DATA_CONTAINER,&incomming_data,3) == -1) { //only check location bin
-							if (FL_QUEUE_ADD(&G_DATA_CONTAINER,&incomming_data) < 0) {
-								ERR(BLE,"Err <QUEUE FOTA ADD>!!\r\n");
-							}
-						}
-					}
-#endif
+//#ifndef MASTER_CORE
+//					if (incomming_data.data_arr[0] == NWK_HDR_FOTA) {
+//						if (FL_QUEUE_FIND(&G_DATA_CONTAINER,&incomming_data,3) == -1) { //only check location bin
+//							if (FL_QUEUE_ADD(&G_DATA_CONTAINER,&incomming_data) < 0) {
+//								ERR(BLE,"Err <QUEUE FOTA ADD>!!\r\n");
+//							}
+//						}
+//					}
+//#endif
 				}
 			}
 		}
@@ -283,7 +283,7 @@ int fl_adv_sendFIFO_add(fl_pack_t _pack) {
 	//ADD Repeat and ackECHO of the fota packet
 	char *str_dbg = (check_hdr_history.frame.hdr == NWK_HDR_FOTA)?"echoFOTA":"HISTORY";
 	if (check_hdr_history.frame.hdr == NWK_HDR_A5_HIS || check_hdr_history.frame.hdr == NWK_HDR_FOTA) {
-		if (FL_QUEUE_FIND(&G_QUEUE_HISTORY_SENDING,&_pack,_pack.length) == -1) {
+		if (FL_QUEUE_FIND(&G_QUEUE_HISTORY_SENDING,&_pack,_pack.length -2) == -1) {
 			if (FL_QUEUE_ADD(&G_QUEUE_HISTORY_SENDING,&_pack) < 0) {
 				ERR(BLE,"Err FULL <QUEUE ADD %s SENDING>!!\r\n",str_dbg);
 				return -1;
@@ -316,7 +316,7 @@ int fl_adv_sendFIFO_add(fl_pack_t _pack) {
 u8 fl_adv_sendFIFO_History_run(void) {
 	fl_pack_t his_data_in_queue;
 	if (!F_SENDING_STATE) {
-		if(FL_QUEUE_GETnCLEAR(&G_QUEUE_HISTORY_SENDING,&his_data_in_queue))
+		if(FL_QUEUE_GET(&G_QUEUE_HISTORY_SENDING,&his_data_in_queue))
 //		if(FL_QUEUE_GET_LOOP(&G_QUEUE_HISTORY_SENDING,&his_data_in_queue))
 		{
 //			if(his_data_in_queue.length<5){
@@ -590,7 +590,7 @@ void fl_adv_init(void) {
 	//Start network
 	fl_nwk_protocol_InitnRun();
 	//fota init
-//	fl_wifi2ble_fota_init();
+	fl_wifi2ble_fota_init();
 #endif
 }
 /***************************************************

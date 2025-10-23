@@ -21,9 +21,6 @@
 #include "fl_nwk_handler.h"
 #include "fl_ble_wifi.h"
 #include "fl_wifi2ble_fota.h"
-#include "../Freelux_libs/dfu.h"
-
-#define DFU_OTA_INIT		ota_init
 
 typedef enum{
 	STATE_ackECHO=0,
@@ -38,12 +35,11 @@ typedef enum{
 /******************************************************************************/
 /******************************************************************************/
 
-#define FW_DATA_SIZE 		128
 
 fl_pack_t g_fw_array[FW_DATA_SIZE];
 fl_data_container_t G_FW_CONTAINER = { .data = g_fw_array, .head_index = 0, .tail_index = 0, .mask = FW_DATA_SIZE - 1, .count = 0 };
 
-#define FW_ECHO_SIZE 		2*FW_DATA_SIZE
+
 
 fl_pack_t g_fw_echo_array[FW_ECHO_SIZE];
 fl_data_container_t G_ECHO_CONTAINER = { .data = g_fw_echo_array, .head_index = 0, .tail_index = 0, .mask = FW_ECHO_SIZE - 1, .count = 0 };
@@ -110,8 +106,8 @@ fl_pack_t _fota_fw_packet_build(u8* _slave_mac,u8* _data, u8 _len,bool _ack){
 
 	//create endpoint => always set below
 	req_pack.frame.endpoint.dbg = 0;
-	req_pack.frame.endpoint.repeat_cnt = 2;
-	req_pack.frame.endpoint.rep_settings = 2;
+	req_pack.frame.endpoint.repeat_cnt = 3;
+	req_pack.frame.endpoint.rep_settings = 3;
 	req_pack.frame.endpoint.repeat_mode = 0;
 	//Create packet from slave
 	req_pack.frame.endpoint.master = _ack==0?FL_FROM_MASTER:FL_FROM_MASTER_ACK;
@@ -436,7 +432,7 @@ void fl_wifi2ble_fota_ContainerClear(void){
 void fl_wifi2ble_fota_init(void){
 	LOG_P(INF_FILE,"FOTA Initilization!!!\r\n");
 	fl_wifi2ble_fota_ContainerClear();
-	DFU_OTA_INIT();
+//	DFU_OTA_INIT();
 }
 
 void fl_wifi2ble_fota_recECHO(fl_pack_t _pack_rec){
@@ -460,15 +456,19 @@ void fl_wifi2ble_fota_recECHO(fl_pack_t _pack_rec){
 			//ERR(BLE,"Err <QUEUE ADD>!!\r\n");
 		} else {
 			if (FL_QUEUE_GET(&G_ECHO_CONTAINER,&data_in_queue)) {
+
 				if (fl_packet_parse(data_in_queue,&packet)) {
+//					P_INFO_HEX(packet.payload,SIZEU8(packet.payload),"FW:");
 					if (plog_IndexOf(packet.payload,OTA_BEGIN,SIZEU8(OTA_BEGIN),SIZEU8(OTA_BEGIN)) != -1) {
 						count_echo = 0;
 						flag_begin_end=1;
-					} else if (plog_IndexOf(packet.payload,OTA_BEGIN,SIZEU8(OTA_END),SIZEU8(OTA_END)) != -1) {
-						P_INFO("FOTA cnt:%d\r\n",count_echo);
+//						FL_QUEUE_CLEAR(&G_ECHO_CONTAINER,G_ECHO_CONTAINER.mask+1);
+						P_INFO("============ FOTA BEGIN     ======\r\n");
+					} else if (flag_begin_end && plog_IndexOf(packet.payload,OTA_END,SIZEU8(OTA_END),SIZEU8(OTA_END)) != -1) {
+						P_INFO("============ FOTA END(%d) ======\r\n",count_echo);
 						count_echo = 0;
 						flag_begin_end=0;
-						FL_QUEUE_CLEAR(&G_ECHO_CONTAINER,G_ECHO_CONTAINER.mask+1);
+//						FL_QUEUE_CLEAR(&G_ECHO_CONTAINER,G_ECHO_CONTAINER.mask+1);
 					}
 					else{
 						if(flag_begin_end)count_echo++;
