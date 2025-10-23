@@ -56,11 +56,11 @@ fl_pack_t g_data_array[IN_DATA_SIZE];
 fl_data_container_t G_DATA_CONTAINER = { .data = g_data_array, .head_index = 0, .tail_index = 0, .mask = IN_DATA_SIZE - 1, .count = 0 };
 
 /*---------------- ADV SEND QUEUE --------------------------*/
-#define QUEUE_SENDING_SIZE 				16
+#define QUEUE_SENDING_SIZE 				32
 fl_pack_t g_sending_array[QUEUE_SENDING_SIZE];
 fl_data_container_t G_QUEUE_SENDING = { .data = g_sending_array, .head_index = 0, .tail_index = 0, .mask = QUEUE_SENDING_SIZE - 1, .count = 0 };
 /*---------------- ADV SEND QUEUE --------------------------*/
-#define QUEUE_HISTORY_SENDING_SIZE 		1014
+#define QUEUE_HISTORY_SENDING_SIZE 		1024
 fl_pack_t g_history_sending_array[QUEUE_HISTORY_SENDING_SIZE];
 fl_data_container_t G_QUEUE_HISTORY_SENDING = { .data = g_history_sending_array, .head_index = 0, .tail_index = 0, .mask = QUEUE_HISTORY_SENDING_SIZE - 1, .count = 0 };
 /*-----------------------------------------------------------*/
@@ -194,12 +194,12 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 					}
 				}
 //				//For TESTING REPEATER
-				extern fl_nodeinnetwork_t G_INFORMATION;
-				u8 master_mac[4] = { U32_BYTE0(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE1(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE2(
-						G_INFORMATION.profile.nwk.mac_parent), U32_BYTE3(G_INFORMATION.profile.nwk.mac_parent) };
-				if (-1 != plog_IndexOf(pa->mac,master_mac,4,6)) {
-					return 0;
-				}
+//				extern fl_nodeinnetwork_t G_INFORMATION;
+//				u8 master_mac[4] = { U32_BYTE0(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE1(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE2(
+//						G_INFORMATION.profile.nwk.mac_parent), U32_BYTE3(G_INFORMATION.profile.nwk.mac_parent) };
+//				if (-1 != plog_IndexOf(pa->mac,master_mac,4,6)) {
+//					return 0;
+//				}
 #endif
 				//Add decrypt
 				NWK_MYKEY();
@@ -589,6 +589,8 @@ void fl_adv_init(void) {
 #ifdef MASTER_CORE
 	//Start network
 	fl_nwk_protocol_InitnRun();
+	//fota init
+//	fl_wifi2ble_fota_init();
 #endif
 }
 /***************************************************

@@ -38,10 +38,15 @@ typedef enum{
 /******************************************************************************/
 /******************************************************************************/
 
-#define FW_DATA_SIZE 		1024
+#define FW_DATA_SIZE 		128
 
 fl_pack_t g_fw_array[FW_DATA_SIZE];
 fl_data_container_t G_FW_CONTAINER = { .data = g_fw_array, .head_index = 0, .tail_index = 0, .mask = FW_DATA_SIZE - 1, .count = 0 };
+
+#define FW_ECHO_SIZE 		2*FW_DATA_SIZE
+
+fl_pack_t g_fw_echo_array[FW_ECHO_SIZE];
+fl_data_container_t G_ECHO_CONTAINER = { .data = g_fw_echo_array, .head_index = 0, .tail_index = 0, .mask = FW_ECHO_SIZE - 1, .count = 0 };
 
 /******************************************************************************/
 /******************************************************************************/
@@ -421,6 +426,7 @@ int fl_wifi2ble_fota_system_start(u8 *_payload_start,u8 _len){
  *************************************************************************************************************************************************/
 void fl_wifi2ble_fota_ContainerClear(void){
 	FL_QUEUE_CLEAR(&G_FW_CONTAINER,G_FW_CONTAINER.mask+1);
+	FL_QUEUE_CLEAR(&G_ECHO_CONTAINER,G_ECHO_CONTAINER.mask+1);
 }
 /******************************************************************************/
 /******************************************************************************/
@@ -434,19 +440,43 @@ void fl_wifi2ble_fota_init(void){
 }
 
 void fl_wifi2ble_fota_recECHO(fl_pack_t _pack_rec){
-//	s16 idx_packInCont=-1;
-//	if (-1!=(idx_packInCont = FL_QUEUE_FIND(&G_FW_CONTAINER,&_pack_rec,_pack_rec.length -2))) {
-////		P_PRINTFHEX_A(INF_FILE,_pack_rec.data_arr,_pack_rec.length -2,"FOTA Echo(%d):",G_FW_CONTAINER.data[idx_packInCont].data_arr[SIZEU8(G_FW_CONTAINER.data[idx_packInCont].data_arr)-1]);
-//		G_FW_CONTAINER.data[idx_packInCont].data_arr[SIZEU8(G_FW_CONTAINER.data[idx_packInCont].data_arr)-1] = STATE_ackECHO;
-////		G_FW_CONTAINER.data[idx_packInCont].length = 0;
-//	}
-//	for (int var = 0; var < G_FW_CONTAINER.mask+1; ++var) {
-//		if(memcmp(G_FW_CONTAINER.data[var].data_arr,_pack_rec.data_arr,_pack_rec.length-2) == 0){
-//			P_PRINTFHEX_A(INF_FILE,_pack_rec.data_arr,_pack_rec.length -2,"FOTA Echo:");
-//			G_FW_CONTAINER.data[var].data_arr[SIZEU8(G_FW_CONTAINER.data[var].data_arr)-1] = STATE_ackECHO;
-//			return;
-//		}
-//	}
+	extern u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
+	fl_pack_t data_in_queue;
+	fl_dataframe_format_t packet;
+	static u32 count_echo=0;
+	static u8 flag_begin_end=0;
+	if (!fl_packet_parse(_pack_rec,&packet)) {
+		ERR(INF,"Packet parse fail!!!\r\n");
+		return;
+	}
+	if (packet.hdr != NWK_HDR_FOTA) {
+		return;
+	}
+	u8 OTA_BEGIN[3]={0,0,2};
+	u8 OTA_END[3]={2,0,2};
+
+	if (-1 == FL_QUEUE_FIND(&G_ECHO_CONTAINER,&_pack_rec,_pack_rec.length - 2)) {
+		if (FL_QUEUE_ADD(&G_ECHO_CONTAINER,&_pack_rec) < 0) {
+			//ERR(BLE,"Err <QUEUE ADD>!!\r\n");
+		} else {
+			if (FL_QUEUE_GET(&G_ECHO_CONTAINER,&data_in_queue)) {
+				if (fl_packet_parse(data_in_queue,&packet)) {
+					if (plog_IndexOf(packet.payload,OTA_BEGIN,SIZEU8(OTA_BEGIN),SIZEU8(OTA_BEGIN)) != -1) {
+						count_echo = 0;
+						flag_begin_end=1;
+					} else if (plog_IndexOf(packet.payload,OTA_BEGIN,SIZEU8(OTA_END),SIZEU8(OTA_END)) != -1) {
+						P_INFO("FOTA cnt:%d\r\n",count_echo);
+						count_echo = 0;
+						flag_begin_end=0;
+						FL_QUEUE_CLEAR(&G_ECHO_CONTAINER,G_ECHO_CONTAINER.mask+1);
+					}
+					else{
+						if(flag_begin_end)count_echo++;
+					}
+				}
+			}
+		}
+	}
 }
 
 void fl_wifi2ble_fota_run(void) {
@@ -456,8 +486,8 @@ void fl_wifi2ble_fota_run(void) {
 	if (!F_SENDING_STATE) {
 		if (FL_QUEUE_GET(&G_FW_CONTAINER,&fw_in_queue)){
 			P_PRINTFHEX_A(INF_FILE,fw_in_queue.data_arr,fw_in_queue.length,"FOTA SEND(%d):",fw_in_queue.data_arr[SIZEU8(fw_in_queue.data_arr)-1]);
-			P_INFO("FOTA(cnt:%d)%d/%d|0x00%02X%02X%02X\r\n",G_FW_CONTAINER.count,G_FW_CONTAINER.head_index,G_FW_CONTAINER.tail_index,
-					fw_in_queue.data_arr[7+3+2],fw_in_queue.data_arr[7+3+1],fw_in_queue.data_arr[7+3+0]);
+//			P_INFO("FOTA(cnt:%d)%d/%d|0x00%02X%02X%02X\r\n",G_FW_CONTAINER.count,G_FW_CONTAINER.head_index,G_FW_CONTAINER.tail_index,
+//					fw_in_queue.data_arr[7+3+2],fw_in_queue.data_arr[7+3+1],fw_in_queue.data_arr[7+3+0]);
 			fl_adv_send(fw_in_queue.data_arr,fw_in_queue.length,G_ADV_SETTINGS.adv_duration);
 		}
 		else{
