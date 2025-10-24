@@ -42,9 +42,9 @@ void FL_QUEUE_CLEAR(fl_data_container_t *pCont, u16 _size) {
 //		pCont->data[var].length=0;
 //	}
 //	pCont->data->
-//	pCont->mask = _size - 1;
-//	pCont->tail_index = 0;
-//	pCont->head_index = 0;
+	pCont->mask = _size - 1;
+	pCont->tail_index = 0;
+	pCont->head_index = 0;
 	pCont->count = 0;
 }
 /**
@@ -128,15 +128,15 @@ u16 FL_QUEUE_NEXTHEAD(fl_data_container_t *pCont, fl_pack_t *pdata) {
  * @return >=0 if data was returned; -1 otherwise.
  */
 s16 FL_QUEUE_GET_LOOP(fl_data_container_t *pCont, fl_pack_t *pdata) {
-//	if(pCont->data[pCont->head_index].length  < 2){
-//		return 0;
-//	}
 	s16 indx_head = -1;
 	*pdata = pCont->data[pCont->head_index];
 //	memcpy(pdata,pCont->data[pCont->head_index].data_arr,sizeof(fl_pack_t)/sizeof(u8));
 	indx_head = pCont->head_index;
 	pCont->head_index = ((pCont->head_index + 1) & pCont->mask);
 	if(pCont->count>0) pCont->count--;
+	if (pCont->data[indx_head].length < 2) {
+		return -1;
+	}
 	return indx_head;
 }
 /**

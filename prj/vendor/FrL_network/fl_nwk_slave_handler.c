@@ -755,8 +755,8 @@ void fl_slave_fota_proc(fl_pack_t _fota_pack){
 				if (flag_begin_end) {
 					DFU_OTA_CRC128_CAL(&packet.payload[6]);
 					count_echo++;
-					P_INFO("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
-					P_INFO("Downloading.......%d",16*count_echo);
+					P_INFO("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
+					P_INFO("Downloading:%d/%d",(16*count_echo),fw_size);
 				}
 			}
 		}

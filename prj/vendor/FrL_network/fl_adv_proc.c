@@ -176,10 +176,7 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 				incomming_data.length = pa->len + 1; //add rssi byte
 				//memcpy(incomming_data.data_arr,pa->data,incomming_data.length);
 //				incomming_data.data_arr[0] = pa->data[0];
-
-
 #ifndef MASTER_CORE
-
 				//IMPORTANT DELETE NETWORK
 //				if(MASTER_DELETE_NETWORK_FLAG)
 				{
@@ -227,15 +224,6 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 				} else {
 //					ERR(BLE,"Err <QUEUE ALREADY>!!\r\n");
 //					P_PRINTFHEX_A(BLE,incomming_data.data_arr,incomming_data.length,"%s(%d):","PACK",incomming_data.length);
-//#ifndef MASTER_CORE
-//					if (incomming_data.data_arr[0] == NWK_HDR_FOTA) {
-//						if (FL_QUEUE_FIND(&G_DATA_CONTAINER,&incomming_data,3) == -1) { //only check location bin
-//							if (FL_QUEUE_ADD(&G_DATA_CONTAINER,&incomming_data) < 0) {
-//								ERR(BLE,"Err <QUEUE FOTA ADD>!!\r\n");
-//							}
-//						}
-//					}
-//#endif
 				}
 			}
 		}
@@ -286,6 +274,7 @@ int fl_adv_sendFIFO_add(fl_pack_t _pack) {
 		if (FL_QUEUE_FIND(&G_QUEUE_HISTORY_SENDING,&_pack,_pack.length -2) == -1) {
 			if (FL_QUEUE_ADD(&G_QUEUE_HISTORY_SENDING,&_pack) < 0) {
 				ERR(BLE,"Err FULL <QUEUE ADD %s SENDING>!!\r\n",str_dbg);
+//				FL_QUEUE_CLEAR(&G_QUEUE_HISTORY_SENDING,G_QUEUE_HISTORY_SENDING.mask+1);
 				return -1;
 			} else {
 				LOGA(BLE,"QUEUE %s SEND ADD: %d/%d (cnt:%d)\r\n",str_dbg,G_QUEUE_HISTORY_SENDING.head_index,
