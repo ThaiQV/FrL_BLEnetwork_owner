@@ -390,7 +390,7 @@ void CMD_TESTFOTA(u8* _data) {
 	//p set testfota <fw size>
 	int rslt = sscanf((char*) _data,"testfota %d",&fw_size);
 	if (rslt == 1) {
-		TEST_virtual_fw(fw_size);
+		//TEST_virtual_fw(fw_size);
 	}
 }
 

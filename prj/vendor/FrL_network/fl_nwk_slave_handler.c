@@ -598,7 +598,8 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 					if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
 						u8 ok[2] = { 'o', 'k' };
 						memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
-						memcpy(packet.frame.payload,ok,SIZEU8(ok));
+						packet.frame.payload[0]= 8;//test version
+						memcpy(packet.frame.payload+1,ok,SIZEU8(ok));
 						//change endpoint to node source
 						packet.frame.endpoint.master = FL_FROM_SLAVE;
 						//add repeat_cnt

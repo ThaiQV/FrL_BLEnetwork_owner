@@ -48,7 +48,8 @@ typedef struct {
 
 typedef enum {
 	/* For UART communication */
-	GF_CMD_PING = 0,
+	GF_CMD_PING_REQUEST  = 0,
+	GF_CMD_PING_RESPONSE = 0,
 	GF_CMD_REPORT_REQUEST = 0x01,
 	GF_CMD_REPORT_RESPONSE = 0x02,
 	GF_CMD_GET_LIST_REQUEST = 0x03,
@@ -122,7 +123,7 @@ void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc);
 void FOTA_RESPONSE(u8* _pdata);
 
 fl_wifiprotocol_proc_t G_WIFI_CON[] = {
-			{ { GF_CMD_PING, PING_REQ }, { GF_CMD_PING, PING_RSP } }, //ping
+			{ { GF_CMD_PING_REQUEST, PING_REQ }, { GF_CMD_PAIRING_RESPONSE, PING_RSP } }, //ping
 			{ { GF_CMD_REPORT_REQUEST, REPORT_REQUEST }, { GF_CMD_REPORT_RESPONSE, REPORT_RESPONSE } },
 			{ { GF_CMD_GET_LIST_REQUEST, GETLIST_REQUEST },{GF_CMD_GET_LIST_RESPONSE, GETLIST_RESPONSE } },
 			{ { GF_CMD_PAIRING_REQUEST, PAIRING_REQUEST }, {GF_CMD_PAIRING_RESPONSE, PAIRING_RESPONSE } },
@@ -152,14 +153,6 @@ u8 _wf_CMD_find(fl_wifi_cmd_e _cmdid) {
 /***                      Processing functions 					             **/
 /******************************************************************************/
 /******************************************************************************/
-
-void PING_REQ(u8* _pdata, RspFunc rspfnc) {
-	//fl_datawifi2ble_t *data = (fl_datawifi2ble_t*)&_pdata[1];
-
-}
-void PING_RSP(u8* _pdata) {
-
-}
 
 static void _getnsend_data_report(u8 var, u8 rspcmd) {
 	extern fl_slaves_list_t G_NODE_LIST;
@@ -424,7 +417,7 @@ void SENDMESS_REQUEST(u8* _pdata, RspFunc rspfnc){
 	data->data[SIZEU8(mac)] = data->data[SIZEU8(mac)]-0x30;
 	memcpy(message,&data->data[SIZEU8(mac)],len_mess);
 
-	fl_api_master_req(mac,NWK_HDR_F6_SENDMESS,message,len_mess,&_SENDMESS_slave_rsp_callback,200,1);
+	fl_api_master_req(mac,NWK_HDR_F6_SENDMESS,message,len_mess,&_SENDMESS_slave_rsp_callback,0,1);
 	if (rspfnc != 0) {
 		//don't reponse in here => wait slave rsp or timeout
 	}
@@ -432,6 +425,63 @@ void SENDMESS_REQUEST(u8* _pdata, RspFunc rspfnc){
 
 void SENDMESS_RESPONSE(u8* _pdata){
 }
+
+void _PING_slave_rsp_callback(void *_data, void* _data2) {
+	fl_rsp_container_t *data = (fl_rsp_container_t*) _data;
+	u8 status = 0;
+	u8 version = 0;
+	//rsp data
+	if (data->timeout > 0) {
+		LOGA(API,"RTT:%d ms\r\n",(data->timeout_set - data->timeout) / 1000);
+		fl_pack_t *packet = (fl_pack_t *) _data2;
+		P_PRINTFHEX_A(API,packet->data_arr,packet->length,"RSP: ");
+		status= 1;
+		version = packet->data_arr[7];
+	} else {
+		LOGA(API,"RTT: TIMEOUT (%d ms)\r\n",(data->timeout_set) / 1000);
+		status=0;
+	}
+	LOGA(API,"cmdID  :%02X\r\n",data->rsp_check.hdr_cmdid);
+	LOGA(API,"SlaveID:%d\r\n",data->rsp_check.slaveID);
+	LOGA(API,"SeqTT  :%d\r\n",data->rsp_check.seqTimetamp);
+	//Rsp to WIFI
+	u8 mac[6];
+	if (fl_master_SlaveMAC_get(data->rsp_check.slaveID,mac) != -1) {
+		fl_datawifi2ble_t wfdata;
+		wfdata.cmd = GF_CMD_PING_RESPONSE;
+		memset(wfdata.data,0,SIZEU8(wfdata.data));
+		memcpy(wfdata.data,mac,SIZEU8(mac));
+		wfdata.data[6] = status;
+		wfdata.data[7] = version;
+		wfdata.len_data = SIZEU8(mac) + 1 + 1; // 1byte status + 1 byte version
+		wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
+		u8 payload_len = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
+		fl_ble_send_wifi((u8*) &wfdata,payload_len);
+	}
+}
+
+void PING_REQ(u8* _pdata, RspFunc rspfnc) {
+	fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[1];
+	LOGA(MCU,"LEN:0x%02X\r\n",data->len_data);
+	LOGA(MCU,"cmdID:0x%02X\r\n",data->cmd);
+	LOGA(MCU,"CRC8:0x%02X\r\n",data->crc8);
+	P_PRINTFHEX_A(MCU,data->data,data->len_data,"Data:");
+	u8 crc8_cal = fl_crc8(data->data,data->len_data);
+	if (crc8_cal != data->crc8) {
+		ERR(MCU,"ERR >> CRC8:0x%02X | 0x%02X\r\n",data->crc8,crc8_cal);
+		return;
+	}
+	u8 mac[6];
+	memcpy(mac,data->data,SIZEU8(mac));
+	fl_api_master_req(mac,NWK_HDR_22_PING,mac,SIZEU8(mac),_PING_slave_rsp_callback,0,1);
+	if (rspfnc != 0) {
+		//don't reponse in here => wait slave rsp or timeout
+	}
+}
+void PING_RSP(u8* _pdata) {
+
+}
+
 
 void _RSTPWMETER_slave_rsp_callback(void *_data, void* _data2) {
 	_slave_rsp_callbackNrspWifiMAC(G_WIFI_CON[_wf_CMD_find(GF_CMD_RSTPWMETER_REQUEST)].rsp.cmd,_data,_data2);
@@ -453,7 +503,7 @@ void RSTPWMETER_REQUEST(u8* _pdata, RspFunc rspfnc){
 	u8 message[22]; //max payload adv
 	memset(message,0,SIZEU8(message));
 	memcpy(message,&data->data[SIZEU8(mac)],3);
-	fl_api_master_req(mac,NWK_HDR_F7_RSTPWMETER,message,3,&_RSTPWMETER_slave_rsp_callback,200,1);
+	fl_api_master_req(mac,NWK_HDR_F7_RSTPWMETER,message,3,&_RSTPWMETER_slave_rsp_callback,0,1);
 	if (rspfnc != 0) {
 		//don't reponse in here => wait slave rsp or timeout
 	}
@@ -479,7 +529,7 @@ void PWMETER_RUNNING_SET_REQUEST(u8* _pdata, RspFunc rspfnc) {
 	u8 message[22]; //max payload adv
 	memset(message,0,SIZEU8(message));
 	memcpy(message,&data->data[SIZEU8(mac)],3*2);//3 channels - 2 bytes for each
-	fl_api_master_req(mac,NWK_HDR_F8_PWMETER_SET,message,3*2,&_PWMETER_SET_slave_rsp_callback,200,1);
+	fl_api_master_req(mac,NWK_HDR_F8_PWMETER_SET,message,3*2,&_PWMETER_SET_slave_rsp_callback,0,1);
 	if (rspfnc != 0) {
 		//don't reponse in here => wait slave rsp or timeout
 	}
