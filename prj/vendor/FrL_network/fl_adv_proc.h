@@ -12,14 +12,14 @@
 #define VENDOR_FRL_NETWORK_FL_ADV_PROC_H_
 
 /* Management QUEUE NETWORK SIZE*/
-#define PACK_REPEAT_SIZE 				32
-#define IN_DATA_SIZE 					1024 //=> Major container receive adv
-#define PACK_HANDLE_SIZE 				32 // bcs : slave need to rec its req and repeater of the neighbors
-#define FW_DATA_SIZE 					32
-#define FW_ECHO_SIZE 					32
+#define PACK_REPEAT_SIZE 				64
+#define IN_DATA_SIZE 					128 //=> Major container receive adv
+#define PACK_HANDLE_SIZE 				64 // bcs : slave need to rec its req and repeater of the neighbors
+#define FW_ECHO_SIZE 					16
 /* SENDING QUEUE */
-#define QUEUE_SENDING_SIZE 				32 	//=> main container sending packed
-#define QUEUE_HISTORY_SENDING_SIZE 		32
+#define FW_DATA_SIZE 					(2*FW_ECHO_SIZE)
+#define QUEUE_SENDING_SIZE 				64 	//=> main container sending packed
+#define QUEUE_HISTORY_SENDING_SIZE 		64
 /* Management QUEUE NETWORK SIZE*/
 
 typedef enum{

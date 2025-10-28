@@ -209,6 +209,10 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 #endif
 	//OFF ALL LOG
 	PLOG_Stop(ALL);
+////	PLOG_Start(ALL);
+//	PLOG_Start(APP);
+//	PLOG_Start(BLE);
+//	PLOG_Start(INF_FILE);
 
 	if (!deepRetWakeUp) {  //read flash size
 #if (BATT_CHECK_ENABLE)
