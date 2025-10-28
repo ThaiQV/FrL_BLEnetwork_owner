@@ -32,7 +32,7 @@
 /***                                Global Parameters                        **/
 /******************************************************************************/
 /******************************************************************************/
-#define NUM_HISTORY								16
+#define NUM_HISTORY								512
 
 extern volatile u8 NWK_DEBUG_STT; // it will be assigned into end-point byte (dbg :1bit)
 extern volatile u8 NWK_REPEAT_MODE; // 1: level | 0 : non-level
@@ -245,11 +245,12 @@ s8 TBS_History_Get(u16 _from, u16 _to) {
 }
 
 void TBS_History_LoadFromFlash(void){
-	for (u16 i = 0; i < NUM_HISTORY ; i++) {
+	for (u16 i = 0; i < NUM_HISTORY ; i++)
+	{
 		if(G_HISTORY_CONTAINER[i].indx != U16_MAX && G_HISTORY_CONTAINER[i].status_proc == 0){
 			//todo: read flash and fill in the G_HISTORY
 //			memcpy(G_HISTORY_CONTAINER[i].data,sample_history_database[G_HISTORY_CONTAINER[i].indx],DATA_HISTORY_SIZE);
-			G_HISTORY_CONTAINER[i].status_proc = 1;
+
 #ifdef COUNTER_DEVICE
 	tbs_history_counter_t* his_dev = (tbs_history_counter_t*)G_HISTORY_CONTAINER[i].data;
 #endif
@@ -260,7 +261,10 @@ void TBS_History_LoadFromFlash(void){
 			tbs_history_load(G_HISTORY_CONTAINER[i].data,DATA_HISTORY_SIZE);
 			P_PRINTFHEX_A(FLA,G_HISTORY_CONTAINER[i].data,DATA_HISTORY_SIZE,"LOAD|[%d]%d:",his_dev->data.index,his_dev->timetamp);
 			//Send to Master
-			fl_adv_sendFIFO_add(tbs_history_create_pack(G_HISTORY_CONTAINER[i].data));
+			if(fl_adv_sendFIFO_add(tbs_history_create_pack(G_HISTORY_CONTAINER[i].data)) == -1){
+				 G_HISTORY_CONTAINER[i].status_proc =0;
+			}
+			else G_HISTORY_CONTAINER[i].status_proc = 1;
 			//exit to step-one-step
 			return;
 		}

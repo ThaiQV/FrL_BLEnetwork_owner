@@ -19,7 +19,7 @@
 /* SENDING QUEUE */
 #define FW_DATA_SIZE 					(2*FW_ECHO_SIZE)
 #define QUEUE_SENDING_SIZE 				64 	//=> main container sending packed
-#define QUEUE_HISTORY_SENDING_SIZE 		64
+#define QUEUE_HISTORY_SENDING_SIZE 		512
 /* Management QUEUE NETWORK SIZE*/
 
 typedef enum{

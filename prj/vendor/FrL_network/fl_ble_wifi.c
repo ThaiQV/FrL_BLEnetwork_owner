@@ -627,7 +627,7 @@ void fl_ble2wifi_HISTORY_SEND(u8* mac,u8* timetamp,u8* _data){
 
 	wfdata.cmd = GF_CMD_REPORT_RESPONSE;
 	u8 ind_node = fl_master_Node_find(mac);
-	wfdata.data[0] = 0;//status
+	wfdata.data[0] = 1;//status => always online when got history
 	memcpy(&wfdata.data[1],mac,6);
 	memcpy(&wfdata.data[1+6],timetamp,4);
 	wfdata.data[1 + 6 + 4] = G_NODE_LIST.sla_info[ind_node].dev_type;
