@@ -53,7 +53,7 @@ volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into endpoint byte (dbg :1
 volatile u8 NWK_REPEAT_MODE = 0; // 1: level | 0 : non-level
 volatile u8 NWK_REPEAT_LEVEL = 3;
 
-fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_A5_HIS, NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_22_PING}; // register cmdid REQ
+fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_FOTA,NWK_HDR_A5_HIS, NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_22_PING}; // register cmdid REQ
 
 #define NWK_HDR_REQ_SIZE (sizeof(G_NWK_HDR_REQLIST)/sizeof(G_NWK_HDR_REQLIST[0]))
 
@@ -390,15 +390,6 @@ fl_pack_t fl_master_packet_GetInfo_build(u8 *_slave_mac_arr, u8 _slave_num) {
 	fl_pack_t packet_built;
 	fl_data_frame_u packet;
 
-	//clear lastest time rec
-//	for (int var = 0; var < _slave_num; ++var) {
-//		s16 idx = fl_master_SlaveID_find(_slave_mac_arr[var]);
-//		if (idx != -1) {
-//			G_NODE_LIST.sla_info[idx].timelife = clock_time();
-//			G_NODE_LIST.sla_info[idx].active = false;
-//		}
-//	}
-
 	/* F5|timetamp|slaveID 1|slaveID 2.......|CRC|TTL */
 	/* 1B|  4Bs   |  1Bs  	|     18Bs  	 |1B |1B  */
 	memset(packet.bytes,0,SIZEU8(packet.bytes));
@@ -508,6 +499,12 @@ u8 fl_master_SlaveID_get(u8* _mac) {
 
 s8 fl_master_SlaveMAC_get(u8 _slaveid,u8* mac){
 	s8 indx = fl_master_SlaveID_find(_slaveid);
+	//broadcast mac
+	if(_slaveid==0xFF && G_NODE_LIST.slot_inused != 0xFF ){
+		memset(mac,0xFF,6);
+		return 1;
+	}
+	//slave mac
 	if(indx != -1){
 		memcpy(mac,G_NODE_LIST.sla_info[indx].mac,SIZEU8(G_NODE_LIST.sla_info[indx].mac));
 		return 1;
@@ -754,8 +751,11 @@ int fl_master_ProccesRSP_cbk(void) {
 		if(!fl_packet_parse(data_in_queue,&packet.frame)) return -1;
 		if(!MASTER_INSTALL_STATE && G_NODE_LIST.slot_inused == 0xFF){return -1;}
 		//LOGA(APP,"NumOfRSP:%d\r\n",numofrsp);
-		LOGA(INF,"HDR_RSP ID: %02X\r\n",packet.frame.hdr);
-		P_PRINTFHEX_A(INF,packet.frame.payload,SIZEU8(packet.frame.payload),"%d:",packet.frame.slaveID.id_u8);
+		P_PRINTFHEX_A(INF,packet.bytes,SIZEU8(packet.bytes),"Slave(%d|0x%02X)-hdr(%02X):",packet.frame.slaveID.id_u8,packet.frame.slaveID.id_u8,
+				packet.frame.hdr);
+		fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(data_in_queue);
+		u32 seq_timetamp =fl_rtc_timetamp2milltampStep(timetamp_inpack);
+		LOGA(INF,"TT inpack:%d\r\n",seq_timetamp);
 		//Todo:Process RSP with API REQ registered
 		fl_queue_REQcRSP_ScanRec(data_in_queue);
 

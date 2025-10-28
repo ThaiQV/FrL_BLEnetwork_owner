@@ -15,6 +15,14 @@
 #ifdef MASTER_CORE
 #include "fl_ble_wifi.h"
 #include "fl_nwk_protocol.h"
+#include "fl_wifi2ble_fota.h"
+/******************************************************************************/
+/***                 DFU configuration        				                 **/
+/******************************************************************************/
+
+
+/******************************************************************************/
+
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -58,6 +66,9 @@ typedef enum {
 	GF_CMD_RSTPWMETER_RESPONSE = 0x0D,
 	GF_CMD_PWMETER_RUNNING_SET_REQUEST = 0x0E,
 	GF_CMD_PWMETER_RUNNING_SET_RESPONSE = 0x0E,
+	///FOTA cmd
+	GF_CMD_FOTA_REQUEST = 0xA0,
+	GF_CMD_FOTA_RESPONSE = 0xA0,
 }fl_wifi_cmd_e;
 
 typedef void (*RspFunc)(u8*);
@@ -106,6 +117,9 @@ void RSTPWMETER_REQUEST(u8* _pdata, RspFunc rspfnc);
 void RSTPWMETER_RESPONSE(u8* _pdata);
 void PWMETER_RUNNING_SET_REQUEST(u8* _pdata, RspFunc rspfnc);
 void PWMETER_RUNNING_SET_RESPONSE(u8* _pdata){};
+//FOTA
+void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc);
+void FOTA_RESPONSE(u8* _pdata);
 
 fl_wifiprotocol_proc_t G_WIFI_CON[] = {
 			{ { GF_CMD_PING, PING_REQ }, { GF_CMD_PING, PING_RSP } }, //ping
@@ -117,7 +131,9 @@ fl_wifiprotocol_proc_t G_WIFI_CON[] = {
 			{ { GF_CMD_RSTFACTORY_REQUEST, RSTFACTORY_REQUEST }, {GF_CMD_RSTFACTORY_RESPONSE, RSTFACTORY_RESPONSE } },
 			{ { GF_CMD_RSTPWMETER_REQUEST, RSTPWMETER_REQUEST }, {GF_CMD_RSTPWMETER_RESPONSE, RSTPWMETER_RESPONSE } },
 			{ { GF_CMD_PWMETER_RUNNING_SET_REQUEST, PWMETER_RUNNING_SET_REQUEST }, {GF_CMD_PWMETER_RUNNING_SET_RESPONSE, PWMETER_RUNNING_SET_RESPONSE } },
-			};
+			//FOTA
+			{ { GF_CMD_FOTA_REQUEST, FOTA_REQUEST }, { GF_CMD_FOTA_RESPONSE, FOTA_RESPONSE } },
+};
 
 #define GWIFI_SIZE 				(sizeof(G_WIFI_CON)/sizeof(G_WIFI_CON[0]))
 
@@ -497,6 +513,42 @@ void RSTFACTORY_REQUEST(u8* _pdata, RspFunc rspfnc){
 void RSTFACTORY_RESPONSE(u8* _pdata){}
 /******************************************************************************/
 /******************************************************************************/
+/***                            FOTA Nwk Processor                           **/
+/******************************************************************************/
+/******************************************************************************/
+void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
+	extern fl_slaves_list_t G_NODE_LIST;
+	fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[1];
+	LOGA(MCU,"LEN:0x%02X\r\n",data->len_data);
+	LOGA(MCU,"cmdID:0x%02X\r\n",data->cmd);
+	LOGA(MCU,"CRC8:0x%02X\r\n",data->crc8);
+	P_PRINTFHEX_A(MCU,data->data,data->len_data,"Data:");
+	u8 crc8_cal = fl_crc8(data->data,data->len_data);
+	if (crc8_cal != data->crc8) {
+		ERR(MCU,"ERR >> CRC8:0x%02X | 0x%02X\r\n",data->crc8,crc8_cal);
+		return;
+	}
+	//callback fnc rsp
+	if (rspfnc != 0) {
+		rspfnc(data->data);
+	}
+}
+
+void FOTA_RESPONSE(u8* _pdata){
+//	Build rsp wifi
+	fl_datawifi2ble_t wfdata;
+	wfdata.cmd = G_WIFI_CON[_wf_CMD_find(GF_CMD_FOTA_REQUEST)].rsp.cmd;
+	memset(wfdata.data,0,SIZEU8(wfdata.data));
+	//DFU put to flash
+	wfdata.data[0] = DFU_OTA_FW_PUT(_pdata);
+	wfdata.len_data = 1; //<OK/ERR> 1 byte
+	wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
+	u8 payload_len = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
+	fl_ble_send_wifi((u8*) &wfdata,payload_len);
+}
+
+/******************************************************************************/
+/******************************************************************************/
 /***                            Functions callback                           **/
 /******************************************************************************/
 /******************************************************************************/
@@ -559,6 +611,16 @@ void fl_ble2wifi_EVENT_SEND(u8* _slave_mac){
 	cmd_data[0] = wfdata.len_data + SIZEU8(wfdata.cmd)+SIZEU8(wfdata.crc8)+SIZEU8(wfdata.len_data);
 	memcpy(&cmd_data[1],(u8*)&wfdata,cmd_data[0]);
 	REPORT_RESPONSE(cmd_data);
+}
+void fl_ble2wifi_send_FOTA_BROADCAST_RSP(u8 *_rslt,u8 _size){
+	fl_datawifi2ble_t wfdata;
+	wfdata.cmd = GF_CMD_FOTA_RESPONSE;
+	memset(wfdata.data,0,SIZEU8(wfdata.data));
+	memcpy(wfdata.data,_rslt,_size);
+	wfdata.len_data = _size;
+	wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
+	P_INFO_HEX(wfdata,wfdata.len_data+3,"FOTA RSP(%d):",wfdata.len_data+3);
+	fl_ble_send_wifi((u8*)&wfdata,wfdata.len_data+3);//len_data + id_cmd + crc
 }
 void fl_ble2wifi_DEBUG2MQTT(u8* _payload,u8 _size){
 	fl_datawifi2ble_t wfdata;

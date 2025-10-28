@@ -34,19 +34,21 @@ typedef void (*fl_rsp_callback_fnc)(void*, void*);
 typedef enum {
 	NWK_HDR_NONE = 0,
 	// slave -> req -> master -> rsp
-	NWK_HDR_11_REACTIVE = 0x11, //inform to master
-	NWK_HDR_22_PING = 0x22, //master ping to slave
+	NWK_HDR_11_REACTIVE = 0x11, 				//inform to master
+	NWK_HDR_22_PING = 0x22, 					//master ping to slave
 	/*Frl protocols*/
-	NWK_HDR_55 = 0x55, // REQ from slave
-	NWK_HDR_A5_HIS=0xA5, //history
+	NWK_HDR_55 = 0x55, 							// REQ from slave
+	NWK_HDR_A5_HIS=0xA5, 						//history
 	// master -> req -> slave -> rsp
-	NWK_HDR_F5_INFO = 0xF5, //get data information real-time
-	NWK_HDR_F6_SENDMESS = 0xF6, //send mess to slave
-	NWK_HDR_F7_RSTPWMETER = 0xF7, //Send req to rst pwmeter
-	NWK_HDR_F8_PWMETER_SET = 0xF8, //Send req to set parameter's pwmeter
-	NWK_HDR_ASSIGN = 0xFC,	//Use to assign SlaveID to slave
+	NWK_HDR_F5_INFO = 0xF5, 					//get data information real-time
+	NWK_HDR_F6_SENDMESS = 0xF6, 				//send mess to slave
+	NWK_HDR_F7_RSTPWMETER = 0xF7, 				//Send req to rst pwmeter
+	NWK_HDR_F8_PWMETER_SET = 0xF8, 				//Send req to set parameter's pwmeter
+	NWK_HDR_ASSIGN = 0xFC,						//Use to assign SlaveID to slave
 	NWK_HDR_HEARTBEAT = 0xFD,
-	NWK_HDR_COLLECT = 0xFE, //Use to collect slave (master and slaves)
+	NWK_HDR_COLLECT = 0xFE, 					//Use to collect slave (master and slaves)
+	// FOTA
+	NWK_HDR_FOTA = 0xFA 						//===> Upload FW via the BLE
 }__attribute__((packed)) fl_hdr_nwk_type_e;
 
 typedef union {
@@ -335,6 +337,7 @@ void fl_master_SYNC_ORIGINAL_TIMETAMP(fl_timetamp_withstep_t _new_origin);
 void fl_nwk_master_init(void);
 void fl_nwk_master_run(fl_pack_t *_pack_handle);
 void fl_nwk_master_process(void);
+fl_pack_t fl_master_packet_heartbeat_build(void);
 int fl_send_heartbeat(void);
 void fl_nwk_master_heartbeat_run(void);
 fl_pack_t fl_master_packet_GetInfo_build(u8 *_slave_mac_arr, u8 _slave_num);
@@ -353,6 +356,7 @@ u8 fl_nwk_mySlaveID(void);
 void fl_nwk_slave_init(void);
 void fl_nwk_slave_run(fl_pack_t *_pack_handle);
 void fl_nwk_slave_process(void);
+void fl_slave_fota_proc(fl_pack_t _fota_pack);
 bool fl_nwk_slave_checkHDR(u8 _hdr);
 u32 fl_req_slave_packet_createNsend(u8 _cmdid, u8* _data, u8 _len);
 s8 fl_queue_REQcRSP_ScanRec(fl_pack_t _pack,void *_id);

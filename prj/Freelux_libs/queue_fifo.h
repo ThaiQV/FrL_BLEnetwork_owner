@@ -54,6 +54,8 @@ s16 FL_QUEUE_ADD(fl_data_container_t *pCont, fl_pack_t *pdata);
  * @return 1 if data was returned; 0 otherwise.
  */
 u16 FL_QUEUE_GET(fl_data_container_t *pCont, fl_pack_t *pdata);
+s16 FL_QUEUE_GET_not_NEXTHEAD(fl_data_container_t *pCont, fl_pack_t *pdata);
+u16 FL_QUEUE_NEXTHEAD(fl_data_container_t *pCont, fl_pack_t *pdata) ;
 /**
  * Returns the pack in a queue container.(FIFO)
  * @param buffer The buffer from which the data should be returned.

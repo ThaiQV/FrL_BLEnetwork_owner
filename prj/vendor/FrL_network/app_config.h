@@ -229,6 +229,11 @@
 #define PA7_OUTPUT_ENABLE         			1
 #define PA7_DATA_OUT                     	1 //must
 
+//#define DEBUG_INFO_TX_PIN           		GPIO_PD3
+//#define PULL_WAKEUP_SRC_PD3         		PM_PIN_PULLUP_10K
+//#define PD3_OUTPUT_ENABLE         			1
+//#define PD3_DATA_OUT                     	1 //must
+
 #define DEBUG_TX_PIN_INIT()					do{	\
 												gpio_function_en(DEBUG_INFO_TX_PIN);								\
 												gpio_set_output(DEBUG_INFO_TX_PIN, 1);								\

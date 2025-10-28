@@ -122,7 +122,7 @@ enum {
                                             TERMINAL_FONT_GREEN();  		\
 											break;                  		\
 											case INF_FILE:          		\
-                                            TERMINAL_FONT_BLUE();   		\
+											TERMINAL_FONT_YELLOW();   		\
                                             break;                  		\
                                             case FLA:               		\
                                             TERMINAL_FONT_YELLOW(); 		\
@@ -256,8 +256,23 @@ enum {
 																					newline = 1;\
 																			}\
 																			P_PRINTF(dbg, "\r\n");}
+#define P_INFO_HEX(buffer_p,size,fmt,...)					{	_COLOR(USER);\
+																uint16_t newline = 0;\
+																uint8_t *buffer=(uint8_t*)&buffer_p; \
+																PRINTF(fmt,##__VA_ARGS__);\
+																for (uint16_t i = 0; i < (uint16_t)size; i++) {\
+																	if (newline != 0) {\
+																		newline = 0;\
+																	}\
+																	PRINTF("%02X ", buffer[i]);\
+																	if (((i + 1) % 16) == 0)\
+																		newline = 1;\
+																}\
+																PRINTF("\r\n");\
+																TERMINAL_FONT_BLACK(); \
+															}
 
-#define P_INFO(fmt,...)			_COLOR(USER);                      \
+#define P_INFO(fmt,...)									_COLOR(USER);             \
 														PRINTF(fmt,##__VA_ARGS__);\
 														TERMINAL_FONT_BLACK();                      
 #define NL1()           do { PRINTF("\r\n"); } while(0)

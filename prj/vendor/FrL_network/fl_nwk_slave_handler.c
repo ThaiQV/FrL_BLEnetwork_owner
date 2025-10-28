@@ -12,11 +12,11 @@
 #include "stack/ble/ble.h"
 #include "app.h"
 #include "stdio.h"
-
 #include "fl_adv_repeat.h"
 #include "fl_adv_proc.h"
 //#include "fl_nwk_protocol.h"
 #include "fl_nwk_handler.h"
+#include "fl_wifi2ble_fota.h"
 //Test api
 #include "test_api.h"
 #include "../TBS_dev/TBS_dev_config.h"
@@ -39,8 +39,8 @@ u8 GETINFO_FLAG_EVENTTEST = 0;
 #define RECHECKING_NETWOK_TIME 		30*1021 		    //ms
 #define RECONNECT_TIME				62*1000*1020		//s
 #define INFORM_MASTER				5*1001*1004
-fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_A5_HIS,NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
-fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_A5_HIS,NWK_HDR_55,NWK_HDR_11_REACTIVE,NWK_HDR_22_PING}; // register cmdid REQ
+fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_FOTA,NWK_HDR_A5_HIS,NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
+fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_FOTA,NWK_HDR_A5_HIS,NWK_HDR_55,NWK_HDR_11_REACTIVE,NWK_HDR_22_PING}; // register cmdid REQ
 
 #define NWK_HDR_SIZE (sizeof(G_NWK_HDR_LIST)/sizeof(G_NWK_HDR_LIST[0]))
 #define NWK_HDR_REQ_SIZE (sizeof(G_NWK_HDR_REQLIST)/sizeof(G_NWK_HDR_REQLIST[0]))
@@ -67,7 +67,6 @@ fl_timetamp_withstep_t GenerateTimetampField(void){
 
 /*---------------- Total Packet handling --------------------------*/
 
-#define PACK_HANDLE_SIZE 		32 // bcs : slave need to rec its req and repeater of the neighbors
 fl_pack_t g_handle_array[PACK_HANDLE_SIZE];
 fl_data_container_t G_HANDLE_CONTAINER = { .data = g_handle_array, .head_index = 0, .tail_index = 0, .mask = PACK_HANDLE_SIZE - 1, .count = 0 };
 
@@ -664,6 +663,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 			return packet_built;
 		}
 		break;
+
 		default:
 			return packet_built;
 		break;
@@ -680,6 +680,89 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 /***                            Functions callback                           **/
 /******************************************************************************/
 /******************************************************************************/
+fl_pack_t fl_slave_fota_rsp_packet_build(u8* _data, u8 _len,fl_data_frame_u _REQpack){
+	/**************************************************************************/
+	/* | HDR | Timetamp | Mill_time | SlaveID | payload | crc8_payload | Ep | */
+	/* | 1B  |   4Bs    |    1B     |    1B   |   22Bs  |   	1B	   | 1B | -> .master = FL_FROM_SLAVE */
+	/**************************************************************************/
+	fl_pack_t rslt = {.length = 0};
+	fl_data_frame_u rsp_pack;
+	/*Create common packet */
+	rsp_pack.frame.hdr = NWK_HDR_FOTA;
+	memcpy(rsp_pack.frame.timetamp,_REQpack.frame.timetamp,SIZEU8(rsp_pack.frame.timetamp));
+	//Add new mill-step
+	rsp_pack.frame.milltamp = _REQpack.frame.milltamp;
+
+	rsp_pack.frame.slaveID.id_u8 = G_INFORMATION.slaveID.id_u8;
+	//Create payload
+	memset(rsp_pack.frame.payload,0x0,SIZEU8(rsp_pack.frame.payload));
+	memcpy(rsp_pack.frame.payload,_data,_len);
+	//crc
+	rsp_pack.frame.crc8 = fl_crc8(rsp_pack.frame.payload,SIZEU8(rsp_pack.frame.payload));
+
+	//create endpoint => always set below
+	rsp_pack.frame.endpoint = _REQpack.frame.endpoint;
+	//Create packet from slave
+	rsp_pack.frame.endpoint.master = FL_FROM_SLAVE;
+
+	//copy to resutl data struct
+	rslt.length = SIZEU8(rsp_pack.bytes) - 1; //skip rssi
+	memcpy(rslt.data_arr,rsp_pack.bytes,rslt.length );
+//	LOGA(FILE,"Send %02X REQ to Slave %d:%d/%d\r\n",rsp_pack.frame.hdr,slaveID,timetampStep.timetamp,timetampStep.milstep);
+	P_PRINTFHEX_A(INF_FILE,rslt.data_arr,rslt.length,"RSP %X:",rsp_pack.frame.hdr);
+	return rslt;
+}
+
+void fl_slave_fota_proc(fl_pack_t _fota_pack){
+	static u32 count_echo=0;
+	static u8 flag_begin_end=0;
+	static u32 rtt=0;
+	static u32 fw_size=0;
+	extern u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
+	fl_dataframe_format_t packet;
+	if(!fl_packet_parse(_fota_pack,&packet)){
+		ERR(INF,"Packet parse fail!!!\r\n");
+		return;
+	}
+	if (packet.hdr == NWK_HDR_FOTA) {
+		if(packet.endpoint.master == FL_FROM_MASTER_ACK){
+			//TEST
+//			u8 version_typefw[4]={'1','2','3',G_INFORMATION.dev_type};
+//			fl_adv_sendFIFO_add(fl_slave_fota_rsp_packet_build(version_typefw,SIZEU8(version_typefw),packet));
+		}else{
+			u8 OTA_BEGIN[3] = { 0, G_INFORMATION.dev_type, 2 };
+			u8 OTA_END[3] = { 2, G_INFORMATION.dev_type, 2 };
+			if (plog_IndexOf(packet.payload,OTA_BEGIN,SIZEU8(OTA_BEGIN),SIZEU8(OTA_BEGIN)) != -1) {
+				count_echo = 0;
+				flag_begin_end = 1;
+				rtt = fl_rtc_get();
+				fw_size = MAKE_U32(0,packet.payload[5],packet.payload[4],packet.payload[3]);
+				DFU_OTA_CRC128_INIT();
+				P_INFO("\r\n============ FOTA BEGIN ============ \r\n");
+
+			} else if (flag_begin_end && plog_IndexOf(packet.payload,OTA_END,SIZEU8(OTA_END),SIZEU8(OTA_END)) != -1) {
+				P_INFO("\r\n============ FOTA END ==============\r\n");
+				u8 crc128[16];
+				memcpy(crc128,DFU_OTA_CRC128_GET(),16);
+				P_INFO_HEX(crc128,16,"** CRC      :");
+				P_INFO_HEX(packet.payload+6,16,"** CRC CHECK:");
+				P_INFO("** File     : %d/%d (%d)\r\n",count_echo*16,fw_size,count_echo);
+				P_INFO("** RTT      : %d s\r\n",(u32)(fl_rtc_get()-rtt));
+				P_INFO("=====================================\r\n");
+				count_echo = 0;
+				flag_begin_end = 0;
+			} else {
+				if (flag_begin_end) {
+					DFU_OTA_CRC128_CAL(&packet.payload[6]);
+					count_echo++;
+					P_INFO("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
+					P_INFO("Downloading:%d/%d",(16*count_echo),fw_size);
+				}
+			}
+		}
+	}
+}
+
 /***************************************************
  * @brief 		:soft-timer callback for the processing response
  *

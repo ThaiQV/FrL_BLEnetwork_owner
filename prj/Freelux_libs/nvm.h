@@ -19,6 +19,8 @@
 #define STORAGE_MAP						0x0100
 
 #define OTA_FW_HEADER_KEY				0x0200
+#define OTA_MEMORY_MAP					0x0201
+#define OTA_CURRENT_VERSION				0x0202
 
 /*-----Structures-----*/
 /*-----Structures-----*/

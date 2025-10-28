@@ -12,5 +12,6 @@
 #define VENDOR_FRL_NETWORK_TEST_API_H_
 
 int TEST_slave_sendREQ(void);
+void TEST_virtual_fw(u32 _fwsize);
 
 #endif /* VENDOR_FRL_NETWORK_TEST_API_H_ */

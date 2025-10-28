@@ -94,6 +94,7 @@ void CMD_ADVSCAN(u8* _data);
 void CMD_CLEARDB(u8* _data);
 void CMD_CHANNELCONFIG(u8* _data);
 void CMD_PING(u8* _data);
+void CMD_TESTFOTA(u8* _data);
 /********************* Functions GET CMD declare ********************/
 void CMD_GETSLALIST(u8* _data);
 void CMD_GETINFOSLAVE(u8* _data);
@@ -110,7 +111,7 @@ fl_cmdlines_t G_CMDSET[] = { { { 'u', 't', 'c' }, 3, CMD_SETUTC }, 			// p set u
 		{ { 'c', 'l', 'e', 'a', 'r' }, 5, CMD_CLEARDB },					// p set clear <nodelist>
 		{ { 'c', 'h', 'n' }, 3, CMD_CHANNELCONFIG },						// p set chn <chn1> <chn2> <chn3>
 		{ { 'p', 'i', 'n','g' }, 4, CMD_PING },								// p set ping <mac> <times>
-
+		{ { 't','e','s','t' ,'f', 'o', 't','a' }, 8, CMD_TESTFOTA },		// p set testfota <size>
 		};
 
 fl_cmdlines_t G_CMDGET[] = { { { 's', 'l', 'a', 'l', 'i', 's', 't' }, 7, CMD_GETSLALIST },	// p get list
@@ -382,6 +383,17 @@ void CMD_HEARTBEAT(u8* _data) {
 	ERR(DRV,"ERR HeartBeat Period (%d):%d\r\n",rslt,period_hb);
 
 }
+
+void CMD_TESTFOTA(u8* _data) {
+	extern void TEST_virtual_fw(u32 _fwsize);
+	u32 fw_size = 0;
+	//p set testfota <fw size>
+	int rslt = sscanf((char*) _data,"testfota %d",&fw_size);
+	if (rslt == 1) {
+		TEST_virtual_fw(fw_size);
+	}
+}
+
 void CMD_REPEAT(u8* _data) {
 	extern volatile u8  NWK_REPEAT_LEVEL;
 	extern volatile u8  NWK_REPEAT_MODE;
@@ -480,8 +492,8 @@ typedef struct {
 		u8 received;
 		u8 lost;
 	} rslt;
-} fl_nkw_ping_t;
-fl_nkw_ping_t G_NWK_PING;
+} fl_nwk_ping_t;
+fl_nwk_ping_t G_NWK_PING;
 
 int ping_process(void);
 void _ping_rsp_callback(void *_data,void* _data2){
@@ -667,7 +679,6 @@ int _GETALLNODES(void) {
 			}
 		}
 	}
-
 	//check timeout
 	if (p_ALLNODES.timeout == 0) {
 		P_INFO("GET ALL TIMEOUT: %d ms\r\n",(clock_time()- p_ALLNODES.rtt)/SYSTEM_TIMER_TICK_1MS);
@@ -679,11 +690,8 @@ int _GETALLNODES(void) {
 	u8 diff = _count_diff_elements(pre_slaveID,slaveID,SIZEU8(slaveID));
 	if ((diff >= 3 )&& slave_num > 0) {
 		//update tail and send req
-//		u8 new_tail = slaveID[slave_num - 1] + GETALL_NUMOF1TIMES;
-//		p_ALLNODES.tail_nodes = new_tail > p_ALLNODES.sort_list.numOfOnl ? p_ALLNODES.sort_list.numOfOnl : new_tail;
 		memcpy(pre_slaveID,slaveID,SIZEU8(slaveID));
-		LOGA(DRV,"Total:%d,Diff:%d,Curr_num:%d,head:%d\r\n",p_ALLNODES.sort_list.numOfOnl,
-				diff,slave_num,p_ALLNODES.head_nodes);
+		LOGA(DRV,"Total:%d,Diff:%d,Curr_num:%d,head:%d\r\n",p_ALLNODES.sort_list.numOfOnl,diff,slave_num,p_ALLNODES.head_nodes);
 		P_PRINTFHEX_A(DRV,slaveID,slave_num,"SlaveID(%d):",slave_num);
 		//Send ADV
 		s8 add_rslt = fl_master_packet_F5_CreateNSend(slaveID,slave_num);
@@ -693,7 +701,7 @@ int _GETALLNODES(void) {
 			goto EXIT_GETALL;
 		}
 	}
-	return 0;
+	return GETALL_TIMEOUT_1_NODE*1000;
 	EXIT_GETALL:
 	fl_send_heartbeat();
 	memset(pre_slaveID,0xFE,SIZEU8(pre_slaveID));
@@ -742,7 +750,7 @@ void CMD_GETALLNODES(u8* _data) {
 		}
 		p_ALLNODES.rtt = clock_time();
 		P_INFO("Get %d/%d nodes (timeout:%d ms)(%d)\r\n",p_ALLNODES.sort_list.numOfOnl,G_NODE_LIST.slot_inused,p_ALLNODES.timeout,GETINFO_FLAG_EVENTTEST);
-		blt_soft_timer_restart(&_GETALLNODES,GETALL_TIMEOUT_1_NODE*1000);
+		blt_soft_timer_restart(&_GETALLNODES,11*999);
 	}
 }
 
@@ -839,8 +847,8 @@ void _Passing_CmdLine(type_debug_t _type, u8 *_data) {
 	} else if (_type == GETCMD) {
 		CMD_EXCUTE_FUNC(G_CMDGET,sizeof(G_CMDGET) / sizeof(fl_cmdlines_t),_data);
 	} else if (_type == RSTCMD) {
-		ERR(APP,"Device will reset after 3s !!!!\r\n");
-		blt_soft_timer_add(&REBOOT_DEV,3 * 1000 * 1000);
+		ERR(APP,"Device will reset after 1s !!!!\r\n");
+		blt_soft_timer_add(&REBOOT_DEV,1 * 1000 * 1000);
 	}else if (_type == FACTORYCMD) {
 		ERR(APP,"Clear and reset factory.....\r\n");
 		fl_db_clearAll();
