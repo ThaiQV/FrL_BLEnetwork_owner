@@ -55,8 +55,18 @@ fl_slave_userdata_t SLAVE_USERDATA_DEFAULT = {
 /******************************************************************************/
 /******************************************************************************/
 
-bool _db_recheck_write(u32 _addr,u8 _sample_size, u8* _sample_check){
+void _db_earse_sector_full(u32 _addr, u8 _size){
+	for (u8 var = 0; var < _size; ++var) {
+		flash_erase_sector(_addr + var*SECTOR_FLASH_SIZE);
+	}
+}
+
+bool _db_recheck_write(u32 _addr,u16 _sample_size, u8* _sample_check){
+#ifdef MASTER_CORE
+	u8 data_buff[2024];
+#else
 	u8 data_buff[250];
+#endif
 	memset(data_buff,0,sizeof(data_buff));
 	flash_page_program(_addr,_sample_size,_sample_check);
 	//recheck
@@ -91,8 +101,9 @@ void fl_db_rtc_save(u32 _timetamp) {
 			}
 		}
 	}
-	flash_erase_sector(ADDR_RTC_START);
+//	flash_erase_sector(ADDR_RTC_START);
 //	flash_page_program(ADDR_RTC_START,RTC_ENTRY_SIZE,(uint8_t*) &entry);
+	_db_earse_sector_full(ADDR_RTC_START,RTC_SIZE/SECTOR_FLASH_SIZE);
 	fl_db_rtc_save(_timetamp);
 }
 
@@ -113,12 +124,13 @@ void fl_db_rtc_init(void) {
 	u32 curr_timetamp = fl_db_rtc_load();
 	if (curr_timetamp == 0) {
 		//clear all and write original time
-		flash_erase_sector(ADDR_RTC_START);
+//		flash_erase_sector(ADDR_RTC_START);
+		_db_earse_sector_full(ADDR_RTC_START,RTC_SIZE/SECTOR_FLASH_SIZE);
 		fl_db_rtc_save(RTC_ORIGINAL_TIMETAMP);
 	}
 }
 void fl_db_rtc_factory(void){
-	flash_erase_sector(ADDR_RTC_START);
+	_db_earse_sector_full(ADDR_RTC_START,RTC_SIZE/SECTOR_FLASH_SIZE);
 }
 /******************** NODELIST FUNCTIONs *******************/
 #ifdef MASTER_CORE
@@ -181,9 +193,12 @@ bool fl_db_nodelist_save(fl_nodelist_db_t *_pnodelist){
 			addr_slave_data_end = addr_slave_data + nodelist_buf.num_slave * size_slave_data;
 			LOGA(FLA,"Save NODELIST at slot(%d)-addr(%08lX - %08lX)\r\n",var,addr_slave_data,addr_slave_data_end);
 			if(addr_slave_data_end > ADDR_NODELIST_START+NODELIST_SIZE)goto RE_STORE;
-			flash_page_program(ADDR_NODELIST_NUMSLAVE + var,1,(u8*) &nodelist_buf.num_slave);
-			flash_page_program(addr_slave_data,nodelist_buf.num_slave * size_slave_data,(u8*) &nodelist_buf.slave);
-			return true;
+//			flash_page_program(ADDR_NODELIST_NUMSLAVE + var,1,(u8*) &nodelist_buf.num_slave);
+//			flash_page_program(addr_slave_data,nodelist_buf.num_slave * size_slave_data,(u8*) &nodelist_buf.slave);
+			if (_db_recheck_write(ADDR_NODELIST_NUMSLAVE + var,1,(u8*) &nodelist_buf.num_slave)
+				&& _db_recheck_write(addr_slave_data,nodelist_buf.num_slave * size_slave_data,(u8*) &nodelist_buf.slave)) {
+				return true;
+			}
 		} else {
 			addr_slave_data = addr_slave_data + num_slave_buf * size_slave_data;
 		}
@@ -191,12 +206,14 @@ bool fl_db_nodelist_save(fl_nodelist_db_t *_pnodelist){
 	RE_STORE:
 	//fully memory -> clear and re-store
 	ERR(FLA,"NODELIST overload memory!!!\r\n");
-	flash_erase_sector(ADDR_NODELIST_START);
+//	flash_erase_sector(ADDR_NODELIST_START);
+	_db_earse_sector_full(ADDR_NODELIST_START,NODELIST_SIZE/SECTOR_FLASH_SIZE);
 	fl_db_nodelist_save(_pnodelist);
 	return false;
 }
 void fl_db_nodelist_clearAll(void){
-	flash_erase_sector(ADDR_NODELIST_START);
+//	flash_erase_sector(ADDR_NODELIST_START);
+	_db_earse_sector_full(ADDR_NODELIST_START,NODELIST_SIZE/SECTOR_FLASH_SIZE);
 }
 
 /******************** MASTER PROFILE FUNCTIONs *******************/
@@ -246,21 +263,26 @@ void fl_db_masterprofile_save(fl_db_master_profile_t entry) {
 		check.magic = 0;
 		flash_dread(ADDR_MASTER_PROFILE_START + i * MASTER_PROFILE_ENTRY_SIZE,MASTER_PROFILE_ENTRY_SIZE,(uint8_t*) &check);
 		if (check.magic != MASTER_PROFILE_MAGIC) {
-			flash_page_program(ADDR_MASTER_PROFILE_START + i * MASTER_PROFILE_ENTRY_SIZE,MASTER_PROFILE_ENTRY_SIZE,(uint8_t*) &entry);
-			LOGA(FLA,"MASTER PROFILE Stored(0x%X):%d|%d|%d\r\n",ADDR_MASTER_PROFILE_START + i * MASTER_PROFILE_ENTRY_SIZE,
-					entry.nwk.chn[0],entry.nwk.chn[1],entry.nwk.chn[2]);
-			return;
+//			flash_page_program(ADDR_MASTER_PROFILE_START + i * MASTER_PROFILE_ENTRY_SIZE,MASTER_PROFILE_ENTRY_SIZE,(uint8_t*) &entry);
+			if (_db_recheck_write(ADDR_MASTER_PROFILE_START + i * MASTER_PROFILE_ENTRY_SIZE,MASTER_PROFILE_ENTRY_SIZE,(uint8_t*) &entry)) {
+				LOGA(FLA,"MASTER PROFILE Stored(0x%X):%d|%d|%d\r\n",ADDR_MASTER_PROFILE_START + i * MASTER_PROFILE_ENTRY_SIZE,entry.nwk.chn[0],
+						entry.nwk.chn[1],entry.nwk.chn[2]);
+				return;
+			}
 		}
 	}
-	flash_erase_sector(ADDR_MASTER_PROFILE_START);
-	flash_page_program(ADDR_MASTER_PROFILE_START,MASTER_PROFILE_ENTRY_SIZE,(uint8_t*) &entry);
+//	flash_erase_sector(ADDR_MASTER_PROFILE_START);
+	_db_earse_sector_full(ADDR_MASTER_PROFILE_START,MASTERPROFILE_SIZE/SECTOR_FLASH_SIZE);
+//	flash_page_program(ADDR_MASTER_PROFILE_START,MASTER_PROFILE_ENTRY_SIZE,(uint8_t*) &entry);
+	fl_db_masterprofile_save(entry);
 }
 fl_db_master_profile_t fl_db_masterprofile_init(void) {
 	fl_db_master_profile_t profile = { .magic = 0xFFFFFFFF };
 	profile = fl_db_masterprofile_load();
 	if (profile.magic != MASTER_PROFILE_MAGIC) {
 		//clear all and write default profiles
-		flash_erase_sector(ADDR_MASTER_PROFILE_START);
+//		flash_erase_sector(ADDR_MASTER_PROFILE_START);
+		_db_earse_sector_full(ADDR_MASTER_PROFILE_START,MASTERPROFILE_SIZE/SECTOR_FLASH_SIZE);
 		fl_db_generate_private_key(MASTER_PROFILE_DEFAULT.nwk.private_key);
 		fl_db_masterprofile_save(MASTER_PROFILE_DEFAULT);
 		profile = fl_db_masterprofile_load();
@@ -319,7 +341,8 @@ void fl_db_slaveprofile_save(fl_slave_profiles_t entry) {
 			}
 		}
 	}
-	flash_erase_sector(ADDR_SLAVE_PROFILE_START);
+//	flash_erase_sector(ADDR_SLAVE_PROFILE_START);
+	_db_earse_sector_full(ADDR_SLAVE_PROFILE_START,SLAVEPROFILE_SIZE/SECTOR_FLASH_SIZE);
 	fl_db_slaveprofile_save(entry);
 }
 
@@ -336,7 +359,8 @@ fl_slave_profiles_t fl_db_slaveprofile_init(void){
 	profile = fl_db_slaveprofile_load();
 	if(profile.magic != SLAVE_PROFILE_MAGIC){
 		//clear all and write default profiles
-		flash_erase_sector(ADDR_SLAVE_PROFILE_START);
+//		flash_erase_sector(ADDR_SLAVE_PROFILE_START);
+		_db_earse_sector_full(ADDR_SLAVE_PROFILE_START,SLAVEPROFILE_SIZE/SECTOR_FLASH_SIZE);
 		fl_db_slaveprofile_save(SLAVE_PROFILE_DEFAULT);
 		profile = fl_db_slaveprofile_load();
 	}
@@ -395,7 +419,8 @@ void fl_db_slavesettings_save(u8 *_data,u8 _size) {
 			}
 		}
 	}
-	flash_erase_sector(ADDR_SLAVE_SETTINGS_START);
+//	flash_erase_sector(ADDR_SLAVE_SETTINGS_START);
+	_db_earse_sector_full(ADDR_SLAVE_SETTINGS_START,SLAVESETTINGS_SIZE/SECTOR_FLASH_SIZE);
 	fl_db_slavesettings_save(_data,_size);
 }
 
@@ -412,7 +437,8 @@ fl_slave_settings_t fl_db_slavesettings_init(void){
 	settings = fl_db_slavesettings_load();
 	if(settings.magic != SLAVE_SETTINGS_MAGIC){
 		//clear all and write default settings
-		flash_erase_sector(ADDR_SLAVE_SETTINGS_START);
+//		flash_erase_sector(ADDR_SLAVE_SETTINGS_START);
+		_db_earse_sector_full(ADDR_SLAVE_SETTINGS_START,SLAVESETTINGS_SIZE/SECTOR_FLASH_SIZE);
 		memset(SLAVE_SETTINGS_DEFAULT.setting_arr,0,sizeof(SLAVE_SETTINGS_DEFAULT.setting_arr));
 		fl_db_slavesettings_save(SLAVE_SETTINGS_DEFAULT.setting_arr,sizeof(SLAVE_SETTINGS_DEFAULT.setting_arr));
 		settings = fl_db_slavesettings_load();
@@ -446,7 +472,8 @@ void fl_db_slaveuserdata_save(u8 *_data,u8 _size) {
 			}
 		}
 	}
-	flash_erase_sector(ADDR_SLAVE_USERDATA_START);
+//	flash_erase_sector(ADDR_SLAVE_USERDATA_START);
+	_db_earse_sector_full(ADDR_SLAVE_USERDATA_START,SLAVEUSERDATA_SIZE/SECTOR_FLASH_SIZE);
 	fl_db_slaveuserdata_save(_data,_size);
 }
 /***************************************************
@@ -483,7 +510,8 @@ fl_db_userdata_t fl_db_slaveuserdata_init(void){
 	userdata = fl_db_slaveuserdata_load();
 	if(userdata.magic != SLAVE_USERDATA_MAGIC){
 		//clear all and write default userdata
-		flash_erase_sector(ADDR_SLAVE_USERDATA_START);
+//		flash_erase_sector(ADDR_SLAVE_USERDATA_START);
+		_db_earse_sector_full(ADDR_SLAVE_USERDATA_START,SLAVEUSERDATA_SIZE/SECTOR_FLASH_SIZE);
 		memset((u8*)SLAVE_USERDATA_DEFAULT.data.payload,0,sizeof(SLAVE_USERDATA_DEFAULT.data.payload));
 		fl_db_slaveuserdata_save(SLAVE_USERDATA_DEFAULT.data.payload,sizeof(SLAVE_USERDATA_DEFAULT.data.payload));
 		userdata = fl_db_slaveuserdata_load();
@@ -508,8 +536,10 @@ void fl_db_init(void) {
 			flash_erase_sector(ADDR_USERAREA_END - SECTOR_FLASH_SIZE);
 			fl_db_clearAll();
 			memset(initialized_db,0x55,QUANTITY_FIELD_STORED_DB);
-			flash_page_program(ADDR_DATABASE_INITIALIZATION,QUANTITY_FIELD_STORED_DB,(uint8_t*) &initialized_db);
-			break;
+			//flash_page_program(ADDR_DATABASE_INITIALIZATION,QUANTITY_FIELD_STORED_DB,(uint8_t*) &initialized_db);
+			if(_db_recheck_write(ADDR_DATABASE_INITIALIZATION,QUANTITY_FIELD_STORED_DB,(uint8_t*) &initialized_db)){
+				break;
+			}
 		}
 	}
 
@@ -528,19 +558,26 @@ void fl_db_all_save(void){
 }
 #ifndef MASTER_CORE
 void fl_db_Pairing_Clear(void){
-	flash_erase_sector(ADDR_SLAVE_PROFILE_START);
+//	flash_erase_sector(ADDR_SLAVE_PROFILE_START);
+	_db_earse_sector_full(ADDR_SLAVE_PROFILE_START,SLAVEPROFILE_SIZE/SECTOR_FLASH_SIZE);
 }
 #endif
 void fl_db_clearAll(void){
-	flash_erase_sector(ADDR_RTC_START);
+//	flash_erase_sector(ADDR_RTC_START);
+	_db_earse_sector_full(ADDR_RTC_START,RTC_SIZE/SECTOR_FLASH_SIZE);
 #ifdef MASTER_CORE
-	flash_erase_sector(ADDR_NODELIST_START);
-	flash_erase_sector(ADDR_MASTER_PROFILE_START);
+//	flash_erase_sector(ADDR_NODELIST_START);
+//	flash_erase_sector(ADDR_MASTER_PROFILE_START);
+	_db_earse_sector_full(ADDR_NODELIST_START,NODELIST_SIZE/SECTOR_FLASH_SIZE);
+	_db_earse_sector_full(ADDR_MASTER_PROFILE_START,MASTERPROFILE_SIZE/SECTOR_FLASH_SIZE);
 #else
-	flash_erase_sector(ADDR_SLAVE_PROFILE_START);
-	flash_erase_sector(ADDR_SLAVE_SETTINGS_START);
-	flash_erase_sector(ADDR_SLAVE_USERDATA_START);
-//	flash_erase_sector(ADDR_USERAREA_END - SECTOR_FLASH_SIZE);
+//	flash_erase_sector(ADDR_SLAVE_PROFILE_START);
+	_db_earse_sector_full(ADDR_SLAVE_PROFILE_START,SLAVEPROFILE_SIZE/SECTOR_FLASH_SIZE);
+//	flash_erase_sector(ADDR_SLAVE_SETTINGS_START);
+	_db_earse_sector_full(ADDR_SLAVE_SETTINGS_START,SLAVESETTINGS_SIZE/SECTOR_FLASH_SIZE);
+//	flash_erase_sector(ADDR_SLAVE_USERDATA_START);
+	_db_earse_sector_full(ADDR_SLAVE_USERDATA_START,SLAVEUSERDATA_SIZE/SECTOR_FLASH_SIZE);
+
 #endif
 }
 /******************************************************************************/
