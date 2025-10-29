@@ -122,11 +122,15 @@ static bool fl_nwk_decrypt16(unsigned char * key,u8* _data,u8 _size, u8* decrypt
 //	}
 
 /*Checking result decrypt*/
-	u32 timetamp_hdr = MAKE_U32(decrypted[4],decrypted[3],decrypted[2],decrypted[1]);
+	//u32 timetamp_hdr = MAKE_U32(decrypted[4],decrypted[3],decrypted[2],decrypted[1]);
 	fl_data_frame_u packet_frame;
 	memcpy(packet_frame.bytes,decrypted,SIZEU8(packet_frame.bytes));
 	u8 pack_crc = fl_crc8(packet_frame.frame.payload,SIZEU8(packet_frame.frame.payload));
-	return (timetamp_hdr>ORIGINAL_TIME_TRUST && IsNWKHDR(decrypted[0])!=0xFF && pack_crc == packet_frame.frame.crc8);
+//	u32 timetamp_hdr = MAKE_U32(packet_frame.frame.timetamp[3],packet_frame.frame.timetamp[2],packet_frame.frame.timetamp[1],packet_frame.frame.timetamp[0]);
+//	if(timetamp_hdr<ORIGINAL_TIME_TRUST){
+//		ERR(BLE,"Decrypt(hdr:0x%02X):%d|%d\r\n",packet_frame.frame.hdr,timetamp_hdr,ORIGINAL_TIME_TRUST);
+//	}
+	return (/*timetamp_hdr>=ORIGINAL_TIME_TRUST &&*/ IsNWKHDR(decrypted[0])!=0xFF && pack_crc == packet_frame.frame.crc8);
 #undef BLOCK_SIZE
 }
 /***************************************************
@@ -795,7 +799,7 @@ void fl_adv_run(void) {
 	/* SEND ADV */
 	if(fl_adv_sendFIFO_run()==0){
 #ifdef MASTER_CORE
-//		fl_wifi2ble_fota_run();
+		fl_wifi2ble_fota_run();
 #else
 		fl_adv_sendFIFO_History_run();
 #endif

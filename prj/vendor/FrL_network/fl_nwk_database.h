@@ -23,22 +23,23 @@
 #define ADDR_DATABASE_INITIALIZATION	(ADDR_USERAREA_END - QUANTITY_FIELD_STORED_DB)	//initialization db
 //////// ======================================================================
 
-#define RTC_SIZE						(10*SECTOR_FLASH_SIZE)
+#define RTC_SIZE						(1*SECTOR_FLASH_SIZE)
 
-#define NODELIST_SIZE					(10*SECTOR_FLASH_SIZE)
+#define NODELIST_SIZE					(1*SECTOR_FLASH_SIZE)
 
-#define SLAVEPROFILE_SIZE				(10*SECTOR_FLASH_SIZE)
+#define SLAVEPROFILE_SIZE				(1*SECTOR_FLASH_SIZE)
 
-#define SLAVESETTINGS_SIZE				(10*SECTOR_FLASH_SIZE)
+#define SLAVESETTINGS_SIZE				(1*SECTOR_FLASH_SIZE)
 
-#define SLAVEUSERDATA_SIZE				(10*SECTOR_FLASH_SIZE)
+#define SLAVEUSERDATA_SIZE				(1*SECTOR_FLASH_SIZE)
 
-#define MASTERPROFILE_SIZE				(10*SECTOR_FLASH_SIZE)
+#define MASTERPROFILE_SIZE				(1*SECTOR_FLASH_SIZE)
 
 //////// ======================================================================
 #define ADDR_RTC_START					(ADDR_USERAREA_START)
 
 /******************** RTC ********************/
+
 #define RTC_ORIGINAL_TIMETAMP			1752473460 // 14/07/2025-11:31:00
 #define RTC_MAGIC 						0xFAFAFAFA
 #define RTC_ENTRY_SIZE          		8       // 4 bytes timestamp + 4 bytes magic
