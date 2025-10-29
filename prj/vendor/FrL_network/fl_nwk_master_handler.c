@@ -130,6 +130,7 @@ void fl_master_nodelist_AddRefesh(fl_nodeinnetwork_t _node) {
  *
  ***************************************************/
 fl_pack_t fl_master_packet_heartbeat_build(void) {
+	extern volatile fl_timetamp_withstep_t WIFI_ORIGINAL_GETALL;
 	extern u8 GETINFO_FLAG_EVENTTEST;
 	fl_pack_t packet_built;
 	fl_data_frame_u packet;
@@ -147,6 +148,7 @@ fl_pack_t fl_master_packet_heartbeat_build(void) {
 //		LOGA(APP,"New:%d-%d\r\n",timetampStep.timetamp,timetampStep.milstep);
 //	}
 //	LOGA(APP,"HB New:%d-%d\r\n",timetampStep.timetamp,timetampStep.milstep);
+
 	packet.frame.timetamp[0] = U32_BYTE0(timetampStep.timetamp);
 	packet.frame.timetamp[1] = U32_BYTE1(timetampStep.timetamp);
 	packet.frame.timetamp[2] = U32_BYTE2(timetampStep.timetamp);
@@ -155,9 +157,14 @@ fl_pack_t fl_master_packet_heartbeat_build(void) {
 	//Add new mill-step
 	packet.frame.milltamp = timetampStep.milstep;
 	packet.frame.slaveID.id_u8 = 0xFF; // all grps + all members
+
 	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
 	packet.frame.payload[0]=GETINFO_FLAG_EVENTTEST;
-
+	packet.frame.payload[1] = U32_BYTE0(WIFI_ORIGINAL_GETALL.timetamp);
+	packet.frame.payload[2] = U32_BYTE1(WIFI_ORIGINAL_GETALL.timetamp);
+	packet.frame.payload[3] = U32_BYTE2(WIFI_ORIGINAL_GETALL.timetamp);
+	packet.frame.payload[4] = U32_BYTE3(WIFI_ORIGINAL_GETALL.timetamp);
+	packet.frame.payload[5]=WIFI_ORIGINAL_GETALL.milstep;
 	//crc
 	packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
 
@@ -695,6 +702,24 @@ int _nwk_master_backup(void) {
 	}
 	return 0;
 }
+
+int _nwk_master_checkSlaveStatus(void) {
+	extern volatile fl_timetamp_withstep_t WIFI_ORIGINAL_GETALL;
+	extern const u32 ORIGINAL_TIME_TRUST;
+#define INTERVAL_REFESH_STATUS 45
+	if (G_NODE_LIST.slot_inused != 0xFF) {
+		if (WIFI_ORIGINAL_GETALL.timetamp < fl_rtc_get() && WIFI_ORIGINAL_GETALL.timetamp > ORIGINAL_TIME_TRUST) {
+			if (fl_rtc_get() - WIFI_ORIGINAL_GETALL.timetamp >= INTERVAL_REFESH_STATUS) {
+				for (u8 var = 0; var < G_NODE_LIST.slot_inused; ++var) {
+					G_NODE_LIST.sla_info[var].active = false;
+				}
+				return INTERVAL_REFESH_STATUS*1000*1000;
+			}
+		}
+	}
+#undef INTERVAL_REFESH_STATUS
+	return 98 * 1001;
+}
 /******************************************************************************/
 /******************************************************************************/
 /***                            Functions callback                           **/
@@ -791,7 +816,7 @@ int fl_master_ProccesRSP_cbk(void) {
 				u8 node_indx = fl_master_SlaveID_find(slave_id);
 				if (node_indx != -1) {
 					if (packet.frame.endpoint.master == FL_FROM_SLAVE_ACK) {
-//						_master_updateDB_for_Node(node_indx,&packet);
+						_master_updateDB_for_Node(node_indx,&packet);
 						G_NODE_LIST.sla_info[node_indx].active = true;
 						//Send rsp to slave
 						u8 seq_timetamp[5];
@@ -833,7 +858,7 @@ int fl_master_ProccesRSP_cbk(void) {
 				if (node_indx != -1) {
 					if (packet.frame.endpoint.master == FL_FROM_SLAVE_ACK) {
 					//send to WIFI the previous data
-					fl_ble2wifi_EVENT_SEND(G_NODE_LIST.sla_info[node_indx].mac);
+//					fl_ble2wifi_EVENT_SEND(G_NODE_LIST.sla_info[node_indx].mac);
 //					G_NODE_LIST.sla_info[node_indx].active = true;
 //					G_NODE_LIST.sla_info[node_indx].timelife = (clock_time() - G_NODE_LIST.sla_info[node_indx].timelife);
 //					u32 cnt_inpack = MAKE_U32(packet.frame.payload[3],packet.frame.payload[2],packet.frame.payload[1],packet.frame.payload[0]);
@@ -931,6 +956,8 @@ void fl_nwk_master_init(void) {
 	memcpy(G_MASTER_INFO.nwk.private_key,master_profile.nwk.private_key,SIZEU8(master_profile.nwk.private_key));
 	blt_soft_timer_add(_nwk_master_backup,2 * 1000 * 1000);
 	fl_nwk_master_heartbeat_init();
+	//Recheck status of the all network
+	blt_soft_timer_add(_nwk_master_checkSlaveStatus,100*1000);
 }
 /***************************************************
  * @brief 		: init nodelist

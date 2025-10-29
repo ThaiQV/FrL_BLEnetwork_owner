@@ -258,15 +258,17 @@ void TBS_History_LoadFromFlash(void){
 	tbs_history_powermeter_t* his_dev = (tbs_history_powermeter_t*)G_HISTORY_CONTAINER[i].data;
 #endif
 			his_dev->data.index = G_HISTORY_CONTAINER[i].indx;
-			tbs_history_load(G_HISTORY_CONTAINER[i].data,DATA_HISTORY_SIZE);
-			P_PRINTFHEX_A(FLA,G_HISTORY_CONTAINER[i].data,DATA_HISTORY_SIZE,"LOAD|[%d]%d:",his_dev->data.index,his_dev->timetamp);
-			//Send to Master
-			if(fl_adv_sendFIFO_add(tbs_history_create_pack(G_HISTORY_CONTAINER[i].data)) == -1){
-				 G_HISTORY_CONTAINER[i].status_proc =0;
+			G_HISTORY_CONTAINER[i].status_proc = 1;
+			if (STORAGE_RET_OK == tbs_history_load(G_HISTORY_CONTAINER[i].data,DATA_HISTORY_SIZE)) {
+				P_PRINTFHEX_A(FLA,G_HISTORY_CONTAINER[i].data,DATA_HISTORY_SIZE,"LOAD|[%d]%d:",his_dev->data.index,his_dev->timetamp);
+				//Send to Master
+				if (fl_adv_sendFIFO_add(tbs_history_create_pack(G_HISTORY_CONTAINER[i].data)) == -1) {
+					G_HISTORY_CONTAINER[i].status_proc = 0;
+				} else
+					G_HISTORY_CONTAINER[i].status_proc = 1;
+				//exit to step-one-step
+				return;
 			}
-			else G_HISTORY_CONTAINER[i].status_proc = 1;
-			//exit to step-one-step
-			return;
 		}
 	}
 }

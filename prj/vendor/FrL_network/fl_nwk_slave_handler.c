@@ -28,6 +28,7 @@
 /******************************************************************************/
 /*---------------- Synchronization Master RTC --------------------------*/
 volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME = {.timetamp = 0,.milstep = 0};
+extern volatile fl_timetamp_withstep_t WIFI_ORIGINAL_GETALL;
 
 #ifndef MASTER_CORE
 #define SYNC_ORIGIN_MASTER(x,y) 			do{	\
@@ -93,6 +94,7 @@ volatile u8  NWK_REPEAT_LEVEL = 3;
 int fl_nwk_joinnwk_timeout(void) ;
 int _informMaster(void);
 int _slave_reconnect(void);
+int _interval_report(void);
 /******************************************************************************/
 /******************************************************************************/
 /***                       Functions declare                   		         **/
@@ -227,7 +229,9 @@ void fl_nwk_slave_init(void) {
 
 	blt_soft_timer_add(_nwk_slave_backup,2*1000*1000);
 	//Interval checking network
-	fl_nwk_slave_reconnectNstoragedata();
+//	fl_nwk_slave_reconnectNstoragedata();
+	WIFI_ORIGINAL_GETALL.timetamp = fl_rtc_get();
+	blt_soft_timer_add(_interval_report,100*1000);
 	//inform to master I'm online
 //	blt_soft_timer_add(&_slave_reconnect,2*1000*1000);
 	blt_soft_timer_add(&_informMaster,INFORM_MASTER);
@@ -340,7 +344,8 @@ u32 fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 			//Create packet from slave
 			req_pack.frame.endpoint.master = FL_FROM_SLAVE_ACK;
 			//tbs index manage
-			TBS_Device_Index_manage(NWK_HDR_55);
+			TBS_Device_Index_manage();
+			P_INFO("EVENT update - indx:%d !!!\r\n",G_COUNTER_DEV.data.index-1);
 		}
 		break;
 		case NWK_HDR_11_REACTIVE: {
@@ -417,6 +422,10 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 		case NWK_HDR_HEARTBEAT:
 			_nwk_slave_syncFromPack(&packet.frame);
 			GETINFO_FLAG_EVENTTEST = packet.frame.payload[0];
+			WIFI_ORIGINAL_GETALL.milstep = packet.frame.payload[5];
+//			memcpy((u8*)WIFI_ORIGINAL_GETALL.timetamp,&packet.frame.payload[1],4);
+			WIFI_ORIGINAL_GETALL.timetamp = MAKE_U32(packet.frame.payload[4],packet.frame.payload[3],packet.frame.payload[2],packet.frame.payload[1]);
+			LOGA(INF,"WIFI_ORIGINAL_GETALL :%d (%d) \r\n",WIFI_ORIGINAL_GETALL.timetamp,WIFI_ORIGINAL_GETALL.milstep);
 			if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
 				//Process rsp
 				memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
@@ -467,9 +476,9 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 					//CRC
 					packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
 					//increase index tbs
-					TBS_Device_Index_manage(NWK_HDR_F5_INFO);
+//					TBS_Device_Index_manage();
 					//start period storage data
-					fl_nwk_slave_reconnectNstoragedata();
+//					fl_nwk_slave_reconnectNstoragedata();
 				} else {
 					packet_built.length = 0;
 					return packet_built;
@@ -843,6 +852,31 @@ int _slave_reconnect(void){
 		return RECONNECT_TIME;
 	}
 	return 0;
+}
+int _interval_report(void) {
+#define INTERVAL_REPORT_TIME (55 - G_INFORMATION.slaveID.memID)
+	extern const u32 ORIGINAL_TIME_TRUST;
+	if (IsJoinedNetwork()) {
+		if (WIFI_ORIGINAL_GETALL.timetamp < fl_rtc_get() && WIFI_ORIGINAL_GETALL.timetamp > ORIGINAL_TIME_TRUST) {
+			if (fl_rtc_get() - WIFI_ORIGINAL_GETALL.timetamp >= INTERVAL_REPORT_TIME) {
+#ifdef COUNTER_DEVICE
+				fl_api_slave_req(NWK_HDR_11_REACTIVE,(u8*) &G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data),0,0,0);
+#else //POWERMETER
+				u8 _payload[SIZEU8(tbs_device_powermeter_t)];
+				tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) G_INFORMATION.data;
+				tbs_pack_powermeter_data(pwmeter_data,_payload);
+				u8 indx_data = SIZEU8(pwmeter_data->type) + SIZEU8(pwmeter_data->mac) + SIZEU8(pwmeter_data->timetamp);
+				fl_api_slave_req(NWK_HDR_11_REACTIVE,&_payload[indx_data],SIZEU8(pwmeter_data->data),0,0,0);
+#endif
+				//increase index
+				TBS_Device_Index_manage();
+				P_INFO("Auto update (%d s) - indx:%d !!!\r\n",58 - G_INFORMATION.slaveID.memID,G_COUNTER_DEV.data.index-1);
+				return INTERVAL_REPORT_TIME*1000*1000;
+			}
+		}
+	}
+#undef INTERVAL_REPORT_TIME
+	return 100 * 1000;
 }
 
 void fl_nwk_slave_reconnectNstoragedata(void){

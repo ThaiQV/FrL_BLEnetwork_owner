@@ -29,7 +29,7 @@ void tbs_counter_printf(type_debug_t _plog_type,void* _p);
 void tbs_power_meter_printf(type_debug_t _plog_type,void* _p);
 void TBS_Device_Init(void);
 void TBS_Device_Run(void);
-void TBS_Device_Index_manage(u8 _cmdID);
+void TBS_Device_Index_manage(void);
 void TBS_history_createSample(void);
 void TBS_History_StoreToFlash(u8* _data_struct);
 void TBS_History_ClearAll(void);

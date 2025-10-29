@@ -883,7 +883,7 @@ void fl_nwk_protocol_InitnRun(void){
 //	sprintf(cmd_fmt,"p get info %d %d %d %d %d %d",255,0,8,G_NODE_LIST.slot_inused,G_ADV_SETTINGS.time_wait_rsp,G_ADV_SETTINGS.retry_times);
 //	_Passing_CmdLine(GETCMD,(u8*)cmd_fmt);
 //	FIRST_PROTOCOL_START =1; //don't change
-	blt_soft_timer_add(&nwk_run,3*1019*1010); //5s
+//	blt_soft_timer_add(&nwk_run,3*1019*1010); //5s
 }
 
 #endif

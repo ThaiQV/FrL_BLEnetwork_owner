@@ -84,9 +84,9 @@ tbs_device_counter_t G_COUNTER_DEV = {  .timetamp = 0,
 												}
 									};
 
+#define G_TBS_DEVICE		G_COUNTER_DEV
 
 u8 G_COUNTER_LCD[COUNTER_LCD_MESS_MAX][LCD_MESSAGE_SIZE];
-
 #define G_TBS_DEVICE		G_COUNTER_DEV
 #endif
 #ifdef POWER_METER_DEVICE
@@ -364,14 +364,16 @@ int TBS_Device_Store_run(void) {
 	return TBS_DEVICE_STORE_INTERVAL;
 }
 
-void TBS_Device_Index_manage(u8 _cmdID) {
+void TBS_Device_Index_manage(void) {
 //	ERR(FLA,"0x%02X callback (indx:%d)!!\r\n",_cmdID,G_TBS_DEVICE.data.index);
 	//todo:store to flash
 	TBS_History_StoreToFlash((u8*) &G_TBS_DEVICE);
 	G_TBS_DEVICE.data.index++;
+	TBS_Device_Store_run();
 	if (G_TBS_DEVICE.data.index >= TBS_PACKET_INDEX_MAX) {
 		G_TBS_DEVICE.data.index = 0;
 	}
+	//ERR(FLA,"0x%02X callback (indx:%d)!!\r\n",_cmdID,G_TBS_DEVICE.data.index);
 }
 
 void TBS_Device_Init(void){

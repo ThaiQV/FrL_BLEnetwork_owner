@@ -176,6 +176,13 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 				incomming_data.length = pa->len + 1; //add rssi byte
 				//memcpy(incomming_data.data_arr,pa->data,incomming_data.length);
 //				incomming_data.data_arr[0] = pa->data[0];
+//				s8 rssi = (s8) pa->data[pa->len];
+//				if(rssi > -45){
+//					P_INFO_HEX(pa->data,pa->len+1,"%s(%d):","PACK",pa->len+1);
+//				}else{
+////					P_INFO("RSSI:%d\r\n",rssi);
+//				}
+//				return 0;
 #ifndef MASTER_CORE
 				//IMPORTANT DELETE NETWORK
 //				if(MASTER_DELETE_NETWORK_FLAG)
@@ -635,7 +642,7 @@ void fl_adv_collection_channel_deinit(void){
 	FL_QUEUE_CLEAR(&G_QUEUE_SENDING,QUEUE_SENDING_SIZE);
 
 	blc_ll_setAdvCustomedChannel(*G_ADV_SETTINGS.nwk_chn.chn1,*G_ADV_SETTINGS.nwk_chn.chn2,*G_ADV_SETTINGS.nwk_chn.chn3);
-
+//	blc_ll_setAdvCustomedChannel(37,38,39);
 	blc_hci_le_setEventMask_cmd(HCI_LE_EVT_MASK_ADVERTISING_REPORT);
 	blc_hci_registerControllerEventHandler(fl_controller_event_callback);
 	//report all adv

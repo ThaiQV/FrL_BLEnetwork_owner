@@ -17,6 +17,8 @@
 /***                                Global Parameters                        **/
 /******************************************************************************/
 /******************************************************************************/
+volatile fl_timetamp_withstep_t WIFI_ORIGINAL_GETALL;
+
 void fl_queue_REQnRSP_TimeoutInit(void);
 int fl_queue_REQnRSP_TimeoutStart(void);
 /***************************************************

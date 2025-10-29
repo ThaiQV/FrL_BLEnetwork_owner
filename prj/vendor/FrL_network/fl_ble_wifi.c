@@ -16,18 +16,13 @@
 #include "fl_ble_wifi.h"
 #include "fl_nwk_protocol.h"
 #include "fl_wifi2ble_fota.h"
-/******************************************************************************/
-/***                 DFU configuration        				                 **/
-/******************************************************************************/
-
-
-/******************************************************************************/
 
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
 /******************************************************************************/
 /******************************************************************************/
+volatile fl_timetamp_withstep_t WIFI_ORIGINAL_GETALL;
 
 #define fl_ble_send_wifi				fl_serial_send
 
@@ -220,7 +215,8 @@ void REPORT_REQUEST(u8* _pdata, RspFunc rspfnc) {
 		fl_wf_report_u report_fmt;
 		memcpy(report_fmt.bytes,data->data,data->len_data);
 		if (IS_MAC_INVALID(report_fmt.frame.mac,0xFF) && G_NODE_LIST.slot_inused != 0xFF) {
-			fl_wifi2ble_Excute(W2B_START_NWK);
+//			fl_wifi2ble_Excute(W2B_START_NWK);
+			WIFI_ORIGINAL_GETALL = fl_rtc_getWithMilliStep();
 		}
 	}
 }
