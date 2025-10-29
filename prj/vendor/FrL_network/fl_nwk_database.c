@@ -55,6 +55,15 @@ fl_slave_userdata_t SLAVE_USERDATA_DEFAULT = {
 /******************************************************************************/
 /******************************************************************************/
 
+bool _db_recheck_write(u32 _addr,u8 _sample_size, u8* _sample_check){
+	u8 data_buff[250];
+	memset(data_buff,0,sizeof(data_buff));
+	flash_page_program(_addr,_sample_size,_sample_check);
+	//recheck
+	flash_dread(_addr,_sample_size,data_buff);
+	return (memcmp(data_buff,_sample_check,_sample_size) == 0);
+}
+
 uint32_t fl_db_crc32(uint8_t *data, size_t len) {
     uint32_t crc = 0xFFFFFFFF;
     while (len--) {
@@ -75,13 +84,16 @@ void fl_db_rtc_save(u32 _timetamp) {
 		flash_dread(ADDR_RTC_START + i * RTC_ENTRY_SIZE,RTC_ENTRY_SIZE,(uint8_t*) &check);
 //		LOGA(FLA,"RTC DB(0x%X):0x%X\r\n",ADDR_RTC_START + i * RTC_ENTRY_SIZE,check.magic);
 		if (check.magic != RTC_MAGIC) {
-			flash_page_program(ADDR_RTC_START + i * RTC_ENTRY_SIZE,RTC_ENTRY_SIZE,(uint8_t*) &entry);
+//			flash_page_program(ADDR_RTC_START + i * RTC_ENTRY_SIZE,RTC_ENTRY_SIZE,(uint8_t*) &entry);
+			if (_db_recheck_write(ADDR_RTC_START + i * RTC_ENTRY_SIZE,RTC_ENTRY_SIZE,(uint8_t*) &entry)) {
 //			LOGA(FLA,"RTC backup(0x%X):%ld\r\n",ADDR_RTC_START + i * RTC_ENTRY_SIZE,entry.timestamp);
-			return;
+				return;
+			}
 		}
 	}
 	flash_erase_sector(ADDR_RTC_START);
-	flash_page_program(ADDR_RTC_START,RTC_ENTRY_SIZE,(uint8_t*) &entry);
+//	flash_page_program(ADDR_RTC_START,RTC_ENTRY_SIZE,(uint8_t*) &entry);
+	fl_db_rtc_save(_timetamp);
 }
 
 u32 fl_db_rtc_load(void) {
@@ -300,15 +312,16 @@ void fl_db_slaveprofile_save(fl_slave_profiles_t entry) {
 		check.magic = 0;
 		flash_dread(ADDR_SLAVE_PROFILE_START + i * SLAVE_PROFILE_ENTRY_SIZE,SLAVE_PROFILE_ENTRY_SIZE,(uint8_t*) &check);
 		if (check.magic != SLAVE_PROFILE_MAGIC) {
-			flash_page_program(ADDR_SLAVE_PROFILE_START + i * SLAVE_PROFILE_ENTRY_SIZE,SLAVE_PROFILE_ENTRY_SIZE,(uint8_t*) &entry);
-			LOGA(FLA,"SLAVE PROFILE Stored(0x%X):%d\r\n",ADDR_SLAVE_PROFILE_START + i * SLAVE_PROFILE_ENTRY_SIZE,entry.slaveid);
-			return;
+			//flash_page_program(ADDR_SLAVE_PROFILE_START + i * SLAVE_PROFILE_ENTRY_SIZE,SLAVE_PROFILE_ENTRY_SIZE,(uint8_t*) &entry);
+			if (_db_recheck_write(ADDR_SLAVE_PROFILE_START + i * SLAVE_PROFILE_ENTRY_SIZE,SLAVE_PROFILE_ENTRY_SIZE,(uint8_t*) &entry)) {
+				LOGA(FLA,"SLAVE PROFILE Stored(0x%X):%d\r\n",ADDR_SLAVE_PROFILE_START + i * SLAVE_PROFILE_ENTRY_SIZE,entry.slaveid);
+				return;
+			}
 		}
 	}
 	flash_erase_sector(ADDR_SLAVE_PROFILE_START);
-	flash_page_program(ADDR_SLAVE_PROFILE_START,SLAVE_PROFILE_ENTRY_SIZE,(uint8_t*) &entry);
+	fl_db_slaveprofile_save(entry);
 }
-
 
 /***************************************************
  * @brief 		: initialization slave profile database
@@ -375,13 +388,15 @@ void fl_db_slavesettings_save(u8 *_data,u8 _size) {
 		check.magic = 0;
 		flash_dread(ADDR_SLAVE_SETTINGS_START + i * SLAVE_SETTINGS_ENTRY_SIZE,SLAVE_SETTINGS_ENTRY_SIZE,(uint8_t*) &check);
 		if (check.magic != SLAVE_SETTINGS_MAGIC) {
-			flash_page_program(ADDR_SLAVE_SETTINGS_START + i * SLAVE_SETTINGS_ENTRY_SIZE,SLAVE_SETTINGS_ENTRY_SIZE,(uint8_t*) &entry);
-			LOGA(FLA,"SLAVE SETTINGS Stored(0x%X)\r\n",ADDR_SLAVE_SETTINGS_START + i * SLAVE_SETTINGS_ENTRY_SIZE);
-			return;
+//			flash_page_program(ADDR_SLAVE_SETTINGS_START + i * SLAVE_SETTINGS_ENTRY_SIZE,SLAVE_SETTINGS_ENTRY_SIZE,(uint8_t*) &entry);
+			if (_db_recheck_write(ADDR_SLAVE_SETTINGS_START + i * SLAVE_SETTINGS_ENTRY_SIZE,SLAVE_SETTINGS_ENTRY_SIZE,(uint8_t*) &entry)) {
+				LOGA(FLA,"SLAVE SETTINGS Stored(0x%X)\r\n",ADDR_SLAVE_SETTINGS_START + i * SLAVE_SETTINGS_ENTRY_SIZE);
+				return;
+			}
 		}
 	}
 	flash_erase_sector(ADDR_SLAVE_SETTINGS_START);
-	flash_page_program(ADDR_SLAVE_SETTINGS_START,SLAVE_SETTINGS_ENTRY_SIZE,(uint8_t*) &entry);
+	fl_db_slavesettings_save(_data,_size);
 }
 
 /***************************************************
@@ -424,13 +439,15 @@ void fl_db_slaveuserdata_save(u8 *_data,u8 _size) {
 		check.magic = 0;
 		flash_dread(ADDR_SLAVE_USERDATA_START+ i * SLAVE_USERDATA_ENTRY_SIZE,SLAVE_USERDATA_ENTRY_SIZE,(uint8_t*) &check);
 		if (check.magic != SLAVE_USERDATA_MAGIC) {
-			flash_page_program(ADDR_SLAVE_USERDATA_START + i * SLAVE_USERDATA_ENTRY_SIZE,SLAVE_USERDATA_ENTRY_SIZE,(uint8_t*) &entry);
-			LOGA(FLA,"SLAVE USERDATA Stored(0x%X)\r\n",ADDR_SLAVE_USERDATA_START + i * SLAVE_USERDATA_ENTRY_SIZE);
-			return;
+			//flash_page_program(ADDR_SLAVE_USERDATA_START + i * SLAVE_USERDATA_ENTRY_SIZE,SLAVE_USERDATA_ENTRY_SIZE,(uint8_t*) &entry);
+			if (_db_recheck_write(ADDR_SLAVE_USERDATA_START + i * SLAVE_USERDATA_ENTRY_SIZE,SLAVE_USERDATA_ENTRY_SIZE,(uint8_t*) &entry)) {
+				LOGA(FLA,"SLAVE USERDATA Stored(0x%X)\r\n",ADDR_SLAVE_USERDATA_START + i * SLAVE_USERDATA_ENTRY_SIZE);
+				return;
+			}
 		}
 	}
 	flash_erase_sector(ADDR_SLAVE_USERDATA_START);
-	flash_page_program(ADDR_SLAVE_USERDATA_START,SLAVE_USERDATA_ENTRY_SIZE,(uint8_t*) &entry);
+	fl_db_slaveuserdata_save(_data,_size);
 }
 /***************************************************
  * @brief 		: read userdata in flash
