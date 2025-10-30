@@ -233,6 +233,7 @@ void REPORT_RESPONSE(u8* _pdata) {
 
 	if (IS_MAC_INVALID(report_fmt.frame.mac,0xFF)) {
 		LOG_P(MCU,"Send all nodelist!!!\r\n");
+		fl_nwk_master_StatusNodesRefesh();
 		//todo : create array data of the all nodelist
 		for (u8 var = 0; var < G_NODE_LIST.slot_inused && G_NODE_LIST.slot_inused != 0xFF; ++var) {
 //			LOGA(MCU,"Devtype:%d\r\n",G_NODE_LIST.sla_info[var].dev_type);
@@ -281,6 +282,7 @@ void GETLIST_RESPONSE(u8* _pdata) {
 	wfdata.cmd = G_WIFI_CON[_wf_CMD_find(data->cmd)].rsp.cmd;
 	//u8 payload[BLE_WIFI_MAXLEN];
 	//memset(payload,0xFF,SIZEU8(payload));
+	fl_nwk_master_StatusNodesRefesh();
 	u8 payload_len = 0;
 	for (u8 var = 0; var < G_NODE_LIST.slot_inused && G_NODE_LIST.slot_inused != 0xFF; ++var) {
 		wfdata.data[payload_len] = G_NODE_LIST.slot_inused ;

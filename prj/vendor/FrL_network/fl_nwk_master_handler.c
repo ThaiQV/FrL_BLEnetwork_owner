@@ -83,9 +83,10 @@ void _master_nodelist_printf(fl_slaves_list_t *_node, u8 _size) {
 	if (_size < 0xFF && _size > 0) {
 		P_INFO("******** NODELIST ********\r\n");
 		for (u8 var = 0; var < _size; ++var) {
-			P_INFO("[%d]Mac:0x%02X%02X%02X%02X%02X%02X-%d\r\n",_node->sla_info[var].slaveID.id_u8,_node->sla_info[var].mac[0],
+			P_INFO("[%3d]0x%02X%02X%02X%02X%02X%02X(%d):%d\r\n",_node->sla_info[var].slaveID.id_u8,_node->sla_info[var].mac[0],
 					_node->sla_info[var].mac[1],_node->sla_info[var].mac[2],_node->sla_info[var].mac[3],_node->sla_info[var].mac[4],
-					_node->sla_info[var].mac[5],_node->sla_info[var].dev_type);
+					_node->sla_info[var].mac[5],_node->sla_info[var].dev_type,
+					_node->sla_info[var].timelife);
 		}
 		P_INFO("******** END *************\r\n");
 	}
@@ -725,6 +726,11 @@ int _nwk_master_checkSlaveStatus(void) {
 /***                            Functions callback                           **/
 /******************************************************************************/
 /******************************************************************************/
+void fl_nwk_master_StatusNodesRefesh(void) {
+	for (u8 i = 0; i < G_NODE_LIST.slot_inused && G_NODE_LIST.slot_inused != 0xFF; i++) {
+		G_NODE_LIST.sla_info[i].active = (fl_rtc_get() - G_NODE_LIST.sla_info[i].timelife <= 20) ? 1 : 0;
+	}
+}
 
 /***************************************************
  * @brief 		:soft-timer callback for the processing response
@@ -736,7 +742,7 @@ int _nwk_master_checkSlaveStatus(void) {
  ***************************************************/
 static void _master_updateDB_for_Node(u8 node_indx ,fl_data_frame_u *packet)  {
 	G_NODE_LIST.sla_info[node_indx].active = true;
-	G_NODE_LIST.sla_info[node_indx].timelife = (clock_time() - G_NODE_LIST.sla_info[node_indx].timelife);
+	G_NODE_LIST.sla_info[node_indx].timelife = fl_rtc_get();
 	//create MAC + TIMETAMP + DEV_TYPE
 	u8 size_mac = SIZEU8(G_NODE_LIST.sla_info[node_indx].mac);
 	memcpy(&G_NODE_LIST.sla_info[node_indx].data[0],G_NODE_LIST.sla_info[node_indx].mac,size_mac); //update mac to pointer data
@@ -915,7 +921,7 @@ int fl_master_ProccesRSP_cbk(void) {
 				if (node_indx == -1) {
 					fl_nodeinnetwork_t new_slave;
 					new_slave.active = true;
-					new_slave.timelife = clock_time();
+					new_slave.timelife = fl_rtc_get();
 //					new_slave.mac_short.mac_u32 = mac_short;
 					memcpy(new_slave.mac,mac,sizeof(mac));
 					new_slave.dev_type = packet.frame.payload[SIZEU8(new_slave.mac)];
@@ -957,7 +963,7 @@ void fl_nwk_master_init(void) {
 	blt_soft_timer_add(_nwk_master_backup,2 * 1000 * 1000);
 	fl_nwk_master_heartbeat_init();
 	//Recheck status of the all network
-	blt_soft_timer_add(_nwk_master_checkSlaveStatus,100*1000);
+//	blt_soft_timer_add(_nwk_master_checkSlaveStatus,100*1000);
 }
 /***************************************************
  * @brief 		: init nodelist

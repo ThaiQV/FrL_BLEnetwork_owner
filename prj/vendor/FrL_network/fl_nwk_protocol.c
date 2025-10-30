@@ -604,6 +604,8 @@ void CMD_GETSLALIST(u8* _data) {
 	extern fl_slaves_list_t G_NODE_LIST;
 	void _master_nodelist_printf(fl_slaves_list_t *_node, u8 _size);
 	_master_nodelist_printf(&G_NODE_LIST,G_NODE_LIST.slot_inused);
+
+
 }
 
 void CMD_GETADVSETTING(u8* _data) {
