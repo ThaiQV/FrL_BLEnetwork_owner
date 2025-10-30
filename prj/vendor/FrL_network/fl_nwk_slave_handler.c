@@ -281,7 +281,7 @@ void _nwk_slave_syncFromPack(fl_dataframe_format_t *packet){
 s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry) {
 	//register timeout cb
 	if (_cb != 0 && ( _timeout_ms*1000 >= 2*QUEUQ_REQcRSP_INTERVAL || _timeout_ms==0)) {
-		u32 seq_timetamp=fl_req_slave_packet_createNsend(_cmdid,_data,_len);
+		u64 seq_timetamp=fl_req_slave_packet_createNsend(_cmdid,_data,_len);
 		if(seq_timetamp){
 			return fl_queueREQcRSP_add(G_INFORMATION.slaveID.id_u8,_cmdid,seq_timetamp,_data,_len,&_cb,_timeout_ms,_retry);
 		}
