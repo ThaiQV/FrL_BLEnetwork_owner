@@ -235,8 +235,11 @@ void REPORT_RESPONSE(u8* _pdata) {
 		LOG_P(MCU,"Send all nodelist!!!\r\n");
 		//todo : create array data of the all nodelist
 		for (u8 var = 0; var < G_NODE_LIST.slot_inused && G_NODE_LIST.slot_inused != 0xFF; ++var) {
-			LOGA(MCU,"Devtype:%d\r\n",G_NODE_LIST.sla_info[var].dev_type);
-			_getnsend_data_report(var,G_WIFI_CON[_wf_CMD_find(data->cmd)].rsp.cmd);
+//			LOGA(MCU,"Devtype:%d\r\n",G_NODE_LIST.sla_info[var].dev_type);
+			//addnew: only send offline nodes bcs the online nodes has automatically sent yet
+			if (G_NODE_LIST.sla_info[var].active == false) {
+				_getnsend_data_report(var,G_WIFI_CON[_wf_CMD_find(data->cmd)].rsp.cmd);
+			}
 		}
 	} else {
 		//todo: send data of the special nodes
@@ -253,7 +256,6 @@ void REPORT_RESPONSE(u8* _pdata) {
 			if(-1==fl_api_master_req(report_fmt.frame.mac,NWK_HDR_A5_HIS,report_fmt.bytes,SIZEU8(report_fmt.bytes),0,0,0)){
 				ERR(MCU,"REQ API !!!!\r\n");
 			}
-
 		}
 	}
 }

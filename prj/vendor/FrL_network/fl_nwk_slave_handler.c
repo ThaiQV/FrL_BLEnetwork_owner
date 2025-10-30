@@ -230,7 +230,7 @@ void fl_nwk_slave_init(void) {
 	blt_soft_timer_add(_nwk_slave_backup,2*1000*1000);
 	//Interval checking network
 //	fl_nwk_slave_reconnectNstoragedata();
-	WIFI_ORIGINAL_GETALL.timetamp = fl_rtc_get();
+	WIFI_ORIGINAL_GETALL = fl_rtc_getWithMilliStep();
 	blt_soft_timer_add(_interval_report,100*1000);
 	//inform to master I'm online
 //	blt_soft_timer_add(&_slave_reconnect,2*1000*1000);
@@ -345,7 +345,7 @@ u64 fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 			req_pack.frame.endpoint.master = FL_FROM_SLAVE_ACK;
 			//tbs index manage
 			TBS_Device_Index_manage();
-			P_INFO("EVENT update - indx:%d !!!\r\n",G_COUNTER_DEV.data.index-1);
+			P_INFO("EVENT update - indx:%d \r\n",G_COUNTER_DEV.data.index-1);
 		}
 		break;
 		case NWK_HDR_11_REACTIVE: {
@@ -860,17 +860,17 @@ int _interval_report(void) {
 		if (WIFI_ORIGINAL_GETALL.timetamp < fl_rtc_get() && WIFI_ORIGINAL_GETALL.timetamp > ORIGINAL_TIME_TRUST) {
 			if (fl_rtc_get() - WIFI_ORIGINAL_GETALL.timetamp >= INTERVAL_REPORT_TIME) {
 #ifdef COUNTER_DEVICE
-				fl_api_slave_req(NWK_HDR_11_REACTIVE,(u8*) &G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data),0,0,0);
+				fl_api_slave_req(NWK_HDR_55,(u8*) &G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data),0,0,0);//NWK_HDR_11_REACTIVE
 #else //POWERMETER
 				u8 _payload[SIZEU8(tbs_device_powermeter_t)];
 				tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) G_INFORMATION.data;
 				tbs_pack_powermeter_data(pwmeter_data,_payload);
 				u8 indx_data = SIZEU8(pwmeter_data->type) + SIZEU8(pwmeter_data->mac) + SIZEU8(pwmeter_data->timetamp);
-				fl_api_slave_req(NWK_HDR_11_REACTIVE,&_payload[indx_data],SIZEU8(pwmeter_data->data),0,0,0);
+				fl_api_slave_req(NWK_HDR_55,&_payload[indx_data],SIZEU8(pwmeter_data->data),0,0,0);
 #endif
-				//increase index
-				TBS_Device_Index_manage();
-				P_INFO("Auto update (%d s) - indx:%d !!!\r\n",58 - G_INFORMATION.slaveID.memID,G_COUNTER_DEV.data.index-1);
+				//increase index if using NWK_HDR_11_REACTIVE
+				//TBS_Device_Index_manage();
+				P_INFO("Auto update (%d s) - indx:%d\r\n",58 - G_INFORMATION.slaveID.memID,G_COUNTER_DEV.data.index-1);
 				return INTERVAL_REPORT_TIME*1000*1000;
 			}
 		}
@@ -881,7 +881,7 @@ int _interval_report(void) {
 
 void fl_nwk_slave_reconnectNstoragedata(void){
 	//Restart timeout reconnect
-	blt_soft_timer_restart(_slave_reconnect,RECONNECT_TIME);
+//	blt_soft_timer_restart(_slave_reconnect,RECONNECT_TIME);
 }
 
 /******************************************************************************/
