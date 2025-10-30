@@ -174,6 +174,12 @@ int _nwk_slave_backup(void){
 	return 0;
 }
 
+void fl_nwk_slave_nwkclear(void){
+	fl_db_Pairing_Clear();
+	G_INFORMATION.profile.run_stt.join_nwk =1;
+	_nwk_slave_backup();
+}
+
 void fl_nwk_slave_init(void) {
 	DEBUG_TURN(NWK_DEBUG_STT);
 //	fl_input_external_init();
@@ -186,12 +192,13 @@ void fl_nwk_slave_init(void) {
 	fl_slave_profiles_t my_profile = fl_db_slaveprofile_init();
 	G_INFORMATION.slaveID.id_u8 = my_profile.slaveid;
 	G_INFORMATION.profile = my_profile;
+
 //	//Test join network + factory
-	if (G_INFORMATION.slaveID.id_u8 == 0xFF && G_INFORMATION.profile.slaveid==G_INFORMATION.slaveID.id_u8)
-	{
-		G_INFORMATION.profile.run_stt.join_nwk = 1; //access to join network
-		G_INFORMATION.profile.run_stt.rst_factory = 1; //has reset factory device
-	}
+//	if (G_INFORMATION.slaveID.id_u8 == 0xFF && G_INFORMATION.profile.slaveid==G_INFORMATION.slaveID.id_u8)
+//	{
+//		G_INFORMATION.profile.run_stt.join_nwk = 1; //access to join network
+//		G_INFORMATION.profile.run_stt.rst_factory = 1; //has reset factory device
+//	}
 	fl_timetamp_withstep_t cur_timetamp = fl_rtc_getWithMilliStep();
 	SYNC_ORIGIN_MASTER(cur_timetamp.timetamp,cur_timetamp.milstep);
 
@@ -221,11 +228,11 @@ void fl_nwk_slave_init(void) {
 	LOGA(INF,"** MAC GW :%02X%02X%02X%02X\r\n",U32_BYTE0( G_INFORMATION.profile.nwk.mac_parent),U32_BYTE1( G_INFORMATION.profile.nwk.mac_parent),
 			U32_BYTE2( G_INFORMATION.profile.nwk.mac_parent),U32_BYTE3( G_INFORMATION.profile.nwk.mac_parent));
 	//test
-	if(G_INFORMATION.slaveID.id_u8 == G_INFORMATION.profile.slaveid && G_INFORMATION.slaveID.id_u8 == 0xFF){
-		ERR(APP,"Turn on install mode\r\n");
-		G_INFORMATION.profile.run_stt.join_nwk = 1;
-		G_INFORMATION.profile.run_stt.rst_factory  = 1 ; //has reset factory device
-	}
+//	if(G_INFORMATION.slaveID.id_u8 == G_INFORMATION.profile.slaveid && G_INFORMATION.slaveID.id_u8 == 0xFF){
+//		ERR(APP,"Turn on install mode\r\n");
+//		G_INFORMATION.profile.run_stt.join_nwk = 1;
+//		G_INFORMATION.profile.run_stt.rst_factory  = 1 ; //has reset factory device
+//	}
 
 	blt_soft_timer_add(_nwk_slave_backup,2*1000*1000);
 	//Interval checking network

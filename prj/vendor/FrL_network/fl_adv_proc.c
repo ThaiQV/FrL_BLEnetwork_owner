@@ -107,7 +107,7 @@ static void fl_nwk_encrypt16(unsigned char * key,u8* _data,u8 _size, u8* encrypt
 static bool fl_nwk_decrypt16(unsigned char * key,u8* _data,u8 _size, u8* decrypted){
 #define BLOCK_SIZE 16
 	if(_size < BLOCK_SIZE){
-		ERR(INF,"Decrypt size!!!\r\n");
+//		ERR(INF,"Decrypt size!!!\r\n");
 		return false;
 	}
 	u8 headbytes[BLOCK_SIZE];

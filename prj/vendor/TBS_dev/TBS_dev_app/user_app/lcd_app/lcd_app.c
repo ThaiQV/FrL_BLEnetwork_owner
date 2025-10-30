@@ -201,7 +201,8 @@ void my_timeout_callback(uint8_t row) {
 			lcd_ctx.print_type = LCD_PRINT_OFF;
 			lcd_app_clear_all(&app_handle);
 			lcd_off();
-			fl_db_Pairing_Clear();
+//			fl_db_Pairing_Clear();
+			fl_nwk_slave_nwkclear();
 			sys_reboot();
 			break;
 
