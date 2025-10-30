@@ -244,6 +244,7 @@ void TBS_Counter_init(void){
 #ifndef HW_SAMPLE_TEST
 	//todo:Init Butt,lcd,7segs,.....
 	user_app_init();
+#else
 	//TEst
 	TEST_EVENT.lifetime = fl_rtc_get();
 	blt_soft_timer_add(&TEST_Counter_Event,5000*1000);

@@ -350,8 +350,11 @@ void CMD_INSTALLMODE(u8* _data) {
 	if (plog_IndexOf(_data,ON,2,CMDLINE_MAXLEN) != -1) {
 		on_bool = 1;
 	}
+	extern fl_slaves_list_t G_NODE_LIST;
+
 	MASTER_INSTALL_STATE = on_bool;
 	LOGA(DRV,"Master installMode: %s\r\n",(on_bool) ? "ON" : "OFF");
+
 }
 void CMD_DEBUG(u8* _data) {
 	extern volatile u8 NWK_DEBUG_STT;
@@ -621,7 +624,6 @@ void CMD_GETADVSETTING(u8* _data) {
 	P_INFO("************************\r\n");
 }
 
-#define MAX_NODES 	200
 typedef struct {
 	u8 numOfOnl;
 	fl_nodeinnetwork_t *sla_info[MAX_NODES];

@@ -288,7 +288,7 @@ typedef struct {
 }__attribute__((packed)) fl_rsp_container_t;
 
 #ifdef MASTER_CORE
-#define MAX_NODES 	200
+#define MAX_NODES 	150
 typedef struct {
 	u8 slot_inused;
 	fl_nodeinnetwork_t sla_info[MAX_NODES];

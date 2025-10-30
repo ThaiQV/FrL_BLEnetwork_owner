@@ -315,11 +315,13 @@ void PAIRING_REQUEST(u8* _pdata, RspFunc rspfnc) {
 		return;
 	}
 	extern volatile u8 MASTER_INSTALL_STATE;
-	MASTER_INSTALL_STATE = (data->data[0]==0x01)?true:false;
+
+	MASTER_INSTALL_STATE = (data->data[0] == 0x01) ? true : false;
 	LOGA(MCU,"WiFi -> Collection mode:%d\r\n",MASTER_INSTALL_STATE);
 	if (rspfnc != 0) {
 		rspfnc(_pdata);
 	}
+
 }
 
 void TIMETAMP_REQUEST(u8* _pdata, RspFunc rspfnc) {

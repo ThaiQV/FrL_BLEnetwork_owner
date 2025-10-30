@@ -918,6 +918,11 @@ int fl_master_ProccesRSP_cbk(void) {
 					return -1;
 				}
 				s16 node_indx = fl_master_Node_find(mac);
+				//Full and node is a new => skip
+				if (G_NODE_LIST.slot_inused > MAX_NODES -1 && G_NODE_LIST.slot_inused != 0xFF && node_indx == -1) {
+					ERR(APP,"Network Full!!!\r\n");
+					break;
+				}
 				if (node_indx == -1) {
 					fl_nodeinnetwork_t new_slave;
 					new_slave.active = true;
