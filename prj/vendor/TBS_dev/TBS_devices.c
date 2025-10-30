@@ -241,11 +241,13 @@ void TBS_Counter_init(void){
 		}
 	}
 	LOG_P(PERI,"========================\r\n");
+#ifndef HW_SAMPLE_TEST
 	//todo:Init Butt,lcd,7segs,.....
 	user_app_init();
 	//TEst
 	TEST_EVENT.lifetime = fl_rtc_get();
 	blt_soft_timer_add(&TEST_Counter_Event,5000*1000);
+#endif
 }
 
 void TBS_Counter_Run(void){
@@ -253,7 +255,9 @@ void TBS_Counter_Run(void){
 	Counter_LCD_MessageStore();
 //	Counter_LCD_MessageCheck_FlagNew();
 	//todo: TBS_Device_App
+#ifndef HW_SAMPLE_TEST
 	user_app_loop();
+#endif
 }
 #endif
 #ifdef POWER_METER_DEVICE
@@ -366,8 +370,10 @@ int TBS_Device_Store_run(void) {
 
 void TBS_Device_Index_manage(void) {
 //	ERR(FLA,"0x%02X callback (indx:%d)!!\r\n",_cmdID,G_TBS_DEVICE.data.index);
+#ifndef HW_SAMPLE_TEST
 	//todo:store to flash
 	TBS_History_StoreToFlash((u8*) &G_TBS_DEVICE);
+#endif
 	G_TBS_DEVICE.data.index++;
 	TBS_Device_Store_run();
 	if (G_TBS_DEVICE.data.index >= TBS_PACKET_INDEX_MAX) {
@@ -386,8 +392,10 @@ void TBS_Device_Init(void){
 #endif
 	if(G_TBS_DEVICE.type == TBS_COUNTER) tbs_counter_printf(FLA,(void*)&G_TBS_DEVICE);
 	else tbs_power_meter_printf(FLA,(void*)&G_TBS_DEVICE);
+#ifndef HW_SAMPLE_TEST
 	//History init
 	TBS_History_Init();
+#endif
 	blt_soft_timer_add(TBS_Device_Store_run,TBS_DEVICE_STORE_INTERVAL);
 }
 
@@ -398,6 +406,8 @@ void TBS_Device_Run(void){
 #ifdef POWER_METER_DEVICE
 	TBS_PowerMeter_Run();
 #endif
+#ifndef HW_SAMPLE_TEST
 	TBS_History_Proc();
+#endif
 }
 #endif
