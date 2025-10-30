@@ -57,8 +57,8 @@ static inline u8 IsREQHDR(fl_hdr_nwk_type_e cmdid) {
 
 fl_timetamp_withstep_t GenerateTimetampField(void){
 	fl_timetamp_withstep_t cur_timetamp = fl_rtc_getWithMilliStep();
-	u32 mill_sys = fl_rtc_timetamp2milltampStep(cur_timetamp);
-	u32 origin_master = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
+	u64 mill_sys = fl_rtc_timetamp2milltampStep(cur_timetamp);
+	u64 origin_master = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
 	if(mill_sys < origin_master){
 		cur_timetamp = ORIGINAL_MASTER_TIME;
 	}
@@ -302,7 +302,7 @@ s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 
  * @return	  	: 0: fail otherwise seq_timetamp
  *
  ***************************************************/
-u32 fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
+u64 fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 	/*****************************************************************/
 	/* | HDR | Timetamp | Mill_time | SlaveID | payload | crc8 | Ep | */
 	/* | 1B  |   4Bs    |    1B     |    1B   |   20Bs  |  1B  | 1B | -> .master = FL_FROM_SLAVE_ACK / FL_FROM_SLAVE */
@@ -385,7 +385,7 @@ u32 fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 	//Send ADV
 	fl_adv_sendFIFO_add(rslt);
 	fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(rslt);
-	u32 seq_timetamp = fl_rtc_timetamp2milltampStep(timetamp_inpack);
+	u64 seq_timetamp = fl_rtc_timetamp2milltampStep(timetamp_inpack);
 	//Synch original time
 	SYNC_ORIGIN_MASTER(timetamp_inpack.timetamp,timetamp_inpack.milstep);
 	return seq_timetamp;

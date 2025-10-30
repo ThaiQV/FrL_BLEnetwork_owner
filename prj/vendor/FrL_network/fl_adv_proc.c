@@ -126,11 +126,11 @@ static bool fl_nwk_decrypt16(unsigned char * key,u8* _data,u8 _size, u8* decrypt
 	fl_data_frame_u packet_frame;
 	memcpy(packet_frame.bytes,decrypted,SIZEU8(packet_frame.bytes));
 	u8 pack_crc = fl_crc8(packet_frame.frame.payload,SIZEU8(packet_frame.frame.payload));
-//	u32 timetamp_hdr = MAKE_U32(packet_frame.frame.timetamp[3],packet_frame.frame.timetamp[2],packet_frame.frame.timetamp[1],packet_frame.frame.timetamp[0]);
+	u32 timetamp_hdr = MAKE_U32(packet_frame.frame.timetamp[3],packet_frame.frame.timetamp[2],packet_frame.frame.timetamp[1],packet_frame.frame.timetamp[0]);
 //	if(timetamp_hdr<ORIGINAL_TIME_TRUST){
 //		ERR(BLE,"Decrypt(hdr:0x%02X):%d|%d\r\n",packet_frame.frame.hdr,timetamp_hdr,ORIGINAL_TIME_TRUST);
 //	}
-	return (/*timetamp_hdr>=ORIGINAL_TIME_TRUST &&*/ IsNWKHDR(decrypted[0])!=0xFF && pack_crc == packet_frame.frame.crc8);
+	return (timetamp_hdr>=ORIGINAL_TIME_TRUST && IsNWKHDR(decrypted[0])!=0xFF && pack_crc == packet_frame.frame.crc8);
 #undef BLOCK_SIZE
 }
 /***************************************************
@@ -338,19 +338,18 @@ u8 fl_adv_sendFIFO_History_run(void) {
 #ifdef MASTER_CORE
 void fl_master_adv_55_RSPCommon_Create(void) {
 	u8 SlaveID[22-5-2]; //22 bytes paloay - 4 bytes timetamps - delta timetamps
-	u32 timetamp_com[22-5-2]; // for testing list
+	u64 timetamp_com[22-5-2]; // for testing list
 	u8 numSlave=0;
 	u8 timetamp_min_u8[SIZEU8(fl_timetamp_withstep_t)];
-	u32 timetamp_min = 0;
-	u32 timetamp_max = 0;
-	u32 origin_pack = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
+	u64 timetamp_min = 0;
+	u64 timetamp_max = 0;
+	u64 origin_pack = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
 	fl_data_frame_u check_rspcom;
 
 	fl_pack_t *p_55RSP[SIZEU8(SlaveID)];
 	for (u8 var = 0; var < G_QUEUE_SENDING.mask + 1; ++var) {
-
 		fl_timetamp_withstep_t timetamp_inpack = fl_adv_timetampStepInPack(G_QUEUE_SENDING.data[var]);
-		u32 inpack = fl_rtc_timetamp2milltampStep(timetamp_inpack);
+		u64 inpack = fl_rtc_timetamp2milltampStep(timetamp_inpack);
 		memset(check_rspcom.bytes,0,SIZEU8(check_rspcom.bytes));
 		memcpy(check_rspcom.bytes,G_QUEUE_SENDING.data[var].data_arr,G_QUEUE_SENDING.data[var].length);
 
@@ -361,7 +360,7 @@ void fl_master_adv_55_RSPCommon_Create(void) {
 			timetamp_str.timetamp = MAKE_U32(check_rspcom.frame.payload[3],check_rspcom.frame.payload[2],check_rspcom.frame.payload[1],
 					check_rspcom.frame.payload[0]);
 			timetamp_str.milstep = check_rspcom.frame.payload[4];
-			u32 timetamp_rsp = fl_rtc_timetamp2milltampStep(timetamp_str);
+			u64 timetamp_rsp = fl_rtc_timetamp2milltampStep(timetamp_str);
 
 			p_55RSP[numSlave] = &G_QUEUE_SENDING.data[var];
 			SlaveID[numSlave] = check_rspcom.frame.slaveID.id_u8;
@@ -389,12 +388,12 @@ void fl_master_adv_55_RSPCommon_Create(void) {
 	//For testing
 	LOGA(APP,"ORIGIN:%d\r\n",ORIGINAL_MASTER_TIME.timetamp);
 	P_PRINTFHEX_A(APP,SlaveID,numSlave,"SlaveID(%d):",numSlave);
-	LOGA(APP,"TimeTamp_min  :%d\r\n",timetamp_min);
+	LOGA(APP,"TimeTamp_min  :%lld\r\n",timetamp_min);
 	u16 delta = (timetamp_max > timetamp_min) ? (u16) (timetamp_max - timetamp_min) : 0;
-	LOGA(APP,"TimeTamp_max  :%d\r\n",timetamp_max);
+	LOGA(APP,"TimeTamp_max  :%lld\r\n",timetamp_max);
 	LOGA(APP,"TimeTamp_delta:%d\r\n",delta);
 	for (u8 i = 0; i < numSlave; i++) {
-		LOGA(APP,"TimeTamp:%d\r\n",timetamp_com[i]);
+		LOGA(APP,"TimeTamp:%lld\r\n",timetamp_com[i]);
 	}
 	//Clear RSP55 old and update G_SENDING_QUEUE.count
 	for(u8 i = 0;i<numSlave;i++){
@@ -424,12 +423,13 @@ void fl_master_adv_55_RSPCommon_Create(void) {
 u8 fl_adv_sendFIFO_run(void) {
 	fl_pack_t data_in_queue;
 	u16 inused_slot = 0;
-	u32 inpack =0;
-	u32 origin_pack = 0;
+	u64 inpack =0;
+	u64 origin_pack = 0;
 	static u8 check_inused = 0; //for debuging
+	u16 slot = 0;
 	if (!F_SENDING_STATE) {
 		/* Get busy slot */
-		for (u16 slot = 0; slot < G_QUEUE_SENDING.mask + 1; ++slot) {
+		for (slot = 0; slot < G_QUEUE_SENDING.mask + 1; ++slot) {
 			fl_pack_t check_busy_slot;
 			if(-1==FL_QUEUE_GET_LOOP(&G_QUEUE_SENDING,&check_busy_slot)) continue;
 			fl_timetamp_withstep_t timetamp_inpack = fl_adv_timetampStepInPack(check_busy_slot);
@@ -452,21 +452,21 @@ u8 fl_adv_sendFIFO_run(void) {
 		s16 indx_head_cur = -1;
 		while ((indx_head_cur = FL_QUEUE_GET_LOOP(&G_QUEUE_SENDING,&data_in_queue)) != -1) {
 			//IMPORTAN SEND DELETE NETWORK
-			if(-1 != plog_IndexOf(data_in_queue.data_arr,MASTER_CLEARNETWORK,SIZEU8(MASTER_CLEARNETWORK),data_in_queue.length)) {
+			if (-1 != plog_IndexOf(data_in_queue.data_arr,MASTER_CLEARNETWORK,SIZEU8(MASTER_CLEARNETWORK),data_in_queue.length)) {
 				ERR(APP,"SEND DELETE NETWORK!!!\r\n");
 				fl_adv_send(data_in_queue.data_arr,data_in_queue.length,G_ADV_SETTINGS.adv_duration);
-				return inused_slot ;
+				return inused_slot;
 			}
 			/*====================*/
-			fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(data_in_queue);
+			fl_timetamp_withstep_t timetamp_inpack = fl_adv_timetampStepInPack(data_in_queue);
 			inpack = fl_rtc_timetamp2milltampStep(timetamp_inpack);
 			origin_pack = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
 			loop_check++;
-			if ( inpack < origin_pack || data_in_queue.length < 10 )
-			{
-				if (loop_check <= G_QUEUE_SENDING.mask+1)
+			if (inpack < origin_pack || data_in_queue.length < 10) {
+				if (loop_check <= G_QUEUE_SENDING.mask + 1) {
+//						LOGA(APP,"TT Origin:%lld,inpack:%lld\r\n",origin_pack,inpack);
 					continue;
-				else{
+				} else {
 //					ERR(INF,"NULL ADV SENDING!! \r\n");
 					return inused_slot;
 				}
@@ -477,7 +477,7 @@ u8 fl_adv_sendFIFO_run(void) {
 			memcpy(check_heartbeat.bytes,data_in_queue.data_arr,data_in_queue.length);
 #ifndef	MASTER_CORE //for slave
 			//Clear HB packer REPEATER
-			if(inused_slot == 1 && check_heartbeat.frame.hdr == NWK_HDR_HEARTBEAT ){ // only have HB packet=> send it one times
+			if(inused_slot == 1 && check_heartbeat.frame.hdr == NWK_HDR_HEARTBEAT ) { // only have HB packet=> send it one times
 				//CLEAR
 				G_QUEUE_SENDING.data[indx_head_cur].length = 0;
 
@@ -486,21 +486,22 @@ u8 fl_adv_sendFIFO_run(void) {
 			//
 			if (check_heartbeat.frame.hdr == NWK_HDR_HEARTBEAT) {
 //				check_hb_slot = cur_slot;
-				u32 origin = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
-				u32 new_origin = fl_rtc_timetamp2milltampStep(timetamp_inpack);
+				u64 origin = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
+				u64 new_origin = fl_rtc_timetamp2milltampStep(timetamp_inpack);
 				if (origin < new_origin) {
 					LOGA(APP,"Master Synchronzation Timetamp:%d(%d)\r\n",ORIGINAL_MASTER_TIME.timetamp,ORIGINAL_MASTER_TIME.milstep);
 				}
 				//TODO: IMPORTANT SYNCHRONIZATION TIMESTAMP
 				fl_master_SYNC_ORIGINAL_TIMETAMP(timetamp_inpack);
 				// CLEAR HB => only send 1 times IF have a new FW need to update for slaves
-				if(inused_slot == 1 && FL_NWK_FOTA_IsReady() > 0){
-					LOGA(INF_FILE,"FOTA Ready:%d\r\n",FL_NWK_FOTA_IsReady() );
+				if (inused_slot == 1 && FL_NWK_FOTA_IsReady() > 0) {
+					LOGA(INF_FILE,"FOTA Ready:%d\r\n",FL_NWK_FOTA_IsReady());
 					G_QUEUE_SENDING.data[indx_head_cur].length = 0;
 				}
 			}
 #endif
 			return inused_slot;
+
 		}
 	}
 	return inused_slot;
@@ -567,6 +568,8 @@ void fl_adv_init(void) {
 	extern fl_master_config_t G_MASTER_INFO;
 //	fl_input_external_init();
 	//fl_adv_sendtest();
+	fl_timetamp_withstep_t init_origin={ORIGINAL_TIME_TRUST,0};
+	fl_master_SYNC_ORIGINAL_TIMETAMP(init_origin);
 	fl_nwk_master_init();
 
 	G_ADV_SETTINGS.nwk_chn.chn1 = &G_MASTER_INFO.nwk.chn[0];
@@ -799,7 +802,7 @@ void fl_adv_run(void) {
 	/* SEND ADV */
 	if(fl_adv_sendFIFO_run()==0){
 #ifdef MASTER_CORE
-		fl_wifi2ble_fota_run();
+//		fl_wifi2ble_fota_run();
 #else
 		fl_adv_sendFIFO_History_run();
 #endif

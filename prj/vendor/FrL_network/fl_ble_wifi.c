@@ -387,7 +387,7 @@ void _slave_rsp_callbackNrspWifiMAC(fl_wifi_cmd_e _rsp_cmdID,void *_data, void* 
 	}
 	LOGA(API,"cmdID  :%02X\r\n",data->rsp_check.hdr_cmdid);
 	LOGA(API,"SlaveID:%d\r\n",data->rsp_check.slaveID);
-	LOGA(API,"SeqTT  :%d\r\n",data->rsp_check.seqTimetamp);
+	LOGA(API,"SeqTT  :%lld\r\n",data->rsp_check.seqTimetamp);
 }
 void _SENDMESS_slave_rsp_callback(void *_data,void* _data2){
 	_slave_rsp_callbackNrspWifiMAC(G_WIFI_CON[_wf_CMD_find(GF_CMD_SENDMESS_REQUEST)].rsp.cmd,_data,_data2);
@@ -439,7 +439,7 @@ void _PING_slave_rsp_callback(void *_data, void* _data2) {
 	}
 	LOGA(API,"cmdID  :%02X\r\n",data->rsp_check.hdr_cmdid);
 	LOGA(API,"SlaveID:%d\r\n",data->rsp_check.slaveID);
-	LOGA(API,"SeqTT  :%d\r\n",data->rsp_check.seqTimetamp);
+	LOGA(API,"SeqTT  :%lld\r\n",data->rsp_check.seqTimetamp);
 	//Rsp to WIFI
 	u8 mac[6];
 	if (fl_master_SlaveMAC_get(data->rsp_check.slaveID,mac) != -1) {
@@ -623,7 +623,7 @@ void fl_ble2wifi_HISTORY_SEND(u8* mac,u8* timetamp,u8* _data){
 
 	wfdata.cmd = GF_CMD_REPORT_RESPONSE;
 	u8 ind_node = fl_master_Node_find(mac);
-	wfdata.data[0] = 1;//status => always online when got history
+	wfdata.data[0] = 2;//status => always 2 when got history
 	memcpy(&wfdata.data[1],mac,6);
 	memcpy(&wfdata.data[1+6],timetamp,4);
 	wfdata.data[1 + 6 + 4] = G_NODE_LIST.sla_info[ind_node].dev_type;

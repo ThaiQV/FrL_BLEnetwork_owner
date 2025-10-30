@@ -276,7 +276,7 @@ typedef struct {
 	u32 timeout_set; //use to retry
 	u8 retry;
 	struct {
-		u32 seqTimetamp;
+		u64 seqTimetamp;
 		u8 hdr_cmdid;
 		u8 slaveID;
 	} rsp_check;
@@ -358,14 +358,14 @@ void fl_nwk_slave_run(fl_pack_t *_pack_handle);
 void fl_nwk_slave_process(void);
 void fl_slave_fota_proc(fl_pack_t _fota_pack);
 bool fl_nwk_slave_checkHDR(u8 _hdr);
-u32 fl_req_slave_packet_createNsend(u8 _cmdid, u8* _data, u8 _len);
+u64 fl_req_slave_packet_createNsend(u8 _cmdid, u8* _data, u8 _len);
 s8 fl_queue_REQcRSP_ScanRec(fl_pack_t _pack,void *_id);
 void fl_nwk_slave_reconnectNstoragedata(void);
 s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry);
 #endif
 u32 fl_adv_timetampInPack(fl_pack_t _pack);
 fl_timetamp_withstep_t fl_adv_timetampStepInPack(fl_pack_t _pack);
-s8 fl_queueREQcRSP_add(u8 slaveid,u8 cmdid,u32 _SeqTimetamp,u8* _payloadreq,u8 _len,fl_rsp_callback_fnc *_cb, u32 _timeout_ms,u8 _retry);
+s8 fl_queueREQcRSP_add(u8 slaveid,u8 cmdid,u64 _SeqTimetamp,u8* _payloadreq,u8 _len,fl_rsp_callback_fnc *_cb, u32 _timeout_ms,u8 _retry);
 void fl_queue_REQnRSP_TimeoutInit(void);
 void fl_adv_setting_update(void);
 int fl_adv_sendFIFO_add(fl_pack_t _pack);

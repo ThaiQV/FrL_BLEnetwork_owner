@@ -97,6 +97,7 @@ uint32_t fl_rtc_get(void) {
 	return tick;
 }
 
+
 fl_timetamp_withstep_t fl_rtc_getWithMilliStep(void) {
 	fl_timetamp_withstep_t rlst;
 	rlst.timetamp = RTC_OFFSET_TIME + clock_get_32k_tick() / RTC_DIV_PPM;
@@ -105,9 +106,7 @@ fl_timetamp_withstep_t fl_rtc_getWithMilliStep(void) {
 	return rlst;
 }
 
-
-
-u32 fl_rtc_timetampmillstep_convert(u8 *_array_timetampmill)
+u64 fl_rtc_timetampmillstep_convert(u8 *_array_timetampmill)
 {
 	fl_timetamp_withstep_t rslt;
 	rslt.timetamp = MAKE_U32(_array_timetampmill[3],_array_timetampmill[2],_array_timetampmill[1],_array_timetampmill[0]);
@@ -115,8 +114,8 @@ u32 fl_rtc_timetampmillstep_convert(u8 *_array_timetampmill)
 	return fl_rtc_timetamp2milltampStep(rslt);
 }
 
-u32 fl_rtc_timetamp2milltampStep(fl_timetamp_withstep_t _timetamp_step){
-	return (_timetamp_step.timetamp*256 + (u32)_timetamp_step.milstep);
+u64 fl_rtc_timetamp2milltampStep(fl_timetamp_withstep_t _timetamp_step) {
+	return ((u64)_timetamp_step.timetamp * 256) + (u64)_timetamp_step.milstep;
 }
 
 void fl_rtc_sync(u32 timetamp_sync) {
