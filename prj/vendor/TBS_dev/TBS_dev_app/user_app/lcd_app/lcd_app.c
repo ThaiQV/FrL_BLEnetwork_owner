@@ -203,7 +203,7 @@ void my_timeout_callback(uint8_t row) {
 			lcd_off();
 //			fl_db_Pairing_Clear();
 			fl_nwk_slave_nwkclear();
-			sys_reboot();
+//			sys_reboot();
 			break;
 
 		case LCD_PRINT_FACTORY_RESET:

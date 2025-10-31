@@ -100,15 +100,31 @@ int _interval_report(void);
 /***                       Functions declare                   		         **/
 /******************************************************************************/
 /******************************************************************************/
+void fl_nwk_LedSignal_init(void) {
+#ifdef COUNTER_DEVICE
+	gpio_function_en(GPIO_PA6);
+	gpio_set_output(GPIO_PA6,1);	//enable output
+	gpio_set_input(GPIO_PA6,0);	//disable input
+	gpio_set_level(GPIO_PA6,0);
+#endif
+}
+void fl_nwk_LedSignal_run(void){
+#ifdef COUNTER_DEVICE
+	gpio_toggle(GPIO_PA6);
+#endif
+}
+
 u8 fl_nwk_mySlaveID(void){
 	return G_INFORMATION.slaveID;
 }
-
+bool IsPairing(void)	{
+	return(G_INFORMATION.profile.run_stt.join_nwk);
+}
 bool IsJoinedNetwork(void)	{
 	return(G_INFORMATION.slaveID != 0xFF);
 }
 bool IsOnline(void){
-	return G_INFORMATION.active;
+	return (G_INFORMATION.active && IsJoinedNetwork());
 }
 void _Inform11_rsp_callback(void *_data,void* _data2){
 	fl_rsp_container_t *data =  (fl_rsp_container_t*)_data;
@@ -218,6 +234,7 @@ void fl_nwk_slave_init(void) {
 	G_INFORMATION.dev_type = TBS_POWERMETER;
 	G_INFORMATION.data =(u8*)&G_POWER_METER;
 #endif
+	fl_nwk_LedSignal_init();
 	//todo: TBS Device initialization
 	TBS_Device_Init();
 	memcpy(G_INFORMATION.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_INFORMATION.mac));
@@ -638,6 +655,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 		/*============================================================================================*/
 		case NWK_HDR_COLLECT: {
 //			_nwk_slave_syncFromPack(&packet.frame);
+			fl_nwk_LedSignal_run();
 			if (IsJoinedNetwork() == 0) {
 				if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
 					//get master's mac
@@ -888,6 +906,11 @@ int _interval_report(void) {
 				P_INFO("Auto update (%d s) - indx:%d\r\n",INTERVAL_REPORT_TIME,G_COUNTER_DEV.data.index-1);
 				return INTERVAL_REPORT_TIME*1000*1000;
 			}
+		}
+	}else{
+		if(IsPairing()){
+			fl_nwk_LedSignal_run();
+			return 300 * 1000;
 		}
 	}
 #undef INTERVAL_REPORT_TIME
