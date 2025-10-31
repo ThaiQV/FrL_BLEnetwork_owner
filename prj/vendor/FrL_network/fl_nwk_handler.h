@@ -31,6 +31,9 @@ typedef void (*fl_rsp_callback_fnc)(void*, void*);
 #define MAC_MATCH(mac1, mac2) 		(memcmp(mac1, mac2, 6) == 0)
 #define MAC_COPY(mac,data)			(memcpy(mac,data,6))
 
+#define FL_SLAVEID_MEMID(id_u8)		((u8)((id_u8) & 0x07))
+#define FL_SLAVEID_GRPID(id_u8) 	((u8)(((id_u8) >> 3) & 0x1F))
+
 typedef enum {
 	NWK_HDR_NONE = 0,
 	// slave -> req -> master -> rsp
@@ -51,19 +54,20 @@ typedef enum {
 	NWK_HDR_FOTA = 0xFA 						//===> Upload FW via the BLE
 }__attribute__((packed)) fl_hdr_nwk_type_e;
 
-typedef union {
-	u8 id_u8;
-	struct {
-		u8 memID :3; //3 bits : 0-8 => total 8*32 = 256 slaves
-		u8 grpID :5; //5bits : 0-32
-	};
-} fl_slaveID_u;
+//
+//typedef union {
+//	u8 id_u8;
+//	struct {
+//		u8 memID :3; //3 bits : 0-8 => total 8*32 = 256 slaves
+//		u8 grpID :5; //5bits : 0-32
+//	};
+//} fl_slaveID_u;
 
 typedef struct {
 	u8 hdr;
 	u8 timetamp[4];
 	u8 milltamp;
-	fl_slaveID_u slaveID;
+	u8 slaveID;
 	u8 payload[22]; //modify to special parameter in the packet
 	u8 crc8;
 	union {
@@ -252,7 +256,7 @@ static inline void tbs_unpack_powermeter_data(tbs_device_powermeter_t *dst, cons
 
 typedef struct {
 	u8 mac[6];
-	fl_slaveID_u slaveID;
+	u8 slaveID;
 	u32 timelife;
 	bool active;
 	tbs_dev_type_e dev_type;

@@ -354,7 +354,7 @@ void fl_master_adv_55_RSPCommon_Create(void) {
 		memcpy(check_rspcom.bytes,G_QUEUE_SENDING.data[var].data_arr,G_QUEUE_SENDING.data[var].length);
 
 		if (inpack >= origin_pack && check_rspcom.frame.endpoint.master == FL_FROM_MASTER && check_rspcom.frame.hdr == NWK_HDR_55
-				&& check_rspcom.frame.slaveID.id_u8 != 0xFF) {
+				&& check_rspcom.frame.slaveID != 0xFF) {
 			//get timetamp_seq in the payload of the rsp
 			fl_timetamp_withstep_t timetamp_str;
 			timetamp_str.timetamp = MAKE_U32(check_rspcom.frame.payload[3],check_rspcom.frame.payload[2],check_rspcom.frame.payload[1],
@@ -363,7 +363,7 @@ void fl_master_adv_55_RSPCommon_Create(void) {
 			u64 timetamp_rsp = fl_rtc_timetamp2milltampStep(timetamp_str);
 
 			p_55RSP[numSlave] = &G_QUEUE_SENDING.data[var];
-			SlaveID[numSlave] = check_rspcom.frame.slaveID.id_u8;
+			SlaveID[numSlave] = check_rspcom.frame.slaveID;
 			timetamp_com[numSlave] = timetamp_rsp;
 
 			if(timetamp_min==0){
@@ -520,10 +520,9 @@ void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms) {
 		bls_ll_setAdvEnable(BLC_ADV_DISABLE);
 		rf_set_power_level_index(MY_RF_POWER_INDEX);
 		u8 mac[6];
-		own_addr_type_t app_own_address_type = OWN_ADDRESS_PUBLIC;
-		memcpy(mac,(app_own_address_type == OWN_ADDRESS_PUBLIC) ? blc_ll_get_macAddrPublic() : blc_ll_get_macAddrRandom(),6);
+		memcpy(mac,blc_ll_get_macAddrPublic(),6);
 		u8 status = bls_ll_setAdvParam(G_ADV_SETTINGS.adv_interval_min,G_ADV_SETTINGS.adv_interval_max,ADV_TYPE_SCANNABLE_UNDIRECTED,
-				app_own_address_type,0,NULL,BLT_ENABLE_ADV_ALL,ADV_FP_NONE);
+				OWN_ADDRESS_PUBLIC,0,NULL,BLT_ENABLE_ADV_ALL,ADV_FP_NONE);
 		if (status != BLE_SUCCESS) {
 			ERR(BLE,"Set ADV param is FAIL !!!\r\n")
 			while (1);
@@ -731,8 +730,9 @@ bool fl_adv_IsFromMe(fl_pack_t data_in_queue) {
 	extern fl_nodeinnetwork_t G_INFORMATION;
 	fl_dataframe_format_t data_parsed;
 	if (fl_packet_parse(data_in_queue,&data_parsed)) {
-		if((data_parsed.endpoint.master == FL_FROM_SLAVE || data_parsed.endpoint.master == FL_FROM_SLAVE_ACK) && data_parsed.slaveID.id_u8 == G_INFORMATION.slaveID.id_u8
-				&& G_INFORMATION.slaveID.id_u8 != 0xFF){
+		if((data_parsed.endpoint.master == FL_FROM_SLAVE || data_parsed.endpoint.master == FL_FROM_SLAVE_ACK)
+				&& data_parsed.slaveID == G_INFORMATION.slaveID
+				&& G_INFORMATION.slaveID != 0xFF){
 			return true;
 		}
 	}
@@ -744,8 +744,8 @@ bool fl_adv_MasterToMe(fl_pack_t data_in_queue) {
 	if (fl_packet_parse(data_in_queue,&data_parsed)) {
 		if((data_parsed.endpoint.master == FL_FROM_MASTER|| data_parsed.endpoint.master == FL_FROM_MASTER_ACK)
 				&& (
-						(data_parsed.slaveID.id_u8 == G_INFORMATION.slaveID.id_u8 && G_INFORMATION.slaveID.id_u8 != 0xFF)
-						|| (data_parsed.slaveID.id_u8 == 0xFF ||  G_INFORMATION.slaveID.id_u8 == 0xFF)
+						(data_parsed.slaveID == G_INFORMATION.slaveID && G_INFORMATION.slaveID != 0xFF)
+						|| (data_parsed.slaveID == 0xFF ||  G_INFORMATION.slaveID == 0xFF)
 					)
 			){
 			return true;

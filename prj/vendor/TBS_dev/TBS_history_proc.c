@@ -199,7 +199,7 @@ fl_pack_t tbs_history_create_pack(u8* _data) {
 	packet.frame.timetamp[3] = U32_BYTE3(data_dev->timetamp);
 	packet.frame.milltamp = next_req++;
 
-	packet.frame.slaveID.id_u8 = fl_nwk_mySlaveID();
+	packet.frame.slaveID = fl_nwk_mySlaveID();
 
 	//payload
 	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));

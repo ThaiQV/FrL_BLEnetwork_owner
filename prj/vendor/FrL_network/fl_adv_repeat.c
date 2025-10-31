@@ -57,7 +57,7 @@ fl_pack_t fl_repeat_packet_build(fl_pack_t _pack) {
 	memcpy(pack_built.data_arr,packet.bytes,pack_built.length);
 
 	LOGA(ZIG_GP,"%s :%d,TTL: %d/%d,Mode: %d\r\n",(packet.frame.endpoint.master == FL_FROM_SLAVE)?"SlaveID":"Master",
-			packet.frame.slaveID.id_u8,packet.frame.endpoint.repeat_cnt,packet.frame.endpoint.rep_settings,
+			packet.frame.slaveID,packet.frame.endpoint.repeat_cnt,packet.frame.endpoint.rep_settings,
 			packet.frame.endpoint.repeat_mode);
 
 	return pack_built;

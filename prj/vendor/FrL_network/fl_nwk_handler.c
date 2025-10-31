@@ -213,7 +213,7 @@ s8 fl_queue_REQcRSP_ScanRec(fl_pack_t _pack,void *_id)
 		fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(_pack);
 		seq_timetamp =fl_rtc_timetamp2milltampStep(timetamp_inpack);
 #else
-		if(_myID->slaveID.id_u8 != packet.frame.slaveID.id_u8 && packet.frame.slaveID.id_u8 !=0xFF){//not me
+		if(_myID->slaveID != packet.frame.slaveID && packet.frame.slaveID !=0xFF){//not me
 			return -1;
 		}
 		//get seq_timetamp in rsp
@@ -226,7 +226,7 @@ s8 fl_queue_REQcRSP_ScanRec(fl_pack_t _pack,void *_id)
 		for(u8 i =0;i < avai_slot;i++){
 			if (G_QUEUE_REQ_CALL_RSP[i].rsp_check.hdr_cmdid != 0 && G_QUEUE_REQ_CALL_RSP[i].rsp_check.hdr_cmdid == packet.frame.hdr) {
 #ifdef MASTER_CORE
-				if (G_QUEUE_REQ_CALL_RSP[i].rsp_check.slaveID == packet.frame.slaveID.id_u8
+				if (G_QUEUE_REQ_CALL_RSP[i].rsp_check.slaveID == packet.frame.slaveID
 					&& G_QUEUE_REQ_CALL_RSP[i].rsp_check.seqTimetamp==seq_timetamp){
 #else
 				u16 timetamp_delta = MAKE_U16(packet.frame.payload[SIZEU8(fl_timetamp_withstep_t)],packet.frame.payload[SIZEU8(fl_timetamp_withstep_t)+1]);
@@ -235,9 +235,9 @@ s8 fl_queue_REQcRSP_ScanRec(fl_pack_t _pack,void *_id)
 				memcpy(slaveID_rsp,&packet.frame.payload[SIZEU8(fl_timetamp_withstep_t)+SIZEU8(timetamp_delta)],SIZEU8(slaveID_rsp));
 				u8 my_slaveID_inrspcom = plog_IndexOf(slaveID_rsp,&G_QUEUE_REQ_CALL_RSP[i].rsp_check.slaveID,1,SIZEU8(slaveID_rsp));
 
-				if ((G_QUEUE_REQ_CALL_RSP[i].rsp_check.slaveID != 0xFF && packet.frame.slaveID.id_u8 ==0xFF && my_slaveID_inrspcom != -1
+				if ((G_QUEUE_REQ_CALL_RSP[i].rsp_check.slaveID != 0xFF && packet.frame.slaveID ==0xFF && my_slaveID_inrspcom != -1
 						&& G_QUEUE_REQ_CALL_RSP[i].rsp_check.seqTimetamp <= (seq_timetamp + (u32)timetamp_delta)) //Check RSP common
-					|| (G_QUEUE_REQ_CALL_RSP[i].rsp_check.slaveID == packet.frame.slaveID.id_u8
+					|| (G_QUEUE_REQ_CALL_RSP[i].rsp_check.slaveID == packet.frame.slaveID
 							&& G_QUEUE_REQ_CALL_RSP[i].rsp_check.seqTimetamp==seq_timetamp)
 					)
 				{
@@ -249,13 +249,13 @@ s8 fl_queue_REQcRSP_ScanRec(fl_pack_t _pack,void *_id)
 					LOGA(API,"MyID:%02X,Found:%d\r\n",G_QUEUE_REQ_CALL_RSP[i].rsp_check.slaveID,my_slaveID_inrspcom);
 #endif
 					rslt = i;
-					LOGA(API,"RSP(%lld|%lld):%d/%d\r\n",G_QUEUE_REQ_CALL_RSP[i].rsp_check.seqTimetamp,seq_timetamp,packet.frame.hdr,packet.frame.slaveID.id_u8);
+					LOGA(API,"RSP(%lld|%lld):%d/%d\r\n",G_QUEUE_REQ_CALL_RSP[i].rsp_check.seqTimetamp,seq_timetamp,packet.frame.hdr,packet.frame.slaveID);
 					G_QUEUE_REQ_CALL_RSP[i].rsp_cb((void*)&G_QUEUE_REQ_CALL_RSP[i],(void*)&_pack); //timeout
 					//clear event
 					_queue_REQcRSP_clear(&G_QUEUE_REQ_CALL_RSP[i]);
 				}
 				else{
-					LOGA(API,"RSP(%lld|%lld):%02X/%d\r\n",G_QUEUE_REQ_CALL_RSP[i].rsp_check.seqTimetamp,seq_timetamp,packet.frame.hdr,packet.frame.slaveID.id_u8);
+					LOGA(API,"RSP(%lld|%lld):%02X/%d\r\n",G_QUEUE_REQ_CALL_RSP[i].rsp_check.seqTimetamp,seq_timetamp,packet.frame.hdr,packet.frame.slaveID);
 				}
 			}
 			//else return;

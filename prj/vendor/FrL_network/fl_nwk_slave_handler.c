@@ -101,11 +101,11 @@ int _interval_report(void);
 /******************************************************************************/
 /******************************************************************************/
 u8 fl_nwk_mySlaveID(void){
-	return G_INFORMATION.slaveID.id_u8;
+	return G_INFORMATION.slaveID;
 }
 
 bool IsJoinedNetwork(void)	{
-	return(G_INFORMATION.slaveID.id_u8 != 0xFF);
+	return(G_INFORMATION.slaveID != 0xFF);
 }
 bool IsOnline(void){
 	return G_INFORMATION.active;
@@ -125,7 +125,7 @@ void _Inform11_rsp_callback(void *_data,void* _data2){
 }
 
 int _informMaster(void){
-	if(IsJoinedNetwork()){
+	if(IsJoinedNetwork() && G_INFORMATION.profile.run_stt.join_nwk == 0){
 		LOGA(INF,"Inform to master (%d s)!!!\r\n",INFORM_MASTER/1000/1000);
 #ifdef COUNTER_DEVICE
 		fl_api_slave_req(NWK_HDR_11_REACTIVE,(u8*)&G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data),_Inform11_rsp_callback,0,0);
@@ -154,9 +154,9 @@ int _nwk_slave_backup(void){
 		fl_db_slaveprofile_save(G_INFORMATION.profile);
 		LOGA(FLA,"** MAC     :%02X%02X%02X%02X%02X%02X\r\n",G_INFORMATION.mac[0],G_INFORMATION.mac[1],G_INFORMATION.mac[2],
 				G_INFORMATION.mac[3],G_INFORMATION.mac[4],G_INFORMATION.mac[5]);
-		LOGA(FLA,"** SlaveID :%d\r\n",G_INFORMATION.slaveID.id_u8);
-		LOGA(FLA,"** grpID   :%d\r\n",G_INFORMATION.slaveID.grpID);
-		LOGA(FLA,"** memID   :%d\r\n",G_INFORMATION.slaveID.memID);
+		LOGA(FLA,"** SlaveID :%d\r\n",G_INFORMATION.slaveID);
+		LOGA(FLA,"** grpID   :%d\r\n",FL_SLAVEID_GRPID(G_INFORMATION.slaveID));
+		LOGA(FLA,"** memID   :%d\r\n",FL_SLAVEID_MEMID(G_INFORMATION.slaveID));
 		LOGA(FLA,"** JoinNWK :%d\r\n",G_INFORMATION.profile.run_stt.join_nwk);
 		LOGA(FLA,"** RstFac  :%d\r\n",G_INFORMATION.profile.run_stt.rst_factory);
 		LOGA(FLA,"** Channels:%d |%d |%d\r\n",G_INFORMATION.profile.nwk.chn[0],G_INFORMATION.profile.nwk.chn[1],G_INFORMATION.profile.nwk.chn[2])
@@ -176,11 +176,15 @@ int _nwk_slave_backup(void){
 
 void fl_nwk_slave_nwkclear(void){
 	fl_db_Pairing_Clear();
+	fl_slave_profiles_t my_profile =fl_db_slaveprofile_init();
+	G_INFORMATION.slaveID = my_profile.slaveid;
+	G_INFORMATION.profile = my_profile;
 	G_INFORMATION.profile.run_stt.join_nwk =1;
 	_nwk_slave_backup();
 }
 
 void fl_nwk_slave_init(void) {
+//	PLOG_Start(ALL);
 	DEBUG_TURN(NWK_DEBUG_STT);
 //	fl_input_external_init();
 	FL_QUEUE_CLEAR(&G_HANDLE_CONTAINER,PACK_HANDLE_SIZE);
@@ -190,7 +194,7 @@ void fl_nwk_slave_init(void) {
 	memcpy(G_INFORMATION.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_INFORMATION.mac));
 	//Load from db
 	fl_slave_profiles_t my_profile = fl_db_slaveprofile_init();
-	G_INFORMATION.slaveID.id_u8 = my_profile.slaveid;
+	G_INFORMATION.slaveID = my_profile.slaveid;
 	G_INFORMATION.profile = my_profile;
 
 //	//Test join network + factory
@@ -205,6 +209,7 @@ void fl_nwk_slave_init(void) {
 #ifdef COUNTER_DEVICE
 	G_INFORMATION.dev_type = TBS_COUNTER;
 	G_INFORMATION.data =(u8*)&G_COUNTER_DEV;
+	memcpy(G_COUNTER_DEV.mac,G_INFORMATION.mac,6);
 	for (u8 i = 0; i < COUNTER_LCD_MESS_MAX; i++) {
 		G_INFORMATION.lcd_mess[i] = &G_COUNTER_LCD[i][0];
 	}
@@ -215,17 +220,18 @@ void fl_nwk_slave_init(void) {
 #endif
 	//todo: TBS Device initialization
 	TBS_Device_Init();
-
-	LOG_P(INF,"Freelux network SLAVE init\r\n");
-	LOGA(INF,"** MAC     :%02X%02X%02X%02X%02X%02X\r\n",G_INFORMATION.mac[0],G_INFORMATION.mac[1],G_INFORMATION.mac[2],
+	memcpy(G_INFORMATION.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_INFORMATION.mac));
+	memcpy(&G_INFORMATION.data[0],G_INFORMATION.mac,6);
+	P_INFO("** Freelux network SLAVE init \r\n");
+	P_INFO("** MAC     :%02X%02X%02X%02X%02X%02X\r\n",G_INFORMATION.mac[0],G_INFORMATION.mac[1],G_INFORMATION.mac[2],
 			G_INFORMATION.mac[3],G_INFORMATION.mac[4],G_INFORMATION.mac[5]);
-	LOGA(INF,"** DevType:%d\r\n",G_INFORMATION.dev_type);
-	LOGA(INF,"** SlaveID:%d\r\n",G_INFORMATION.slaveID.id_u8);
-	LOGA(INF,"** grpID  :%d\r\n",G_INFORMATION.slaveID.grpID);
-	LOGA(INF,"** memID  :%d\r\n",G_INFORMATION.slaveID.memID);
-	LOGA(INF,"** JoinNWK:%d\r\n",G_INFORMATION.profile.run_stt.join_nwk);
-	LOGA(INF,"** RstFac :%d\r\n",G_INFORMATION.profile.run_stt.rst_factory);
-	LOGA(INF,"** MAC GW :%02X%02X%02X%02X\r\n",U32_BYTE0( G_INFORMATION.profile.nwk.mac_parent),U32_BYTE1( G_INFORMATION.profile.nwk.mac_parent),
+	P_INFO("** DevType:%d\r\n",G_INFORMATION.dev_type);
+	P_INFO("** SlaveID:%d\r\n",G_INFORMATION.slaveID);
+	P_INFO("** grpID  :%d\r\n",FL_SLAVEID_GRPID(G_INFORMATION.slaveID));
+	P_INFO("** memID  :%d\r\n",FL_SLAVEID_MEMID(G_INFORMATION.slaveID));
+	P_INFO("** JoinNWK:%d\r\n",G_INFORMATION.profile.run_stt.join_nwk);
+	P_INFO("** RstFac :%d\r\n",G_INFORMATION.profile.run_stt.rst_factory);
+	P_INFO("** MAC GW :%02X%02X%02X%02X\r\n",U32_BYTE0( G_INFORMATION.profile.nwk.mac_parent),U32_BYTE1( G_INFORMATION.profile.nwk.mac_parent),
 			U32_BYTE2( G_INFORMATION.profile.nwk.mac_parent),U32_BYTE3( G_INFORMATION.profile.nwk.mac_parent));
 	//test
 //	if(G_INFORMATION.slaveID.id_u8 == G_INFORMATION.profile.slaveid && G_INFORMATION.slaveID.id_u8 == 0xFF){
@@ -290,7 +296,7 @@ s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 
 	if (_cb != 0 && ( _timeout_ms*1000 >= 2*QUEUQ_REQcRSP_INTERVAL || _timeout_ms==0)) {
 		u64 seq_timetamp=fl_req_slave_packet_createNsend(_cmdid,_data,_len);
 		if(seq_timetamp){
-			return fl_queueREQcRSP_add(G_INFORMATION.slaveID.id_u8,_cmdid,seq_timetamp,_data,_len,&_cb,_timeout_ms,_retry);
+			return fl_queueREQcRSP_add(G_INFORMATION.slaveID,_cmdid,seq_timetamp,_data,_len,&_cb,_timeout_ms,_retry);
 		}
 	} else if(_cb == 0 && _timeout_ms ==0){
 		return (fl_req_slave_packet_createNsend(_cmdid,_data,_len) == 0?-1:0); // none rsp
@@ -335,7 +341,7 @@ u64 fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 			req_pack.frame.timetamp[3] = U32_BYTE3(field_timetamp.timetamp);
 			req_pack.frame.milltamp = field_timetamp.milstep;
 
-			req_pack.frame.slaveID.id_u8 = G_INFORMATION.slaveID.id_u8;
+			req_pack.frame.slaveID = G_INFORMATION.slaveID;
 
 			//Create payload
 			memset(req_pack.frame.payload,0xFF,SIZEU8(req_pack.frame.payload));
@@ -367,7 +373,7 @@ u64 fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 			req_pack.frame.timetamp[3] = U32_BYTE3(field_timetamp.timetamp);
 			req_pack.frame.milltamp = field_timetamp.milstep;
 
-			req_pack.frame.slaveID.id_u8 = G_INFORMATION.slaveID.id_u8;
+			req_pack.frame.slaveID = G_INFORMATION.slaveID;
 			//Create payload
 			memset(req_pack.frame.payload,0xFF,SIZEU8(req_pack.frame.payload));
 			memcpy(req_pack.frame.payload,_data,_len);
@@ -423,7 +429,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 		packet_built.length = 0;
 		return packet_built;
 	}
-	LOGA(INF,"(%d|%x)HDR_REQ ID: %02X - ACK:%d\r\n",IsJoinedNetwork(),G_INFORMATION.slaveID.id_u8,packet.frame.hdr,packet.frame.endpoint.master);
+	LOGA(INF,"(%d|%x)HDR_REQ ID: %02X - ACK:%d\r\n",IsJoinedNetwork(),G_INFORMATION.slaveID,packet.frame.hdr,packet.frame.endpoint.master);
 
 	switch ((fl_hdr_nwk_type_e) packet.frame.hdr) {
 		case NWK_HDR_HEARTBEAT:
@@ -452,14 +458,14 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 //			_nwk_slave_syncFromPack(&packet.frame);
 			if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK && IsJoinedNetwork()) {
 				//Process rsp
-				s8 memid_idx = plog_IndexOf(packet.frame.payload,(u8*)&G_INFORMATION.slaveID.id_u8,1,sizeof(packet.frame.payload)-1); //skip lastbyte int the payload
+				s8 memid_idx = plog_IndexOf(packet.frame.payload,(u8*)&G_INFORMATION.slaveID,1,sizeof(packet.frame.payload)-1); //skip lastbyte int the payload
 				u32 master_timetamp = MAKE_U32(packet.frame.timetamp[3],packet.frame.timetamp[2],packet.frame.timetamp[1],packet.frame.timetamp[0]);
 				datetime_t cur_dt;
 				fl_rtc_timestamp_to_datetime(master_timetamp,&cur_dt);
 				u8 _payload[POWER_METER_STRUCT_BYTESIZE];
 				memset(_payload,0xFF,SIZEU8(_payload));
 				//u8 len_payload=0;
-				LOGA(APP,"(%d)SlaveID:%X | inPack:%X | TestEvent:%d\r\n",memid_idx,G_INFORMATION.slaveID.id_u8,packet.frame.payload[memid_idx],GETINFO_FLAG_EVENTTEST);
+				LOGA(APP,"(%d)SlaveID:%X | inPack:%X | TestEvent:%d\r\n",memid_idx,G_INFORMATION.slaveID,packet.frame.payload[memid_idx],GETINFO_FLAG_EVENTTEST);
 				packet.frame.endpoint.dbg = NWK_DEBUG_STT;
 				u8 indx_data = 0;
 				if (memid_idx != -1) {
@@ -477,7 +483,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 					tbs_pack_powermeter_data(pwmeter_data,_payload);
 					indx_data = SIZEU8(pwmeter_data->type) + SIZEU8(pwmeter_data->mac) + SIZEU8(pwmeter_data->timetamp);
 #endif
-					packet.frame.slaveID.id_u8 = G_INFORMATION.slaveID.id_u8;
+					packet.frame.slaveID = G_INFORMATION.slaveID;
 					memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
 					memcpy(&packet.frame.payload,&_payload[indx_data],SIZEU8(packet.frame.payload));
 					//CRC
@@ -503,7 +509,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 		break;
 		case NWK_HDR_A5_HIS:{
 			if (IsJoinedNetwork()) {
-				if(packet.frame.slaveID.id_u8 == G_INFORMATION.slaveID.id_u8){
+				if(packet.frame.slaveID == G_INFORMATION.slaveID){
 					//get mac
 					u8 mac[6];
 					memcpy(mac,&packet.frame.payload[0],SIZEU8(mac));
@@ -525,7 +531,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 			if (IsJoinedNetwork()) {
 #ifdef COUNTER_DEVICE
 				//check packet_slaveid
-				if(packet.frame.slaveID.id_u8 == G_INFORMATION.slaveID.id_u8){
+				if(packet.frame.slaveID == G_INFORMATION.slaveID){
 					u8 slot_indx = packet.frame.payload[0];
 					memset(G_INFORMATION.lcd_mess[slot_indx],0,SIZEU8(G_INFORMATION.lcd_mess[slot_indx]));
 					memcpy(G_INFORMATION.lcd_mess[slot_indx],&packet.frame.payload[1],SIZEU8(packet.frame.payload)-1);
@@ -610,7 +616,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 		case NWK_HDR_22_PING: {
 			if (IsJoinedNetwork()) {
 				//check packet_slaveid
-				if (packet.frame.slaveID.id_u8 == G_INFORMATION.slaveID.id_u8) {
+				if (packet.frame.slaveID == G_INFORMATION.slaveID) {
 					if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
 						u8 ok[2] = { 'o', 'k' };
 						memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
@@ -637,6 +643,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 					//get master's mac
 					G_INFORMATION.profile.nwk.mac_parent = MAKE_U32(packet.frame.payload[3],packet.frame.payload[2],packet.frame.payload[1],packet.frame.payload[0]);
 					//Process rsp
+					memcpy(G_INFORMATION.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_INFORMATION.mac));
 					memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
 					memcpy(packet.frame.payload,G_INFORMATION.mac,SIZEU8(G_INFORMATION.mac));
 					packet.frame.payload[SIZEU8(G_INFORMATION.mac)] = G_INFORMATION.dev_type;
@@ -658,11 +665,12 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 		{
 //			_nwk_slave_syncFromPack(&packet.frame);
 			//Process rsp
+			memcpy(G_INFORMATION.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_INFORMATION.mac));
 			s8 mymac_idx = plog_IndexOf(packet.frame.payload,G_INFORMATION.mac,SIZEU8(G_INFORMATION.mac),sizeof(packet.frame.payload));
 			if (mymac_idx != -1) {
-				G_INFORMATION.slaveID.id_u8 = packet.frame.slaveID.id_u8;
-				LOGA(INF,"UPDATE SlaveID: %d(grpID:%d|memID:%d)\r\n",G_INFORMATION.slaveID.id_u8,G_INFORMATION.slaveID.grpID,G_INFORMATION.slaveID.memID);
-				G_INFORMATION.profile.slaveid = G_INFORMATION.slaveID.id_u8 ;
+				G_INFORMATION.slaveID = packet.frame.slaveID;
+				LOGA(INF,"UPDATE SlaveID: %d(grpID:%d|memID:%d)\r\n",G_INFORMATION.slaveID,FL_SLAVEID_GRPID(G_INFORMATION.slaveID),FL_SLAVEID_MEMID(G_INFORMATION.slaveID));
+				G_INFORMATION.profile.slaveid = G_INFORMATION.slaveID ;
 				G_INFORMATION.profile.run_stt.rst_factory = 0;
 				G_INFORMATION.profile.nwk.chn[0] = packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac)];
 				G_INFORMATION.profile.nwk.chn[1] = packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac) + 1];
@@ -710,7 +718,7 @@ fl_pack_t fl_slave_fota_rsp_packet_build(u8* _data, u8 _len,fl_data_frame_u _REQ
 	//Add new mill-step
 	rsp_pack.frame.milltamp = _REQpack.frame.milltamp;
 
-	rsp_pack.frame.slaveID.id_u8 = G_INFORMATION.slaveID.id_u8;
+	rsp_pack.frame.slaveID = G_INFORMATION.slaveID;
 	//Create payload
 	memset(rsp_pack.frame.payload,0x0,SIZEU8(rsp_pack.frame.payload));
 	memcpy(rsp_pack.frame.payload,_data,_len);
@@ -861,7 +869,7 @@ int _slave_reconnect(void){
 	return 0;
 }
 int _interval_report(void) {
-#define INTERVAL_REPORT_TIME (55 - G_INFORMATION.slaveID.memID)
+#define INTERVAL_REPORT_TIME (55 - FL_SLAVEID_MEMID(G_INFORMATION.slaveID))
 	extern const u32 ORIGINAL_TIME_TRUST;
 	if (IsJoinedNetwork()) {
 		if (WIFI_ORIGINAL_GETALL.timetamp < fl_rtc_get() && WIFI_ORIGINAL_GETALL.timetamp > ORIGINAL_TIME_TRUST) {
@@ -877,7 +885,7 @@ int _interval_report(void) {
 #endif
 				//increase index if using NWK_HDR_11_REACTIVE
 				//TBS_Device_Index_manage();
-				P_INFO("Auto update (%d s) - indx:%d\r\n",58 - G_INFORMATION.slaveID.memID,G_COUNTER_DEV.data.index-1);
+				P_INFO("Auto update (%d s) - indx:%d\r\n",INTERVAL_REPORT_TIME,G_COUNTER_DEV.data.index-1);
 				return INTERVAL_REPORT_TIME*1000*1000;
 			}
 		}

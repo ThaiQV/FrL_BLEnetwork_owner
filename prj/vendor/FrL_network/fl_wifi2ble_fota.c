@@ -130,7 +130,7 @@ fl_pack_t _fota_fw_packet_build(u8* _slave_mac,u8* _data, u8 _len,bool _ack){
 	//Add new mill-step
 	req_pack.frame.milltamp = timetampStep.milstep;
 
-	req_pack.frame.slaveID.id_u8 = slaveID;
+	req_pack.frame.slaveID = slaveID;
 	//Create payload
 	memset(req_pack.frame.payload,0x0,SIZEU8(req_pack.frame.payload));
 	memcpy(req_pack.frame.payload,_data,_len);

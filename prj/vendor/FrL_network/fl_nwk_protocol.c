@@ -202,7 +202,7 @@ int _getInfo_autorun(void) {
 		else{
 			G_SLA_INFO_RSP.id[var] = G_SLA_INFO_RSP.rslt.offline[(var + G_SLA_INFO_RSP.num_retrieved)%G_SLA_INFO_RSP.rslt.num_off];
 		}
-		slave_arr[var] = G_SLA_INFO_RSP.id[var]->slaveID.id_u8;
+		slave_arr[var] = G_SLA_INFO_RSP.id[var]->slaveID;
 		//clear status of slave
 		G_SLA_INFO_RSP.id[var]->active = false;
 		G_SLA_INFO_RSP.id[var]->timelife = clock_time();
@@ -230,7 +230,7 @@ int _getInfo_autorun(void) {
 		G_SLA_INFO_RSP.rslt.num_off = G_SLA_INFO_RSP.total_slaves - G_SLA_INFO_RSP.rslt.num_onl;
 
 		for (idx_get = 0; idx_get < G_SLA_INFO_RSP.rslt.num_off; ++idx_get) {
-			P_INFO("[%d]Mac:0x%02X%02X%02X%02X%02X%02X\r\n",G_SLA_INFO_RSP.rslt.offline[idx_get]->slaveID.id_u8,
+			P_INFO("[%d]Mac:0x%02X%02X%02X%02X%02X%02X\r\n",G_SLA_INFO_RSP.rslt.offline[idx_get]->slaveID,
 					G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[0],G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[1],G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[2],
 					G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[3],G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[4],G_SLA_INFO_RSP.rslt.offline[idx_get]->mac[5]);
 		}
@@ -689,7 +689,7 @@ int _GETALLNODES(void) {
 			}
 		} else {
 			if (slave_num < SIZEU8(slaveID)) {
-				slaveID[slave_num] = p_ALLNODES.sort_list.sla_info[i]->slaveID.id_u8; //index of the node
+				slaveID[slave_num] = p_ALLNODES.sort_list.sla_info[i]->slaveID; //index of the node
 				slave_num++;
 			}
 		}

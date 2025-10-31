@@ -227,20 +227,20 @@ int TEST_Counter_Event(void){
 /* END TEST*/
 
 void TBS_Counter_init(void){
-	memcpy(G_COUNTER_DEV.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_COUNTER_DEV.mac));
+//	memcpy(G_COUNTER_DEV.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_COUNTER_DEV.mac));
 	G_COUNTER_DEV.type = TBS_COUNTER;
 	G_COUNTER_DEV.timetamp = fl_rtc_get();
 	//passing lcd message
 	memcpy(G_COUNTER_LCD,fl_db_slavesettings_init().setting_arr,SIZEU8(G_COUNTER_LCD[0]) * COUNTER_LCD_MESS_MAX);
-	//for debuging
-	LOG_P(PERI,"========================\r\n");
-	for (u8 i = 0; i < COUNTER_LCD_MESS_MAX; i++) {
-		if (G_COUNTER_LCD[i][0] != 0xFF){
-//			sprintf(str_mess,"[%d]%s",i,G_COUNTER_LCD[i]);
-			P_INFO("[%d]%s-%d\r\n",i,(char* )G_COUNTER_LCD[i],G_COUNTER_LCD[i][LCD_MESSAGE_SIZE-1]);
-		}
-	}
-	LOG_P(PERI,"========================\r\n");
+//	//for debuging
+//	LOG_P(PERI,"========================\r\n");
+//	for (u8 i = 0; i < COUNTER_LCD_MESS_MAX; i++) {
+//		if (G_COUNTER_LCD[i][0] != 0xFF){
+////			sprintf(str_mess,"[%d]%s",i,G_COUNTER_LCD[i]);
+//			P_INFO("[%d]%s-%d\r\n",i,(char* )G_COUNTER_LCD[i],G_COUNTER_LCD[i][LCD_MESSAGE_SIZE-1]);
+//		}
+//	}
+//	LOG_P(PERI,"========================\r\n");
 #ifndef HW_SAMPLE_TEST
 	//todo:Init Butt,lcd,7segs,.....
 	user_app_init();
@@ -274,7 +274,7 @@ void TBS_PowerMeter_init(void){
 
 	LOGA(PERI,"Threshold channel:%d-%d-%d\r\n",G_POWER_METER_PARAMETER[0],	G_POWER_METER_PARAMETER[1],	G_POWER_METER_PARAMETER[2]);
 
-	memcpy(G_POWER_METER.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_POWER_METER.mac));
+//	memcpy(G_POWER_METER.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_POWER_METER.mac));
 	G_POWER_METER.type = TBS_POWERMETER;
 	G_POWER_METER.timetamp= fl_rtc_get();
 	test_powermeter();
