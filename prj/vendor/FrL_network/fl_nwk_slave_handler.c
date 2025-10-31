@@ -197,6 +197,7 @@ void fl_nwk_slave_nwkclear(void){
 	G_INFORMATION.profile = my_profile;
 	G_INFORMATION.profile.run_stt.join_nwk =1;
 	_nwk_slave_backup();
+	blt_soft_timer_restart(_interval_report,100*100);
 }
 
 void fl_nwk_slave_init(void) {
@@ -910,7 +911,7 @@ int _interval_report(void) {
 	}else{
 		if(IsPairing()){
 			fl_nwk_LedSignal_run();
-			return 300 * 1000;
+			return 500 * 1000;
 		}
 	}
 #undef INTERVAL_REPORT_TIME
