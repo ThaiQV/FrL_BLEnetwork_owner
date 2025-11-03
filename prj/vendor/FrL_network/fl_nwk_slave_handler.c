@@ -36,7 +36,7 @@ extern volatile fl_timetamp_withstep_t WIFI_ORIGINAL_GETALL;
 												ORIGINAL_MASTER_TIME.milstep = y;\
 											}while(0) //Sync original time-master req
 u8 GETINFO_FLAG_EVENTTEST = 0;
-#define JOIN_NETWORK_TIME 			30*1012 			//ms
+#define JOIN_NETWORK_TIME 			60*1012 			//ms
 #define RECHECKING_NETWOK_TIME 		30*1021 		    //ms
 #define RECONNECT_TIME				62*1000*1020		//s
 #define INFORM_MASTER				5*1001*1004
@@ -102,15 +102,19 @@ int _interval_report(void);
 /******************************************************************************/
 void fl_nwk_LedSignal_init(void) {
 #ifdef COUNTER_DEVICE
+#ifndef HW_SAMPLE_TEST
 	gpio_function_en(GPIO_PA6);
 	gpio_set_output(GPIO_PA6,1);	//enable output
 	gpio_set_input(GPIO_PA6,0);	//disable input
 	gpio_set_level(GPIO_PA6,0);
 #endif
+#endif
 }
 void fl_nwk_LedSignal_run(void){
 #ifdef COUNTER_DEVICE
+#ifndef HW_SAMPLE_TEST
 	gpio_toggle(GPIO_PA6);
+#endif
 #endif
 }
 
@@ -213,13 +217,6 @@ void fl_nwk_slave_init(void) {
 	fl_slave_profiles_t my_profile = fl_db_slaveprofile_init();
 	G_INFORMATION.slaveID = my_profile.slaveid;
 	G_INFORMATION.profile = my_profile;
-
-//	//Test join network + factory
-//	if (G_INFORMATION.slaveID.id_u8 == 0xFF && G_INFORMATION.profile.slaveid==G_INFORMATION.slaveID.id_u8)
-//	{
-//		G_INFORMATION.profile.run_stt.join_nwk = 1; //access to join network
-//		G_INFORMATION.profile.run_stt.rst_factory = 1; //has reset factory device
-//	}
 	fl_timetamp_withstep_t cur_timetamp = fl_rtc_getWithMilliStep();
 	SYNC_ORIGIN_MASTER(cur_timetamp.timetamp,cur_timetamp.milstep);
 
@@ -251,12 +248,13 @@ void fl_nwk_slave_init(void) {
 	P_INFO("** RstFac :%d\r\n",G_INFORMATION.profile.run_stt.rst_factory);
 	P_INFO("** MAC GW :%02X%02X%02X%02X\r\n",U32_BYTE0( G_INFORMATION.profile.nwk.mac_parent),U32_BYTE1( G_INFORMATION.profile.nwk.mac_parent),
 			U32_BYTE2( G_INFORMATION.profile.nwk.mac_parent),U32_BYTE3( G_INFORMATION.profile.nwk.mac_parent));
-	//test
-//	if(G_INFORMATION.slaveID.id_u8 == G_INFORMATION.profile.slaveid && G_INFORMATION.slaveID.id_u8 == 0xFF){
-//		ERR(APP,"Turn on install mode\r\n");
-//		G_INFORMATION.profile.run_stt.join_nwk = 1;
-//		G_INFORMATION.profile.run_stt.rst_factory  = 1 ; //has reset factory device
-//	}
+#ifdef HW_SAMPLE_TEST
+	if(G_INFORMATION.slaveID == G_INFORMATION.profile.slaveid && G_INFORMATION.slaveID == 0xFF){
+		ERR(APP,"Turn on install mode\r\n");
+		G_INFORMATION.profile.run_stt.join_nwk = 1;
+		G_INFORMATION.profile.run_stt.rst_factory  = 1 ; //has reset factory device
+	}
+#endif
 
 	blt_soft_timer_add(_nwk_slave_backup,2*1000*1000);
 	//Interval checking network
@@ -855,7 +853,7 @@ int fl_nwk_joinnwk_timeout(void) {
 	}
 }
 void fl_nwk_slave_joinnwk_exc(void) {
-	if (G_INFORMATION.profile.run_stt.join_nwk) {
+	if (IsPairing()) {
 		if (blt_soft_timer_find(&fl_nwk_joinnwk_timeout) == -1) {
 			fl_adv_collection_channel_init();
 			blt_soft_timer_add(&fl_nwk_joinnwk_timeout,JOIN_NETWORK_TIME * 1000);

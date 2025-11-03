@@ -188,26 +188,30 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 //				}
 //				return 0;
 #ifndef MASTER_CORE
-				//IMPORTANT DELETE NETWORK
-//				if(MASTER_DELETE_NETWORK_FLAG)
-				{
-					u8 delete_network[32];
-					fl_nwk_decrypt16(FL_NWK_PB_KEY,pa->data,incomming_data.length,delete_network);
-					if (-1 != plog_IndexOf(delete_network,MASTER_CLEARNETWORK,SIZEU8(MASTER_CLEARNETWORK),incomming_data.length)) {
-						extern int REBOOT_DEV(void);
-						ERR(APP,"DETELE NETWORK!!!!\r\n");
-						fl_db_Pairing_Clear();
-						delay_ms(1000);
-						REBOOT_DEV();
-					}
-				}
-//				/*For TESTING REPEATER*/
-//				extern fl_nodeinnetwork_t G_INFORMATION;
-//				u8 master_mac[4] = { U32_BYTE0(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE1(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE2(
-//						G_INFORMATION.profile.nwk.mac_parent), U32_BYTE3(G_INFORMATION.profile.nwk.mac_parent) };
+				extern fl_nodeinnetwork_t G_INFORMATION;
+				/*For TESTING REPEATER*/
+//				u8 master_mac[4] = { U32_BYTE0(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE1(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE2(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE3(G_INFORMATION.profile.nwk.mac_parent) };
 //				if (-1 != plog_IndexOf(pa->mac,master_mac,4,6)) {
 //					return 0;
 //				}
+				//IMPORTANT DELETE NETWORK
+				u8 delete_network[32];
+				fl_nwk_decrypt16(FL_NWK_PB_KEY,pa->data,incomming_data.length,delete_network);
+				if (-1 != plog_IndexOf(delete_network,MASTER_CLEARNETWORK,SIZEU8(MASTER_CLEARNETWORK),incomming_data.length)) {
+										u8 master_mac[4] = { U32_BYTE0(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE1(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE2(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE3(G_INFORMATION.profile.nwk.mac_parent) };
+					if (-1 != plog_IndexOf(delete_network,master_mac,SIZEU8(master_mac),incomming_data.length)) {
+						extern int REBOOT_DEV(void);
+						ERR(APP,"DETELE NETWORK!!!!\r\n");
+						fl_db_Pairing_Clear();
+#ifdef HW_SAMPLE_TEST
+						fl_nwk_slave_nwkclear();
+#endif
+						delay_ms(1000);
+						REBOOT_DEV();
+					}else{
+						return 0;
+					}
+				}
 #endif
 				//Add decrypt
 				NWK_MYKEY();

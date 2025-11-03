@@ -70,15 +70,15 @@ void tbs_power_meter_printf(type_debug_t _plog_type,void* _p) {
 tbs_device_counter_t G_COUNTER_DEV = {  .timetamp = 0,
 										.type = TBS_COUNTER,
 										.data = {
-												.index=101,
-												.bt_call = 2,
-												.bt_endcall = 3,
-												.bt_rst = 4,
-												.pass_product = 5,
-												.err_product = 6,
-												.mode = 1,
-												.pre_pass_product = 7,
-												.pre_err_product=8,
+												.index=0,
+												.bt_call = 0,
+												.bt_endcall = 0,
+												.bt_rst = 0,
+												.pass_product = 0,
+												.err_product = 0,
+												.mode = 0,
+												.pre_pass_product = 0,
+												.pre_err_product=0,
 												.pre_mode =0,
 												.pre_timetamp =0
 												}
@@ -181,7 +181,7 @@ void TEST_rsp_callback(void *_data,void* _data2){
 		P_PRINTFHEX_A(API,packet->data_arr,packet->length,"RSP: ");
 //		P_INFO("Master RSP:%c%c\r\n",packet->data_arr[7],packet->data_arr[8]);
 		TEST_EVENT.rsp_num++;
-
+		G_COUNTER_DEV.data.pre_pass_product = TEST_EVENT.rsp_num;
 	}else{
 //		P_INFO("Master RSP: NON-RSP \r\n");
 
@@ -197,29 +197,19 @@ void TEST_rsp_callback(void *_data,void* _data2){
 
 int TEST_Counter_Event(void){
 	extern u8 GETINFO_FLAG_EVENTTEST; // for testing
-	u32 period = RAND(1,30);
-	if (IsJoinedNetwork() && IsOnline() && GETINFO_FLAG_EVENTTEST ==1) {
-		//For testing : randon valid of fields
-		G_COUNTER_DEV.data.bt_call = RAND(0,1);
-		G_COUNTER_DEV.data.bt_endcall = G_COUNTER_DEV.data.bt_call ? 0 : 1;
-		G_COUNTER_DEV.data.bt_rst = RAND(0,1);
-		G_COUNTER_DEV.data.pass_product = RAND(1,1020);
-		G_COUNTER_DEV.data.err_product = RAND(1,500);
-		G_COUNTER_DEV.data.mode = 1;
-		G_COUNTER_DEV.data.pre_err_product = RAND(1,1020);
-		G_COUNTER_DEV.data.pre_pass_product = RAND(1,1020);
-		G_COUNTER_DEV.data.pre_mode = RAND(0,1);;
-//		G_COUNTER_DEV.data.pre_timetamp
-
+	u32 period = RAND(1,60);
+	if (IsOnline() && GETINFO_FLAG_EVENTTEST ==1) {
+		if (TEST_EVENT.req_num == 0) {
+			G_COUNTER_DEV.data.pre_err_product = G_COUNTER_DEV.data.index;
+		}
 		//
 		G_COUNTER_DEV.data.bt_call = RAND(0,1);
 		G_COUNTER_DEV.data.bt_endcall = G_COUNTER_DEV.data.bt_call ? 0 : 1;
-		G_COUNTER_DEV.data.bt_rst = G_COUNTER_DEV.data.bt_call ? 0 : RAND(0,1);
-
+		G_COUNTER_DEV.data.bt_rst = 0;
 		fl_api_slave_req(NWK_HDR_55,(u8*)&G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data),&TEST_rsp_callback,0,1);
-
 		TEST_EVENT.rtt = clock_time();
 		TEST_EVENT.req_num++;
+		G_COUNTER_DEV.data.pass_product = TEST_EVENT.req_num;
 		P_INFO("TEST EVNET after:%d s\r\n",period);
 	}
 	return period*1000*1000;
@@ -227,7 +217,7 @@ int TEST_Counter_Event(void){
 /* END TEST*/
 
 void TBS_Counter_init(void){
-//	memcpy(G_COUNTER_DEV.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_COUNTER_DEV.mac));
+	memcpy(G_COUNTER_DEV.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_COUNTER_DEV.mac));
 	G_COUNTER_DEV.type = TBS_COUNTER;
 	G_COUNTER_DEV.timetamp = fl_rtc_get();
 	//passing lcd message
@@ -244,14 +234,15 @@ void TBS_Counter_init(void){
 #ifndef HW_SAMPLE_TEST
 	//todo:Init Butt,lcd,7segs,.....
 	user_app_init();
-#else
+#endif
 	//TEst
 	TEST_EVENT.lifetime = fl_rtc_get();
 	blt_soft_timer_add(&TEST_Counter_Event,5000*1000);
-#endif
+
 }
 
 void TBS_Counter_Run(void){
+	memcpy(G_COUNTER_DEV.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_COUNTER_DEV.mac));
 	G_COUNTER_DEV.timetamp = fl_rtc_get();
 	Counter_LCD_MessageStore();
 //	Counter_LCD_MessageCheck_FlagNew();
