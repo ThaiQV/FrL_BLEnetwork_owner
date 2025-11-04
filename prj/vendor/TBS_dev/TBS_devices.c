@@ -359,10 +359,10 @@ int TBS_Device_Store_run(void) {
 	}
 
 	//TEST save and load TBS profile
-	u8 tbs_profile[4] = {1,2,3,4};
-	fl_db_tbsprofile_save(tbs_profile,SIZEU8(tbs_profile));
-	fl_tbs_data_t tbs_load = fl_db_tbsprofile_load();
-	P_INFO_HEX(tbs_load.data,12,"TBS PROFILE(max:%d):",12);
+	// u8 tbs_profile[4] = {1,2,3,4};
+	// fl_db_tbsprofile_save(tbs_profile,SIZEU8(tbs_profile));
+	// fl_tbs_data_t tbs_load = fl_db_tbsprofile_load();
+	// P_INFO_HEX(tbs_load.data,12,"TBS PROFILE(max:%d):",12);
 //	u32 load_tbsprofile=MAKE_U32(tbs_load.data[3],tbs_load.data[2],tbs_load.data[1],tbs_load.data[0]);
 //	P_INFO("TBS PROFILE Load:%d\r\n",load_tbsprofile);
 	///
@@ -387,8 +387,8 @@ void TBS_Device_Index_manage(void) {
 void TBS_Device_Init(void){
 	TBS_Device_Flash_Init_n_Reload();
 	//TEST TBS Profile
-	fl_tbs_data_t tbs_profile=fl_db_tbsprofile_init();
-	P_INFO_HEX(tbs_profile.data,12,"TBS PROFILE(max:%d):",12);
+	// fl_tbs_data_t tbs_profile=fl_db_tbsprofile_init();
+	// P_INFO_HEX(tbs_profile.data,12,"TBS PROFILE(max:%d):",12);
 	//
 #ifdef COUNTER_DEVICE
 	TBS_Counter_init();
