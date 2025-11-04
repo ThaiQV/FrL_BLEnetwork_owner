@@ -33,6 +33,8 @@
 
 #define SLAVEUSERDATA_SIZE				(10*SECTOR_FLASH_SIZE)
 
+#define TBSPROFILE_SIZE					(SECTOR_FLASH_SIZE)
+
 #define MASTERPROFILE_SIZE				(10*SECTOR_FLASH_SIZE)
 
 //////// ======================================================================
@@ -144,6 +146,21 @@ typedef struct {
 fl_db_userdata_t fl_db_slaveuserdata_init(void);
 void fl_db_slaveuserdata_save(u8 *_data,u8 _size);
 fl_slave_userdata_t fl_db_slaveuserdata_load(void);
+
+typedef struct {
+	u8 data[12];
+	//Don't change
+	u32 magic; // constant for LSB
+}__attribute__((packed)) fl_tbs_data_t;
+
+#define ADDR_TBS_PROFILE_START			(ADDR_SLAVE_USERDATA_START + SLAVEUSERDATA_SIZE)
+#define TBS_PROFILE_MAGIC 				0xBBBBBBBB
+#define TBS_PROFILE_ENTRY_SIZE      	(sizeof(fl_tbs_data_t)/sizeof(u8))
+#define TBS_PROFILE_MAX_ENTRIES      	(TBSPROFILE_SIZE / TBS_PROFILE_ENTRY_SIZE - 1)
+
+fl_tbs_data_t fl_db_tbsprofile_init(void);
+void fl_db_tbsprofile_save(u8 *_data,u8 _size);
+fl_tbs_data_t fl_db_tbsprofile_load(void);
 
 #endif
 //////// ======================================================================
