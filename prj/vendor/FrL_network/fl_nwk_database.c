@@ -47,6 +47,9 @@ fl_slave_userdata_t SLAVE_USERDATA_DEFAULT = {
 											.data={.len=40},
 											.magic= SLAVE_USERDATA_MAGIC,
 											};
+fl_tbs_data_t TBS_PROFILE_DEFAULT = 		{
+											.magic= TBS_PROFILE_MAGIC,
+											};
 #endif
 
 /******************************************************************************/
@@ -518,6 +521,80 @@ fl_db_userdata_t fl_db_slaveuserdata_init(void){
 	}
 	return userdata.data;
 }
+/***************************************************
+ * @brief 		: read tbs profile in flash
+ *
+ * @param[in] 	:none
+ *
+ * @return	  	:tbsdata struct
+ *
+ ***************************************************/
+fl_tbs_data_t fl_db_tbsprofile_load(void) {
+	fl_tbs_data_t entry = {};
+	memset(entry.data,0,sizeof(entry.data));
+	for (s16 i = TBS_PROFILE_MAX_ENTRIES - 1; i >= 0; i--) {
+		flash_dread(ADDR_TBS_PROFILE_START + i * TBS_PROFILE_ENTRY_SIZE,TBS_PROFILE_ENTRY_SIZE,(uint8_t*) &entry);
+		if (entry.magic == TBS_PROFILE_MAGIC) {
+			LOGA(FLA,"TBS_PROFILE Load(0x%X)\r\n",ADDR_TBS_PROFILE_START + i * TBS_PROFILE_ENTRY_SIZE);
+			return entry;
+		}
+	}
+	return entry;
+}
+/***************************************************
+ * @brief 		: initialization tbs profile database
+ *
+ * @param[in] 	: none
+ *
+ * @return	  	: none
+ *
+ ***************************************************/
+fl_tbs_data_t fl_db_tbsprofile_init(void){
+	fl_tbs_data_t tbsdata;
+	tbsdata = fl_db_tbsprofile_load();
+	if(tbsdata.magic != TBS_PROFILE_MAGIC){
+		//clear all and write default userdata
+//		flash_erase_sector(ADDR_TBS_PROFILE_START);
+		_db_earse_sector_full(ADDR_TBS_PROFILE_START,TBSPROFILE_SIZE/SECTOR_FLASH_SIZE);
+		memset((u8*)TBS_PROFILE_DEFAULT.data,0,sizeof(TBS_PROFILE_DEFAULT.data));
+		fl_db_tbsprofile_save(TBS_PROFILE_DEFAULT.data,sizeof(TBS_PROFILE_DEFAULT.data));
+		tbsdata = fl_db_tbsprofile_load();
+	}
+	return tbsdata;
+}
+
+/***************************************************
+ * @brief 		:store tbsprofile into the flash
+ *
+ * @param[in] 	:none
+ *
+ * @return	  	:tbsdata struct
+ *
+ ***************************************************/
+void fl_db_tbsprofile_save(u8 *_data,u8 _size){
+	fl_tbs_data_t entry;
+	memset(entry.data,0,sizeof(entry.data));
+	if(_size>sizeof(entry.data)){
+		ERR(FLA,"TBS profile oversize (max:12 bytes)!!!\r\n");
+		return;
+	}
+	memcpy(entry.data,_data,_size);
+	entry.magic = TBS_PROFILE_MAGIC;
+	fl_tbs_data_t check;
+	for (u16 i = 0; i < TBS_PROFILE_MAX_ENTRIES; i++) {
+		check.magic = 0;
+		flash_dread(ADDR_TBS_PROFILE_START+ i * TBS_PROFILE_ENTRY_SIZE,TBS_PROFILE_ENTRY_SIZE,(uint8_t*) &check);
+		if (check.magic != TBS_PROFILE_MAGIC) {
+			if (_db_recheck_write(ADDR_TBS_PROFILE_START + i * TBS_PROFILE_ENTRY_SIZE,TBS_PROFILE_ENTRY_SIZE,(uint8_t*) &entry)) {
+				LOGA(FLA,"TBS_PROFILE Stored(0x%X)\r\n",ADDR_TBS_PROFILE_START + i * TBS_PROFILE_ENTRY_SIZE);
+				return;
+			}
+		}
+	}
+//	flash_erase_sector(ADDR_TBS_PROFILE_START);
+	_db_earse_sector_full(ADDR_TBS_PROFILE_START,TBSPROFILE_SIZE/SECTOR_FLASH_SIZE);
+	fl_db_tbsprofile_save(_data,_size);
+}
 #endif
 /******************************************************************************/
 /******************************************************************************/
@@ -551,6 +628,7 @@ void fl_db_init(void) {
 	LOGA(FLA,"SLAVE_PROFILE  (%d):0x%X-0x%X\r\n",SLAVE_PROFILE_ENTRY_SIZE,ADDR_SLAVE_PROFILE_START,ADDR_SLAVE_PROFILE_START+SLAVEPROFILE_SIZE);
 	LOGA(FLA,"SLAVE_SETTINGS (%d):0x%X-0x%X\r\n",SLAVE_SETTINGS_ENTRY_SIZE,ADDR_SLAVE_SETTINGS_START,ADDR_SLAVE_SETTINGS_START+SLAVESETTINGS_SIZE);
 	LOGA(FLA,"SLAVE_USERDATA (%d):0x%X-0x%X\r\n",SLAVE_USERDATA_ENTRY_SIZE,ADDR_SLAVE_USERDATA_START,ADDR_SLAVE_USERDATA_START+SLAVEUSERDATA_SIZE);
+	LOGA(FLA,"TBS_PROFILE    (%d):0x%X-0x%X\r\n",TBS_PROFILE_ENTRY_SIZE,ADDR_TBS_PROFILE_START,ADDR_TBS_PROFILE_START+TBSPROFILE_SIZE);
 #endif
 }
 void fl_db_all_save(void){
@@ -577,6 +655,7 @@ void fl_db_clearAll(void){
 	_db_earse_sector_full(ADDR_SLAVE_SETTINGS_START,SLAVESETTINGS_SIZE/SECTOR_FLASH_SIZE);
 //	flash_erase_sector(ADDR_SLAVE_USERDATA_START);
 	_db_earse_sector_full(ADDR_SLAVE_USERDATA_START,SLAVEUSERDATA_SIZE/SECTOR_FLASH_SIZE);
+	_db_earse_sector_full(ADDR_TBS_PROFILE_START,TBSPROFILE_SIZE/SECTOR_FLASH_SIZE);
 
 #endif
 }
