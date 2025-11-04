@@ -390,19 +390,30 @@ void CMD_HEARTBEAT(u8* _data) {
 void CMD_TEST(u8* _data) {
 	extern void TEST_virtual_fw(u32 _fwsize);
 	extern u8 GETINFO_FLAG_EVENTTEST;
-	 u8 slave_event[5] = {'e','v','e','n','t'};
+	u8 slave_event[5] = {'e','v','e','n','t'};
+	u8 fota_test[4] = {'f','o','t','a'};
 	char cmd[10];
 	int para[3];
 	u8 mqtt_rp[200];
 	memset(mqtt_rp,0,SIZEU8(mqtt_rp));
 	int rslt = sscanf((char*) _data,"test %10s %d %d %d",cmd,&para[0],&para[1],&para[2]);
 	if (rslt >= 1) {
+		//AUTOMATIC create event - p set test even 1
 		if(plog_IndexOf((u8*)cmd,slave_event,SIZEU8(slave_event),SIZEU8(cmd)) != -1){
 			if(rslt == 2){
 				GETINFO_FLAG_EVENTTEST = para[0];
 				sprintf((char*)mqtt_rp,"Test Even:%d",GETINFO_FLAG_EVENTTEST);
 				fl_ble2wifi_DEBUG2MQTT(mqtt_rp,strlen((char*)mqtt_rp));
-				LOGA(MCU,"%s\r\n",mqtt_rp);
+				P_INFO("%s\r\n",mqtt_rp);
+			}
+		}
+		//FOTA - p set test fota <size_fw>
+		if (plog_IndexOf((u8*) cmd,fota_test,SIZEU8(fota_test),SIZEU8(cmd)) != -1) {
+			if (rslt == 2) {
+				sprintf((char*) mqtt_rp,"FOTA size:%d bytes",para[0]);
+				fl_ble2wifi_DEBUG2MQTT(mqtt_rp,strlen((char*) mqtt_rp));
+				P_INFO("%s\r\n",mqtt_rp);
+				TEST_virtual_fw(para[0]);
 			}
 		}
 	}

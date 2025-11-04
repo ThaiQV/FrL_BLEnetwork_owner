@@ -799,6 +799,7 @@ void fl_adv_run(void) {
 	}
 #ifdef  MASTER_CORE
 	fl_nwk_master_process();
+	fl_wifi2ble_fota_proc();
 #else
 	//Features processor
 	fl_nwk_slave_process();
@@ -806,7 +807,7 @@ void fl_adv_run(void) {
 	/* SEND ADV */
 	if(fl_adv_sendFIFO_run()==0){
 #ifdef MASTER_CORE
-//		fl_wifi2ble_fota_run();
+		fl_wifi2ble_fota_run();
 #else
 		fl_adv_sendFIFO_History_run();
 #endif

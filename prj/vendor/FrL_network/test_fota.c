@@ -52,7 +52,7 @@ int _send_fw(void){
 		packet[5] = (uint8_t) (VIRTUAL_FW_ADDR >> 16);	// address
 		memcpy(&packet[6],buff,OTA_PACKET_LENGTH);
 
-		if(-1 == fl_wifi2ble_fota_fwpush(packet,sizeof(packet)))
+		if(-1 == fl_wifi2ble_fota_fwpush(VIRTUAL_FW_ADDR,packet,sizeof(packet)))
 		{
 			return 0;
 		}
