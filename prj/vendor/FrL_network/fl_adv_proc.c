@@ -331,7 +331,7 @@ u8 fl_adv_sendFIFO_History_run(void) {
 //			}
 //			P_INFO("SEND ECHO(cnt:%d)%d/%d\r\n",G_QUEUE_HISTORY_SENDING.count,G_QUEUE_HISTORY_SENDING.head_index,G_QUEUE_HISTORY_SENDING.tail_index);
 			fl_adv_send(his_data_in_queue.data_arr,his_data_in_queue.length,G_ADV_SETTINGS.adv_duration);
-			P_PRINTFHEX_A(APP,his_data_in_queue.data_arr,his_data_in_queue.length,"[%d-%d/%d]HIS(%d):",
+			P_INFO_HEX(his_data_in_queue.data_arr,his_data_in_queue.length,"[%d-%d/%d]HIS(%d):",
 					G_QUEUE_HISTORY_SENDING.head_index,G_QUEUE_HISTORY_SENDING.tail_index,G_QUEUE_HISTORY_SENDING.count,
 					his_data_in_queue.length);
 		}
@@ -448,6 +448,7 @@ u8 fl_adv_sendFIFO_run(void) {
 		if (check_inused != inused_slot) {
 			check_inused = inused_slot;
 			LOGA(APP,"SENDING QUEUES :%d/%d\r\n",check_inused,G_QUEUE_SENDING.mask + 1);
+			if(inused_slot == 0) return inused_slot;
 		}
 #ifdef MASTER_CORE
 		fl_master_adv_55_RSPCommon_Create();
@@ -799,7 +800,7 @@ void fl_adv_run(void) {
 	}
 #ifdef  MASTER_CORE
 	fl_nwk_master_process();
-	fl_wifi2ble_fota_proc();
+	fl_wifi2ble_fota_retry_proc();
 #else
 	//Features processor
 	fl_nwk_slave_process();

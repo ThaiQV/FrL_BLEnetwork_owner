@@ -17,7 +17,7 @@
 #define PACK_HANDLE_SIZE 				64 // bcs : slave need to rec its req and repeater of the neighbors
 #define FOTA_ECHO_SIZE 					512
 /* SENDING QUEUE */
-#define FOTA_SIZE 						512
+#define FOTA_SIZE 						32
 #define QUEUE_SENDING_SIZE 				64 	//=> main container sending packed
 #define QUEUE_HISTORY_SENDING_SIZE 		512
 /* Management QUEUE NETWORK SIZE*/
