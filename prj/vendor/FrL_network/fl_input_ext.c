@@ -213,8 +213,10 @@ void fl_input_serial_rec(void) {
 		ERR(MCU,"OVER DATA!!!\r\n");
 //		uart_clr_irq_status(G_INPUT_EXT.serial.uart_num,UART_CLR_RX);
 //		uart_reset(G_INPUT_EXT.serial.uart_num);
+		my_fifo_next(&fl_rx_fifo);
 		u8* cur_addr = fl_rx_fifo.p + (fl_rx_fifo.wptr & (fl_rx_fifo.num - 1)) * fl_rx_fifo.size;
 		uart_receive_dma(G_INPUT_EXT.serial.uart_num,(unsigned char *)cur_addr,(unsigned int) fl_rx_fifo.size);
+		uart_clr_irq_status(G_INPUT_EXT.serial.uart_num,UART_CLR_RX);
 		return;
 	}
 	u8* w = fl_rx_fifo.p + (fl_rx_fifo.wptr & (fl_rx_fifo.num - 1)) * fl_rx_fifo.size;

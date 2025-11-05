@@ -150,8 +150,12 @@ u16 FL_QUEUE_GETnCLEAR(fl_data_container_t *pCont, fl_pack_t *pdata) {
 		/* No items */
 		return 0;
 	}
-	*pdata = pCont->data[pCont->head_index];
-	memset(&pCont->data[pCont->head_index], 0, sizeof(fl_pack_t));
+	//*pdata = pCont->data[pCont->head_index];
+	memcpy(pdata->data_arr,pCont->data[pCont->head_index].data_arr,pCont->data[pCont->head_index].length);
+	pdata->length = pCont->data[pCont->head_index].length;
+
+	memset(pCont->data[pCont->head_index].data_arr, 0, sizeof(pCont->data[pCont->head_index].data_arr));
+	pCont->data[pCont->head_index].length=0;
 	pCont->head_index = ((pCont->head_index + 1) & pCont->mask);
 	pCont->count--;
 	return 1;

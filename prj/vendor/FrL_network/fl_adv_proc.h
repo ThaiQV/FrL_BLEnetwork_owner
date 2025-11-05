@@ -15,9 +15,8 @@
 #define PACK_REPEAT_SIZE 				64
 #define IN_DATA_SIZE 					128 //=> Major container receive adv
 #define PACK_HANDLE_SIZE 				64 // bcs : slave need to rec its req and repeater of the neighbors
-#define FW_ECHO_SIZE 					16
 /* SENDING QUEUE */
-#define FW_DATA_SIZE 					(2*FW_ECHO_SIZE)
+#define FOTA_SIZE 						32
 #define QUEUE_SENDING_SIZE 				64 	//=> main container sending packed
 #define QUEUE_HISTORY_SENDING_SIZE 		512
 /* Management QUEUE NETWORK SIZE*/

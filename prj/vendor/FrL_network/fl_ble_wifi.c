@@ -582,21 +582,33 @@ void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 	}
 	//callback fnc rsp
 	if (rspfnc != 0) {
-		rspfnc(data->data);
+//		rspfnc(data->data);
+		fl_datawifi2ble_t wfdata;
+		wfdata.cmd = G_WIFI_CON[_wf_CMD_find(GF_CMD_FOTA_REQUEST)].rsp.cmd;
+		memset(wfdata.data,0,SIZEU8(wfdata.data));
+		//DFU put to flash
+		u8 data_fw[22];
+		memcpy(data_fw,data->data,SIZEU8(data_fw));
+		//P_INFO_HEX(data_fw,SIZEU8(data_fw),"Data:");
+		wfdata.data[0] = DFU_OTA_FW_PUT(data_fw,data->crc8);
+		wfdata.len_data = 1; //<OK/ERR> 1 byte
+		wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
+		u8 payload_len = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
+		fl_ble_send_wifi((u8*) &wfdata,payload_len);
 	}
 }
 
 void FOTA_RESPONSE(u8* _pdata){
 //	Build rsp wifi
-	fl_datawifi2ble_t wfdata;
-	wfdata.cmd = G_WIFI_CON[_wf_CMD_find(GF_CMD_FOTA_REQUEST)].rsp.cmd;
-	memset(wfdata.data,0,SIZEU8(wfdata.data));
-	//DFU put to flash
-	wfdata.data[0] = DFU_OTA_FW_PUT(_pdata);
-	wfdata.len_data = 1; //<OK/ERR> 1 byte
-	wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
-	u8 payload_len = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
-	fl_ble_send_wifi((u8*) &wfdata,payload_len);
+//	fl_datawifi2ble_t wfdata;
+//	wfdata.cmd = G_WIFI_CON[_wf_CMD_find(GF_CMD_FOTA_REQUEST)].rsp.cmd;
+//	memset(wfdata.data,0,SIZEU8(wfdata.data));
+//	//DFU put to flash
+//	wfdata.data[0] = DFU_OTA_FW_PUT(_pdata,);
+//	wfdata.len_data = 1; //<OK/ERR> 1 byte
+//	wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
+//	u8 payload_len = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
+//	fl_ble_send_wifi((u8*) &wfdata,payload_len);
 }
 
 /******************************************************************************/

@@ -222,7 +222,7 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 #ifdef MASTER_CORE
 				//skip process from  master and check rspECHO
 				if (fl_adv_IsFromMaster(incomming_data)) {
-					fl_wifi2ble_fota_recECHO(incomming_data);
+					if(incomming_data.data_arr[0] == NWK_HDR_FOTA) fl_wifi2ble_fota_recECHO(incomming_data);
 					return 0;
 				}
 #else
@@ -331,9 +331,9 @@ u8 fl_adv_sendFIFO_History_run(void) {
 //			}
 //			P_INFO("SEND ECHO(cnt:%d)%d/%d\r\n",G_QUEUE_HISTORY_SENDING.count,G_QUEUE_HISTORY_SENDING.head_index,G_QUEUE_HISTORY_SENDING.tail_index);
 			fl_adv_send(his_data_in_queue.data_arr,his_data_in_queue.length,G_ADV_SETTINGS.adv_duration);
-			P_PRINTFHEX_A(APP,his_data_in_queue.data_arr,his_data_in_queue.length,"[%d-%d/%d]HIS(%d):",
-					G_QUEUE_HISTORY_SENDING.head_index,G_QUEUE_HISTORY_SENDING.tail_index,G_QUEUE_HISTORY_SENDING.count,
-					his_data_in_queue.length);
+//			P_INFO_HEX(his_data_in_queue.data_arr,his_data_in_queue.length,"[%d-%d/%d]HIS(%d):",
+//					G_QUEUE_HISTORY_SENDING.head_index,G_QUEUE_HISTORY_SENDING.tail_index,G_QUEUE_HISTORY_SENDING.count,
+//					his_data_in_queue.length);
 		}
 	}
 	return 1;
@@ -448,6 +448,7 @@ u8 fl_adv_sendFIFO_run(void) {
 		if (check_inused != inused_slot) {
 			check_inused = inused_slot;
 			LOGA(APP,"SENDING QUEUES :%d/%d\r\n",check_inused,G_QUEUE_SENDING.mask + 1);
+			if(inused_slot == 0) return inused_slot;
 		}
 #ifdef MASTER_CORE
 		fl_master_adv_55_RSPCommon_Create();
@@ -784,6 +785,12 @@ void fl_adv_run(void) {
 			}
 			//Todo: FOTA packet -> this is a special format don't use standard frl adv
 			if (data_parsed.hdr == NWK_HDR_FOTA) {
+				for(u16 indx =0;indx<G_DATA_CONTAINER.mask+1;indx++){
+					if(-1!=plog_IndexOf(G_DATA_CONTAINER.data[indx].data_arr,data_parsed.payload,20,G_DATA_CONTAINER.data[indx].length)
+							&& 0!= memcmp(G_DATA_CONTAINER.data[indx].data_arr,data_in_queue.data_arr,6)){
+						goto SKIP_FOTA;
+					}
+				}
 				fl_slave_fota_proc(data_in_queue);
 			} else {
 				//Todo: Handle FORM MASTER REQ
@@ -799,14 +806,16 @@ void fl_adv_run(void) {
 	}
 #ifdef  MASTER_CORE
 	fl_nwk_master_process();
+	fl_wifi2ble_fota_retry_proc();
 #else
+	SKIP_FOTA:
 	//Features processor
 	fl_nwk_slave_process();
 #endif
 	/* SEND ADV */
 	if(fl_adv_sendFIFO_run()==0){
 #ifdef MASTER_CORE
-//		fl_wifi2ble_fota_run();
+		fl_wifi2ble_fota_run();
 #else
 		fl_adv_sendFIFO_History_run();
 #endif

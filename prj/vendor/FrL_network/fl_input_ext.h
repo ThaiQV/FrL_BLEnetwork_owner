@@ -14,8 +14,8 @@
 #pragma once
 #ifdef MASTER_CORE
 
-#define FL_RXFIFO_SIZE		256
-#define FL_RXFIFO_NUM		5
+#define FL_RXFIFO_SIZE		128
+#define FL_RXFIFO_NUM		256
 #define FL_TXFIFO_SIZE		128
 #define FL_TXFIFO_NUM		256
 
