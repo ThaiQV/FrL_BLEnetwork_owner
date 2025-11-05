@@ -340,7 +340,7 @@ u8 fl_adv_sendFIFO_History_run(void) {
 }
 
 #ifdef MASTER_CORE
-void fl_master_adv_55_RSPCommon_Create(void) {
+void fl_master_adv_1155_RSPCommon_Create(fl_hdr_nwk_type_e _cmdid) {
 	u8 SlaveID[22-5-2]; //22 bytes paloay - 4 bytes timetamps - delta timetamps
 	u64 timetamp_com[22-5-2]; // for testing list
 	u8 numSlave=0;
@@ -350,14 +350,14 @@ void fl_master_adv_55_RSPCommon_Create(void) {
 	u64 origin_pack = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
 	fl_data_frame_u check_rspcom;
 
-	fl_pack_t *p_55RSP[SIZEU8(SlaveID)];
+	fl_pack_t *p_RSP[SIZEU8(SlaveID)];
 	for (u8 var = 0; var < G_QUEUE_SENDING.mask + 1; ++var) {
 		fl_timetamp_withstep_t timetamp_inpack = fl_adv_timetampStepInPack(G_QUEUE_SENDING.data[var]);
 		u64 inpack = fl_rtc_timetamp2milltampStep(timetamp_inpack);
 		memset(check_rspcom.bytes,0,SIZEU8(check_rspcom.bytes));
 		memcpy(check_rspcom.bytes,G_QUEUE_SENDING.data[var].data_arr,G_QUEUE_SENDING.data[var].length);
 
-		if (inpack >= origin_pack && check_rspcom.frame.endpoint.master == FL_FROM_MASTER && check_rspcom.frame.hdr == NWK_HDR_55
+		if (inpack >= origin_pack && check_rspcom.frame.endpoint.master == FL_FROM_MASTER && check_rspcom.frame.hdr == _cmdid
 				&& check_rspcom.frame.slaveID != 0xFF) {
 			//get timetamp_seq in the payload of the rsp
 			fl_timetamp_withstep_t timetamp_str;
@@ -366,7 +366,7 @@ void fl_master_adv_55_RSPCommon_Create(void) {
 			timetamp_str.milstep = check_rspcom.frame.payload[4];
 			u64 timetamp_rsp = fl_rtc_timetamp2milltampStep(timetamp_str);
 
-			p_55RSP[numSlave] = &G_QUEUE_SENDING.data[var];
+			p_RSP[numSlave] = &G_QUEUE_SENDING.data[var];
 			SlaveID[numSlave] = check_rspcom.frame.slaveID;
 			timetamp_com[numSlave] = timetamp_rsp;
 
@@ -387,26 +387,26 @@ void fl_master_adv_55_RSPCommon_Create(void) {
 			else break;
 		}
 	}
-	if (numSlave < 3)
+	if (numSlave < 2)
 		return;
 	//For testing
 	LOGA(APP,"ORIGIN:%d\r\n",ORIGINAL_MASTER_TIME.timetamp);
 	P_PRINTFHEX_A(APP,SlaveID,numSlave,"SlaveID(%d):",numSlave);
 	LOGA(APP,"TimeTamp_min  :%lld\r\n",timetamp_min);
 	u16 delta = (timetamp_max > timetamp_min) ? (u16) (timetamp_max - timetamp_min) : 0;
-	LOGA(APP,"TimeTamp_max  :%lld\r\n",timetamp_max);
+	LOGA(APP,"TimeTamp_max  :%lld\r\n",timetamp_max + 2); //offset 2 mins
 	LOGA(APP,"TimeTamp_delta:%d\r\n",delta);
 	for (u8 i = 0; i < numSlave; i++) {
 		LOGA(APP,"TimeTamp:%lld\r\n",timetamp_com[i]);
 	}
 	//Clear RSP55 old and update G_SENDING_QUEUE.count
 	for(u8 i = 0;i<numSlave;i++){
-		memset(p_55RSP[i]->data_arr,0,SIZEU8(p_55RSP[i]->data_arr));
-		p_55RSP[i]->length = 0;
+		memset(p_RSP[i]->data_arr,0,SIZEU8(p_RSP[i]->data_arr));
+		p_RSP[i]->length = 0;
 	}
-	fl_pack_t RSP_55_Com = fl_master_packet_RSP_55Com_build(SlaveID,numSlave,timetamp_min_u8,delta);
-	P_PRINTFHEX_A(APP,RSP_55_Com.data_arr,RSP_55_Com.length,"RSP_55_Com(%d):",numSlave);
-	fl_adv_sendFIFO_add(RSP_55_Com);
+	fl_pack_t RSP_Com = fl_master_packet_RSP_1155Com_build(_cmdid,SlaveID,numSlave,timetamp_min_u8,delta);
+	P_PRINTFHEX_A(APP,RSP_Com.data_arr,RSP_Com.length,"RSP_Com(%d)0x%02X:",numSlave,_cmdid);
+	fl_adv_sendFIFO_add(RSP_Com);
 //	u8 origin[SIZEU8(fl_timetamp_withstep_t)];
 //	origin[0] = U32_BYTE0(ORIGINAL_MASTER_TIME.timetamp);
 //	origin[1] = U32_BYTE1(ORIGINAL_MASTER_TIME.timetamp);
@@ -451,7 +451,8 @@ u8 fl_adv_sendFIFO_run(void) {
 			if(inused_slot == 0) return inused_slot;
 		}
 #ifdef MASTER_CORE
-		fl_master_adv_55_RSPCommon_Create();
+		fl_master_adv_1155_RSPCommon_Create(NWK_HDR_55);
+		fl_master_adv_1155_RSPCommon_Create(NWK_HDR_11_REACTIVE);
 #endif
 		u8 loop_check = 0;
 		s16 indx_head_cur = -1;

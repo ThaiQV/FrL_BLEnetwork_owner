@@ -568,6 +568,7 @@ void RSTFACTORY_RESPONSE(u8* _pdata){}
 /***                            FOTA Nwk Processor                           **/
 /******************************************************************************/
 /******************************************************************************/
+u8 data_fw[22];
 void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 	extern fl_slaves_list_t G_NODE_LIST;
 	fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[1];
@@ -587,10 +588,11 @@ void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 		wfdata.cmd = G_WIFI_CON[_wf_CMD_find(GF_CMD_FOTA_REQUEST)].rsp.cmd;
 		memset(wfdata.data,0,SIZEU8(wfdata.data));
 		//DFU put to flash
-		u8 data_fw[22];
+		memset(data_fw,0,SIZEU8(data_fw));
 		memcpy(data_fw,data->data,SIZEU8(data_fw));
 		//P_INFO_HEX(data_fw,SIZEU8(data_fw),"Data:");
 		wfdata.data[0] = DFU_OTA_FW_PUT(data_fw,data->crc8);
+		P_INFO_HEX(data_fw,SIZEU8(data_fw),"Data:");
 		wfdata.len_data = 1; //<OK/ERR> 1 byte
 		wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
 		u8 payload_len = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);

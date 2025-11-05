@@ -336,7 +336,7 @@ static inline uint32_t swap_endian32(uint32_t val) {
 }
 
 #ifdef MASTER_CORE
-fl_pack_t fl_master_packet_RSP_55Com_build(u8* _slaveID,u8 _numslave,u8* _seqtimetamp,u16 _deltaTT);
+fl_pack_t fl_master_packet_RSP_1155Com_build(fl_hdr_nwk_type_e _cmdid,u8* _slaveID,u8 _numslave,u8* _seqtimetamp,u16 _deltaTT);
 void fl_master_SYNC_ORIGINAL_TIMETAMP(fl_timetamp_withstep_t _new_origin);
 void fl_nwk_master_init(void);
 void fl_nwk_master_run(fl_pack_t *_pack_handle);

@@ -37,7 +37,7 @@ extern volatile fl_timetamp_withstep_t WIFI_ORIGINAL_GETALL;
 											}while(0) //Sync original time-master req
 u8 GETINFO_FLAG_EVENTTEST = 0;
 #define JOIN_NETWORK_TIME 			60*1012 			//ms
-#define RECHECKING_NETWOK_TIME 		30*1021 		    //ms
+#define RECHECKING_NETWOK_TIME 		24*1021 		    //ms
 #define RECONNECT_TIME				62*1000*1020		//s
 #define INFORM_MASTER				5*1001*1004
 fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_FOTA,NWK_HDR_A5_HIS,NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
@@ -873,13 +873,13 @@ int _slave_reconnect(void){
 		LOGA(INF,"Reconnect network (%d s)!!!\r\n",RECONNECT_TIME/1000/1000);
 		//
 #ifdef COUNTER_DEVICE
-		fl_api_slave_req(NWK_HDR_55,(u8*)&G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data),0,0,0);
+		fl_api_slave_req(NWK_HDR_55,(u8*)&G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data),0,0,1);
 #else //POWERMETER
 		u8 _payload[SIZEU8(tbs_device_powermeter_t)];
 		tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) G_INFORMATION.data;
 		tbs_pack_powermeter_data(pwmeter_data,_payload);
 		u8 indx_data = SIZEU8(pwmeter_data->type) + SIZEU8(pwmeter_data->mac) + SIZEU8(pwmeter_data->timetamp);
-		fl_api_slave_req(NWK_HDR_55,&_payload[indx_data],SIZEU8(pwmeter_data->data),0,0,0);
+		fl_api_slave_req(NWK_HDR_55,&_payload[indx_data],SIZEU8(pwmeter_data->data),0,0,1);
 #endif
 		return RECONNECT_TIME;
 	}
@@ -892,13 +892,13 @@ int _interval_report(void) {
 		if (WIFI_ORIGINAL_GETALL.timetamp < fl_rtc_get() && WIFI_ORIGINAL_GETALL.timetamp > ORIGINAL_TIME_TRUST) {
 			if (fl_rtc_get() - WIFI_ORIGINAL_GETALL.timetamp >= INTERVAL_REPORT_TIME) {
 #ifdef COUNTER_DEVICE
-				fl_api_slave_req(NWK_HDR_55,(u8*) &G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data),0,0,0);//NWK_HDR_11_REACTIVE
+				fl_api_slave_req(NWK_HDR_55,(u8*) &G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data),0,0,1);//NWK_HDR_11_REACTIVE
 #else //POWERMETER
 				u8 _payload[SIZEU8(tbs_device_powermeter_t)];
 				tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) G_INFORMATION.data;
 				tbs_pack_powermeter_data(pwmeter_data,_payload);
 				u8 indx_data = SIZEU8(pwmeter_data->type) + SIZEU8(pwmeter_data->mac) + SIZEU8(pwmeter_data->timetamp);
-				fl_api_slave_req(NWK_HDR_55,&_payload[indx_data],SIZEU8(pwmeter_data->data),0,0,0);
+				fl_api_slave_req(NWK_HDR_55,&_payload[indx_data],SIZEU8(pwmeter_data->data),0,0,1);
 #endif
 				//increase index if using NWK_HDR_11_REACTIVE
 				//TBS_Device_Index_manage();

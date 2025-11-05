@@ -555,7 +555,7 @@ uint8_t ota_packet_crc(uint8_t *pdata)
 * -------------------------------------------------------------------------
 * @retval: ota_ret_t
 */
-ota_ret_t ota_fw_put(uint8_t *pdata, uint8_t crc)
+ota_ret_t ota_fw_put(uint8_t *p_data_buffer, uint8_t crc)
 {
 	ota_packet_type_t	packet_type;
 	ota_device_type_t 	device_type;
@@ -566,6 +566,9 @@ ota_ret_t ota_fw_put(uint8_t *pdata, uint8_t crc)
 	uint32_t			i,j;
 	uint32_t			sector;
 	uint8_t				slot;
+
+	u8 pdata[22];
+	memcpy(pdata,p_data_buffer,sizeof(pdata));
 
 	packet_type = pdata[0];
 
@@ -691,7 +694,7 @@ ota_ret_t ota_packet_header_get(ota_fw_header_t *header)
 	return OTA_RET_ERROR;
 }
 
-
+/*
 void test_ota(void)
 {
 	uint32_t 	i,j;
@@ -753,3 +756,4 @@ void test_ota(void)
 	ret = ota_fw_put(packet,crc);
 	DFU_PRINTF("End: %d\n",ret);
 }
+*/

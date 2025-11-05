@@ -373,7 +373,7 @@ void CMD_HEARTBEAT(u8* _data) {
 	//p set hb 5000
 	int rslt = sscanf((char*) _data,"hb %hd",&period_hb);
 	if (rslt == 1) {
-		if (period_hb > 1000) {
+		if (period_hb > 200) {
 			LOGA(DRV,"HeartBeat Period:%d ms\r\n",period_hb);
 			PERIOD_HEARTBEAT = period_hb;
 			return;
@@ -384,7 +384,6 @@ void CMD_HEARTBEAT(u8* _data) {
 		}
 	}
 	ERR(DRV,"ERR HeartBeat Period (%d):%d\r\n",rslt,period_hb);
-
 }
 
 void CMD_TEST(u8* _data) {

@@ -47,7 +47,7 @@ fl_master_config_t G_MASTER_INFO = { .nwk = { .chn = { 37, 39, 39 }, .collect_ch
 
 volatile u8 MASTER_INSTALL_STATE = 0;
 //Period of the heartbeat
-u16 PERIOD_HEARTBEAT = (16+1)*100; // 16 slots sending and 100ms interval adv
+u16 PERIOD_HEARTBEAT = (9+1)*101; // 16 slots sending and 100ms interval adv
 //flag debug of the network
 volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into endpoint byte (dbg :1bit)
 volatile u8 NWK_REPEAT_MODE = 0; // 1: level | 0 : non-level
@@ -294,12 +294,12 @@ fl_pack_t fl_master_packet_assignSlaveID_build(u8* _mac) {
  * @return	  	: fl_pack_t
  *
  ***************************************************/
-fl_pack_t fl_master_packet_RSP_55Com_build(u8* _slaveID,u8 _numslave,u8* _seqtimetamp,u16 _deltaTT) {
+fl_pack_t fl_master_packet_RSP_1155Com_build(fl_hdr_nwk_type_e _cmdid,u8* _slaveID,u8 _numslave,u8* _seqtimetamp,u16 _deltaTT) {
 	fl_pack_t packet_built;
 
 	fl_data_frame_u packet;
 	memset(packet.bytes,0,SIZEU8(packet.bytes));
-	packet.frame.hdr = NWK_HDR_55;
+	packet.frame.hdr = _cmdid;
 
 	fl_timetamp_withstep_t timetampStep = fl_rtc_getWithMilliStep();
 //	u32 timetamp = fl_rtc_get();

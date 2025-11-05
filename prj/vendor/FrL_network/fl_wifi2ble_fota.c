@@ -194,7 +194,7 @@ void fl_wifi2ble_fota_ContainerClear(void){
 void fl_wifi2ble_fota_init(void){
 	LOG_P(INF_FILE,"FOTA Initilization!!!\r\n");
 	fl_wifi2ble_fota_ContainerClear();
-//	DFU_OTA_INIT();
+	DFU_OTA_INIT();
 }
 
 void fl_wifi2ble_fota_recECHO(fl_pack_t _pack_rec){
