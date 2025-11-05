@@ -227,12 +227,6 @@ static subapp_result_t data_app_init(subapp_t* self)
 		event_bus_subscribe(app_data_evt_table[i], data_app_event_handler, NULL, name);
 	}
 	
-	// for (int i = 0; i < 10; i++) {
-	//     memcpy(G_COUNTER_LCD[i], mess[i], sizeof(G_COUNTER_LCD[i]) - 1);
-	//     G_COUNTER_LCD[i][sizeof(G_COUNTER_LCD[i]) - 1] = '\0';
-	// }
-
-
 	return SUBAPP_OK;
 }
 
@@ -246,7 +240,15 @@ static subapp_result_t data_app_loop(subapp_t* self)
 		return SUBAPP_OK;
 	}
 
-	g_app_data.is_online = IsOnline();
+	if(IsJoinedNetwork())
+	{
+		g_app_data.is_online = IsOnline();
+	}
+	else
+	{
+		g_app_data.is_online = 0;
+	}
+	
 
 	return SUBAPP_OK;
 }
@@ -300,7 +302,6 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 			g_app_data.is_call = false;
 			update_cont();
 			data_ctx.mode = APP_MODE_SELEC;
-			EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_SELECT_MODE, EVENT_PRIORITY_HIGH);
 
             break;
 
@@ -382,12 +383,20 @@ static void data_app_event_handler(const event_t* event, void* user_data)
         case EVENT_BUTTON_RST_PED_HOLD_5S:
             ULOGA("Handle EVENT_BUTTON_RST_PED_HOLD_5S\n");
 			ULOGA("PAIR\n");
+			g_app_data.is_call = false;
+			u8 tbs_profile[1] = {0} ;
+			fl_db_tbsprofile_save(tbs_profile,SIZEU8(tbs_profile));
+			EVENT_PUBLISH_SIMPLE(EVENT_DATA_ENDCALL, EVENT_PRIORITY_HIGH);
 			EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_PAIRING, EVENT_PRIORITY_HIGH);
 
             break;
         case EVENT_BUTTON_RST_PEU_HOLD_5S:
             ULOGA("Handle EVENT_BUTTON_RST_PEU_HOLD_5S\n");
 			ULOGA("RST Factory\n");
+			g_app_data.is_call = false;
+			u8 tbs_profile1[1] = {0} ;
+			fl_db_tbsprofile_save(tbs_profile1,SIZEU8(tbs_profile));
+			EVENT_PUBLISH_SIMPLE(EVENT_DATA_ENDCALL, EVENT_PRIORITY_HIGH);
 			EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_FACTORY_RESET, EVENT_PRIORITY_HIGH);
 
 			break;
@@ -404,6 +413,18 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 			EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_MAC, EVENT_PRIORITY_HIGH);
 
             break;
+
+		case EVENT_DATA_START_DONE:
+			if (g_app_data.is_call)
+			{
+				EVENT_PUBLISH_SIMPLE(EVENT_DATA_CALL, EVENT_PRIORITY_HIGH);
+			}
+			
+			if(IsPairing() && !IsJoinedNetwork())
+			{
+				EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_PAIRING, EVENT_PRIORITY_HIGH);
+			}
+			break;
 
         default:
             ULOGA("Unknown event: 0x%lx\n", (uint32_t)event);

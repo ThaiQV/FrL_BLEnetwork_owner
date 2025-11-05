@@ -12,6 +12,7 @@
 
 #include "../../user_lib.h"
 #include "vendor/FrL_network/fl_nwk_handler.h"
+#include "vendor/FrL_network/fl_nwk_api.h"
 #include <stdio.h>
 
 extern get_data_t get_data;
@@ -198,7 +199,7 @@ void my_timeout_callback(uint8_t row) {
 			break;
 
 		case LCD_PRINT_PAIRING:
-			if(get_data.is_online())
+			if(IsJoinedNetwork())
 			{
 				lcd_ctx.print_type = LCD_PRINT_OFF;
 				lcd_app_clear_all(&app_handle);
@@ -478,17 +479,7 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 			lcd_ctx.enable = 1;
 			lcd_ctx.print_type = LCD_PRINT_RESET;
 			lcd_app_set_message(&app_handle, 0, "    Reset OK    ", 30000); //  0, timeout 10s
-			lcd_app_set_message(&app_handle, 1, "                ", 5000); //  0, timeout 10s	
-
-			break;
-
-		case EVENT_LCD_PRINT_SELECT_MODE:
-			ULOGA("Handler EVENT_LCD_PRINT_SELECT_MODE\n");
-
-			lcd_ctx.enable = 1;
-			lcd_ctx.print_type = LCD_PRINT_RESET;
-			lcd_app_set_message(&app_handle, 0, "    Reset OK    ", 30000); //  0, timeout 10s
-			lcd_app_set_message(&app_handle, 1, " Tinh Trong Ca? ", 10000); //  0, timeout 10s		
+			lcd_app_set_message(&app_handle, 1, " Tinh Trong Ca? ", 10000); //  0, timeout 10s	
 
 			break;
 

@@ -194,15 +194,6 @@ static subapp_result_t led_app_loop(subapp_t* self)
 		led_off(LED_ID_NWK);
 	}
 
-	if(get_data.is_call() == true)
-	{
-		led_on(LED_ID_CALL);
-	}
-	else
-	{
-		led_off(LED_ID_CALL);
-	}
-
 	return SUBAPP_OK;
 }
 
