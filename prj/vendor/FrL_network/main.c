@@ -65,6 +65,7 @@ void uart1_recieve_irq(void) {
 		fl_input_serial_rec();
 		uart_clr_irq_status(UART1, UART_CLR_RX);
 		uart_clr_irq_mask(UART1,UART_RXBUF_IRQ_STATUS);
+		FLAG_uart_dma_send = 0;
 	}
 	if (uart_get_irq_status(UART1,UART_TXDONE)) {
 		FLAG_uart_dma_send = 0;
@@ -80,6 +81,7 @@ void uart1_recieve_irq(void) {
 	if(uart_get_irq_status(UART1,UART_RX_ERR)){
 		ERR(APP,"UART FAIL !!\r\n");
 		uart_clr_irq_status(UART1,UART_CLR_RX);
+		FLAG_uart_dma_send = 0;
 	}
 #endif
 }
