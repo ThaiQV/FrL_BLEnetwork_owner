@@ -573,20 +573,10 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 
 			lcd_ctx.enable = 1;
 			lcd_ctx.print_type = LCD_PRINT_MESS_NEW;
-			lcd_ctx.row0_mess_num = lcd_ctx.row1_mess_num;
 			lcd_app_set_message(&app_handle, 0, (char *)G_COUNTER_LCD[lcd_ctx.row0_mess_num], 15000);
-
+			lcd_app_clear_row(&app_handle, 1);
 
 			lcd_ctx.row1_mess_num = find_next_mess(lcd_ctx.row1_mess_num);
-			if(lcd_ctx.row1_mess_num == lcd_ctx.row0_mess_num)
-			{
-				lcd_app_clear_row(&app_handle, 1);
-			}
-			else
-			{
-				lcd_app_set_message(&app_handle, 1, (char *)G_COUNTER_LCD[lcd_ctx.row1_mess_num], 30000);
-				}
-
 			break;
 
         default:
@@ -603,7 +593,7 @@ static void LCD_MessageCheck_FlagNew(void){
 		{
 			if(memcmp(mess_zero, (uint8_t *)G_COUNTER_LCD[var], 20) != 0)
 			{
-				lcd_ctx.row1_mess_num = var;
+				lcd_ctx.row0_mess_num = var;
 				ULOGA("lcd_ctx.row0_mess_num %d\n", lcd_ctx.row1_mess_num);
 				lcd_ctx.time_off = get_system_time_ms() + LCD_TIME_DELAY_PRINT;
 				EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_MESS_NEW, EVENT_PRIORITY_HIGH);
