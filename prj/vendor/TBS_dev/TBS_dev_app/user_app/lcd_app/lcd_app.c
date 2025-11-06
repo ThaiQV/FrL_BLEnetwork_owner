@@ -145,6 +145,7 @@ lcd_app_handle_t app_handle;
 
 void my_timeout_callback(uint8_t row) {
 	ULOGA("my_timeout_callback \n");
+
 	for(int out = 0; out < 10; out++)
 	{
 	switch (lcd_ctx.print_type)
@@ -216,10 +217,10 @@ void my_timeout_callback(uint8_t row) {
 
 		case LCD_PRINT_FACTORY_RESET:
 			lcd_ctx.print_type = LCD_PRINT_OFF;
-			lcd_app_clear_all(&app_handle);
-			lcd_off();
 			fl_db_clearAll();
 			TBS_History_ClearAll();
+			lcd_app_clear_all(&app_handle);
+			lcd_off();
 			sys_reboot();
 			break;
 
@@ -251,7 +252,12 @@ void my_timeout_callback(uint8_t row) {
 
 		default:
 			lcd_ctx.print_mode = 0;
-			if (get_data.is_call())
+			if((IsJoinedNetwork() == false) && (IsPairing() == true))
+			{
+				lcd_ctx.print_type = LCD_PRINT_PAIRING;
+				continue;
+			}
+			else if (get_data.is_call())
 			{
 				lcd_ctx.print_type = LCD_PRINT_CALL;
 				continue;

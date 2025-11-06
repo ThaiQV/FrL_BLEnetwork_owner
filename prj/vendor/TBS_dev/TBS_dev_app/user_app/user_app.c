@@ -145,6 +145,13 @@ static void update_cont(void);
 
 void user_app_init(void)
 {
+	fl_tbs_data_t tbs_load = fl_db_tbsprofile_load();
+	if (tbs_load.data[0] = 0xff)
+	{
+		u8 tbs_profile[1] = {0} ;
+		fl_db_tbsprofile_save(tbs_profile,SIZEU8(tbs_profile));
+	}
+	
 	read_count();
 
 	user_tca9555_app_init();
@@ -286,6 +293,10 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 
         case EVENT_BUTTON_RST_HOLD_3S:
             ULOGA("Handle EVENT_BUTTON_RST_HOLD_3S\n");
+			if(IsJoinedNetwork() == false)
+			{
+				break;
+			}
 
 			G_COUNTER_DEV.data.bt_rst = 1;
 			fl_api_slave_req(NWK_HDR_55, (u8*)&G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data), 0, TIME_OUT_CHECK_RSP, NUM_RETRY);
@@ -299,7 +310,6 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 			
 			g_app_data.count->pass_product = 0;
 			g_app_data.count->err_product = 0;
-			g_app_data.is_call = false;
 			update_cont();
 			data_ctx.mode = APP_MODE_SELEC;
 
@@ -308,7 +318,12 @@ static void data_app_event_handler(const event_t* event, void* user_data)
         case EVENT_BUTTON_CALL_ONCLICK:
             ULOGA("Handle EVENT_BUTTON_CALL_ONCLICK\n");
 
-			if(IsJoinedNetwork() == 0 || IsOnline() == 0)
+			if(IsJoinedNetwork() == false)
+			{
+				break;
+			}
+
+			if(IsJoinedNetwork() == 1 && IsOnline() == 0)
 			{
 				EVENT_PUBLISH_SIMPLE(EVENT_DATA_CALL_FAIL_OFFLINE, EVENT_PRIORITY_HIGH);
 				break;
@@ -326,6 +341,11 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 
         case EVENT_BUTTON_ENDCALL_ONCLICK:
             ULOGA("Handle EVENT_BUTTON_ENDCALL_ONCLICK\n");
+			if(IsJoinedNetwork() == false)
+			{
+				break;
+			}
+
 			if( g_app_data.is_call)
 			{
 				EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_CALL__, EVENT_PRIORITY_HIGH);
@@ -386,17 +406,13 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 			g_app_data.is_call = false;
 			u8 tbs_profile[1] = {0} ;
 			fl_db_tbsprofile_save(tbs_profile,SIZEU8(tbs_profile));
-			EVENT_PUBLISH_SIMPLE(EVENT_DATA_ENDCALL, EVENT_PRIORITY_HIGH);
+			EVENT_PUBLISH_SIMPLE(EVENT_LED_CALL_OFF, EVENT_PRIORITY_HIGH);
 			EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_PAIRING, EVENT_PRIORITY_HIGH);
 
             break;
         case EVENT_BUTTON_RST_PEU_HOLD_5S:
             ULOGA("Handle EVENT_BUTTON_RST_PEU_HOLD_5S\n");
 			ULOGA("RST Factory\n");
-			g_app_data.is_call = false;
-			u8 tbs_profile1[1] = {0} ;
-			fl_db_tbsprofile_save(tbs_profile1,SIZEU8(tbs_profile));
-			EVENT_PUBLISH_SIMPLE(EVENT_DATA_ENDCALL, EVENT_PRIORITY_HIGH);
 			EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_FACTORY_RESET, EVENT_PRIORITY_HIGH);
 
 			break;
@@ -417,7 +433,7 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 		case EVENT_DATA_START_DONE:
 			if (g_app_data.is_call)
 			{
-				EVENT_PUBLISH_SIMPLE(EVENT_DATA_CALL, EVENT_PRIORITY_HIGH);
+				EVENT_PUBLISH_SIMPLE(EVENT_LED_CALL_ON, EVENT_PRIORITY_HIGH);
 			}
 			
 			if(IsPairing() && !IsJoinedNetwork())
@@ -441,7 +457,6 @@ static void read_count(void)
 	g_app_data.bt_call 				= G_COUNTER_DEV.data.bt_call;
 	g_app_data.bt_endcall 			= G_COUNTER_DEV.data.bt_endcall;
 	fl_tbs_data_t tbs_load = fl_db_tbsprofile_load();
-	P_INFO_HEX(tbs_load.data,12,"TBS PROFILE(max:%d):",12);
 	g_app_data.is_call = tbs_load.data[0];
 }
 

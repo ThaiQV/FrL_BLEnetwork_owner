@@ -223,7 +223,7 @@ static void led_app_event_handler(const event_t* event, void* user_data)
             // TODO: turn LED for call active
             break;
 
-        case EVENT_LED_NWK_CALL_OFF:
+        case EVENT_LED_CALL_OFF:
             ULOGA("Handle EVENT_LED_NWK_CALL_OFF\n");
 			led_off(LED_ID_CALL);
             // TODO: turn off LED for network call
