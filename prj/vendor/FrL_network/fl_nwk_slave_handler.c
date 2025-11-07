@@ -37,7 +37,7 @@ extern volatile fl_timetamp_withstep_t WIFI_ORIGINAL_GETALL;
 											}while(0) //Sync original time-master req
 u8 GETINFO_FLAG_EVENTTEST = 0;
 #define JOIN_NETWORK_TIME 			60*1012 			//ms
-#define RECHECKING_NETWOK_TIME 		24*1021 		    //ms
+#define RECHECKING_NETWOK_TIME 		14*1021 		    //ms
 #define RECONNECT_TIME				62*1000*1020		//s
 #define INFORM_MASTER				9*1001*1004
 fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_FOTA,NWK_HDR_A5_HIS,NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
@@ -938,7 +938,7 @@ int _interval_report(void) {
 		}
 	}
 #undef INTERVAL_REPORT_TIME
-	return 100 * 1000+ offset_spread;
+	return 100 * 1000 + offset_spread;
 }
 
 void fl_nwk_slave_reconnectNstoragedata(void){
@@ -991,6 +991,9 @@ void fl_nwk_slave_process(void){
 	if(debug_on_offline != G_INFORMATION.active){
 		debug_on_offline = G_INFORMATION.active;
 		ERR(INF,"Device -> %s\r\n",debug_on_offline==true?"Online":"Offline");
+	}
+	if(blt_soft_timer_find(_interval_report) == -1){
+		blt_soft_timer_restart(_interval_report,100*100);
 	}
 }
 /***************************************************

@@ -780,7 +780,8 @@ bool fl_adv_MasterToMe(fl_pack_t data_in_queue) {
 void fl_adv_run(void) {
 	//todo: process adv ....
 	fl_pack_t data_in_queue;
-	if (FL_QUEUE_GET(&G_DATA_CONTAINER,&data_in_queue)) {
+	u8 multiple_pack = 0;
+	while (FL_QUEUE_GET(&G_DATA_CONTAINER,&data_in_queue)) {
 //		LOGA(APP,"QUEUE GET : (%d)%d-%d\r\n",G_DATA_CONTAINER.count,G_DATA_CONTAINER.head_index,G_DATA_CONTAINER.tail_index);
 		fl_dataframe_format_t data_parsed;
 		if (fl_packet_parse(data_in_queue,&data_parsed)) {
@@ -807,7 +808,15 @@ void fl_adv_run(void) {
 					fl_nwk_slave_run(&data_in_queue);
 				}
 			}
+			break;
 #endif
+			//process multiple packet on the circle
+			if (G_DATA_CONTAINER.count > 0) {
+				multiple_pack++;
+				if (multiple_pack < 5) {
+					continue;
+				}
+			}
 		} else {
 			ERR(APP,"ERR <PARSE PACKET>!!\r\n");
 			P_PRINTFHEX_A(APP,data_in_queue.data_arr,data_in_queue.length,"%s(%d):","PACK",data_in_queue.length);
