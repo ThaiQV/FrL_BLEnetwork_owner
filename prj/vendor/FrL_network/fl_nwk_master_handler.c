@@ -47,7 +47,7 @@ fl_master_config_t G_MASTER_INFO = { .nwk = { .chn = { 37, 39, 39 }, .collect_ch
 
 volatile u8 MASTER_INSTALL_STATE = 0;
 //Period of the heartbeat
-u16 PERIOD_HEARTBEAT = (9+1)*101; // 16 slots sending and 100ms interval adv
+u16 PERIOD_HEARTBEAT = (16+1)*101; // 16 slots sending and 100ms interval adv
 //flag debug of the network
 volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into endpoint byte (dbg :1bit)
 volatile u8 NWK_REPEAT_MODE = 0; // 1: level | 0 : non-level
@@ -166,6 +166,7 @@ fl_pack_t fl_master_packet_heartbeat_build(void) {
 	packet.frame.payload[3] = U32_BYTE2(WIFI_ORIGINAL_GETALL.timetamp);
 	packet.frame.payload[4] = U32_BYTE3(WIFI_ORIGINAL_GETALL.timetamp);
 	packet.frame.payload[5]=WIFI_ORIGINAL_GETALL.milstep;
+
 	//crc
 	packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
 
@@ -703,24 +704,24 @@ int _nwk_master_backup(void) {
 	}
 	return 0;
 }
-
-int _nwk_master_checkSlaveStatus(void) {
-	extern volatile fl_timetamp_withstep_t WIFI_ORIGINAL_GETALL;
-	extern const u32 ORIGINAL_TIME_TRUST;
-#define INTERVAL_REFESH_STATUS 45
-	if (G_NODE_LIST.slot_inused != 0xFF) {
-		if (WIFI_ORIGINAL_GETALL.timetamp < fl_rtc_get() && WIFI_ORIGINAL_GETALL.timetamp > ORIGINAL_TIME_TRUST) {
-			if (fl_rtc_get() - WIFI_ORIGINAL_GETALL.timetamp >= INTERVAL_REFESH_STATUS) {
-				for (u8 var = 0; var < G_NODE_LIST.slot_inused; ++var) {
-					G_NODE_LIST.sla_info[var].active = false;
-				}
-				return INTERVAL_REFESH_STATUS*1000*1000;
-			}
-		}
-	}
-#undef INTERVAL_REFESH_STATUS
-	return 98 * 1001;
-}
+//
+//int _nwk_master_checkSlaveStatus(void) {
+//	extern volatile fl_timetamp_withstep_t WIFI_ORIGINAL_GETALL;
+//	extern const u32 ORIGINAL_TIME_TRUST;
+//#define INTERVAL_REFESH_STATUS 45
+//	if (G_NODE_LIST.slot_inused != 0xFF) {
+//		if (WIFI_ORIGINAL_GETALL.timetamp < fl_rtc_get() && WIFI_ORIGINAL_GETALL.timetamp > ORIGINAL_TIME_TRUST) {
+//			if (fl_rtc_get() - WIFI_ORIGINAL_GETALL.timetamp >= INTERVAL_REFESH_STATUS) {
+//				for (u8 var = 0; var < G_NODE_LIST.slot_inused; ++var) {
+//					G_NODE_LIST.sla_info[var].active = false;
+//				}
+//				return INTERVAL_REFESH_STATUS*1000*1000;
+//			}
+//		}
+//	}
+//#undef INTERVAL_REFESH_STATUS
+//	return 98 * 1001;
+//}
 /******************************************************************************/
 /******************************************************************************/
 /***                            Functions callback                           **/
@@ -728,7 +729,7 @@ int _nwk_master_checkSlaveStatus(void) {
 /******************************************************************************/
 void fl_nwk_master_StatusNodesRefesh(void) {
 	for (u8 i = 0; i < G_NODE_LIST.slot_inused && G_NODE_LIST.slot_inused != 0xFF; i++) {
-		G_NODE_LIST.sla_info[i].active = (fl_rtc_get() - G_NODE_LIST.sla_info[i].timelife <= 20) ? 1 : 0;
+		G_NODE_LIST.sla_info[i].active = (fl_rtc_get() - G_NODE_LIST.sla_info[i].timelife <= 40) ? 1 : 0;
 	}
 }
 
@@ -743,9 +744,10 @@ void fl_nwk_master_StatusNodesRefesh(void) {
 static void _master_updateDB_for_Node(u8 node_indx ,fl_data_frame_u *packet)  {
 	G_NODE_LIST.sla_info[node_indx].active = true;
 	G_NODE_LIST.sla_info[node_indx].timelife = fl_rtc_get();
+	P_INFO_HEX(G_NODE_LIST.sla_info[node_indx].mac,6,"%d->[%02d]",G_NODE_LIST.sla_info[node_indx].timelife,G_NODE_LIST.sla_info[node_indx].slaveID);
 	//create MAC + TIMETAMP + DEV_TYPE
 	u8 size_mac = SIZEU8(G_NODE_LIST.sla_info[node_indx].mac);
-	memcpy(&G_NODE_LIST.sla_info[node_indx].data[0],G_NODE_LIST.sla_info[node_indx].mac,size_mac); //update mac to pointer data
+	//memcpy(&G_NODE_LIST.sla_info[node_indx].data[0],G_NODE_LIST.sla_info[node_indx].mac,size_mac); //update mac to pointer data
 	/*Timetamp*/
 //	fl_timetamp_withstep_t timetampStep = fl_rtc_getWithMilliStep();
 //	//	u32 timetamp = fl_rtc_get();
@@ -897,6 +899,8 @@ int fl_master_ProccesRSP_cbk(void) {
 					node_indx = fl_master_SlaveID_find(slave_id);
 					if (node_indx != -1) {
 						_master_updateDB_for_Node(node_indx,&packet);
+						//send to WIFI
+//						fl_ble2wifi_EVENT_SEND(G_NODE_LIST.sla_info[node_indx].mac);
 					} else {
 						ERR(INF,"ID not foud:%02X\r\n",slave_id);
 						return -1;

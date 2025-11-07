@@ -197,6 +197,11 @@ static void _getnsend_data_report(u8 var, u8 rspcmd) {
 	}
 }
 
+int _RegetallNetwork(void){
+	fl_wifi2ble_Excute(W2B_START_NWK);
+	return -1;
+}
+
 void REPORT_REQUEST(u8* _pdata, RspFunc rspfnc) {
 	extern fl_slaves_list_t G_NODE_LIST;
 	fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[1];
@@ -212,11 +217,13 @@ void REPORT_REQUEST(u8* _pdata, RspFunc rspfnc) {
 	}
 	if (rspfnc != 0) {
 		rspfnc(_pdata);
+
 		fl_wf_report_u report_fmt;
 		memcpy(report_fmt.bytes,data->data,data->len_data);
 		if (IS_MAC_INVALID(report_fmt.frame.mac,0xFF) && G_NODE_LIST.slot_inused != 0xFF) {
 //			fl_wifi2ble_Excute(W2B_START_NWK);
 			WIFI_ORIGINAL_GETALL = fl_rtc_getWithMilliStep();
+			//blt_soft_timer_restart(_RegetallNetwork,55*1001*999);//55s
 		}
 	}
 }
@@ -239,6 +246,7 @@ void REPORT_RESPONSE(u8* _pdata) {
 //			LOGA(MCU,"Devtype:%d\r\n",G_NODE_LIST.sla_info[var].dev_type);
 			//addnew: only send offline nodes bcs the online nodes has automatically sent yet
 			if (G_NODE_LIST.sla_info[var].active == false) {
+				P_INFO_HEX(G_NODE_LIST.sla_info[var].mac,6,"[%d]Mac:",G_NODE_LIST.sla_info[var].slaveID);
 				_getnsend_data_report(var,G_WIFI_CON[_wf_CMD_find(data->cmd)].rsp.cmd);
 			}
 		}
@@ -282,7 +290,7 @@ void GETLIST_RESPONSE(u8* _pdata) {
 	wfdata.cmd = G_WIFI_CON[_wf_CMD_find(data->cmd)].rsp.cmd;
 	//u8 payload[BLE_WIFI_MAXLEN];
 	//memset(payload,0xFF,SIZEU8(payload));
-	fl_nwk_master_StatusNodesRefesh();
+//	fl_nwk_master_StatusNodesRefesh();
 	u8 payload_len = 0;
 	for (u8 var = 0; var < G_NODE_LIST.slot_inused && G_NODE_LIST.slot_inused != 0xFF; ++var) {
 		wfdata.data[payload_len] = G_NODE_LIST.slot_inused ;

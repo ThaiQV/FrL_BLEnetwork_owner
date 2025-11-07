@@ -79,6 +79,7 @@ fl_hdr_nwk_type_e FL_NWK_HDR[]={NWK_HDR_FOTA,NWK_HDR_11_REACTIVE,NWK_HDR_22_PING
 /***                       Functions declare                   		         **/
 /******************************************************************************/
 /******************************************************************************/
+
 void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms);
 s8 fl_adv_IsFromMaster(fl_pack_t data_in_queue);
 u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
@@ -189,11 +190,6 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 //				return 0;
 #ifndef MASTER_CORE
 				extern fl_nodeinnetwork_t G_INFORMATION;
-				/*For TESTING REPEATER*/
-//				u8 master_mac[4] = { U32_BYTE0(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE1(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE2(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE3(G_INFORMATION.profile.nwk.mac_parent) };
-//				if (-1 != plog_IndexOf(pa->mac,master_mac,4,6)) {
-//					return 0;
-//				}
 				//IMPORTANT DELETE NETWORK
 				u8 delete_network[32];
 				fl_nwk_decrypt16(FL_NWK_PB_KEY,pa->data,incomming_data.length,delete_network);
@@ -212,6 +208,13 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 						return 0;
 					}
 				}
+#ifdef BLOCK_MASTER
+				/*For TESTING REPEATER*/
+				u8 master_mac[4] = { U32_BYTE0(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE1(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE2(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE3(G_INFORMATION.profile.nwk.mac_parent) };
+				if (-1 != plog_IndexOf(pa->mac,master_mac,4,6)) {
+					return 0;
+				}
+#endif
 #endif
 				//Add decrypt
 				NWK_MYKEY();
@@ -319,7 +322,9 @@ int fl_adv_sendFIFO_add(fl_pack_t _pack) {
 	ERR(BLE,"Err <QUEUE ALREADY ADV SENDING>!!\r\n");
 	return -1;
 }
-
+u16 FL_NWK_HISTORY_IsReady(void){
+	return G_QUEUE_HISTORY_SENDING.count;
+}
 u8 fl_adv_sendFIFO_History_run(void) {
 	fl_pack_t his_data_in_queue;
 	if (!F_SENDING_STATE) {
@@ -483,10 +488,13 @@ u8 fl_adv_sendFIFO_run(void) {
 			memcpy(check_heartbeat.bytes,data_in_queue.data_arr,data_in_queue.length);
 #ifndef	MASTER_CORE //for slave
 			//Clear HB packer REPEATER
-			if(inused_slot == 1 && check_heartbeat.frame.hdr == NWK_HDR_HEARTBEAT ) { // only have HB packet=> send it one times
+			if (check_heartbeat.frame.hdr == NWK_HDR_HEARTBEAT) {
+//				fl_nwk_slave_SYNC_ORIGIN_MASTER(timetamp_inpack.timetamp,timetamp_inpack.milstep);
+//				ERR(INF,"ORIGINAL MASTER-TIME:%d\r\n",ORIGINAL_MASTER_TIME.milstep);
+				if (inused_slot == 1 && FL_NWK_HISTORY_IsReady() > 0) { // only have HB packet=> send it one times
 				//CLEAR
-				G_QUEUE_SENDING.data[indx_head_cur].length = 0;
-
+					G_QUEUE_SENDING.data[indx_head_cur].length = 0;
+				}
 			}
 #else //for master
 			//
