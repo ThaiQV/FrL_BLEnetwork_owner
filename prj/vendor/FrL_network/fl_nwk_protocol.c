@@ -749,7 +749,7 @@ void CMD_GETALLNODES(u8* _data) {
 		u8 onl_msb_indx =0;
 		u8 off_lsb_indx = p_ALLNODES.sort_list.numOfOnl -1;
 		for (u8 indx = 0; indx < G_NODE_LIST.slot_inused; ++indx) {
-			if(G_NODE_LIST.sla_info[indx].active == true){
+			if(G_NODE_LIST.sla_info[indx].active == false){
 				p_ALLNODES.sort_list.sla_info[onl_msb_indx++]=&G_NODE_LIST.sla_info[indx];
 			}
 			else{
@@ -763,16 +763,16 @@ void CMD_GETALLNODES(u8* _data) {
 //					p_ALLNODES.sort_list.sla_info[k]->mac[3],p_ALLNODES.sort_list.sla_info[k]->mac[4],p_ALLNODES.sort_list.sla_info[k]->mac[5],
 //					p_ALLNODES.sort_list.sla_info[k]->active);
 //		}
-		//Update num of online slave => onlt get online
+		//Update num of online slave => only get online or offline
 		p_ALLNODES.sort_list.numOfOnl = onl_msb_indx;
 		if(p_ALLNODES.sort_list.numOfOnl==0) return;
 		//Register timeout
 		p_ALLNODES.timeout = timeout==0?p_ALLNODES.sort_list.numOfOnl*16*GETALL_TIMEOUT_1_NODE:timeout*1000; //default num*durationADV
 		p_ALLNODES.timeout = (p_ALLNODES.timeout>20*1000)?20*1000:p_ALLNODES.timeout;
 		//clear all previous status of the all
-		for (u8 var = 0; var < G_NODE_LIST.slot_inused; ++var) {
-			G_NODE_LIST.sla_info[var].active = false;
-		}
+//		for (u8 var = 0; var < G_NODE_LIST.slot_inused; ++var) {
+//			G_NODE_LIST.sla_info[var].active = false;
+//		}
 		p_ALLNODES.rtt = clock_time();
 		P_INFO("Get %d/%d nodes (timeout:%d ms)(%d)\r\n",p_ALLNODES.sort_list.numOfOnl,G_NODE_LIST.slot_inused,p_ALLNODES.timeout,GETINFO_FLAG_EVENTTEST);
 		blt_soft_timer_restart(&_GETALLNODES,11*999);

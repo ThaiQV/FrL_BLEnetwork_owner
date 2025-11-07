@@ -18,7 +18,7 @@
 /******************************************************************************/
 /******************************************************************************/
 #define RTC_DIV_PPM			32000 //32.768 khz rtc
-#define RTC_SYNC_SPREAD		2 // 2s : diff real-timetamp with curr-timetamp
+#define RTC_SYNC_SPREAD		3 // s : diff real-timetamp with curr-timetamp
 static const uint8_t days_in_month[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
 _attribute_data_retention_ u32 RTC_OFFSET_TIME = 1752473460; // 14/07/2025-11:31:00
@@ -117,7 +117,12 @@ u64 fl_rtc_timetampmillstep_convert(u8 *_array_timetampmill)
 u64 fl_rtc_timetamp2milltampStep(fl_timetamp_withstep_t _timetamp_step) {
 	return ((u64)_timetamp_step.timetamp * 256) + (u64)_timetamp_step.milstep;
 }
-
+fl_timetamp_withstep_t fl_rtc_milltampStep2timetamp(u64 _millstamp) {
+    fl_timetamp_withstep_t result;
+    result.timetamp = (u32)(_millstamp / 256);
+    result.milstep  = (uint8_t)(_millstamp % 256);
+    return result;
+}
 void fl_rtc_sync(u32 timetamp_sync) {
 	int time_spread = timetamp_sync - fl_rtc_get();
 	if (abs(time_spread) >= (int) RTC_SYNC_SPREAD) {

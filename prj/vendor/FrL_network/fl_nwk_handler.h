@@ -327,7 +327,6 @@ inline u8 fl_crc8(u8* _pdata, u8 _len) {
 							if (x) { PLOG_Start(ALL); } \
 							else   { PLOG_Stop(ALL);  }\
 						} while(0)
-
 static inline uint32_t swap_endian32(uint32_t val) {
     return ((val >> 24) & 0x000000FF) |
            ((val >> 8)  & 0x0000FF00) |
@@ -364,13 +363,15 @@ void fl_nwk_slave_run(fl_pack_t *_pack_handle);
 void fl_nwk_slave_process(void);
 void fl_slave_fota_proc(fl_pack_t _fota_pack);
 bool fl_nwk_slave_checkHDR(u8 _hdr);
-u64 fl_req_slave_packet_createNsend(u8 _cmdid, u8* _data, u8 _len);
+void fl_nwk_slave_SYNC_ORIGIN_MASTER(u32 _timetamp,u8 _mil);
+u64 fl_req_slave_packet_createNsend(u8 _cmdid, u8* _data, u8 _len,u32 *_timequeues);
 s8 fl_queue_REQcRSP_ScanRec(fl_pack_t _pack,void *_id);
 void fl_nwk_slave_reconnectNstoragedata(void);
 s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry);
 #endif
 u32 fl_adv_timetampInPack(fl_pack_t _pack);
 fl_timetamp_withstep_t fl_adv_timetampStepInPack(fl_pack_t _pack);
+void fl_queue_REQnRSP_OriginTime_set(u64 _timestamp_set);
 s8 fl_queueREQcRSP_add(u8 slaveid,u8 cmdid,u64 _SeqTimetamp,u8* _payloadreq,u8 _len,fl_rsp_callback_fnc *_cb, u32 _timeout_ms,u8 _retry);
 void fl_queue_REQnRSP_TimeoutInit(void);
 void fl_adv_setting_update(void);
