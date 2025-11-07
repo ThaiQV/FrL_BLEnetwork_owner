@@ -37,7 +37,7 @@ extern _attribute_data_retention_ volatile fl_timetamp_withstep_t ORIGINAL_MASTE
 /******************************************************************************/
 #define TIME_COLLECT_NODE				5*1000 //
 
-#define PACK_HANDLE_MASTER_SIZE 		32
+#define PACK_HANDLE_MASTER_SIZE 		64
 fl_pack_t g_handle_master_array[PACK_HANDLE_MASTER_SIZE];
 fl_data_container_t G_HANDLE_MASTER_CONTAINER = {.data = g_handle_master_array, .head_index = 0, .tail_index = 0, .mask = PACK_HANDLE_MASTER_SIZE - 1, .count = 0 };
 
@@ -47,7 +47,7 @@ fl_master_config_t G_MASTER_INFO = { .nwk = { .chn = { 37, 39, 39 }, .collect_ch
 
 volatile u8 MASTER_INSTALL_STATE = 0;
 //Period of the heartbeat
-u16 PERIOD_HEARTBEAT = (PACK_HANDLE_MASTER_SIZE+1)*101; // 16 slots sending and 100ms interval adv
+u16 PERIOD_HEARTBEAT = (PACK_HANDLE_MASTER_SIZE)*101; // 16 slots sending and 100ms interval adv
 //flag debug of the network
 volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into endpoint byte (dbg :1bit)
 volatile u8 NWK_REPEAT_MODE = 0; // 1: level | 0 : non-level
