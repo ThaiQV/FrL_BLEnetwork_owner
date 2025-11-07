@@ -958,6 +958,7 @@ int fl_master_ProccesRSP_cbk(void) {
 /******************************************************************************/
 /******************************************************************************/
 void fl_nwk_master_init(void) {
+	extern volatile fl_timetamp_withstep_t WIFI_ORIGINAL_GETALL;
 	LOG_P(INF,"Freelux network MASTER init -> ok\r\n");
 	FL_QUEUE_CLEAR(&G_HANDLE_MASTER_CONTAINER,PACK_HANDLE_MASTER_SIZE);
 	//todo: load database into the flash
@@ -972,6 +973,7 @@ void fl_nwk_master_init(void) {
 	blt_soft_timer_add(_nwk_master_backup,2 * 1000 * 1000);
 	fl_nwk_master_heartbeat_init();
 	//Recheck status of the all network
+	WIFI_ORIGINAL_GETALL = fl_rtc_getWithMilliStep();
 //	blt_soft_timer_add(_nwk_master_checkSlaveStatus,100*1000);
 }
 /***************************************************

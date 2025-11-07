@@ -197,11 +197,6 @@ static void _getnsend_data_report(u8 var, u8 rspcmd) {
 	}
 }
 
-int _RegetallNetwork(void){
-	fl_wifi2ble_Excute(W2B_START_NWK);
-	return -1;
-}
-
 void REPORT_REQUEST(u8* _pdata, RspFunc rspfnc) {
 	extern fl_slaves_list_t G_NODE_LIST;
 	fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[1];
