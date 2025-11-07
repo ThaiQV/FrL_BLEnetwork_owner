@@ -129,16 +129,6 @@ void fw_copy(fw_header_t *header, uint32_t fw_addr)
 	fw_header_t	header_app = {0};
 
 	DFU_PRINTF("Copy FW: ver: %d.%d.%d - size: %d\n",header->major,header->minor,header->patch,header->size);
-//	// Check FW is correct or not
-//	if(check_valid_ota_fw(fw_addr) == 1)
-//	{
-//		DFU_PRINTF("OTA FW is valid\n");
-//	}
-//	else
-//	{
-//		DFU_PRINTF("OTA FW is invalid\n");
-//		return;
-//	}
 
 	// Check CRC128 of OTA FW in external flash before load into internal flash
 	crc128_init();
@@ -252,20 +242,7 @@ void fw_copy(fw_header_t *header, uint32_t fw_addr)
 		DFU_PRINTF("Copy remain: %d bytes\n",size);
 	}
 
-//	// Verify new FW
-//	crc128_init();
-//	size = header->size/sizeof(buff);
-//	for(i = 0; i < size; i++)
-//	{
-//		flash_read_page(FLASH_R_BASE_ADDR + APP_IMAGE_ADDR + i*sizeof(buff), sizeof(buff), (uint8_t *)buff);
-//		// calculate crc128
-//		for(j = 0; j < (sizeof(buff)/CRC128_LENGTH); j++)
-//		{
-//			crc128_calculate(&buff[j*CRC128_LENGTH]);
-//		}
-//		DFU_PRINTF("Verify: %d%%\n",(((i+1)*100)/size));
-//	}
-
+	// Verify new FW
 	size = 0;
 	crc128_init();
 	while(size < header->size)
@@ -415,7 +392,7 @@ void put_fw_into_ex_flash(uint32_t fw_addr)
 */
 void firmware_check(void)
 {
-	// Check valid F
+	// Check valid FW
 	fw_header_t header_current_fw;
 	fw_header_t header_ota_fw;
 	fw_header_t header_original_fw;
@@ -456,7 +433,7 @@ void firmware_check(void)
 	{
 		if(HVP(&header_current_fw) != HEADER_EMPTY)
 		{
-			if(HVP(&header_ota_fw) > HVP(&header_current_fw))
+//			if(HVP(&header_ota_fw) > HVP(&header_current_fw))
 			{
 				DFU_PRINTF("OTA FW\n");
 				// Copy FW from OTA FW to current FW
@@ -707,6 +684,21 @@ ota_ret_t ota_packet_header_get(ota_fw_header_t *header)
 		return OTA_RET_OK;
 	}
 	return OTA_RET_ERROR;
+}
+
+/**
+* @brief: Get current FW version, due to OTA only send 1 byte version so return only "patch" of version
+* @param: see below
+*/
+uint8_t get_current_fw_version(void)
+{
+	fw_header_t header_current_fw;
+
+	// Read header of current FW in internal-flash
+	flash_read_page(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER, sizeof(fw_header_t), (uint8_t *)&header_current_fw);
+	DFU_PRINTF("Current FW ver: %x.%x.%x\n",header_current_fw.major,header_current_fw.minor,header_current_fw.patch);
+	DFU_PRINTF("Size: %x\n",header_current_fw.size);
+	return header_current_fw.patch;
 }
 
 
