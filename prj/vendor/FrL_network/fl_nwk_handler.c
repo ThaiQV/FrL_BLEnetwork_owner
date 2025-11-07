@@ -114,7 +114,7 @@ s8 fl_queueREQcRSP_add(u8 slaveid,u8 cmdid,u64 _SeqTimetamp,u8* _payloadreq,u8 _
 	ERR(API,"queueREQcRSP Add [%d]SeqTimetamp(%lld):%d ms|retry: %d \r\n",avai_slot,_SeqTimetamp,_timeout_ms,_retry);
 	return -1;
 }
-
+#ifndef MASTER_CORE
 void fl_queue_REQnRSP_OriginTime_set(u64 _timestamp_set){
 	extern volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME;
 	u64 origin = _timestamp_set;
@@ -134,6 +134,7 @@ void fl_queue_REQnRSP_OriginTime_set(u64 _timestamp_set){
 		fl_nwk_slave_SYNC_ORIGIN_MASTER(ORIGINAL_MASTER_TIME.timetamp,ORIGINAL_MASTER_TIME.milstep);
 	}
 }
+#endif
 /***************************************************
  * @brief 		:Run checking rsp and timeout
  *
