@@ -47,7 +47,7 @@ fl_master_config_t G_MASTER_INFO = { .nwk = { .chn = { 37, 39, 39 }, .collect_ch
 
 volatile u8 MASTER_INSTALL_STATE = 0;
 //Period of the heartbeat
-u16 PERIOD_HEARTBEAT = (16+1)*101; // 16 slots sending and 100ms interval adv
+u16 PERIOD_HEARTBEAT = (PACK_HANDLE_MASTER_SIZE+1)*101; // 16 slots sending and 100ms interval adv
 //flag debug of the network
 volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into endpoint byte (dbg :1bit)
 volatile u8 NWK_REPEAT_MODE = 0; // 1: level | 0 : non-level
@@ -669,14 +669,6 @@ int fl_send_collection_req(void) {
  *
  ***************************************************/
 int fl_send_heartbeat(void) {
-	//if(G_NODE_LIST.slot_inused == 0xFF){return 0;}
-//	datetime_t cur_dt;
-//	u32 cur_timetamp = fl_rtc_get();
-//	fl_rtc_timestamp_to_datetime(cur_timetamp,&cur_dt);
-
-//	fl_master_node_printf();
-//	LOGA(APP,"[%02d/%02d/%02d-%02d:%02d:%02d] HeartBeat Sync(%d ms)\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second,
-//			PERIOD_HEARTBEAT);
 	fl_pack_t packet_built = fl_master_packet_heartbeat_build();
 	fl_adv_sendFIFO_add(packet_built);
 	return 0; //
@@ -1078,12 +1070,22 @@ void fl_nwk_master_CLEARALL_NETWORK(void) {
  * @return	  	:none
  *
  ***************************************************/
+
+int _interval_heartbeat(void) {
+	static u32 sys_tick_hb =0;
+	if(clock_time_exceed(sys_tick_hb,PERIOD_HEARTBEAT*1000)){
+		fl_pack_t packet_built = fl_master_packet_heartbeat_build();
+		fl_adv_sendFIFO_add(packet_built);
+		sys_tick_hb = clock_time();
+	}
+	return 0; //
+}
 void fl_nwk_master_heartbeat_init(void){
 	fl_send_heartbeat();
-	blt_soft_timer_add(&fl_send_heartbeat,PERIOD_HEARTBEAT * 1000);
+	blt_soft_timer_add(&_interval_heartbeat,100 * 1000);
 }
 void fl_nwk_master_heartbeat_run(void) {
-	blt_soft_timer_restart(&fl_send_heartbeat,PERIOD_HEARTBEAT * 1000);
+	blt_soft_timer_restart(&_interval_heartbeat,100 * 1000);
 }
 /***************************************************
  * @brief 		: collection slave (install mode)
