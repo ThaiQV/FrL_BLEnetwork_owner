@@ -245,6 +245,7 @@ void my_timeout_callback(uint8_t row) {
 			if(get_system_time_ms() > lcd_ctx.time_off)
 			{
 				lcd_ctx.print_type = LCD_PRINT_OFF;
+				lcd_ctx.print_mode = 0;
 				continue;
 			}
 			EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_MESS_NEW, EVENT_PRIORITY_HIGH);
@@ -371,46 +372,66 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 			lcd_ctx.enable = 1;
 			lcd_ctx.print_type = LCD_PRINT_MESS;
 			
-			if(lcd_ctx.print_mode == 0)
+			switch (lcd_ctx.print_mode)
 			{
-				if(get_data.is_mode_actic())
-				{
-					lcd_app_set_message(&app_handle, 0, "   Trong Ca     ", 15000); //  0, timeout 10s
-				}
-				else
-				{
-					lcd_app_set_message(&app_handle, 0, "   Chay Thu     ", 15000); //  0, timeout 10s
-				}
+				case 0:
+					if (get_data.is_mode_actic())
+					{
+						lcd_app_set_message(&app_handle, 0, "   Trong Ca     ", 15000); // 0, timeout 10s
+					}
+					else
+					{
+						lcd_app_set_message(&app_handle, 0, "   Chay Thu     ", 15000); // 0, timeout 10s
+					}
 
-				lcd_app_clear_row(&app_handle, 1);
-				lcd_ctx.print_mode = 1;
-				lcd_ctx.row0_mess_num = find_next_mess(COUNTER_LCD_MESS_MAX);
-				
-
-			}
-			else if(lcd_ctx.print_mode == 1)
-			{
-				lcd_ctx.print_mode = 2;
-				sprintf(lcd_ctx.display.line1, "pass %4d", get_data.pass_product());
-				sprintf(lcd_ctx.display.line2, "err  %4d", get_data.err_product());
-				lcd_app_set_message(&app_handle, 0, lcd_ctx.display.line1, 30000); //  0, timeout 10s
-				lcd_app_set_message(&app_handle, 1, lcd_ctx.display.line2, 15000); //  0, timeout 10s
-			}
-			else
-			{
-				lcd_app_clear_all(&app_handle);
-
-				if(lcd_ctx.row0_mess_num == COUNTER_LCD_MESS_MAX)
-				{
-					lcd_app_set_message(&app_handle, 0, "               ", 1);
-					lcd_app_set_message(&app_handle, 1, "               ", 1);
+					lcd_app_clear_row(&app_handle, 1);
+					lcd_ctx.print_mode = 1;
+					lcd_ctx.row0_mess_num = find_next_mess(COUNTER_LCD_MESS_MAX);
 					break;
-				}
 
-				lcd_app_set_message(&app_handle, 0, (char *)G_COUNTER_LCD[lcd_ctx.row0_mess_num], 15000);
-				lcd_ctx.row0_mess_num = find_next_mess(lcd_ctx.row0_mess_num);
-				
+				case 1:
+					lcd_ctx.print_mode = 2;
+					sprintf(lcd_ctx.display.line1, "pass %4d", get_data.pass_product());
+					sprintf(lcd_ctx.display.line2, "err  %4d", get_data.err_product());
+
+					lcd_app_set_message(&app_handle, 0, lcd_ctx.display.line1, 30000); // 0, timeout 10s
+					lcd_app_set_message(&app_handle, 1, lcd_ctx.display.line2, 15000); // 1, timeout 10s
+					break;
+
+				case 2:
+					lcd_app_clear_all(&app_handle);
+
+					if (lcd_ctx.row0_mess_num == COUNTER_LCD_MESS_MAX)
+					{
+						lcd_app_set_message(&app_handle, 0, "               ", 1);
+						lcd_app_set_message(&app_handle, 1, "               ", 1);
+						break;
+					}
+
+					lcd_app_set_message(&app_handle, 0, (char *)G_COUNTER_LCD[lcd_ctx.row0_mess_num], 15000);
+					lcd_ctx.row1_mess_num = find_next_mess(lcd_ctx.row0_mess_num);
+
+					if (lcd_ctx.row0_mess_num > lcd_ctx.row1_mess_num)
+					{
+						lcd_ctx.print_mode = 0;
+					}
+					else
+					{
+						lcd_ctx.row0_mess_num = lcd_ctx.row1_mess_num;
+					}
+					break;
+				case 3:
+					lcd_app_set_message(&app_handle, 0, (char *)G_COUNTER_LCD[lcd_ctx.row0_mess_num], 15000);
+					lcd_app_clear_row(&app_handle, 1);
+					lcd_ctx.row0_mess_num = find_next_mess(lcd_ctx.row0_mess_num);
+
+					break;
+
+				default:
+					break;
+
 			}
+
 			
             break;
 
@@ -575,8 +596,8 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 			lcd_ctx.print_type = LCD_PRINT_MESS_NEW;
 			lcd_app_set_message(&app_handle, 0, (char *)G_COUNTER_LCD[lcd_ctx.row0_mess_num], 15000);
 			lcd_app_clear_row(&app_handle, 1);
-
-			lcd_ctx.row1_mess_num = find_next_mess(lcd_ctx.row1_mess_num);
+			lcd_ctx.row0_mess_num = find_next_mess(lcd_ctx.row0_mess_num);
+			
 			break;
 
         default:
@@ -598,6 +619,7 @@ static void LCD_MessageCheck_FlagNew(void){
 				lcd_ctx.time_off = get_system_time_ms() + LCD_TIME_DELAY_PRINT;
 				EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_MESS_NEW, EVENT_PRIORITY_HIGH);
 				mess_lcd->f_new = 0;
+				lcd_ctx.print_mode = 3;
 			}
 			
 		}

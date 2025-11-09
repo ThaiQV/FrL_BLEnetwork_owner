@@ -78,6 +78,7 @@ app_data_t g_app_data = {
 	.timetamp = 0,
 	.is_call = false,
 	.is_online = false,
+	.is_wait_rsp = false,
 	.mode = APP_MODE_TESTS,
 };
 
@@ -146,7 +147,7 @@ static void update_cont(void);
 void user_app_init(void)
 {
 	fl_tbs_data_t tbs_load = fl_db_tbsprofile_load();
-	if (tbs_load.data[0] = 0xff)
+	if (tbs_load.data[0] == 0xff)
 	{
 		u8 tbs_profile[1] = {0} ;
 		fl_db_tbsprofile_save(tbs_profile,SIZEU8(tbs_profile));
@@ -205,8 +206,8 @@ static void call_cb_rsp(void *_data,void* _data2)
 	}else{
 		EVENT_PUBLISH_SIMPLE(EVENT_DATA_CALL_FAIL_NORSP, EVENT_PRIORITY_HIGH);
 	}
-
-
+	g_app_data.is_wait_rsp = false;
+	
 }
 
 static void endcall_cb_rsp(void *_data,void* _data2)
@@ -220,6 +221,7 @@ static void endcall_cb_rsp(void *_data,void* _data2)
 	}else{
 		EVENT_PUBLISH_SIMPLE(EVENT_DATA_ENDCALL_FAIL_NORSP, EVENT_PRIORITY_HIGH);
 	}
+	g_app_data.is_wait_rsp = false;
 
 }
 
@@ -320,6 +322,11 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 
 			if(IsJoinedNetwork() == false)
 			{
+				if(IsPairing() == true)
+				{
+					break;
+				}
+				EVENT_PUBLISH_SIMPLE(EVENT_DATA_CALL_FAIL_OFFLINE, EVENT_PRIORITY_HIGH);
 				break;
 			}
 
@@ -329,12 +336,19 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 				break;
 			}
 
+			if (g_app_data.is_wait_rsp == true)
+			{
+				break;
+			}
+
 			if(g_app_data.is_call == false)
 			{
 				EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_CALL__, EVENT_PRIORITY_HIGH);
 				G_COUNTER_DEV.data.bt_call = 1;
 				fl_api_slave_req(NWK_HDR_55, (u8*)&G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data), call_cb_rsp, TIME_OUT_CHECK_RSP, NUM_RETRY);
 				G_COUNTER_DEV.data.bt_call = 0;
+
+				g_app_data.is_wait_rsp = true;
 			}
 
             break;
@@ -346,12 +360,19 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 				break;
 			}
 
+			if (g_app_data.is_wait_rsp == true)
+			{
+				break;
+			}
+
 			if( g_app_data.is_call)
 			{
 				EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_CALL__, EVENT_PRIORITY_HIGH);
 				G_COUNTER_DEV.data.bt_endcall = 1;
 				fl_api_slave_req(NWK_HDR_55, (u8*)&G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data), endcall_cb_rsp, TIME_OUT_CHECK_RSP, NUM_RETRY);
 				G_COUNTER_DEV.data.bt_endcall = 0;
+
+				g_app_data.is_wait_rsp = true;
 			}
 
             break;

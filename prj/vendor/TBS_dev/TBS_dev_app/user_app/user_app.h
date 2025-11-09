@@ -40,6 +40,7 @@ typedef struct {
 	count_product_t *count;
     bool is_call;
     bool is_online;
+    bool is_wait_rsp;
 	app_mode_t mode;
 }app_data_t;
 
