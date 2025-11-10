@@ -97,8 +97,8 @@ typedef struct {
 		u32 mac_parent;
 	} nwk;
 	struct {
-		u8 rst_factory;
 		u8 join_nwk;
+		u8 rst_factory;
 	} run_stt;
 	//Don't change
 	u32 magic; // constant for LSB

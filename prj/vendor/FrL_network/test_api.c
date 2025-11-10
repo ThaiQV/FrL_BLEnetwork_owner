@@ -122,7 +122,7 @@ u8 TEST_Buttons_RST(fl_exButton_states_e _state, void *_data) {
 //		fl_db_clearAll();
 //		delay_ms(1000);
 //		sys_reboot();
-		fl_db_Pairing_Clear();
+//		fl_db_Pairing_Clear();
 	}
 	//Must to clear status if done
 	return BUTT_STATE_NONE;

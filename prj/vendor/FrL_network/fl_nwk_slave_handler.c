@@ -208,13 +208,13 @@ void fl_nwk_slave_nwkclear(void){
 	G_INFORMATION.slaveID = my_profile.slaveid;
 	G_INFORMATION.profile = my_profile;
 	G_INFORMATION.profile.run_stt.join_nwk =1;
-	_nwk_slave_backup();
+	fl_db_slaveprofile_save(G_INFORMATION.profile);
 	blt_soft_timer_restart(_interval_report,100*100);
 }
 
 void fl_nwk_slave_init(void) {
 //	PLOG_Start(APP);
-//	PLOG_Start(API);
+//	PLOG_Start(FLA);
 	DEBUG_TURN(NWK_DEBUG_STT);
 //	fl_input_external_init();
 	FL_QUEUE_CLEAR(&G_HANDLE_CONTAINER,PACK_HANDLE_SIZE);
@@ -883,6 +883,7 @@ int fl_nwk_joinnwk_timeout(void) {
 		return -1;
 	} else {
 		ERR(INF,"Join-network timeout and re-scan!!!\r\n");
+		G_INFORMATION.profile.run_stt.join_nwk = 1;
 		return 0;
 	}
 }
