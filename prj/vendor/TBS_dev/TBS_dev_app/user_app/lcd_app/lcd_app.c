@@ -12,6 +12,7 @@
 
 #include "../../user_lib.h"
 #include "vendor/FrL_network/fl_nwk_handler.h"
+#include "vendor/FrL_network/fl_nwk_api.h"
 #include <stdio.h>
 
 extern get_data_t get_data;
@@ -43,7 +44,7 @@ typedef struct {
     uint8_t row0_mess_num;
     uint8_t row1_mess_num;
     uint32_t time_off;
-	bool print_mode;
+	uint8_t print_mode;
     bool enable;            ///< Data validity flag
     bool startup;
     lcd_print_type_t print_type;
@@ -144,7 +145,8 @@ lcd_app_handle_t app_handle;
 
 void my_timeout_callback(uint8_t row) {
 	ULOGA("my_timeout_callback \n");
-	for(int i = 0; i < 10; i++)
+
+	for(int out = 0; out < 10; out++)
 	{
 	switch (lcd_ctx.print_type)
 	{
@@ -198,17 +200,26 @@ void my_timeout_callback(uint8_t row) {
 			break;
 
 		case LCD_PRINT_PAIRING:
-			lcd_ctx.print_type = LCD_PRINT_OFF;
-			lcd_app_clear_all(&app_handle);
-			lcd_off();
-//			fl_db_Pairing_Clear();
-			fl_nwk_slave_nwkclear();
-//			sys_reboot();
+			if(IsJoinedNetwork())
+			{
+				lcd_ctx.print_type = LCD_PRINT_OFF;
+				lcd_app_clear_all(&app_handle);
+				continue;
+			}
+			else
+			{
+				lcd_app_set_message(&app_handle, 0, "    Pairing     ", 30000); //  0, timeout 10s
+				lcd_app_set_message(&app_handle, 1, "                ", 3000); //  0, timeout 10s
+			}
+
+			out = 11;
 			break;
 
 		case LCD_PRINT_FACTORY_RESET:
 			lcd_ctx.print_type = LCD_PRINT_OFF;
 			lcd_app_clear_all(&app_handle);
+			lcd_app_set_message(&app_handle, 0, "                ", 3000); //  0, timeout 10s
+			lcd_app_set_message(&app_handle, 1, "                ", 3000); //  0, timeout 10s
 			lcd_off();
 			fl_db_clearAll();
 			TBS_History_ClearAll();
@@ -236,6 +247,7 @@ void my_timeout_callback(uint8_t row) {
 			if(get_system_time_ms() > lcd_ctx.time_off)
 			{
 				lcd_ctx.print_type = LCD_PRINT_OFF;
+				lcd_ctx.print_mode = 0;
 				continue;
 			}
 			EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_MESS_NEW, EVENT_PRIORITY_HIGH);
@@ -243,7 +255,12 @@ void my_timeout_callback(uint8_t row) {
 
 		default:
 			lcd_ctx.print_mode = 0;
-			if (get_data.is_call())
+			if((IsJoinedNetwork() == false) && (IsPairing() == true))
+			{
+				lcd_ctx.print_type = LCD_PRINT_PAIRING;
+				continue;
+			}
+			else if (get_data.is_call())
 			{
 				lcd_ctx.print_type = LCD_PRINT_CALL;
 				continue;
@@ -297,7 +314,7 @@ static subapp_result_t lcd_app_init(subapp_t* self)
 	lcd_app_init_drv(&app_handle, &lcd_handle, &app_config);
 
 	lcd_app_set_message(&app_handle, 0, "   TBS GROUP   ", 30000); //  0, timeout 10s
-	lcd_app_set_message(&app_handle, 1, "Chung Suc Kien Tao Tuong Lai", 13000); //  1, timeout 15s
+	lcd_app_set_message(&app_handle, 1, "Chung Suc Kien Tao Tuong Lai      ", 15500); //  1, timeout 15s
 
 	uint32_t app_lcd_evt_table[] = get_lcd_event();
 
@@ -357,49 +374,66 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 			lcd_ctx.enable = 1;
 			lcd_ctx.print_type = LCD_PRINT_MESS;
 			
-			if(lcd_ctx.print_mode == 0)
+			switch (lcd_ctx.print_mode)
 			{
-				if(get_data.is_mode_actic())
-				{
-					lcd_app_set_message(&app_handle, 0, "   Trong Ca     ", 15000); //  0, timeout 10s
-				}
-				else
-				{
-					lcd_app_set_message(&app_handle, 0, "   Chay Thu     ", 15000); //  0, timeout 10s
-				}
+				case 0:
+					if (get_data.is_mode_actic())
+					{
+						lcd_app_set_message(&app_handle, 0, "   Trong Ca     ", 15000); // 0, timeout 10s
+					}
+					else
+					{
+						lcd_app_set_message(&app_handle, 0, "   Chay Thu     ", 15000); // 0, timeout 10s
+					}
 
-				lcd_app_clear_row(&app_handle, 1);
-				lcd_ctx.print_mode = 1;
-				lcd_ctx.row1_mess_num = find_next_mess(COUNTER_LCD_MESS_MAX);
-				
-
-			}
-			else
-			{
-				lcd_app_clear_all(&app_handle);
-
-				if(lcd_ctx.row1_mess_num == COUNTER_LCD_MESS_MAX)
-				{
-					lcd_app_set_message(&app_handle, 0, "               ", 1);
-					lcd_app_set_message(&app_handle, 1, "               ", 1);
-					break;
-				}
-
-				lcd_ctx.row0_mess_num = lcd_ctx.row1_mess_num;
-				lcd_app_set_message(&app_handle, 0, (char *)G_COUNTER_LCD[lcd_ctx.row0_mess_num], 15000);
-
-
-				lcd_ctx.row1_mess_num = find_next_mess(lcd_ctx.row1_mess_num);
-				if(lcd_ctx.row1_mess_num == lcd_ctx.row0_mess_num)
-				{
 					lcd_app_clear_row(&app_handle, 1);
-				}
-				else
-				{
-					lcd_app_set_message(&app_handle, 1, (char *)G_COUNTER_LCD[lcd_ctx.row1_mess_num], 30000);
-				}
-				
+					lcd_ctx.print_mode = 1;
+					lcd_ctx.row0_mess_num = find_next_mess(COUNTER_LCD_MESS_MAX);
+					break;
+
+				case 1:
+					lcd_ctx.print_mode = 2;
+					sprintf(lcd_ctx.display.line1, "pass %4d", get_data.pass_product());
+					sprintf(lcd_ctx.display.line2, "err  %4d", get_data.err_product());
+
+					lcd_app_set_message(&app_handle, 0, lcd_ctx.display.line1, 30000); // 0, timeout 10s
+					lcd_app_set_message(&app_handle, 1, lcd_ctx.display.line2, 15000); // 1, timeout 10s
+					break;
+
+				case 2:
+					lcd_app_clear_all(&app_handle);
+
+					if (lcd_ctx.row0_mess_num == COUNTER_LCD_MESS_MAX)
+					{
+						lcd_app_set_message(&app_handle, 0, "               ", 1);
+						lcd_app_set_message(&app_handle, 1, "               ", 1);
+						break;
+					}
+
+					lcd_app_set_message(&app_handle, 0, (char *)G_COUNTER_LCD[lcd_ctx.row0_mess_num], 15000);
+					lcd_ctx.row1_mess_num = find_next_mess(lcd_ctx.row0_mess_num);
+
+					if (lcd_ctx.row0_mess_num >= lcd_ctx.row1_mess_num)
+					{
+						lcd_ctx.print_mode = 0;
+					}
+					else
+					{
+						lcd_ctx.row0_mess_num = lcd_ctx.row1_mess_num;
+					}
+					break;
+				case 3:
+					lcd_app_set_message(&app_handle, 0, (char *)G_COUNTER_LCD[lcd_ctx.row0_mess_num], 15000);
+					lcd_app_clear_row(&app_handle, 1);
+					lcd_ctx.row0_mess_num = find_next_mess(lcd_ctx.row0_mess_num);
+
+					break;
+
+				default:
+					break;
+
 			}
+
 			
             break;
 
@@ -474,17 +508,7 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 			lcd_ctx.enable = 1;
 			lcd_ctx.print_type = LCD_PRINT_RESET;
 			lcd_app_set_message(&app_handle, 0, "    Reset OK    ", 30000); //  0, timeout 10s
-			lcd_app_set_message(&app_handle, 1, "                ", 5000); //  0, timeout 10s	
-
-			break;
-
-		case EVENT_LCD_PRINT_SELECT_MODE:
-			ULOGA("Handler EVENT_LCD_PRINT_SELECT_MODE\n");
-
-			lcd_ctx.enable = 1;
-			lcd_ctx.print_type = LCD_PRINT_RESET;
-			lcd_app_set_message(&app_handle, 0, "    Reset OK    ", 30000); //  0, timeout 10s
-			lcd_app_set_message(&app_handle, 1, " Tinh Trong Ca? ", 10000); //  0, timeout 10s		
+			lcd_app_set_message(&app_handle, 1, " Tinh Trong Ca? ", 10000); //  0, timeout 10s	
 
 			break;
 
@@ -493,8 +517,9 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 
 			lcd_ctx.enable = 1;
 			lcd_ctx.print_type = LCD_PRINT_PAIRING;
+			fl_nwk_slave_nwkclear();
 			lcd_app_set_message(&app_handle, 0, "    Pairing     ", 30000); //  0, timeout 10s
-			lcd_app_set_message(&app_handle, 1, "                ", 3000); //  0, timeout 10s		
+			lcd_app_set_message(&app_handle, 1, "                ", 1000); //  0, timeout 10s		
 
 			break;
 
@@ -562,7 +587,7 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 				lcd_app_set_message(&app_handle, 0, "  Call......    ", 30000);
 			}
 			 //  0, timeout 10s
-			lcd_app_set_message(&app_handle, 1, "                ", 3000); //  0, timeout 10s	
+			lcd_app_set_message(&app_handle, 1, "                ", 60000); //  0, timeout 10s	
 
 			break;
 
@@ -571,20 +596,19 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 
 			lcd_ctx.enable = 1;
 			lcd_ctx.print_type = LCD_PRINT_MESS_NEW;
-			lcd_ctx.row0_mess_num = lcd_ctx.row1_mess_num;
 			lcd_app_set_message(&app_handle, 0, (char *)G_COUNTER_LCD[lcd_ctx.row0_mess_num], 15000);
+			lcd_app_clear_row(&app_handle, 1);
+			lcd_ctx.row1_mess_num = find_next_mess(lcd_ctx.row0_mess_num);
 
-
-			lcd_ctx.row1_mess_num = find_next_mess(lcd_ctx.row1_mess_num);
-			if(lcd_ctx.row1_mess_num == lcd_ctx.row0_mess_num)
+			if (lcd_ctx.row0_mess_num >= lcd_ctx.row1_mess_num)
 			{
-				lcd_app_clear_row(&app_handle, 1);
+				lcd_ctx.print_mode = 0;
 			}
 			else
 			{
-				lcd_app_set_message(&app_handle, 1, (char *)G_COUNTER_LCD[lcd_ctx.row1_mess_num], 30000);
-				}
-
+				lcd_ctx.row0_mess_num = lcd_ctx.row1_mess_num;
+			}
+			
 			break;
 
         default:
@@ -601,11 +625,12 @@ static void LCD_MessageCheck_FlagNew(void){
 		{
 			if(memcmp(mess_zero, (uint8_t *)G_COUNTER_LCD[var], 20) != 0)
 			{
-				lcd_ctx.row1_mess_num = var;
+				lcd_ctx.row0_mess_num = var;
 				ULOGA("lcd_ctx.row0_mess_num %d\n", lcd_ctx.row1_mess_num);
 				lcd_ctx.time_off = get_system_time_ms() + LCD_TIME_DELAY_PRINT;
 				EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_MESS_NEW, EVENT_PRIORITY_HIGH);
 				mess_lcd->f_new = 0;
+				lcd_ctx.print_mode = 2;
 			}
 			
 		}

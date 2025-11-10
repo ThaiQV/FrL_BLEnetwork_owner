@@ -40,6 +40,7 @@ typedef struct {
 	count_product_t *count;
     bool is_call;
     bool is_online;
+    bool is_wait_rsp;
 	app_mode_t mode;
 }app_data_t;
 
@@ -61,7 +62,6 @@ void user_app_run(void);
     EVENT_BUTTON_NONE,\
     EVENT_BUTTON_RST_ONCLICK,\
     EVENT_BUTTON_RST_HOLD_3S,\
-    EVENT_BUTTON_RST_HOLD_5S,\
     EVENT_BUTTON_PPD_HOLD_3S,\
     EVENT_BUTTON_CALL_ONCLICK,\
     EVENT_BUTTON_ENDCALL_ONCLICK,\
@@ -74,6 +74,7 @@ void user_app_run(void);
     EVENT_BUTTON_CALL_HOLD_3S,\
 	EVENT_BUTTON_ENDCALL_HOLD_5S,\
     EVENT_LCD_PRINT_SELECT_MODE_TIMEOUT,\
+    EVENT_DATA_START_DONE,\
 }
 
 #endif /* COUNTER_DEVICE*/

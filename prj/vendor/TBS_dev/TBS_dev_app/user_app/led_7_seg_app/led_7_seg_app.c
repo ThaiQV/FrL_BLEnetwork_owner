@@ -188,7 +188,7 @@ static void led7_app_event_handler(const event_t* event, void* user_data)
             break;
 
 		case EVENT_DATA_RESET:
-            ULOGA("Handle EVENT_DATA_CALL\n");
+            ULOGA("Handle EVENT_DATA_RESET\n");
 			et6226m_display_number(&display_handle, get_data.pass_product(), false);
             // TODO: blink LED for call state
 			break;

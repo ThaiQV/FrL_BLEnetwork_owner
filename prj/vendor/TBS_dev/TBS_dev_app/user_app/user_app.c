@@ -78,6 +78,7 @@ app_data_t g_app_data = {
 	.timetamp = 0,
 	.is_call = false,
 	.is_online = false,
+	.is_wait_rsp = false,
 	.mode = APP_MODE_TESTS,
 };
 
@@ -145,6 +146,13 @@ static void update_cont(void);
 
 void user_app_init(void)
 {
+	fl_tbs_data_t tbs_load = fl_db_tbsprofile_load();
+	if (tbs_load.data[0] == 0xff)
+	{
+		u8 tbs_profile[1] = {0} ;
+		fl_db_tbsprofile_save(tbs_profile,SIZEU8(tbs_profile));
+	}
+	
 	read_count();
 
 	user_tca9555_app_init();
@@ -193,11 +201,13 @@ static void call_cb_rsp(void *_data,void* _data2)
 	if(data->timeout > 0){
 		EVENT_PUBLISH_SIMPLE(EVENT_DATA_CALL, EVENT_PRIORITY_HIGH);
 		g_app_data.is_call = true;
+		u8 tbs_profile[1] = {1} ;
+		fl_db_tbsprofile_save(tbs_profile,SIZEU8(tbs_profile));
 	}else{
 		EVENT_PUBLISH_SIMPLE(EVENT_DATA_CALL_FAIL_NORSP, EVENT_PRIORITY_HIGH);
 	}
-
-
+	g_app_data.is_wait_rsp = false;
+	
 }
 
 static void endcall_cb_rsp(void *_data,void* _data2)
@@ -206,9 +216,12 @@ static void endcall_cb_rsp(void *_data,void* _data2)
 	if(data->timeout > 0){
 		EVENT_PUBLISH_SIMPLE(EVENT_DATA_ENDCALL, EVENT_PRIORITY_HIGH);
 		g_app_data.is_call = false;
+		u8 tbs_profile[1] = {0} ;
+		fl_db_tbsprofile_save(tbs_profile,SIZEU8(tbs_profile));
 	}else{
 		EVENT_PUBLISH_SIMPLE(EVENT_DATA_ENDCALL_FAIL_NORSP, EVENT_PRIORITY_HIGH);
 	}
+	g_app_data.is_wait_rsp = false;
 
 }
 
@@ -223,12 +236,6 @@ static subapp_result_t data_app_init(subapp_t* self)
 		event_bus_subscribe(app_data_evt_table[i], data_app_event_handler, NULL, name);
 	}
 	
-	// for (int i = 0; i < 10; i++) {
-	//     memcpy(G_COUNTER_LCD[i], mess[i], sizeof(G_COUNTER_LCD[i]) - 1);
-	//     G_COUNTER_LCD[i][sizeof(G_COUNTER_LCD[i]) - 1] = '\0';
-	// }
-
-
 	return SUBAPP_OK;
 }
 
@@ -242,7 +249,15 @@ static subapp_result_t data_app_loop(subapp_t* self)
 		return SUBAPP_OK;
 	}
 
-	g_app_data.is_online = IsOnline();
+	if(IsJoinedNetwork())
+	{
+		g_app_data.is_online = IsOnline();
+	}
+	else
+	{
+		g_app_data.is_online = 0;
+	}
+	
 
 	return SUBAPP_OK;
 }
@@ -280,6 +295,10 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 
         case EVENT_BUTTON_RST_HOLD_3S:
             ULOGA("Handle EVENT_BUTTON_RST_HOLD_3S\n");
+			if(IsJoinedNetwork() == false)
+			{
+				break;
+			}
 
 			G_COUNTER_DEV.data.bt_rst = 1;
 			fl_api_slave_req(NWK_HDR_55, (u8*)&G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data), 0, TIME_OUT_CHECK_RSP, NUM_RETRY);
@@ -293,17 +312,32 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 			
 			g_app_data.count->pass_product = 0;
 			g_app_data.count->err_product = 0;
-			g_app_data.is_call = false;
 			update_cont();
+			data_ctx.mode = APP_MODE_SELEC;
 
             break;
 
         case EVENT_BUTTON_CALL_ONCLICK:
             ULOGA("Handle EVENT_BUTTON_CALL_ONCLICK\n");
 
-			if(IsJoinedNetwork() == 0 || IsOnline() == 0)
+			if(IsJoinedNetwork() == false)
+			{
+				if(IsPairing() == true)
+				{
+					break;
+				}
+				EVENT_PUBLISH_SIMPLE(EVENT_DATA_CALL_FAIL_OFFLINE, EVENT_PRIORITY_HIGH);
+				break;
+			}
+
+			if(IsJoinedNetwork() == 1 && IsOnline() == 0)
 			{
 				EVENT_PUBLISH_SIMPLE(EVENT_DATA_CALL_FAIL_OFFLINE, EVENT_PRIORITY_HIGH);
+				break;
+			}
+
+			if (g_app_data.is_wait_rsp == true)
+			{
 				break;
 			}
 
@@ -313,18 +347,32 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 				G_COUNTER_DEV.data.bt_call = 1;
 				fl_api_slave_req(NWK_HDR_55, (u8*)&G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data), call_cb_rsp, TIME_OUT_CHECK_RSP, NUM_RETRY);
 				G_COUNTER_DEV.data.bt_call = 0;
+
+				g_app_data.is_wait_rsp = true;
 			}
 
             break;
 
         case EVENT_BUTTON_ENDCALL_ONCLICK:
             ULOGA("Handle EVENT_BUTTON_ENDCALL_ONCLICK\n");
+			if(IsJoinedNetwork() == false)
+			{
+				break;
+			}
+
+			if (g_app_data.is_wait_rsp == true)
+			{
+				break;
+			}
+
 			if( g_app_data.is_call)
 			{
 				EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_CALL__, EVENT_PRIORITY_HIGH);
 				G_COUNTER_DEV.data.bt_endcall = 1;
 				fl_api_slave_req(NWK_HDR_55, (u8*)&G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data), endcall_cb_rsp, TIME_OUT_CHECK_RSP, NUM_RETRY);
 				G_COUNTER_DEV.data.bt_endcall = 0;
+
+				g_app_data.is_wait_rsp = true;
 			}
 
             break;
@@ -376,6 +424,10 @@ static void data_app_event_handler(const event_t* event, void* user_data)
         case EVENT_BUTTON_RST_PED_HOLD_5S:
             ULOGA("Handle EVENT_BUTTON_RST_PED_HOLD_5S\n");
 			ULOGA("PAIR\n");
+			g_app_data.is_call = false;
+			u8 tbs_profile[1] = {0} ;
+			fl_db_tbsprofile_save(tbs_profile,SIZEU8(tbs_profile));
+			EVENT_PUBLISH_SIMPLE(EVENT_LED_CALL_OFF, EVENT_PRIORITY_HIGH);
 			EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_PAIRING, EVENT_PRIORITY_HIGH);
 
             break;
@@ -399,12 +451,17 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 
             break;
 
-		case EVENT_BUTTON_RST_HOLD_5S:
-			ULOGA("Handle EVENT_BUTTON_RST_HOLD_5S\n");
-			data_ctx.mode = APP_MODE_SELEC;
-			EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_SELECT_MODE, EVENT_PRIORITY_HIGH);
-
-            break;
+		case EVENT_DATA_START_DONE:
+			if (g_app_data.is_call)
+			{
+				EVENT_PUBLISH_SIMPLE(EVENT_LED_CALL_ON, EVENT_PRIORITY_HIGH);
+			}
+			
+			if(IsPairing() && !IsJoinedNetwork())
+			{
+				EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_PAIRING, EVENT_PRIORITY_HIGH);
+			}
+			break;
 
         default:
             ULOGA("Unknown event: 0x%lx\n", (uint32_t)event);
@@ -415,8 +472,13 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 
 static void read_count(void)
 {
-	g_app_data.count->pass_product = G_COUNTER_DEV.data.pass_product;
-	g_app_data.count->err_product  = G_COUNTER_DEV.data.err_product;
+	g_app_data.count->pass_product 	= G_COUNTER_DEV.data.pass_product;
+	g_app_data.count->err_product  	= G_COUNTER_DEV.data.err_product;
+	g_app_data.mode 			 	= G_COUNTER_DEV.data.mode;
+	g_app_data.bt_call 				= G_COUNTER_DEV.data.bt_call;
+	g_app_data.bt_endcall 			= G_COUNTER_DEV.data.bt_endcall;
+	fl_tbs_data_t tbs_load = fl_db_tbsprofile_load();
+	g_app_data.is_call = tbs_load.data[0];
 }
 
 static void update_cont(void)
