@@ -373,7 +373,7 @@ void CMD_HEARTBEAT(u8* _data) {
 	//p set hb 5000
 	int rslt = sscanf((char*) _data,"hb %hd",&period_hb);
 	if (rslt == 1) {
-		if (period_hb > 1000) {
+		if (period_hb > 200) {
 			LOGA(DRV,"HeartBeat Period:%d ms\r\n",period_hb);
 			PERIOD_HEARTBEAT = period_hb;
 			return;
@@ -384,25 +384,35 @@ void CMD_HEARTBEAT(u8* _data) {
 		}
 	}
 	ERR(DRV,"ERR HeartBeat Period (%d):%d\r\n",rslt,period_hb);
-
 }
 
 void CMD_TEST(u8* _data) {
 	extern void TEST_virtual_fw(u32 _fwsize);
 	extern u8 GETINFO_FLAG_EVENTTEST;
-	 u8 slave_event[5] = {'e','v','e','n','t'};
+	u8 slave_event[5] = {'e','v','e','n','t'};
+	u8 fota_test[4] = {'f','o','t','a'};
 	char cmd[10];
 	int para[3];
 	u8 mqtt_rp[200];
 	memset(mqtt_rp,0,SIZEU8(mqtt_rp));
 	int rslt = sscanf((char*) _data,"test %10s %d %d %d",cmd,&para[0],&para[1],&para[2]);
 	if (rslt >= 1) {
+		//AUTOMATIC create event - p set test even 1
 		if(plog_IndexOf((u8*)cmd,slave_event,SIZEU8(slave_event),SIZEU8(cmd)) != -1){
 			if(rslt == 2){
 				GETINFO_FLAG_EVENTTEST = para[0];
 				sprintf((char*)mqtt_rp,"Test Even:%d",GETINFO_FLAG_EVENTTEST);
 				fl_ble2wifi_DEBUG2MQTT(mqtt_rp,strlen((char*)mqtt_rp));
-				LOGA(MCU,"%s\r\n",mqtt_rp);
+				P_INFO("%s\r\n",mqtt_rp);
+			}
+		}
+		//FOTA - p set test fota <size_fw>
+		if (plog_IndexOf((u8*) cmd,fota_test,SIZEU8(fota_test),SIZEU8(cmd)) != -1) {
+			if (rslt == 2) {
+				sprintf((char*) mqtt_rp,"FOTA size:%d bytes",para[0]);
+				fl_ble2wifi_DEBUG2MQTT(mqtt_rp,strlen((char*) mqtt_rp));
+				P_INFO("%s\r\n",mqtt_rp);
+				TEST_virtual_fw(para[0]);
 			}
 		}
 	}
@@ -739,7 +749,7 @@ void CMD_GETALLNODES(u8* _data) {
 		u8 onl_msb_indx =0;
 		u8 off_lsb_indx = p_ALLNODES.sort_list.numOfOnl -1;
 		for (u8 indx = 0; indx < G_NODE_LIST.slot_inused; ++indx) {
-			if(G_NODE_LIST.sla_info[indx].active == true){
+			if(G_NODE_LIST.sla_info[indx].active == false){
 				p_ALLNODES.sort_list.sla_info[onl_msb_indx++]=&G_NODE_LIST.sla_info[indx];
 			}
 			else{
@@ -753,16 +763,16 @@ void CMD_GETALLNODES(u8* _data) {
 //					p_ALLNODES.sort_list.sla_info[k]->mac[3],p_ALLNODES.sort_list.sla_info[k]->mac[4],p_ALLNODES.sort_list.sla_info[k]->mac[5],
 //					p_ALLNODES.sort_list.sla_info[k]->active);
 //		}
-		//Update num of online slave => onlt get online
+		//Update num of online slave => only get online or offline
 		p_ALLNODES.sort_list.numOfOnl = onl_msb_indx;
 		if(p_ALLNODES.sort_list.numOfOnl==0) return;
 		//Register timeout
 		p_ALLNODES.timeout = timeout==0?p_ALLNODES.sort_list.numOfOnl*16*GETALL_TIMEOUT_1_NODE:timeout*1000; //default num*durationADV
 		p_ALLNODES.timeout = (p_ALLNODES.timeout>20*1000)?20*1000:p_ALLNODES.timeout;
 		//clear all previous status of the all
-		for (u8 var = 0; var < G_NODE_LIST.slot_inused; ++var) {
-			G_NODE_LIST.sla_info[var].active = false;
-		}
+//		for (u8 var = 0; var < G_NODE_LIST.slot_inused; ++var) {
+//			G_NODE_LIST.sla_info[var].active = false;
+//		}
 		p_ALLNODES.rtt = clock_time();
 		P_INFO("Get %d/%d nodes (timeout:%d ms)(%d)\r\n",p_ALLNODES.sort_list.numOfOnl,G_NODE_LIST.slot_inused,p_ALLNODES.timeout,GETINFO_FLAG_EVENTTEST);
 		blt_soft_timer_restart(&_GETALLNODES,11*999);

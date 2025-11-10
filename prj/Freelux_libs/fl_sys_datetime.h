@@ -32,6 +32,7 @@ void fl_rtc_init(void);
 void fl_rtc_set(uint32_t timestamp_seconds);
 uint32_t fl_rtc_get(void);
 fl_timetamp_withstep_t fl_rtc_getWithMilliStep(void);
+fl_timetamp_withstep_t fl_rtc_milltampStep2timetamp(u64 _millstamp) ;
 u64 fl_rtc_timetamp2milltampStep(fl_timetamp_withstep_t _timetamp_step);
 u64 fl_rtc_timetampmillstep_convert(u8 *_array_timetampmill);
 void fl_rtc_sync(u32 timetamp_sync);

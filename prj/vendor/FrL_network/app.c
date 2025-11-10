@@ -57,7 +57,7 @@ int app_system_time_sync(void) {
 	//fl_rtc_set(0);
 #else
 	extern bool IsOnline(void);
-	if(!IsOnline())fl_rtc_set(0);
+	if(!IsOnline()) fl_rtc_set(0);
 #endif
 	return 0;
 }

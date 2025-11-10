@@ -139,7 +139,7 @@ int blt_soft_timer_delete(blt_timer_callback_t func) {
 				if ((u32) (blt_timer.timer[0].t - clock_time()) < 3000 * SYSTEM_TIMER_TICK_1MS) {
 					bls_pm_setAppWakeupLowPower(blt_timer.timer[0].t,1);
 				} else {
-					bls_pm_setAppWakeupLowPower(0,0);  //disable
+//					bls_pm_setAppWakeupLowPower(0,0);  //disable
 				}
 
 			}
@@ -176,7 +176,7 @@ void blt_soft_timer_process(int type) {
 
 	u32 now = clock_time();
 	if (!blt_timer.currentNum) {
-		bls_pm_setAppWakeupLowPower(0,0);  //disable
+//		bls_pm_setAppWakeupLowPower(0,0);  //disable
 		return;
 	}
 
@@ -198,10 +198,10 @@ void blt_soft_timer_process(int type) {
 					blt_soft_timer_delete_by_index(i);
 				} else if (result == 0) {
 					change_flg = 1;
-					blt_timer.timer[i].t = now + blt_timer.timer[i].interval;
+					blt_timer.timer[i].t = now + blt_timer.timer[i].interval+(rand() % 1000) + 10;
 				} else {  //set new timer interval
 					change_flg = 1;
-					blt_timer.timer[i].interval = result * SYSTEM_TIMER_TICK_1US;
+					blt_timer.timer[i].interval = (result+(rand() % 1000) + 10) * SYSTEM_TIMER_TICK_1US;
 					blt_timer.timer[i].t = now + blt_timer.timer[i].interval;
 				}
 			}
@@ -217,12 +217,12 @@ void blt_soft_timer_process(int type) {
 			bls_pm_setAppWakeupLowPower(blt_timer.timer[0].t,1);
 		} else {
 			//ERR(DRV,"blt>soft-timer :disable\r\n");
-			bls_pm_setAppWakeupLowPower(0,0);  //disable
+//			bls_pm_setAppWakeupLowPower(0,0);  //disable//
 		}
 
 	} else {
 		ERR(DRV,"blt>soft-timer :disable\r\n");
-		bls_pm_setAppWakeupLowPower(0,0);  //disable
+//		bls_pm_setAppWakeupLowPower(0,0);  //disable
 	}
 
 }

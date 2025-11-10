@@ -68,6 +68,7 @@ typedef struct {
 		u8 chn[3];
 		//key
 		u8 private_key[NWK_PRIVATE_KEY_SIZE];
+//		u8 hb_interval;
 	} nwk;
 	//Don't change
 	u32 magic;

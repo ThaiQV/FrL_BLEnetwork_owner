@@ -88,7 +88,9 @@ void crc128_calculate(uint8_t *pdata)
 		crc128[i] = (crc128[i] ^ pdata[i]);
 	}
 }
-
+u8* ota_crc128_get(void){
+	return &crc128[0];
+}
 /**
 * @brief: parse header version for FW
 * @param: see below
@@ -100,76 +102,185 @@ uint32_t header_version_parse(fw_header_t *header)
 }
 
 /**
+*@brief	disorder for OTA data
+*@param see below
+*/
+void disorder_data(uint8_t *p)
+{
+	uint8_t	disorder[CRC128_LENGTH] = {0x55,0xAA,0x55,0xAA,0x55,0xAA,0x55,0xAA,0x55,0xAA,0x55,0xAA,0x55,0xAA,0x55,0xAA};
+	uint8_t	i;
+
+	for(i = 0; i < CRC128_LENGTH; i++)
+	{
+		p[i] = (p[i] ^ disorder[i]);
+	}
+}
+/**
 * @brief: copy fw from OTA region to running region
 * @param: see below
 * @retval: None
 */
 void fw_copy(fw_header_t *header, uint32_t fw_addr)
 {
-	uint32_t 	i,j;
+	uint32_t 	i;
 	uint32_t 	size;
+//	uint32_t 	remain;
 	uint8_t		buff[1024];
-	fw_header_t	header_app = {0};
+	uint8_t		buff_ex[32];
+//	uint8_t		packet[22];
+//	fw_header_t	header_app = {0};
 
 	DFU_PRINTF("Copy FW: ver: %d.%d.%d - size: %d\n",header->major,header->minor,header->patch,header->size);
-	// Check FW is correct or not
-	if(check_valid_ota_fw(fw_addr) == 1)
-	{
-		DFU_PRINTF("OTA FW is valid\n");
-	}
-	else
-	{
-		DFU_PRINTF("OTA FW is invalid\n");
-		return;
-	}
-	// Erase running region to copy OTA FW
-	flash_read_mid();
-	flash_unlock_mid146085();
-	DFU_PRINTF("Erase Running region\n");
-	for(i = 0; i < (APP_IMAGE_SIZE_MAX/APP_PAGE_SIZE); i++)
-	{
-		flash_erase_sector(FLASH_R_BASE_ADDR + APP_IMAGE_ADDR + i*APP_PAGE_SIZE);
-	}
-	// Copy OTA FW into running region
-	size = header->size/sizeof(buff);
-	for(i = 0; i < size; i++)
-	{
-		W25XXX_Read((uint8_t *)buff,fw_addr + i*sizeof(buff),sizeof(buff));
-		flash_write_page(FLASH_R_BASE_ADDR + APP_IMAGE_ADDR + i*sizeof(buff), sizeof(buff), (uint8_t *)buff);
-		DFU_PRINTF("Copy: %d%%\n",(((i+1)*100)/size));
-	}
-	// Verify new FW
+//	// Check FW is correct or not
+//	if(check_valid_ota_fw(fw_addr) == 1)
+//	{
+//		DFU_PRINTF("OTA FW is valid\n");
+//	}
+//	else
+//	{
+//		DFU_PRINTF("OTA FW is invalid\n");
+//		return;
+//	}
+
+	// Check CRC128 of OTA FW in external flash before load into internal flash
 	crc128_init();
-	for(i = 0; i < size; i++)
+	size = 0;
+	while(size < header->size)
 	{
-		flash_read_page(FLASH_R_BASE_ADDR + APP_IMAGE_ADDR + i*sizeof(buff), sizeof(buff), (uint8_t *)buff);
-		// calculate crc128
-		for(j = 0; j < (sizeof(buff)/CRC128_LENGTH); j++)
-		{
-			crc128_calculate(&buff[j*CRC128_LENGTH]);
-		}
-		DFU_PRINTF("Verify: %d%%\n",(((i+1)*100)/size));
+		W25XXX_Read((uint8_t *)buff,fw_addr + size,CRC128_LENGTH);
+
+		disorder_data(buff);
+
+		crc128_calculate(buff);
+		size += CRC128_LENGTH;
 	}
-	// Check CRC128
+
+	DFU_PRINTF("Header CRC128: ");
+	for(i = 0; i < CRC128_LENGTH; i++)
+	{
+		printf("%x ",header->crc128[i]);
+	}
+	printf("\n");
+	DFU_PRINTF("Calculate CRC128: ");
+	for(i = 0; i < CRC128_LENGTH; i++)
+	{
+		printf("%x ",crc128[i]);
+	}
+	printf("\n");
+
 	if(memcmp(crc128,header->crc128,CRC128_LENGTH) == 0)
 	{
-		DFU_PRINTF("CRC128 is correct\n");
-		// Write Application FW header
-		header_app.major = header->major;
-		header_app.minor = header->minor;
-		header_app.patch = header->patch;
-		header_app.size  = header->size;
-		memcpy(header_app.crc128,crc128,CRC128_LENGTH);
-		// Erase header page before write new header
-		flash_erase_sector(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER);
-		flash_write_page(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER, sizeof(header_app), (uint8_t *)&header_app);
-
-		jump_to_application();
+		DFU_PRINTF("OTA FW CRC128 is valid\n");
 	}
 	else
 	{
-		DFU_PRINTF("CRC128 is incorrect\n");
+		DFU_PRINTF("OTA FW CRC128 is invalid\n");
 	}
+
+	// Compare FW in flash vs ex-flash
+	crc128_init();
+	size = 0;
+	while(size < header->size)
+	{
+		flash_read_page(FLASH_R_BASE_ADDR + APP_IMAGE_ADDR + size, CRC128_LENGTH, (uint8_t *)buff);
+		crc128_calculate(buff);
+		size += CRC128_LENGTH;
+	}
+
+	DFU_PRINTF("FW Calculate CRC128: ");
+	for(i = 0; i < CRC128_LENGTH; i++)
+	{
+		printf("%x ",crc128[i]);
+	}
+	printf("\n");
+
+	size = 0;
+	while(size < header->size)
+	{
+		flash_read_page(FLASH_R_BASE_ADDR + APP_IMAGE_ADDR + size, CRC128_LENGTH, (uint8_t *)buff);
+		W25XXX_Read((uint8_t *)buff_ex,fw_addr + size,CRC128_LENGTH);
+
+		disorder_data(buff_ex);
+
+		if(memcmp(buff_ex,buff,CRC128_LENGTH) != 0)
+		{
+			DFU_PRINTF("Wrong compare: %x\n",size);
+			for(i = 0; i < CRC128_LENGTH; i++)
+			{
+				printf("%x ",buff[i]);
+			}
+			printf("\n");
+			for(i = 0; i < CRC128_LENGTH; i++)
+			{
+				printf("%x ",buff_ex[i]);
+			}
+			printf("\n");
+
+//			W25XXX_WR_Block((uint8_t*)buff,fw_addr + size,OTA_PACKET_LENGTH);
+		}
+		size += CRC128_LENGTH;
+	}
+
+
+//	// Erase running region to copy OTA FW
+//	flash_read_mid();
+//	flash_unlock_mid146085();
+//	DFU_PRINTF("Erase Running region\n");
+//	for(i = 0; i < (APP_IMAGE_SIZE_MAX/APP_PAGE_SIZE); i++)
+//	{
+//		flash_erase_sector(FLASH_R_BASE_ADDR + APP_IMAGE_ADDR + i*APP_PAGE_SIZE);
+//	}
+//	// Copy OTA FW into running region
+//	size = header->size/sizeof(buff);
+//	for(i = 0; i < size; i++)
+//	{
+//		W25XXX_Read((uint8_t *)buff,fw_addr + i*sizeof(buff),sizeof(buff));
+//		flash_write_page(FLASH_R_BASE_ADDR + APP_IMAGE_ADDR + i*sizeof(buff), sizeof(buff), (uint8_t *)buff);
+//		DFU_PRINTF("Copy: %d%%\n",(((i+1)*100)/size));
+//	}
+//
+//	remain = header->size%sizeof(buff);
+//	if(remain > 0)
+//	{
+//		W25XXX_Read((uint8_t *)buff,fw_addr + size*sizeof(buff),remain);
+//		flash_write_page(FLASH_R_BASE_ADDR + APP_IMAGE_ADDR + size*sizeof(buff), remain, (uint8_t *)buff);
+//		DFU_PRINTF("Copy remain: %d bytes\n",size);
+//	}
+//
+//	// Verify new FW
+//	crc128_init();
+//	for(i = 0; i < size; i++)
+//	{
+//		flash_read_page(FLASH_R_BASE_ADDR + APP_IMAGE_ADDR + i*sizeof(buff), sizeof(buff), (uint8_t *)buff);
+//		// calculate crc128
+//		for(j = 0; j < (sizeof(buff)/CRC128_LENGTH); j++)
+//		{
+//			crc128_calculate(&buff[j*CRC128_LENGTH]);
+//		}
+//		DFU_PRINTF("Verify: %d%%\n",(((i+1)*100)/size));
+//	}
+//	// Check CRC128
+//	if(memcmp(crc128,header->crc128,CRC128_LENGTH) == 0)
+//	{
+//		DFU_PRINTF("CRC128 is correct\n");
+//		// Write Application FW header
+//		header_app.major = header->major;
+//		header_app.minor = header->minor;
+//		header_app.patch = header->patch;
+//		header_app.size  = header->size;
+//		memcpy(header_app.crc128,crc128,CRC128_LENGTH);
+//		// Erase header page before write new header
+//		flash_erase_sector(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER);
+//		flash_write_page(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER, sizeof(header_app), (uint8_t *)&header_app);
+//
+//		jump_to_application();
+//	}
+//	else
+//	{
+//		// Erase OTA FW header if the CRC128 is wrong
+////		FLASH_Erase_Sector(OTA_FW_HEADER);
+//		DFU_PRINTF("CRC128 is incorrect\n");
+//	}
 }
 
 /**
@@ -308,6 +419,7 @@ void firmware_check(void)
 	DFU_PRINTF("Current FW ver: %x.%x.%x\n",header_current_fw.major,header_current_fw.minor,header_current_fw.patch);
 	DFU_PRINTF("Size: %x\n",header_current_fw.size);
 
+//	fw_copy(&header_ota_fw,OTA_FW_ADDRESS);
 
 	// Check original FW
 	if(HVP(&header_original_fw) == HEADER_EMPTY) // No original FW
@@ -339,6 +451,19 @@ void firmware_check(void)
 		// First time start or no current FW
 		if(check_valid_current_fw() == 1)
 		{
+			// Erase header page before write new header
+			flash_read_mid();
+			flash_unlock_mid146085();
+			flash_erase_sector(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER);
+
+			// Write Application current FW header
+			header_current_fw.major = 0;
+			header_current_fw.minor = 0;
+			header_current_fw.patch = 1;
+			header_current_fw.size  = 0x40000;
+			memcpy(header_current_fw.crc128,crc128,CRC128_LENGTH);
+			flash_write_page(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER, sizeof(header_current_fw), (uint8_t *)&header_current_fw);
+
 			jump_to_application();
 		}
 		else
@@ -394,8 +519,21 @@ void ota_init(void)
 	printf("\n");
 }
 
-u8* ota_crc128_get(void){
-	return &crc128[0];
+/**
+* @brief: check crc of ota packet
+* @param: see below
+*/
+uint8_t ota_packet_crc(uint8_t *pdata)
+{
+	uint8_t crc = 0;
+	uint8_t	i = 0;
+
+	for(i = 0; i < 22; i++)
+	{
+		crc = (crc + pdata[i]);
+	}
+
+	return crc;
 }
 
 /**
@@ -417,7 +555,7 @@ u8* ota_crc128_get(void){
 * -------------------------------------------------------------------------
 * @retval: ota_ret_t
 */
-ota_ret_t ota_fw_put(uint8_t *pdata)
+ota_ret_t ota_fw_put(uint8_t *p_data_buffer, uint8_t crc)
 {
 	ota_packet_type_t	packet_type;
 	ota_device_type_t 	device_type;
@@ -429,94 +567,106 @@ ota_ret_t ota_fw_put(uint8_t *pdata)
 	uint32_t			sector;
 	uint8_t				slot;
 
+	u8 pdata[22];
+	memcpy(pdata,p_data_buffer,sizeof(pdata));
+
 	packet_type = pdata[0];
 
-	if(packet_type == OTA_PACKET_BEGIN)
+	if(ota_packet_crc(pdata) == crc)
 	{
-		packet_header.state = OTA_FW_STATE_EMPTY;
-		packet_header.type = pdata[1];
-		packet_header.version = pdata[2];
-		packet_header.size = (uint32_t)pdata[3] + (uint32_t)(pdata[4] << 8) + (uint32_t)(pdata[5] << 16);
-		memcpy((uint8_t*)packet_header.signature,(uint8_t*)&pdata[6],OTA_PACKET_LENGTH);
-		ota_packet_header_set(&packet_header);
-		DFU_PRINTF("OTA Begin\n");
-		return OTA_RET_OK;
-	}
-	else if(packet_type == OTA_PACKET_END)
-	{
-		ota_packet_header_get(&packet_header);
-		if((packet_header.state == OTA_FW_STATE_EMPTY) || (packet_header.state == OTA_FW_STATE_WRITING))
+		if(packet_type == OTA_PACKET_BEGIN)
 		{
-			packet_header.state = OTA_FW_STATE_COMPLETE;
+			packet_header.state = OTA_FW_STATE_EMPTY;
 			packet_header.type = pdata[1];
 			packet_header.version = pdata[2];
 			packet_header.size = (uint32_t)pdata[3] + (uint32_t)(pdata[4] << 8) + (uint32_t)(pdata[5] << 16);
 			memcpy((uint8_t*)packet_header.signature,(uint8_t*)&pdata[6],OTA_PACKET_LENGTH);
 			ota_packet_header_set(&packet_header);
-
-			// Write OTA header
-			ota_header.major = 0;
-			ota_header.minor = 0;
-			ota_header.patch = packet_header.version;
-			ota_header.size  = packet_header.size;
-			memcpy(ota_header.crc128,(uint8_t*)packet_header.signature,OTA_PACKET_LENGTH);
-
-			DFU_PRINTF("Signature: ");
-			for(i = 0; i < CRC128_LENGTH; i++)
-			{
-				printf("%x ",ota_header.crc128[i]);
-			}
-			printf("\n");
-
-			// Erase OTA Header sector before write
-			FLASH_Erase_Sector(OTA_FW_HEADER);
-			// Write OTA Header
-			W25XXX_WR_Block((uint8_t *)&ota_header,OTA_FW_HEADER,sizeof(ota_header));
-			// Write OTA Map
-			memset(ota_map,0xFF,sizeof(ota_map));
-			nvm_record_write(OTA_MEMORY_MAP,(uint8_t*)ota_map,sizeof(ota_map));
-
-			DFU_PRINTF("OTA End\n");
+			DFU_PRINTF("OTA Begin\n");
 			return OTA_RET_OK;
 		}
-	}
-	else if(packet_type == OTA_PACKET_DATA)
-	{
-		device_type = pdata[1];
-		version		= pdata[2];
-		memory_addr	= (uint32_t)pdata[3] + (uint32_t)(pdata[4] << 8) + (uint32_t)(pdata[5] << 16);
-
-		ota_packet_header_get(&packet_header);
-		if((packet_header.state == OTA_FW_STATE_EMPTY) || (packet_header.state == OTA_FW_STATE_WRITING))
+		else if(packet_type == OTA_PACKET_END)
 		{
-			if((device_type == packet_header.type) && (version == packet_header.version))
+			ota_packet_header_get(&packet_header);
+			if((packet_header.state == OTA_FW_STATE_EMPTY) || (packet_header.state == OTA_FW_STATE_WRITING))
 			{
-				sector = memory_addr/0x1000;
-				// Check sector is available to write
-				for(i = 0; i < sizeof(ota_map); i++)
+				packet_header.state = OTA_FW_STATE_COMPLETE;
+				packet_header.type = pdata[1];
+				packet_header.version = pdata[2];
+				packet_header.size = (uint32_t)pdata[3] + (uint32_t)(pdata[4] << 8) + (uint32_t)(pdata[5] << 16);
+				memcpy((uint8_t*)packet_header.signature,(uint8_t*)&pdata[6],OTA_PACKET_LENGTH);
+				ota_packet_header_set(&packet_header);
+
+				// Write OTA header
+				ota_header.major = 0;
+				ota_header.minor = 0;
+				ota_header.patch = packet_header.version;
+				ota_header.size  = packet_header.size;
+				memcpy(ota_header.crc128,(uint8_t*)packet_header.signature,OTA_PACKET_LENGTH);
+
+				DFU_PRINTF("Signature: ");
+				for(i = 0; i < CRC128_LENGTH; i++)
 				{
-					slot = ota_map[i];
-					for(j = 0; j < 8; j++)
-					{
-						if(sector == (j + i*8))
-						{
-							if(((0x01 << j) & slot) != 0)
-							{
-								// clear sector position in ota_map and erase sector
-								ota_map[i] &= (~(0x01 << j));
-								FLASH_Erase_Sector(OTA_FW_ADDRESS +  sector*DEF_UDISK_SECTOR_SIZE);
-								DFU_PRINTF("Erase sector: %d\n",sector);
-							}
-						}
-					}
+					printf("%x ",ota_header.crc128[i]);
 				}
-				memory_addr = OTA_FW_ADDRESS + memory_addr;
-				W25XXX_WR_Block((uint8_t*)&pdata[6],memory_addr,OTA_PACKET_LENGTH);
-//				DFU_PRINTF("Write addr: %x\n",memory_addr);
+				printf("\n");
+
+				// Erase OTA Header sector before write
+				FLASH_Erase_Sector(OTA_FW_HEADER);
+				// Write OTA Header
+				W25XXX_WR_Block((uint8_t *)&ota_header,OTA_FW_HEADER,sizeof(ota_header));
+				// Write OTA Map
+				memset(ota_map,0xFF,sizeof(ota_map));
+				nvm_record_write(OTA_MEMORY_MAP,(uint8_t*)ota_map,sizeof(ota_map));
+
+				DFU_PRINTF("OTA End\n");
 				return OTA_RET_OK;
 			}
 		}
+		else if(packet_type == OTA_PACKET_DATA)
+		{
+			device_type = pdata[1];
+			version		= pdata[2];
+			memory_addr	= (uint32_t)pdata[3] + (uint32_t)(pdata[4] << 8) + (uint32_t)(pdata[5] << 16);
+
+			ota_packet_header_get(&packet_header);
+			if((packet_header.state == OTA_FW_STATE_EMPTY) || (packet_header.state == OTA_FW_STATE_WRITING))
+			{
+				if((device_type == packet_header.type) && (version == packet_header.version))
+				{
+					sector = memory_addr/0x1000;
+					// Check sector is available to write
+					for(i = 0; i < sizeof(ota_map); i++)
+					{
+						slot = ota_map[i];
+						for(j = 0; j < 8; j++)
+						{
+							if(sector == (j + i*8))
+							{
+								if(((0x01 << j) & slot) != 0)
+								{
+									// clear sector position in ota_map and erase sector
+									ota_map[i] &= (~(0x01 << j));
+									FLASH_Erase_Sector(OTA_FW_ADDRESS +  sector*DEF_UDISK_SECTOR_SIZE);
+									DFU_PRINTF("Erase sector: %d\n",sector);
+								}
+							}
+						}
+					}
+					memory_addr = OTA_FW_ADDRESS + memory_addr;
+					if(ota_packet_crc(pdata) != crc)
+					{
+						P_INFO_HEX(pdata,22,"FW(%02X):",crc);
+						return OTA_RET_ERROR;
+					}
+					W25XXX_WR_Block((uint8_t*)&pdata[6],memory_addr,OTA_PACKET_LENGTH);
+	//				DFU_PRINTF("Write addr: %x\n",memory_addr);
+					return OTA_RET_OK;
+				}
+			}
+		}
 	}
+	P_INFO_HEX(pdata,22,"FW(%02X):",crc);
 	return OTA_RET_ERROR;
 }
 
@@ -544,15 +694,17 @@ ota_ret_t ota_packet_header_get(ota_fw_header_t *header)
 	return OTA_RET_ERROR;
 }
 
-
+/*
 void test_ota(void)
 {
 	uint32_t 	i,j;
 	uint8_t		buff[1024];
 	uint8_t		packet[22];
 	uint32_t	address;
-	uint32_t	image_size = 0x24000;//APP_IMAGE_SIZE_MAX;
+	uint32_t	image_size = 0x40000;//APP_IMAGE_SIZE_MAX;
 //	uint32_t	image_size = 0x1000;//APP_IMAGE_SIZE_MAX;
+	ota_ret_t	ret;
+	uint8_t		crc = 0;
 
 	// put packet begin
 	packet[0] = OTA_PACKET_BEGIN; 			// packet begin
@@ -561,13 +713,13 @@ void test_ota(void)
 	packet[3] = (uint8_t)image_size;		// FW size
 	packet[4] = (uint8_t)(image_size>>8);	// FW size
 	packet[5] = (uint8_t)(image_size>>16);	// FW size
-	ota_fw_put(packet);
+	ret = ota_fw_put(packet,crc);
+	DFU_PRINTF("Begin: %d\n",ret);
 
 	flash_read_mid();
 	flash_unlock_mid146085();
-
-
 	crc128_init();
+
 	// put packet data
 	packet[0] = OTA_PACKET_DATA; 			// packet data
 	packet[1] = 0;							// device type
@@ -575,14 +727,14 @@ void test_ota(void)
 	address = 0;
 	for(i = 0; i < (image_size/sizeof(buff)); i++)
 	{
-		flash_read_page(0x10000+FLASH_R_BASE_ADDR + APP_IMAGE_ADDR + i*sizeof(buff), sizeof(buff), (uint8_t *)buff);
+		flash_read_page(FLASH_R_BASE_ADDR + APP_IMAGE_ADDR + i*sizeof(buff), sizeof(buff), (uint8_t *)buff);
 		for(j = 0; j < (sizeof(buff)/OTA_PACKET_LENGTH); j++)
 		{
 			packet[3] = (uint8_t)address;		// address
 			packet[4] = (uint8_t)(address>>8);	// address
 			packet[5] = (uint8_t)(address>>16);	// address
 			memcpy(&packet[6],&buff[j*OTA_PACKET_LENGTH],OTA_PACKET_LENGTH);
-			ota_fw_put(packet);
+			ret = ota_fw_put(packet,crc);
 			address += OTA_PACKET_LENGTH;
 		}
 		// calculate crc128
@@ -590,9 +742,8 @@ void test_ota(void)
 		{
 			crc128_calculate(&buff[j*CRC128_LENGTH]);
 		}
-		DFU_PRINTF("Copy: %d%%\n",(((i+1)*100)/(image_size/sizeof(buff))));
+		DFU_PRINTF("Copy: %d%% - %d\n",(((i+1)*100)/(image_size/sizeof(buff))),ret);
 	}
-
 
 	// put packet begin
 	packet[0] = OTA_PACKET_END; 			// packet begin
@@ -602,6 +753,7 @@ void test_ota(void)
 	packet[4] = (uint8_t)(image_size>>8);	// FW size
 	packet[5] = (uint8_t)(image_size>>16);	// FW size
 	memcpy(&packet[6],crc128,OTA_PACKET_LENGTH);
-	///
-	ota_fw_put(packet);
+	ret = ota_fw_put(packet,crc);
+	DFU_PRINTF("End: %d\n",ret);
 }
+*/

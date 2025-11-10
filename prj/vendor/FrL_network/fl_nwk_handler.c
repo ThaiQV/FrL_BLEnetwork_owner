@@ -93,7 +93,7 @@ s8 fl_queueREQcRSP_add(u8 slaveid,u8 cmdid,u64 _SeqTimetamp,u8* _payloadreq,u8 _
 	extern fl_adv_settings_t G_ADV_SETTINGS;
 	u8 avai_slot= 0xFF;
 	if(fl_queueREQcRSP_find(_cb,_SeqTimetamp,&avai_slot) == -1 && avai_slot < QUEUE_RSP_SLOT_MAX){
-		G_QUEUE_REQ_CALL_RSP[avai_slot].timeout = ((_timeout_ms!=0?(_timeout_ms + 8*G_ADV_SETTINGS.adv_duration):16*G_ADV_SETTINGS.adv_duration)*1000);
+		G_QUEUE_REQ_CALL_RSP[avai_slot].timeout = ((_timeout_ms!=0?(_timeout_ms + 16*G_ADV_SETTINGS.adv_duration):32*G_ADV_SETTINGS.adv_duration)*1000);
 		G_QUEUE_REQ_CALL_RSP[avai_slot].timeout_set = G_QUEUE_REQ_CALL_RSP[avai_slot].timeout;
 		G_QUEUE_REQ_CALL_RSP[avai_slot].rsp_cb = *_cb;
 		G_QUEUE_REQ_CALL_RSP[avai_slot].rsp_check.seqTimetamp = _SeqTimetamp;
@@ -108,11 +108,33 @@ s8 fl_queueREQcRSP_add(u8 slaveid,u8 cmdid,u64 _SeqTimetamp,u8* _payloadreq,u8 _
 			ERR(INF,"REQcRSP RE-Initialization (%d us)!!\r\n",QUEUQ_REQcRSP_INTERVAL);
 			blt_soft_timer_restart(&fl_queue_REQnRSP_TimeoutStart,QUEUQ_REQcRSP_INTERVAL);
 		}
+//		fl_queue_REQnRSP_OriginTime_set(_SeqTimetamp);
 		return avai_slot;
 	}
 	ERR(API,"queueREQcRSP Add [%d]SeqTimetamp(%lld):%d ms|retry: %d \r\n",avai_slot,_SeqTimetamp,_timeout_ms,_retry);
 	return -1;
 }
+#ifndef MASTER_CORE
+void fl_queue_REQnRSP_OriginTime_set(u64 _timestamp_set){
+	extern volatile fl_timetamp_withstep_t ORIGINAL_MASTER_TIME;
+	u64 origin = _timestamp_set;
+	u64 master_curr = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
+	fl_timetamp_withstep_t origin_mil;
+	for (u8 indx = 0; indx < QUEUE_RSP_SLOT_MAX; ++indx) {
+		if(G_QUEUE_REQ_CALL_RSP[indx].rsp_check.seqTimetamp < origin && G_QUEUE_REQ_CALL_RSP[indx].rsp_check.seqTimetamp != 0
+				&&G_QUEUE_REQ_CALL_RSP[indx].rsp_check.seqTimetamp >= master_curr){
+			origin = G_QUEUE_REQ_CALL_RSP[indx].rsp_check.seqTimetamp;
+			origin_mil = fl_rtc_milltampStep2timetamp(origin);
+		}
+	}
+	if(origin>=master_curr){
+		P_INFO("REQnRSP synch ORIGIN_MASTER:%lld\r\n",origin);
+		fl_nwk_slave_SYNC_ORIGIN_MASTER(origin_mil.timetamp,origin_mil.milstep);
+	}else{
+		fl_nwk_slave_SYNC_ORIGIN_MASTER(ORIGINAL_MASTER_TIME.timetamp,ORIGINAL_MASTER_TIME.milstep);
+	}
+}
+#endif
 /***************************************************
  * @brief 		:Run checking rsp and timeout
  *

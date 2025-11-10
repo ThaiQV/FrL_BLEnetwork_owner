@@ -14,7 +14,7 @@
 #include "stdio.h"
 #include "fl_adv_repeat.h"
 #include "fl_adv_proc.h"
-//#include "fl_nwk_protocol.h"
+#include "fl_nwk_protocol.h"
 #include "fl_nwk_handler.h"
 #include "fl_wifi2ble_fota.h"
 //Test api
@@ -37,9 +37,9 @@ extern volatile fl_timetamp_withstep_t WIFI_ORIGINAL_GETALL;
 											}while(0) //Sync original time-master req
 u8 GETINFO_FLAG_EVENTTEST = 0;
 #define JOIN_NETWORK_TIME 			60*1012 			//ms
-#define RECHECKING_NETWOK_TIME 		30*1021 		    //ms
+#define RECHECKING_NETWOK_TIME 		14*1021 		    //ms
 #define RECONNECT_TIME				62*1000*1020		//s
-#define INFORM_MASTER				5*1001*1004
+#define INFORM_MASTER				9*1001*1004
 fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_FOTA,NWK_HDR_A5_HIS,NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
 fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_FOTA,NWK_HDR_A5_HIS,NWK_HDR_55,NWK_HDR_11_REACTIVE,NWK_HDR_22_PING}; // register cmdid REQ
 
@@ -66,11 +66,18 @@ fl_timetamp_withstep_t GenerateTimetampField(void){
 	return cur_timetamp;
 }
 
+void fl_nwk_slave_SYNC_ORIGIN_MASTER(u32 _timetamp,u8 _mil) {
+	ORIGINAL_MASTER_TIME.timetamp = _timetamp;
+	ORIGINAL_MASTER_TIME.milstep = _mil;
+} //Sync original time-master req
+
 /*---------------- Total Packet handling --------------------------*/
 
 fl_pack_t g_handle_array[PACK_HANDLE_SIZE];
 fl_data_container_t G_HANDLE_CONTAINER = { .data = g_handle_array, .head_index = 0, .tail_index = 0, .mask = PACK_HANDLE_SIZE - 1, .count = 0 };
-
+/*---------------- Priority Sending --------------------------*/
+fl_pack_t g_priority_sending_array[8];
+fl_data_container_t G_PRIORITY_QUEUE_SENDING = { .data = g_priority_sending_array, .head_index = 0, .tail_index = 0, .mask = 8 - 1, .count = 0 };
 //My information
 fl_nodeinnetwork_t G_INFORMATION ={.active=false};
 #ifndef MASTER_CORE
@@ -145,7 +152,7 @@ void _Inform11_rsp_callback(void *_data,void* _data2){
 }
 
 int _informMaster(void){
-	if(IsJoinedNetwork() && G_INFORMATION.profile.run_stt.join_nwk == 0){
+	if(IsOnline() && G_INFORMATION.profile.run_stt.join_nwk == 0){
 		LOGA(INF,"Inform to master (%d s)!!!\r\n",INFORM_MASTER/1000/1000);
 #ifdef COUNTER_DEVICE
 		fl_api_slave_req(NWK_HDR_11_REACTIVE,(u8*)&G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data),_Inform11_rsp_callback,0,0);
@@ -159,6 +166,7 @@ int _informMaster(void){
 	}
 	return -1;
 }
+
 int _isOnline_check(void) {
 	ERR(INF,"Device -> offline\r\n");
 	G_INFORMATION.active = false;
@@ -205,7 +213,8 @@ void fl_nwk_slave_nwkclear(void){
 }
 
 void fl_nwk_slave_init(void) {
-//	PLOG_Start(ALL);
+//	PLOG_Start(APP);
+//	PLOG_Start(API);
 	DEBUG_TURN(NWK_DEBUG_STT);
 //	fl_input_external_init();
 	FL_QUEUE_CLEAR(&G_HANDLE_CONTAINER,PACK_HANDLE_SIZE);
@@ -233,8 +242,7 @@ void fl_nwk_slave_init(void) {
 	G_INFORMATION.data =(u8*)&G_POWER_METER;
 #endif
 	fl_nwk_LedSignal_init();
-	//todo: TBS Device initialization
-	TBS_Device_Init();
+
 	memcpy(G_INFORMATION.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_INFORMATION.mac));
 	memcpy(&G_INFORMATION.data[0],G_INFORMATION.mac,6);
 	P_INFO("** Freelux network SLAVE init \r\n");
@@ -256,15 +264,17 @@ void fl_nwk_slave_init(void) {
 	}
 #endif
 
-	blt_soft_timer_add(_nwk_slave_backup,2*1000*1000);
+	blt_soft_timer_add(_nwk_slave_backup,2*1020*999);
 	//Interval checking network
 //	fl_nwk_slave_reconnectNstoragedata();
 	WIFI_ORIGINAL_GETALL = fl_rtc_getWithMilliStep();
 	blt_soft_timer_add(_interval_report,100*1000);
 	//inform to master I'm online
 //	blt_soft_timer_add(&_slave_reconnect,2*1000*1000);
-	blt_soft_timer_add(&_informMaster,INFORM_MASTER);
+	blt_soft_timer_add(&_informMaster,5*1000*1000);
 	G_INFORMATION.active = false;
+	//todo: TBS Device initialization
+	TBS_Device_Init();
 	//test random send req
 //	TEST_slave_sendREQ();
 }
@@ -280,10 +290,17 @@ void _nwk_slave_syncFromPack(fl_dataframe_format_t *packet){
 	u32 master_timetamp; //, slave_timetamp;
 	//Synchronize time master
 	master_timetamp = MAKE_U32(packet->timetamp[3],packet->timetamp[2],packet->timetamp[1],packet->timetamp[0]);
-	datetime_t cur_dt;
-	fl_rtc_timestamp_to_datetime(master_timetamp,&cur_dt);
-	LOGA(APP,"(%d)MASTER-TIME:%02d/%02d/%02d - %02d:%02d:%02d\r\n",packet->endpoint.dbg,cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,
-			cur_dt.minute,cur_dt.second);
+//	datetime_t cur_dt;
+//	fl_rtc_timestamp_to_datetime(master_timetamp,&cur_dt);
+//	P_INFO("(%d)MASTER-TIME:%02d/%02d/%02d - %02d:%02d:%02d\r\n",packet->endpoint.dbg,cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,
+//			cur_dt.second);
+//	fl_rtc_timestamp_to_datetime(WIFI_ORIGINAL_GETALL.timetamp,&cur_dt);
+//	P_INFO("ORIGINAL_GETALL:%02d/%02d/%02d - %02d:%02d:%02d\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second);
+//
+//	u32 cur_timetamp = fl_rtc_get();
+//	fl_rtc_timestamp_to_datetime(cur_timetamp,&cur_dt);
+//	P_INFO("SYSTIME:%02d/%02d/%02d - %02d:%02d:%02d\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second);
+
 	fl_rtc_sync(master_timetamp);
 	//Synchronize debug log
 	NWK_DEBUG_STT = packet->endpoint.dbg;
@@ -293,32 +310,38 @@ void _nwk_slave_syncFromPack(fl_dataframe_format_t *packet){
 	//add repeat_cnt
 	NWK_REPEAT_LEVEL = packet->endpoint.rep_settings;
 
-	//Sync mastertime origin
-	//if (packet->hdr == NWK_HDR_HEARTBEAT)
-	{
-		SYNC_ORIGIN_MASTER(master_timetamp,packet->milltamp);
-		LOGA(INF,"ORIGINAL MASTER-TIME:%d\r\n",ORIGINAL_MASTER_TIME.milstep);
-	}
-	//Sync network status
-	//if(packet->slaveID.id_u8 == G_INFORMATION.slaveID.id_u8)
-	{
-		G_INFORMATION.active = true;
-		blt_soft_timer_restart(&_isOnline_check,RECHECKING_NETWOK_TIME * 1000);
-	}
+	SYNC_ORIGIN_MASTER(master_timetamp,packet->milltamp);
+	LOGA(INF,"ORIGINAL MASTER-TIME:%d\r\n",ORIGINAL_MASTER_TIME.milstep);
+
+	G_INFORMATION.active = true;
+	blt_soft_timer_restart(&_isOnline_check,RECHECKING_NETWOK_TIME * 1000);
 }
 
 s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry) {
+	extern fl_adv_settings_t G_ADV_SETTINGS;
 	//register timeout cb
+	u32 waittime=0;
+	s8 rslt=-1;
 	if (_cb != 0 && ( _timeout_ms*1000 >= 2*QUEUQ_REQcRSP_INTERVAL || _timeout_ms==0)) {
-		u64 seq_timetamp=fl_req_slave_packet_createNsend(_cmdid,_data,_len);
+		u64 seq_timetamp=fl_req_slave_packet_createNsend(_cmdid,_data,_len,&waittime);
 		if(seq_timetamp){
-			return fl_queueREQcRSP_add(G_INFORMATION.slaveID,_cmdid,seq_timetamp,_data,_len,&_cb,_timeout_ms,_retry);
+			P_INFO("REQ waittime:%d\r\n",waittime);
+			waittime = _timeout_ms+waittime*G_ADV_SETTINGS.adv_duration;
+			rslt=fl_queueREQcRSP_add(G_INFORMATION.slaveID,_cmdid,seq_timetamp,_data,_len,&_cb,waittime,_retry);
 		}
 	} else if(_cb == 0 && _timeout_ms ==0){
-		return (fl_req_slave_packet_createNsend(_cmdid,_data,_len) == 0?-1:0); // none rsp
+		rslt = (fl_req_slave_packet_createNsend(_cmdid,_data,_len,&waittime) == 0?-1:0); // none rsp
 	}
-	ERR(API,"Can't register REQ (%d/%d ms)!!\r\n",(u32)_cb,_timeout_ms);
-	return -1;
+
+	if (rslt > -1) {
+//		fl_timetamp_withstep_t timetamp_inpack = fl_adv_timetampStepInPack(rslt);
+//		u64 seq_timetamp = fl_rtc_timetamp2milltampStep(timetamp_inpack);
+//		//Synch original time
+//		SYNC_ORIGIN_MASTER(timetamp_inpack.timetamp,timetamp_inpack.milstep);
+	} else {
+		ERR(API,"Can't register REQ (%d/%d ms)!!\r\n",(u32 )_cb,_timeout_ms);
+	}
+	return rslt;;
 }
 
 /***************************************************
@@ -331,7 +354,7 @@ s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 
  * @return	  	: 0: fail otherwise seq_timetamp
  *
  ***************************************************/
-u64 fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
+u64 fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len,u32 *_timequeues){
 	/*****************************************************************/
 	/* | HDR | Timetamp | Mill_time | SlaveID | payload | crc8 | Ep | */
 	/* | 1B  |   4Bs    |    1B     |    1B   |   20Bs  |  1B  | 1B | -> .master = FL_FROM_SLAVE_ACK / FL_FROM_SLAVE */
@@ -412,10 +435,21 @@ u64 fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len){
 	memcpy(rslt.data_arr,req_pack.bytes,rslt.length );
 	P_PRINTFHEX_A(INF,rslt.data_arr,rslt.length,"REQ %X ",_cmdid);
 	//Send ADV
-	fl_adv_sendFIFO_add(rslt);
+
+	//report head and tail
+//	extern fl_data_container_t G_PRIORITY_QUEUE_SENDING;
+	extern fl_data_container_t G_QUEUE_SENDING;
+	s16 cur_tail =fl_adv_sendFIFO_add(rslt);
+//	s16 cur_tail = fl_nwk_slave_PriorityADV_Add(rslt);
+//	if(cur_tail > 0){
+//		*_timequeues = (cur_tail - G_PRIORITY_QUEUE_SENDING.head_index + G_PRIORITY_QUEUE_SENDING.mask) % G_PRIORITY_QUEUE_SENDING.mask;
+//	}
+	if (cur_tail > 0) {
+		*_timequeues = (cur_tail - G_QUEUE_SENDING.head_index + G_QUEUE_SENDING.mask) % G_QUEUE_SENDING.mask;
+	}
 	fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(rslt);
 	u64 seq_timetamp = fl_rtc_timetamp2milltampStep(timetamp_inpack);
-	//Synch original time
+//	//Synch original time
 	SYNC_ORIGIN_MASTER(timetamp_inpack.timetamp,timetamp_inpack.milstep);
 	return seq_timetamp;
 }
@@ -873,37 +907,38 @@ int _slave_reconnect(void){
 		LOGA(INF,"Reconnect network (%d s)!!!\r\n",RECONNECT_TIME/1000/1000);
 		//
 #ifdef COUNTER_DEVICE
-		fl_api_slave_req(NWK_HDR_55,(u8*)&G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data),0,0,0);
+		fl_api_slave_req(NWK_HDR_55,(u8*)&G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data),0,0,1);
 #else //POWERMETER
 		u8 _payload[SIZEU8(tbs_device_powermeter_t)];
 		tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) G_INFORMATION.data;
 		tbs_pack_powermeter_data(pwmeter_data,_payload);
 		u8 indx_data = SIZEU8(pwmeter_data->type) + SIZEU8(pwmeter_data->mac) + SIZEU8(pwmeter_data->timetamp);
-		fl_api_slave_req(NWK_HDR_55,&_payload[indx_data],SIZEU8(pwmeter_data->data),0,0,0);
+		fl_api_slave_req(NWK_HDR_55,&_payload[indx_data],SIZEU8(pwmeter_data->data),0,0,1);
 #endif
 		return RECONNECT_TIME;
 	}
 	return 0;
 }
 int _interval_report(void) {
+	int offset_spread = (fl_rtc_getWithMilliStep().milstep - WIFI_ORIGINAL_GETALL.milstep)*10;
 #define INTERVAL_REPORT_TIME (55 - FL_SLAVEID_MEMID(G_INFORMATION.slaveID))
 	extern const u32 ORIGINAL_TIME_TRUST;
 	if (IsJoinedNetwork()) {
 		if (WIFI_ORIGINAL_GETALL.timetamp < fl_rtc_get() && WIFI_ORIGINAL_GETALL.timetamp > ORIGINAL_TIME_TRUST) {
 			if (fl_rtc_get() - WIFI_ORIGINAL_GETALL.timetamp >= INTERVAL_REPORT_TIME) {
 #ifdef COUNTER_DEVICE
-				fl_api_slave_req(NWK_HDR_55,(u8*) &G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data),0,0,0);//NWK_HDR_11_REACTIVE
+				fl_api_slave_req(NWK_HDR_55,(u8*) &G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data),0,0,1);//NWK_HDR_11_REACTIVE
 #else //POWERMETER
 				u8 _payload[SIZEU8(tbs_device_powermeter_t)];
 				tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) G_INFORMATION.data;
 				tbs_pack_powermeter_data(pwmeter_data,_payload);
 				u8 indx_data = SIZEU8(pwmeter_data->type) + SIZEU8(pwmeter_data->mac) + SIZEU8(pwmeter_data->timetamp);
-				fl_api_slave_req(NWK_HDR_55,&_payload[indx_data],SIZEU8(pwmeter_data->data),0,0,0);
+				fl_api_slave_req(NWK_HDR_55,&_payload[indx_data],SIZEU8(pwmeter_data->data),0,0,1);
 #endif
 				//increase index if using NWK_HDR_11_REACTIVE
 				//TBS_Device_Index_manage();
-				P_INFO("Auto update (%d s) - indx:%d\r\n",INTERVAL_REPORT_TIME,G_COUNTER_DEV.data.index-1);
-				return INTERVAL_REPORT_TIME*1000*1000;
+				P_INFO("Auto update (%d s) - indx:%d\r\n",INTERVAL_REPORT_TIME*1000*1000 + offset_spread,G_COUNTER_DEV.data.index-1);
+				return INTERVAL_REPORT_TIME*1000*1000 + offset_spread;
 			}
 		}
 	}else{
@@ -913,7 +948,7 @@ int _interval_report(void) {
 		}
 	}
 #undef INTERVAL_REPORT_TIME
-	return 100 * 1000;
+	return 100 * 1000 + offset_spread;
 }
 
 void fl_nwk_slave_reconnectNstoragedata(void){
@@ -967,6 +1002,45 @@ void fl_nwk_slave_process(void){
 		debug_on_offline = G_INFORMATION.active;
 		ERR(INF,"Device -> %s\r\n",debug_on_offline==true?"Online":"Offline");
 	}
+	if(blt_soft_timer_find(_interval_report) == -1){
+		blt_soft_timer_restart(_interval_report,100*100);
+	}
+}
+/***************************************************
+ * @brief 		: priority request
+ *
+ * @param[in] 	:none
+ *
+ * @return	  	:
+ *
+ ***************************************************/
+s16 fl_nwk_slave_PriorityADV_Add(fl_pack_t _pack) {
+	if (FL_QUEUE_FIND(&G_PRIORITY_QUEUE_SENDING,&_pack,_pack.length - 1) == -1) {
+		if (FL_QUEUE_ADD(&G_PRIORITY_QUEUE_SENDING,&_pack) < 0) {
+			ERR(BLE,"Err FULL <QUEUE ADD PRIORITY ADV SENDING>!!\r\n");
+			return -1;
+		} else {
+			P_PRINTFHEX_A(BLE,_pack.data_arr,_pack.length,"%s(%d):","QUEUE PRIORITY ADV",_pack.length);
+			LOGA(BLE,"QUEUE PRIORITY SEND ADD: %d/%d (cnt:%d)\r\n",G_PRIORITY_QUEUE_SENDING.head_index,G_PRIORITY_QUEUE_SENDING.tail_index,G_PRIORITY_QUEUE_SENDING.count);
+			return G_PRIORITY_QUEUE_SENDING.tail_index;
+		}
+	}
+	ERR(BLE,"Err <QUEUE ALREADY PRIORITY ADV SENDING>!!\r\n");
+	return -1;
+}
+
+u8 fl_adv_sendFIFO_PriorityADV_run(void) {
+	extern fl_adv_settings_t G_ADV_SETTINGS ;
+	extern volatile u8 F_SENDING_STATE;
+	fl_pack_t data_in_queue;
+	if (!F_SENDING_STATE) {
+		if (FL_QUEUE_GET(&G_PRIORITY_QUEUE_SENDING,&data_in_queue)) {
+			fl_adv_send(data_in_queue.data_arr,data_in_queue.length,G_ADV_SETTINGS.adv_duration);
+			P_INFO_HEX(data_in_queue.data_arr,data_in_queue.length,"[%d-%d/%d]PRIORITY(%d):",G_PRIORITY_QUEUE_SENDING.head_index,
+					G_PRIORITY_QUEUE_SENDING.tail_index,G_PRIORITY_QUEUE_SENDING.count,data_in_queue.length);
+		}
+	}
+	return 1;
 }
 /***************************************************
  * @brief 		:Main functions to process income packet

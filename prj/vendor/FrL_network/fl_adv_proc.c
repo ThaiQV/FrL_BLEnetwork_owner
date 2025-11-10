@@ -79,6 +79,7 @@ fl_hdr_nwk_type_e FL_NWK_HDR[]={NWK_HDR_FOTA,NWK_HDR_11_REACTIVE,NWK_HDR_22_PING
 /***                       Functions declare                   		         **/
 /******************************************************************************/
 /******************************************************************************/
+
 void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms);
 s8 fl_adv_IsFromMaster(fl_pack_t data_in_queue);
 u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
@@ -189,11 +190,6 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 //				return 0;
 #ifndef MASTER_CORE
 				extern fl_nodeinnetwork_t G_INFORMATION;
-				/*For TESTING REPEATER*/
-//				u8 master_mac[4] = { U32_BYTE0(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE1(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE2(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE3(G_INFORMATION.profile.nwk.mac_parent) };
-//				if (-1 != plog_IndexOf(pa->mac,master_mac,4,6)) {
-//					return 0;
-//				}
 				//IMPORTANT DELETE NETWORK
 				u8 delete_network[32];
 				fl_nwk_decrypt16(FL_NWK_PB_KEY,pa->data,incomming_data.length,delete_network);
@@ -212,6 +208,13 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 						return 0;
 					}
 				}
+#ifdef BLOCK_MASTER
+				/*For TESTING REPEATER*/
+				u8 master_mac[4] = { U32_BYTE0(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE1(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE2(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE3(G_INFORMATION.profile.nwk.mac_parent) };
+				if (-1 != plog_IndexOf(pa->mac,master_mac,4,6)) {
+					return 0;
+				}
+#endif
 #endif
 				//Add decrypt
 				NWK_MYKEY();
@@ -222,7 +225,7 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 #ifdef MASTER_CORE
 				//skip process from  master and check rspECHO
 				if (fl_adv_IsFromMaster(incomming_data)) {
-					fl_wifi2ble_fota_recECHO(incomming_data);
+					if(incomming_data.data_arr[0] == NWK_HDR_FOTA) fl_wifi2ble_fota_recECHO(incomming_data);
 					return 0;
 				}
 #else
@@ -319,7 +322,9 @@ int fl_adv_sendFIFO_add(fl_pack_t _pack) {
 	ERR(BLE,"Err <QUEUE ALREADY ADV SENDING>!!\r\n");
 	return -1;
 }
-
+u16 FL_NWK_HISTORY_IsReady(void){
+	return G_QUEUE_HISTORY_SENDING.count;
+}
 u8 fl_adv_sendFIFO_History_run(void) {
 	fl_pack_t his_data_in_queue;
 	if (!F_SENDING_STATE) {
@@ -331,16 +336,16 @@ u8 fl_adv_sendFIFO_History_run(void) {
 //			}
 //			P_INFO("SEND ECHO(cnt:%d)%d/%d\r\n",G_QUEUE_HISTORY_SENDING.count,G_QUEUE_HISTORY_SENDING.head_index,G_QUEUE_HISTORY_SENDING.tail_index);
 			fl_adv_send(his_data_in_queue.data_arr,his_data_in_queue.length,G_ADV_SETTINGS.adv_duration);
-			P_PRINTFHEX_A(APP,his_data_in_queue.data_arr,his_data_in_queue.length,"[%d-%d/%d]HIS(%d):",
-					G_QUEUE_HISTORY_SENDING.head_index,G_QUEUE_HISTORY_SENDING.tail_index,G_QUEUE_HISTORY_SENDING.count,
-					his_data_in_queue.length);
+//			P_INFO_HEX(his_data_in_queue.data_arr,his_data_in_queue.length,"[%d-%d/%d]HIS(%d):",
+//					G_QUEUE_HISTORY_SENDING.head_index,G_QUEUE_HISTORY_SENDING.tail_index,G_QUEUE_HISTORY_SENDING.count,
+//					his_data_in_queue.length);
 		}
 	}
 	return 1;
 }
 
 #ifdef MASTER_CORE
-void fl_master_adv_55_RSPCommon_Create(void) {
+void fl_master_adv_1155_RSPCommon_Create(fl_hdr_nwk_type_e _cmdid) {
 	u8 SlaveID[22-5-2]; //22 bytes paloay - 4 bytes timetamps - delta timetamps
 	u64 timetamp_com[22-5-2]; // for testing list
 	u8 numSlave=0;
@@ -350,14 +355,14 @@ void fl_master_adv_55_RSPCommon_Create(void) {
 	u64 origin_pack = fl_rtc_timetamp2milltampStep(ORIGINAL_MASTER_TIME);
 	fl_data_frame_u check_rspcom;
 
-	fl_pack_t *p_55RSP[SIZEU8(SlaveID)];
+	fl_pack_t *p_RSP[SIZEU8(SlaveID)];
 	for (u8 var = 0; var < G_QUEUE_SENDING.mask + 1; ++var) {
 		fl_timetamp_withstep_t timetamp_inpack = fl_adv_timetampStepInPack(G_QUEUE_SENDING.data[var]);
 		u64 inpack = fl_rtc_timetamp2milltampStep(timetamp_inpack);
 		memset(check_rspcom.bytes,0,SIZEU8(check_rspcom.bytes));
 		memcpy(check_rspcom.bytes,G_QUEUE_SENDING.data[var].data_arr,G_QUEUE_SENDING.data[var].length);
 
-		if (inpack >= origin_pack && check_rspcom.frame.endpoint.master == FL_FROM_MASTER && check_rspcom.frame.hdr == NWK_HDR_55
+		if (inpack >= origin_pack && check_rspcom.frame.endpoint.master == FL_FROM_MASTER && check_rspcom.frame.hdr == _cmdid
 				&& check_rspcom.frame.slaveID != 0xFF) {
 			//get timetamp_seq in the payload of the rsp
 			fl_timetamp_withstep_t timetamp_str;
@@ -366,7 +371,7 @@ void fl_master_adv_55_RSPCommon_Create(void) {
 			timetamp_str.milstep = check_rspcom.frame.payload[4];
 			u64 timetamp_rsp = fl_rtc_timetamp2milltampStep(timetamp_str);
 
-			p_55RSP[numSlave] = &G_QUEUE_SENDING.data[var];
+			p_RSP[numSlave] = &G_QUEUE_SENDING.data[var];
 			SlaveID[numSlave] = check_rspcom.frame.slaveID;
 			timetamp_com[numSlave] = timetamp_rsp;
 
@@ -387,26 +392,26 @@ void fl_master_adv_55_RSPCommon_Create(void) {
 			else break;
 		}
 	}
-	if (numSlave < 3)
+	if (numSlave < 2)
 		return;
 	//For testing
 	LOGA(APP,"ORIGIN:%d\r\n",ORIGINAL_MASTER_TIME.timetamp);
 	P_PRINTFHEX_A(APP,SlaveID,numSlave,"SlaveID(%d):",numSlave);
 	LOGA(APP,"TimeTamp_min  :%lld\r\n",timetamp_min);
 	u16 delta = (timetamp_max > timetamp_min) ? (u16) (timetamp_max - timetamp_min) : 0;
-	LOGA(APP,"TimeTamp_max  :%lld\r\n",timetamp_max);
+	LOGA(APP,"TimeTamp_max  :%lld\r\n",timetamp_max + 2); //offset 2 mins
 	LOGA(APP,"TimeTamp_delta:%d\r\n",delta);
 	for (u8 i = 0; i < numSlave; i++) {
 		LOGA(APP,"TimeTamp:%lld\r\n",timetamp_com[i]);
 	}
 	//Clear RSP55 old and update G_SENDING_QUEUE.count
 	for(u8 i = 0;i<numSlave;i++){
-		memset(p_55RSP[i]->data_arr,0,SIZEU8(p_55RSP[i]->data_arr));
-		p_55RSP[i]->length = 0;
+		memset(p_RSP[i]->data_arr,0,SIZEU8(p_RSP[i]->data_arr));
+		p_RSP[i]->length = 0;
 	}
-	fl_pack_t RSP_55_Com = fl_master_packet_RSP_55Com_build(SlaveID,numSlave,timetamp_min_u8,delta);
-	P_PRINTFHEX_A(APP,RSP_55_Com.data_arr,RSP_55_Com.length,"RSP_55_Com(%d):",numSlave);
-	fl_adv_sendFIFO_add(RSP_55_Com);
+	fl_pack_t RSP_Com = fl_master_packet_RSP_1155Com_build(_cmdid,SlaveID,numSlave,timetamp_min_u8,delta);
+	P_PRINTFHEX_A(APP,RSP_Com.data_arr,RSP_Com.length,"RSP_Com(%d)0x%02X:",numSlave,_cmdid);
+	fl_adv_sendFIFO_add(RSP_Com);
 //	u8 origin[SIZEU8(fl_timetamp_withstep_t)];
 //	origin[0] = U32_BYTE0(ORIGINAL_MASTER_TIME.timetamp);
 //	origin[1] = U32_BYTE1(ORIGINAL_MASTER_TIME.timetamp);
@@ -448,9 +453,11 @@ u8 fl_adv_sendFIFO_run(void) {
 		if (check_inused != inused_slot) {
 			check_inused = inused_slot;
 			LOGA(APP,"SENDING QUEUES :%d/%d\r\n",check_inused,G_QUEUE_SENDING.mask + 1);
+			if(inused_slot == 0) return inused_slot;
 		}
 #ifdef MASTER_CORE
-		fl_master_adv_55_RSPCommon_Create();
+		fl_master_adv_1155_RSPCommon_Create(NWK_HDR_55);
+		fl_master_adv_1155_RSPCommon_Create(NWK_HDR_11_REACTIVE);
 #endif
 		u8 loop_check = 0;
 		s16 indx_head_cur = -1;
@@ -481,10 +488,13 @@ u8 fl_adv_sendFIFO_run(void) {
 			memcpy(check_heartbeat.bytes,data_in_queue.data_arr,data_in_queue.length);
 #ifndef	MASTER_CORE //for slave
 			//Clear HB packer REPEATER
-			if(inused_slot == 1 && check_heartbeat.frame.hdr == NWK_HDR_HEARTBEAT ) { // only have HB packet=> send it one times
+			if (check_heartbeat.frame.hdr == NWK_HDR_HEARTBEAT) {
+//				fl_nwk_slave_SYNC_ORIGIN_MASTER(timetamp_inpack.timetamp,timetamp_inpack.milstep);
+//				ERR(INF,"ORIGINAL MASTER-TIME:%d\r\n",ORIGINAL_MASTER_TIME.milstep);
+				if (inused_slot == 1 && FL_NWK_HISTORY_IsReady() > 0) { // only have HB packet=> send it one times
 				//CLEAR
-				G_QUEUE_SENDING.data[indx_head_cur].length = 0;
-
+					G_QUEUE_SENDING.data[indx_head_cur].length = 0;
+				}
 			}
 #else //for master
 			//
@@ -770,12 +780,14 @@ bool fl_adv_MasterToMe(fl_pack_t data_in_queue) {
 void fl_adv_run(void) {
 	//todo: process adv ....
 	fl_pack_t data_in_queue;
-	if (FL_QUEUE_GET(&G_DATA_CONTAINER,&data_in_queue)) {
+	u8 multiple_pack = 0;
+	while (FL_QUEUE_GET(&G_DATA_CONTAINER,&data_in_queue)) {
 //		LOGA(APP,"QUEUE GET : (%d)%d-%d\r\n",G_DATA_CONTAINER.count,G_DATA_CONTAINER.head_index,G_DATA_CONTAINER.tail_index);
 		fl_dataframe_format_t data_parsed;
 		if (fl_packet_parse(data_in_queue,&data_parsed)) {
 #ifdef MASTER_CORE
 			fl_nwk_master_run(&data_in_queue); //process reponse from the slaves
+
 #else //SLAVE
 			//Todo: Repeat process
 			if (fl_adv_IsFromMe(data_in_queue) == false && data_parsed.endpoint.repeat_cnt > 0) {
@@ -784,6 +796,12 @@ void fl_adv_run(void) {
 			}
 			//Todo: FOTA packet -> this is a special format don't use standard frl adv
 			if (data_parsed.hdr == NWK_HDR_FOTA) {
+				for(u16 indx =0;indx<G_DATA_CONTAINER.mask+1;indx++){
+					if(-1!=plog_IndexOf(G_DATA_CONTAINER.data[indx].data_arr,data_parsed.payload,20,G_DATA_CONTAINER.data[indx].length)
+							&& 0!= memcmp(G_DATA_CONTAINER.data[indx].data_arr,data_in_queue.data_arr,6)){
+						goto SKIP_FOTA;
+					}
+				}
 				fl_slave_fota_proc(data_in_queue);
 			} else {
 				//Todo: Handle FORM MASTER REQ
@@ -791,7 +809,18 @@ void fl_adv_run(void) {
 					fl_nwk_slave_run(&data_in_queue);
 				}
 			}
+//			break;
 #endif
+			//process multiple packet on the circle
+			if (G_DATA_CONTAINER.count > 0) {
+				multiple_pack++;
+				if (multiple_pack < 5) {
+					continue;
+				}
+				else{
+					break;
+				}
+			}
 		} else {
 			ERR(APP,"ERR <PARSE PACKET>!!\r\n");
 			P_PRINTFHEX_A(APP,data_in_queue.data_arr,data_in_queue.length,"%s(%d):","PACK",data_in_queue.length);
@@ -799,14 +828,18 @@ void fl_adv_run(void) {
 	}
 #ifdef  MASTER_CORE
 	fl_nwk_master_process();
+	fl_wifi2ble_fota_retry_proc();
 #else
+	SKIP_FOTA:
 	//Features processor
 	fl_nwk_slave_process();
+	//SEND PRIORITY ADV
+//	fl_adv_sendFIFO_PriorityADV_run();
 #endif
 	/* SEND ADV */
 	if(fl_adv_sendFIFO_run()==0){
 #ifdef MASTER_CORE
-//		fl_wifi2ble_fota_run();
+		fl_wifi2ble_fota_run();
 #else
 		fl_adv_sendFIFO_History_run();
 #endif

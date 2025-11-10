@@ -37,7 +37,7 @@ extern _attribute_data_retention_ volatile fl_timetamp_withstep_t ORIGINAL_MASTE
 /******************************************************************************/
 #define TIME_COLLECT_NODE				5*1000 //
 
-#define PACK_HANDLE_MASTER_SIZE 		32
+#define PACK_HANDLE_MASTER_SIZE 		64
 fl_pack_t g_handle_master_array[PACK_HANDLE_MASTER_SIZE];
 fl_data_container_t G_HANDLE_MASTER_CONTAINER = {.data = g_handle_master_array, .head_index = 0, .tail_index = 0, .mask = PACK_HANDLE_MASTER_SIZE - 1, .count = 0 };
 
@@ -47,7 +47,7 @@ fl_master_config_t G_MASTER_INFO = { .nwk = { .chn = { 37, 39, 39 }, .collect_ch
 
 volatile u8 MASTER_INSTALL_STATE = 0;
 //Period of the heartbeat
-u16 PERIOD_HEARTBEAT = (16+1)*100; // 16 slots sending and 100ms interval adv
+u16 PERIOD_HEARTBEAT = (PACK_HANDLE_MASTER_SIZE)*101; // slots sending and 100ms interval adv
 //flag debug of the network
 volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into endpoint byte (dbg :1bit)
 volatile u8 NWK_REPEAT_MODE = 0; // 1: level | 0 : non-level
@@ -166,6 +166,7 @@ fl_pack_t fl_master_packet_heartbeat_build(void) {
 	packet.frame.payload[3] = U32_BYTE2(WIFI_ORIGINAL_GETALL.timetamp);
 	packet.frame.payload[4] = U32_BYTE3(WIFI_ORIGINAL_GETALL.timetamp);
 	packet.frame.payload[5]=WIFI_ORIGINAL_GETALL.milstep;
+
 	//crc
 	packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
 
@@ -294,12 +295,12 @@ fl_pack_t fl_master_packet_assignSlaveID_build(u8* _mac) {
  * @return	  	: fl_pack_t
  *
  ***************************************************/
-fl_pack_t fl_master_packet_RSP_55Com_build(u8* _slaveID,u8 _numslave,u8* _seqtimetamp,u16 _deltaTT) {
+fl_pack_t fl_master_packet_RSP_1155Com_build(fl_hdr_nwk_type_e _cmdid,u8* _slaveID,u8 _numslave,u8* _seqtimetamp,u16 _deltaTT) {
 	fl_pack_t packet_built;
 
 	fl_data_frame_u packet;
 	memset(packet.bytes,0,SIZEU8(packet.bytes));
-	packet.frame.hdr = NWK_HDR_55;
+	packet.frame.hdr = _cmdid;
 
 	fl_timetamp_withstep_t timetampStep = fl_rtc_getWithMilliStep();
 //	u32 timetamp = fl_rtc_get();
@@ -438,9 +439,9 @@ s8 fl_master_packet_F5_CreateNSend(u8 *_slave_mac_arr, u8 _slave_num) {
 	P_PRINTFHEX_A(INF,info_pack.data_arr,info_pack.length,"%s(%d):","Info Pack",info_pack.length);
 	//Send ADV
 	s8 add_rslt = fl_adv_sendFIFO_add(info_pack);
-	if (add_rslt != -1) {
-		fl_nwk_master_heartbeat_run();
-	}
+//	if (add_rslt != -1) {
+//		fl_nwk_master_heartbeat_run();
+//	}
 	return add_rslt;
 }
 /******************************************************************************/
@@ -622,7 +623,7 @@ u64 fl_req_master_packet_createNsend(u8* _slave_mac,u8 _cmdid,u8* _data, u8 _len
 		seq_timetamp = fl_rtc_timetamp2milltampStep(timetamp_inpack);
 //		LOGA(API,"API REQ Synchronization TimeTamp:%d(%d)\r\n",timetamp_inpack.timetamp,timetamp_inpack.milstep);
 //		SYNC_ORIGIN_MASTER(timetamp_inpack.timetamp,timetamp_inpack.milstep);
-		fl_nwk_master_heartbeat_run();
+//		fl_nwk_master_heartbeat_run();
 	}
 	return seq_timetamp;
 }
@@ -668,14 +669,6 @@ int fl_send_collection_req(void) {
  *
  ***************************************************/
 int fl_send_heartbeat(void) {
-	//if(G_NODE_LIST.slot_inused == 0xFF){return 0;}
-//	datetime_t cur_dt;
-//	u32 cur_timetamp = fl_rtc_get();
-//	fl_rtc_timestamp_to_datetime(cur_timetamp,&cur_dt);
-
-//	fl_master_node_printf();
-//	LOGA(APP,"[%02d/%02d/%02d-%02d:%02d:%02d] HeartBeat Sync(%d ms)\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second,
-//			PERIOD_HEARTBEAT);
 	fl_pack_t packet_built = fl_master_packet_heartbeat_build();
 	fl_adv_sendFIFO_add(packet_built);
 	return 0; //
@@ -703,24 +696,24 @@ int _nwk_master_backup(void) {
 	}
 	return 0;
 }
-
-int _nwk_master_checkSlaveStatus(void) {
-	extern volatile fl_timetamp_withstep_t WIFI_ORIGINAL_GETALL;
-	extern const u32 ORIGINAL_TIME_TRUST;
-#define INTERVAL_REFESH_STATUS 45
-	if (G_NODE_LIST.slot_inused != 0xFF) {
-		if (WIFI_ORIGINAL_GETALL.timetamp < fl_rtc_get() && WIFI_ORIGINAL_GETALL.timetamp > ORIGINAL_TIME_TRUST) {
-			if (fl_rtc_get() - WIFI_ORIGINAL_GETALL.timetamp >= INTERVAL_REFESH_STATUS) {
-				for (u8 var = 0; var < G_NODE_LIST.slot_inused; ++var) {
-					G_NODE_LIST.sla_info[var].active = false;
-				}
-				return INTERVAL_REFESH_STATUS*1000*1000;
-			}
-		}
-	}
-#undef INTERVAL_REFESH_STATUS
-	return 98 * 1001;
-}
+//
+//int _nwk_master_checkSlaveStatus(void) {
+//	extern volatile fl_timetamp_withstep_t WIFI_ORIGINAL_GETALL;
+//	extern const u32 ORIGINAL_TIME_TRUST;
+//#define INTERVAL_REFESH_STATUS 45
+//	if (G_NODE_LIST.slot_inused != 0xFF) {
+//		if (WIFI_ORIGINAL_GETALL.timetamp < fl_rtc_get() && WIFI_ORIGINAL_GETALL.timetamp > ORIGINAL_TIME_TRUST) {
+//			if (fl_rtc_get() - WIFI_ORIGINAL_GETALL.timetamp >= INTERVAL_REFESH_STATUS) {
+//				for (u8 var = 0; var < G_NODE_LIST.slot_inused; ++var) {
+//					G_NODE_LIST.sla_info[var].active = false;
+//				}
+//				return INTERVAL_REFESH_STATUS*1000*1000;
+//			}
+//		}
+//	}
+//#undef INTERVAL_REFESH_STATUS
+//	return 98 * 1001;
+//}
 /******************************************************************************/
 /******************************************************************************/
 /***                            Functions callback                           **/
@@ -728,7 +721,7 @@ int _nwk_master_checkSlaveStatus(void) {
 /******************************************************************************/
 void fl_nwk_master_StatusNodesRefesh(void) {
 	for (u8 i = 0; i < G_NODE_LIST.slot_inused && G_NODE_LIST.slot_inused != 0xFF; i++) {
-		G_NODE_LIST.sla_info[i].active = (fl_rtc_get() - G_NODE_LIST.sla_info[i].timelife <= 20) ? 1 : 0;
+		G_NODE_LIST.sla_info[i].active = (fl_rtc_get() - G_NODE_LIST.sla_info[i].timelife <= 40) ? 1 : 0;
 	}
 }
 
@@ -743,9 +736,10 @@ void fl_nwk_master_StatusNodesRefesh(void) {
 static void _master_updateDB_for_Node(u8 node_indx ,fl_data_frame_u *packet)  {
 	G_NODE_LIST.sla_info[node_indx].active = true;
 	G_NODE_LIST.sla_info[node_indx].timelife = fl_rtc_get();
+	P_INFO_HEX(G_NODE_LIST.sla_info[node_indx].mac,6,"%d->[%02d]",G_NODE_LIST.sla_info[node_indx].timelife,G_NODE_LIST.sla_info[node_indx].slaveID);
 	//create MAC + TIMETAMP + DEV_TYPE
 	u8 size_mac = SIZEU8(G_NODE_LIST.sla_info[node_indx].mac);
-	memcpy(&G_NODE_LIST.sla_info[node_indx].data[0],G_NODE_LIST.sla_info[node_indx].mac,size_mac); //update mac to pointer data
+	//memcpy(&G_NODE_LIST.sla_info[node_indx].data[0],G_NODE_LIST.sla_info[node_indx].mac,size_mac); //update mac to pointer data
 	/*Timetamp*/
 //	fl_timetamp_withstep_t timetampStep = fl_rtc_getWithMilliStep();
 //	//	u32 timetamp = fl_rtc_get();
@@ -897,6 +891,8 @@ int fl_master_ProccesRSP_cbk(void) {
 					node_indx = fl_master_SlaveID_find(slave_id);
 					if (node_indx != -1) {
 						_master_updateDB_for_Node(node_indx,&packet);
+						//send to WIFI
+//						fl_ble2wifi_EVENT_SEND(G_NODE_LIST.sla_info[node_indx].mac);
 					} else {
 						ERR(INF,"ID not foud:%02X\r\n",slave_id);
 						return -1;
@@ -954,6 +950,7 @@ int fl_master_ProccesRSP_cbk(void) {
 /******************************************************************************/
 /******************************************************************************/
 void fl_nwk_master_init(void) {
+	extern volatile fl_timetamp_withstep_t WIFI_ORIGINAL_GETALL;
 	LOG_P(INF,"Freelux network MASTER init -> ok\r\n");
 	FL_QUEUE_CLEAR(&G_HANDLE_MASTER_CONTAINER,PACK_HANDLE_MASTER_SIZE);
 	//todo: load database into the flash
@@ -968,6 +965,7 @@ void fl_nwk_master_init(void) {
 	blt_soft_timer_add(_nwk_master_backup,2 * 1000 * 1000);
 	fl_nwk_master_heartbeat_init();
 	//Recheck status of the all network
+	WIFI_ORIGINAL_GETALL = fl_rtc_getWithMilliStep();
 //	blt_soft_timer_add(_nwk_master_checkSlaveStatus,100*1000);
 }
 /***************************************************
@@ -1072,12 +1070,32 @@ void fl_nwk_master_CLEARALL_NETWORK(void) {
  * @return	  	:none
  *
  ***************************************************/
+//
+//int _interval_clk_heartbeat(void){
+//	P_INFO("HeartBeat send:%d\r\n",1501*999)
+//	fl_pack_t packet_built = fl_master_packet_heartbeat_build();
+//	fl_adv_sendFIFO_add(packet_built);
+//	sys_tick_hb=clock_time();
+//	return 0;
+//}
+int _interval_heartbeat(void) {
+	static u32 sys_tick_hb =0;
+	if(clock_time_exceed(sys_tick_hb,PERIOD_HEARTBEAT*1000)){
+		P_INFO("HeartBeat send:%d\r\n",PERIOD_HEARTBEAT)
+		fl_pack_t packet_built = fl_master_packet_heartbeat_build();
+		fl_adv_sendFIFO_add(packet_built);
+		sys_tick_hb = clock_time();
+		//blt_soft_timer_restart(&_interval_clk_heartbeat,1501*999);
+	}
+	return 0; //
+}
 void fl_nwk_master_heartbeat_init(void){
 	fl_send_heartbeat();
-	blt_soft_timer_add(&fl_send_heartbeat,PERIOD_HEARTBEAT * 1000);
+	blt_soft_timer_add(&_interval_heartbeat,999 * 1002);
 }
 void fl_nwk_master_heartbeat_run(void) {
-	blt_soft_timer_restart(&fl_send_heartbeat,PERIOD_HEARTBEAT * 1000);
+	blt_soft_timer_restart(&_interval_heartbeat,999 * 1001);
+	//blt_soft_timer_restart(&_interval_clk_heartbeat,1501*999);
 }
 /***************************************************
  * @brief 		: collection slave (install mode)
