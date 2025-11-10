@@ -47,7 +47,7 @@ fl_master_config_t G_MASTER_INFO = { .nwk = { .chn = { 37, 39, 39 }, .collect_ch
 
 volatile u8 MASTER_INSTALL_STATE = 0;
 //Period of the heartbeat
-u16 PERIOD_HEARTBEAT = (PACK_HANDLE_MASTER_SIZE)*101; // 16 slots sending and 100ms interval adv
+u16 PERIOD_HEARTBEAT = (PACK_HANDLE_MASTER_SIZE)*101; // slots sending and 100ms interval adv
 //flag debug of the network
 volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into endpoint byte (dbg :1bit)
 volatile u8 NWK_REPEAT_MODE = 0; // 1: level | 0 : non-level
@@ -439,9 +439,9 @@ s8 fl_master_packet_F5_CreateNSend(u8 *_slave_mac_arr, u8 _slave_num) {
 	P_PRINTFHEX_A(INF,info_pack.data_arr,info_pack.length,"%s(%d):","Info Pack",info_pack.length);
 	//Send ADV
 	s8 add_rslt = fl_adv_sendFIFO_add(info_pack);
-	if (add_rslt != -1) {
-		fl_nwk_master_heartbeat_run();
-	}
+//	if (add_rslt != -1) {
+//		fl_nwk_master_heartbeat_run();
+//	}
 	return add_rslt;
 }
 /******************************************************************************/
@@ -623,7 +623,7 @@ u64 fl_req_master_packet_createNsend(u8* _slave_mac,u8 _cmdid,u8* _data, u8 _len
 		seq_timetamp = fl_rtc_timetamp2milltampStep(timetamp_inpack);
 //		LOGA(API,"API REQ Synchronization TimeTamp:%d(%d)\r\n",timetamp_inpack.timetamp,timetamp_inpack.milstep);
 //		SYNC_ORIGIN_MASTER(timetamp_inpack.timetamp,timetamp_inpack.milstep);
-		fl_nwk_master_heartbeat_run();
+//		fl_nwk_master_heartbeat_run();
 	}
 	return seq_timetamp;
 }
@@ -1070,22 +1070,32 @@ void fl_nwk_master_CLEARALL_NETWORK(void) {
  * @return	  	:none
  *
  ***************************************************/
-
+//
+//int _interval_clk_heartbeat(void){
+//	P_INFO("HeartBeat send:%d\r\n",1501*999)
+//	fl_pack_t packet_built = fl_master_packet_heartbeat_build();
+//	fl_adv_sendFIFO_add(packet_built);
+//	sys_tick_hb=clock_time();
+//	return 0;
+//}
 int _interval_heartbeat(void) {
 	static u32 sys_tick_hb =0;
 	if(clock_time_exceed(sys_tick_hb,PERIOD_HEARTBEAT*1000)){
+		P_INFO("HeartBeat send:%d\r\n",PERIOD_HEARTBEAT)
 		fl_pack_t packet_built = fl_master_packet_heartbeat_build();
 		fl_adv_sendFIFO_add(packet_built);
 		sys_tick_hb = clock_time();
+		//blt_soft_timer_restart(&_interval_clk_heartbeat,1501*999);
 	}
 	return 0; //
 }
 void fl_nwk_master_heartbeat_init(void){
 	fl_send_heartbeat();
-	blt_soft_timer_add(&_interval_heartbeat,100 * 1000);
+	blt_soft_timer_add(&_interval_heartbeat,999 * 1002);
 }
 void fl_nwk_master_heartbeat_run(void) {
-	blt_soft_timer_restart(&_interval_heartbeat,100 * 1000);
+	blt_soft_timer_restart(&_interval_heartbeat,999 * 1001);
+	//blt_soft_timer_restart(&_interval_clk_heartbeat,1501*999);
 }
 /***************************************************
  * @brief 		: collection slave (install mode)

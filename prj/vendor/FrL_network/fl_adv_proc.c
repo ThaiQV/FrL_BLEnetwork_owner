@@ -787,6 +787,7 @@ void fl_adv_run(void) {
 		if (fl_packet_parse(data_in_queue,&data_parsed)) {
 #ifdef MASTER_CORE
 			fl_nwk_master_run(&data_in_queue); //process reponse from the slaves
+
 #else //SLAVE
 			//Todo: Repeat process
 			if (fl_adv_IsFromMe(data_in_queue) == false && data_parsed.endpoint.repeat_cnt > 0) {
@@ -829,6 +830,8 @@ void fl_adv_run(void) {
 	SKIP_FOTA:
 	//Features processor
 	fl_nwk_slave_process();
+	//SEND PRIORITY ADV
+//	fl_adv_sendFIFO_PriorityADV_run();
 #endif
 	/* SEND ADV */
 	if(fl_adv_sendFIFO_run()==0){

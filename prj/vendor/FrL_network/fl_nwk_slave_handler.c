@@ -75,7 +75,9 @@ void fl_nwk_slave_SYNC_ORIGIN_MASTER(u32 _timetamp,u8 _mil) {
 
 fl_pack_t g_handle_array[PACK_HANDLE_SIZE];
 fl_data_container_t G_HANDLE_CONTAINER = { .data = g_handle_array, .head_index = 0, .tail_index = 0, .mask = PACK_HANDLE_SIZE - 1, .count = 0 };
-
+/*---------------- Priority Sending --------------------------*/
+fl_pack_t g_priority_sending_array[8];
+fl_data_container_t G_PRIORITY_QUEUE_SENDING = { .data = g_priority_sending_array, .head_index = 0, .tail_index = 0, .mask = 8 - 1, .count = 0 };
 //My information
 fl_nodeinnetwork_t G_INFORMATION ={.active=false};
 #ifndef MASTER_CORE
@@ -164,6 +166,7 @@ int _informMaster(void){
 	}
 	return -1;
 }
+
 int _isOnline_check(void) {
 	ERR(INF,"Device -> offline\r\n");
 	G_INFORMATION.active = false;
@@ -239,8 +242,7 @@ void fl_nwk_slave_init(void) {
 	G_INFORMATION.data =(u8*)&G_POWER_METER;
 #endif
 	fl_nwk_LedSignal_init();
-	//todo: TBS Device initialization
-	TBS_Device_Init();
+
 	memcpy(G_INFORMATION.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_INFORMATION.mac));
 	memcpy(&G_INFORMATION.data[0],G_INFORMATION.mac,6);
 	P_INFO("** Freelux network SLAVE init \r\n");
@@ -262,7 +264,7 @@ void fl_nwk_slave_init(void) {
 	}
 #endif
 
-	blt_soft_timer_add(_nwk_slave_backup,2*1000*1000);
+	blt_soft_timer_add(_nwk_slave_backup,2*1020*999);
 	//Interval checking network
 //	fl_nwk_slave_reconnectNstoragedata();
 	WIFI_ORIGINAL_GETALL = fl_rtc_getWithMilliStep();
@@ -271,6 +273,8 @@ void fl_nwk_slave_init(void) {
 //	blt_soft_timer_add(&_slave_reconnect,2*1000*1000);
 	blt_soft_timer_add(&_informMaster,5*1000*1000);
 	G_INFORMATION.active = false;
+	//todo: TBS Device initialization
+	TBS_Device_Init();
 	//test random send req
 //	TEST_slave_sendREQ();
 }
@@ -431,10 +435,16 @@ u64 fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len,u32 *_timequeue
 	memcpy(rslt.data_arr,req_pack.bytes,rslt.length );
 	P_PRINTFHEX_A(INF,rslt.data_arr,rslt.length,"REQ %X ",_cmdid);
 	//Send ADV
+
 	//report head and tail
-	extern fl_data_container_t G_QUEUE_SENDING ;
+//	extern fl_data_container_t G_PRIORITY_QUEUE_SENDING;
+	extern fl_data_container_t G_QUEUE_SENDING;
 	s16 cur_tail =fl_adv_sendFIFO_add(rslt);
-	if(cur_tail > 0){
+//	s16 cur_tail = fl_nwk_slave_PriorityADV_Add(rslt);
+//	if(cur_tail > 0){
+//		*_timequeues = (cur_tail - G_PRIORITY_QUEUE_SENDING.head_index + G_PRIORITY_QUEUE_SENDING.mask) % G_PRIORITY_QUEUE_SENDING.mask;
+//	}
+	if (cur_tail > 0) {
 		*_timequeues = (cur_tail - G_QUEUE_SENDING.head_index + G_QUEUE_SENDING.mask) % G_QUEUE_SENDING.mask;
 	}
 	fl_timetamp_withstep_t  timetamp_inpack = fl_adv_timetampStepInPack(rslt);
@@ -995,6 +1005,42 @@ void fl_nwk_slave_process(void){
 	if(blt_soft_timer_find(_interval_report) == -1){
 		blt_soft_timer_restart(_interval_report,100*100);
 	}
+}
+/***************************************************
+ * @brief 		: priority request
+ *
+ * @param[in] 	:none
+ *
+ * @return	  	:
+ *
+ ***************************************************/
+s16 fl_nwk_slave_PriorityADV_Add(fl_pack_t _pack) {
+	if (FL_QUEUE_FIND(&G_PRIORITY_QUEUE_SENDING,&_pack,_pack.length - 1) == -1) {
+		if (FL_QUEUE_ADD(&G_PRIORITY_QUEUE_SENDING,&_pack) < 0) {
+			ERR(BLE,"Err FULL <QUEUE ADD PRIORITY ADV SENDING>!!\r\n");
+			return -1;
+		} else {
+			P_PRINTFHEX_A(BLE,_pack.data_arr,_pack.length,"%s(%d):","QUEUE PRIORITY ADV",_pack.length);
+			LOGA(BLE,"QUEUE PRIORITY SEND ADD: %d/%d (cnt:%d)\r\n",G_PRIORITY_QUEUE_SENDING.head_index,G_PRIORITY_QUEUE_SENDING.tail_index,G_PRIORITY_QUEUE_SENDING.count);
+			return G_PRIORITY_QUEUE_SENDING.tail_index;
+		}
+	}
+	ERR(BLE,"Err <QUEUE ALREADY PRIORITY ADV SENDING>!!\r\n");
+	return -1;
+}
+
+u8 fl_adv_sendFIFO_PriorityADV_run(void) {
+	extern fl_adv_settings_t G_ADV_SETTINGS ;
+	extern volatile u8 F_SENDING_STATE;
+	fl_pack_t data_in_queue;
+	if (!F_SENDING_STATE) {
+		if (FL_QUEUE_GET(&G_PRIORITY_QUEUE_SENDING,&data_in_queue)) {
+			fl_adv_send(data_in_queue.data_arr,data_in_queue.length,G_ADV_SETTINGS.adv_duration);
+			P_INFO_HEX(data_in_queue.data_arr,data_in_queue.length,"[%d-%d/%d]PRIORITY(%d):",G_PRIORITY_QUEUE_SENDING.head_index,
+					G_PRIORITY_QUEUE_SENDING.tail_index,G_PRIORITY_QUEUE_SENDING.count,data_in_queue.length);
+		}
+	}
+	return 1;
 }
 /***************************************************
  * @brief 		:Main functions to process income packet

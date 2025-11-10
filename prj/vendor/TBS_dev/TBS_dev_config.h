@@ -17,7 +17,7 @@ typedef enum{
 }__attribute__((__packed__)) tbs_dev_type_e;
 
 #ifndef MASTER_CORE
-#define HW_SAMPLE_TEST
+//#define HW_SAMPLE_TEST
 //#define BLOCK_MASTER
 #define COUNTER_DEVICE
 #define COUNTER_LCD_MESS_MAX		10

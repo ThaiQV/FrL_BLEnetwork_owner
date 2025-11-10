@@ -356,10 +356,12 @@ s8 fl_queue_REQcRSP_ScanRec(fl_pack_t _pack);
 s8 fl_api_master_req(u8* _mac_slave,u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry);
 #else
 extern volatile u8 NWK_DEBUG_STT; // it will be assigned into end-point byte (dbg :1bit);
+s16 fl_nwk_slave_PriorityADV_Add(fl_pack_t _pack);
 u8 fl_nwk_mySlaveID(void);
 void fl_nwk_slave_init(void);
 void fl_nwk_slave_nwkclear(void);
 void fl_nwk_slave_run(fl_pack_t *_pack_handle);
+u8 fl_adv_sendFIFO_PriorityADV_run(void) ;
 void fl_nwk_slave_process(void);
 void fl_slave_fota_proc(fl_pack_t _fota_pack);
 bool fl_nwk_slave_checkHDR(u8 _hdr);
