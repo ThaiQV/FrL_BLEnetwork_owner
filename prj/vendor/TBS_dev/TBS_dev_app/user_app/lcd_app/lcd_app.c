@@ -217,12 +217,12 @@ void my_timeout_callback(uint8_t row) {
 
 		case LCD_PRINT_FACTORY_RESET:
 			lcd_ctx.print_type = LCD_PRINT_OFF;
-			fl_db_clearAll();
-			TBS_History_ClearAll();
 			lcd_app_clear_all(&app_handle);
 			lcd_app_set_message(&app_handle, 0, "                ", 3000); //  0, timeout 10s
 			lcd_app_set_message(&app_handle, 1, "                ", 3000); //  0, timeout 10s
 			lcd_off();
+			fl_db_clearAll();
+			TBS_History_ClearAll();
 			sys_reboot();
 			break;
 
@@ -598,7 +598,16 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 			lcd_ctx.print_type = LCD_PRINT_MESS_NEW;
 			lcd_app_set_message(&app_handle, 0, (char *)G_COUNTER_LCD[lcd_ctx.row0_mess_num], 15000);
 			lcd_app_clear_row(&app_handle, 1);
-			lcd_ctx.row0_mess_num = find_next_mess(lcd_ctx.row0_mess_num);
+			lcd_ctx.row1_mess_num = find_next_mess(lcd_ctx.row0_mess_num);
+
+			if (lcd_ctx.row0_mess_num >= lcd_ctx.row1_mess_num)
+			{
+				lcd_ctx.print_mode = 0;
+			}
+			else
+			{
+				lcd_ctx.row0_mess_num = lcd_ctx.row1_mess_num;
+			}
 			
 			break;
 
