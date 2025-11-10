@@ -411,7 +411,7 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 					lcd_app_set_message(&app_handle, 0, (char *)G_COUNTER_LCD[lcd_ctx.row0_mess_num], 15000);
 					lcd_ctx.row1_mess_num = find_next_mess(lcd_ctx.row0_mess_num);
 
-					if (lcd_ctx.row0_mess_num > lcd_ctx.row1_mess_num)
+					if (lcd_ctx.row0_mess_num >= lcd_ctx.row1_mess_num)
 					{
 						lcd_ctx.print_mode = 0;
 					}
@@ -585,7 +585,7 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 				lcd_app_set_message(&app_handle, 0, "  Call......    ", 30000);
 			}
 			 //  0, timeout 10s
-			lcd_app_set_message(&app_handle, 1, "                ", 3000); //  0, timeout 10s	
+			lcd_app_set_message(&app_handle, 1, "                ", 60000); //  0, timeout 10s	
 
 			break;
 
@@ -619,7 +619,7 @@ static void LCD_MessageCheck_FlagNew(void){
 				lcd_ctx.time_off = get_system_time_ms() + LCD_TIME_DELAY_PRINT;
 				EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_MESS_NEW, EVENT_PRIORITY_HIGH);
 				mess_lcd->f_new = 0;
-				lcd_ctx.print_mode = 3;
+				lcd_ctx.print_mode = 2;
 			}
 			
 		}
