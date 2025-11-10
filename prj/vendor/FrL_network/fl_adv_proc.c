@@ -809,13 +809,16 @@ void fl_adv_run(void) {
 					fl_nwk_slave_run(&data_in_queue);
 				}
 			}
-			break;
+//			break;
 #endif
 			//process multiple packet on the circle
 			if (G_DATA_CONTAINER.count > 0) {
 				multiple_pack++;
 				if (multiple_pack < 5) {
 					continue;
+				}
+				else{
+					break;
 				}
 			}
 		} else {
