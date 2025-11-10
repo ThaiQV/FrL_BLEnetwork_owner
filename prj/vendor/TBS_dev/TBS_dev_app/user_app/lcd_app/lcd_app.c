@@ -220,6 +220,8 @@ void my_timeout_callback(uint8_t row) {
 			fl_db_clearAll();
 			TBS_History_ClearAll();
 			lcd_app_clear_all(&app_handle);
+			lcd_app_set_message(&app_handle, 0, "                ", 3000); //  0, timeout 10s
+			lcd_app_set_message(&app_handle, 1, "                ", 3000); //  0, timeout 10s
 			lcd_off();
 			sys_reboot();
 			break;
