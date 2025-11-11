@@ -12,6 +12,8 @@
 
 #define get_button_event() {\
     EVENT_DATA_START_DONE,\
+    EVENT_DISABLE_COUNTER_BT,\
+    EVENT_ENABLE_COUNTER_BT,\
 }
 
 #endif /* COUNTER_DEVICE*/

@@ -204,10 +204,6 @@ static void button_app_event_handler(const event_t* event, void* user_data)
             ULOGA("button Handle EVENT_DATA_START_DONE\n");
             button_ctx.start = 1;
 
-			button_set_click_callback(BUTTON_ID_PED, button_on_click);
-			button_set_click_callback(BUTTON_ID_PEU, button_on_click);
-			button_set_click_callback(BUTTON_ID_PPD, button_on_click);
-			button_set_click_callback(BUTTON_ID_PPU, button_on_click);
 			button_set_click_callback(BUTTON_ID_CALL, button_on_click);
 			button_set_click_callback(BUTTON_ID_ENDCALL, button_on_click);
 			button_set_click_callback(BUTTON_ID_RESET, button_on_click);
@@ -226,6 +222,23 @@ static void button_app_event_handler(const event_t* event, void* user_data)
 			button_set_combo_hold_callback(combo_id2, 5000, ped_rst_hold_5s);
 
             break;
+		
+		case EVENT_DISABLE_COUNTER_BT:
+			button_remove_click_callback(BUTTON_ID_PED);
+			button_remove_click_callback(BUTTON_ID_PEU);
+			button_remove_click_callback(BUTTON_ID_PPD);
+			button_remove_click_callback(BUTTON_ID_PPU);
+
+			break;
+
+		case EVENT_ENABLE_COUNTER_BT:
+			button_set_click_callback(BUTTON_ID_PED, button_on_click);
+			button_set_click_callback(BUTTON_ID_PEU, button_on_click);
+			button_set_click_callback(BUTTON_ID_PPD, button_on_click);
+			button_set_click_callback(BUTTON_ID_PPU, button_on_click);
+			
+			break;
+
         default:
             break;
     }

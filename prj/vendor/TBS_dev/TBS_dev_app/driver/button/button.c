@@ -219,6 +219,16 @@ bool button_set_click_callback(uint8_t button_id, void (*callback)(uint8_t)) {
     return true;
 }
 
+bool button_remove_click_callback(uint8_t button_id)
+{
+    if (!button_validate_id(button_id)) {
+        return false;
+    }
+
+    g_button_manager.buttons[button_id].on_click = NULL;
+    return true;
+}
+
 bool button_set_multiclick_callback(uint8_t button_id,
                                    void (*callback)(uint8_t button_id, uint8_t click_count)) {
     if (!button_validate_id(button_id)) {
