@@ -58,7 +58,9 @@ typedef enum {
 
 	/********** Button events *********/
 	//INPUT EVENT
-
+    EVENT_DISABLE_COUNTER_BT,
+    EVENT_ENABLE_COUNTER_BT,
+    
 	//OUTPUT EVENT
     EVENT_BUTTON_NONE = 0x0100,
 	EVENT_BUTTON_RST_ONCLICK,
