@@ -235,9 +235,9 @@ void REPORT_RESPONSE(u8* _pdata) {
 
 	if (IS_MAC_INVALID(report_fmt.frame.mac,0xFF)) {
 		LOG_P(MCU,"Send all nodelist!!!\r\n");
-		fl_nwk_master_StatusNodesRefesh();
+//		fl_nwk_master_StatusNodesRefesh();
 		//todo : create array data of the all nodelist
-		for (u8 var = 0; var < G_NODE_LIST.slot_inused && G_NODE_LIST.slot_inused != 0xFF; ++var) {
+		for (u8 var = 0; var <= G_NODE_LIST.slot_inused && G_NODE_LIST.slot_inused != 0xFF; ++var) {
 //			LOGA(MCU,"Devtype:%d\r\n",G_NODE_LIST.sla_info[var].dev_type);
 			//addnew: only send offline nodes bcs the online nodes has automatically sent yet
 			if (G_NODE_LIST.sla_info[var].active == false) {
@@ -248,15 +248,16 @@ void REPORT_RESPONSE(u8* _pdata) {
 	} else {
 		//todo: send data of the special nodes
 		u8 slave_idx = fl_master_SlaveID_get(report_fmt.frame.mac);
-		if (slave_idx != 0xFF && !memcmp(report_fmt.frame.timetamp_begin,report_fmt.frame.timetamp_end,4) &&
-				MAKE_U32(report_fmt.frame.timetamp_begin[0],report_fmt.frame.timetamp_begin[1],report_fmt.frame.timetamp_begin[2],report_fmt.frame.timetamp_begin[3]) == 0) {
-			_getnsend_data_report(slave_idx,G_WIFI_CON[_wf_CMD_find(data->cmd)].rsp.cmd);
-		}
+//		if (slave_idx != 0xFF && !memcmp(report_fmt.frame.timetamp_begin,report_fmt.frame.timetamp_end,4)
+//				&& MAKE_U32(report_fmt.frame.timetamp_begin[0],report_fmt.frame.timetamp_begin[1],report_fmt.frame.timetamp_begin[2],report_fmt.frame.timetamp_begin[3]) == 0
+//				)
+//		{
+//			_getnsend_data_report(slave_idx,G_WIFI_CON[_wf_CMD_find(data->cmd)].rsp.cmd);
+//		}
 		//todo: get history from the flash
-		else
+//		else
+		if (slave_idx != 0xFF)
 		{
-//			u16 from_index = MAKE_U16(report_fmt.frame.timetamp_begin[2],report_fmt.frame.timetamp_begin[3]);
-//			u16 to_index = MAKE_U16(report_fmt.frame.timetamp_end[2],report_fmt.frame.timetamp_end[3]);
 			if(-1==fl_api_master_req(report_fmt.frame.mac,NWK_HDR_A5_HIS,report_fmt.bytes,SIZEU8(report_fmt.bytes),0,0,0)){
 				ERR(MCU,"REQ API !!!!\r\n");
 			}
@@ -345,6 +346,7 @@ void TIMETAMP_REQUEST(u8* _pdata, RspFunc rspfnc) {
 		LOGA(MCU,"TIME SET:%02d/%02d/%02d - %02d:%02d:%02d\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second);
 		//fl_rtc_sync(timetamp_wifi_set);
 		fl_rtc_set(timetamp_wifi_set);
+		fl_nwk_master_StatusNodesRefesh();
 //		fl_rtc_set(timetamp_wifi_set);
 //		/*todo: send heartbeat to network so synchronize timetamp*/
 //		extern int fl_send_heartbeat(void);
@@ -668,18 +670,21 @@ void fl_ble2wifi_HISTORY_SEND(u8* mac,u8* timetamp,u8* _data){
 	fl_ble_send_wifi(payload,len_payload);
 }
 void fl_ble2wifi_EVENT_SEND(u8* _slave_mac){
-	fl_datawifi2ble_t wfdata;
-	wfdata.cmd = GF_CMD_REPORT_REQUEST;
-	memset(wfdata.data,0,SIZEU8(wfdata.data));
-	memcpy(wfdata.data,_slave_mac,6);
-	wfdata.len_data = 6 + 4 + 4; // mac + timetamp_begin + timetamp_end
-	wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
-	LOGA(MCU,"Ext-Call:0x%02X%02X%02X%02X%02X%02X\r\n",wfdata.data[0],wfdata.data[1],wfdata.data[2],wfdata.data[3],wfdata.data[4],wfdata.data[5]);
-	u8 cmd_data[30];
-	memset(cmd_data,0,SIZEU8(cmd_data));
-	cmd_data[0] = wfdata.len_data + SIZEU8(wfdata.cmd)+SIZEU8(wfdata.crc8)+SIZEU8(wfdata.len_data);
-	memcpy(&cmd_data[1],(u8*)&wfdata,cmd_data[0]);
-	REPORT_RESPONSE(cmd_data);
+//	fl_datawifi2ble_t wfdata;
+//	wfdata.cmd = GF_CMD_REPORT_REQUEST;
+//	memset(wfdata.data,0,SIZEU8(wfdata.data));
+//	memcpy(wfdata.data,_slave_mac,6);
+//	wfdata.len_data = 6 + 4 + 4; // mac + timetamp_begin + timetamp_end
+//	wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
+//	LOGA(MCU,"Ext-Call:0x%02X%02X%02X%02X%02X%02X\r\n",wfdata.data[0],wfdata.data[1],wfdata.data[2],wfdata.data[3],wfdata.data[4],wfdata.data[5]);
+//	u8 cmd_data[30];
+//	memset(cmd_data,0,SIZEU8(cmd_data));
+//	cmd_data[0] = wfdata.len_data + SIZEU8(wfdata.cmd)+SIZEU8(wfdata.crc8)+SIZEU8(wfdata.len_data);
+//	memcpy(&cmd_data[1],(u8*)&wfdata,cmd_data[0]);
+//	REPORT_RESPONSE(cmd_data);
+//
+	u8 slave_idx = fl_master_SlaveID_get(_slave_mac);
+	_getnsend_data_report(slave_idx,GF_CMD_REPORT_RESPONSE);
 }
 void fl_ble2wifi_send_FOTA_BROADCAST_RSP(u8 *_rslt,u8 _size){
 	fl_datawifi2ble_t wfdata;
