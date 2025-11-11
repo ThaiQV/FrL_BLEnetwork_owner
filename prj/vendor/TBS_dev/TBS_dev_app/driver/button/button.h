@@ -342,6 +342,7 @@ bool button_set_release_callback(uint8_t button_id, void (*callback)(uint8_t but
  * @return true if successful, false otherwise
  */
 bool button_set_click_callback(uint8_t button_id, void (*callback)(uint8_t));
+bool button_remove_click_callback(uint8_t button_id);
 
 /**
  * @brief Set multi-click event callback
