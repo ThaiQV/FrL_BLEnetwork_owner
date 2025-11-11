@@ -794,7 +794,7 @@ void fl_adv_run(void) {
 				//check repeat_mode
 				fl_repeat_run(&data_in_queue);
 			}
-			//Todo: FOTA packet -> this is a special format don't use standard frl adv
+			//Todo: FOTA packet
 			if (data_parsed.hdr == NWK_HDR_FOTA) {
 				for(u16 indx =0;indx<G_DATA_CONTAINER.mask+1;indx++){
 					if(-1!=plog_IndexOf(G_DATA_CONTAINER.data[indx].data_arr,data_parsed.payload,20,G_DATA_CONTAINER.data[indx].length)
@@ -804,12 +804,12 @@ void fl_adv_run(void) {
 				}
 				fl_slave_fota_proc(data_in_queue);
 			} else {
-				//Todo: Handle FORM MASTER REQ
+				//Todo: Handle FROM MASTER REQ
 				if (fl_adv_MasterToMe(data_in_queue)) {
 					fl_nwk_slave_run(&data_in_queue);
 				}
 			}
-//			break;
+			SKIP_FOTA:
 #endif
 			//process multiple packet on the circle
 			if (G_DATA_CONTAINER.count > 0) {
@@ -830,7 +830,6 @@ void fl_adv_run(void) {
 	fl_nwk_master_process();
 	fl_wifi2ble_fota_retry_proc();
 #else
-	SKIP_FOTA:
 	//Features processor
 	fl_nwk_slave_process();
 	//SEND PRIORITY ADV

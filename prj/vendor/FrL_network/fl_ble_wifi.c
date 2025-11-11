@@ -237,11 +237,11 @@ void REPORT_RESPONSE(u8* _pdata) {
 		LOG_P(MCU,"Send all nodelist!!!\r\n");
 //		fl_nwk_master_StatusNodesRefesh();
 		//todo : create array data of the all nodelist
-		for (u8 var = 0; var <= G_NODE_LIST.slot_inused && G_NODE_LIST.slot_inused != 0xFF; ++var) {
+		for (u8 var = 0; var < G_NODE_LIST.slot_inused && G_NODE_LIST.slot_inused != 0xFF; ++var) {
 //			LOGA(MCU,"Devtype:%d\r\n",G_NODE_LIST.sla_info[var].dev_type);
 			//addnew: only send offline nodes bcs the online nodes has automatically sent yet
 			if (G_NODE_LIST.sla_info[var].active == false) {
-				P_INFO_HEX(G_NODE_LIST.sla_info[var].mac,6,"[%d]Mac:",G_NODE_LIST.sla_info[var].slaveID);
+//				P_INFO_HEX(G_NODE_LIST.sla_info[var].mac,6,"[%d]Mac:",G_NODE_LIST.sla_info[var].slaveID);
 				_getnsend_data_report(var,G_WIFI_CON[_wf_CMD_find(data->cmd)].rsp.cmd);
 			}
 		}

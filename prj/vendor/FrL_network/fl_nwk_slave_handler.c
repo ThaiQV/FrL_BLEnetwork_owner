@@ -325,7 +325,7 @@ s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 
 	if (_cb != 0 && ( _timeout_ms*1000 >= 2*QUEUQ_REQcRSP_INTERVAL || _timeout_ms==0)) {
 		u64 seq_timetamp=fl_req_slave_packet_createNsend(_cmdid,_data,_len,&waittime);
 		if(seq_timetamp){
-			P_INFO("REQ waittime:%d\r\n",waittime);
+//			P_INFO("REQ waittime:%d\r\n",waittime);
 			waittime = _timeout_ms+waittime*G_ADV_SETTINGS.adv_duration;
 			rslt=fl_queueREQcRSP_add(G_INFORMATION.slaveID,_cmdid,seq_timetamp,_data,_len,&_cb,waittime,_retry);
 		}
@@ -397,7 +397,7 @@ u64 fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len,u32 *_timequeue
 			req_pack.frame.endpoint.master = FL_FROM_SLAVE_ACK;
 			//tbs index manage
 			TBS_Device_Index_manage();
-			P_INFO("EVENT update - indx:%d \r\n",G_COUNTER_DEV.data.index-1);
+//			P_INFO("EVENT update - indx:%d \r\n",G_COUNTER_DEV.data.index-1);
 		}
 		break;
 		case NWK_HDR_11_REACTIVE: {
@@ -790,10 +790,12 @@ fl_pack_t fl_slave_fota_rsp_packet_build(u8* _data, u8 _len,fl_data_frame_u _REQ
 }
 
 void fl_slave_fota_proc(fl_pack_t _fota_pack){
-	static u32 count_echo=0;
-	static u8 flag_begin_end=0;
+//	static u32 count_echo=0;
+	static u8 flag_begin=0;
+	static u8 flag_end=0;
 	static u32 rtt=0;
 	static u32 fw_size=0;
+
 	extern u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
 	fl_dataframe_format_t packet;
 	if(!fl_packet_parse(_fota_pack,&packet)){
@@ -809,31 +811,21 @@ void fl_slave_fota_proc(fl_pack_t _fota_pack){
 			u8 OTA_BEGIN[3] = { 0, G_INFORMATION.dev_type, 2 };
 			u8 OTA_END[3] = { 2, G_INFORMATION.dev_type, 2 };
 			if (plog_IndexOf(packet.payload,OTA_BEGIN,SIZEU8(OTA_BEGIN),SIZEU8(OTA_BEGIN)) != -1) {
-				count_echo = 0;
-				flag_begin_end = 1;
+				flag_begin++;
 				rtt = fl_rtc_get();
-				fw_size = MAKE_U32(0,packet.payload[5],packet.payload[4],packet.payload[3]);
-				DFU_OTA_CRC128_INIT();
-				P_INFO("\r\n============ FOTA BEGIN ============ \r\n");
-
-			} else if (flag_begin_end && plog_IndexOf(packet.payload,OTA_END,SIZEU8(OTA_END),SIZEU8(OTA_END)) != -1) {
-				P_INFO("\r\n============ FOTA END ==============\r\n");
-				u8 crc128[16];
-				memcpy(crc128,DFU_OTA_CRC128_GET(),16);
-				P_INFO_HEX(crc128,16,"** CRC      :");
-				P_INFO_HEX(packet.payload+6,16,"** CRC CHECK:");
-				P_INFO("** File     : %d/%d (%d)\r\n",count_echo*16,fw_size,count_echo);
-				P_INFO("** RTT      : %d s\r\n",(u32)(fl_rtc_get()-rtt));
-				P_INFO("=====================================\r\n");
-				count_echo = 0;
-				flag_begin_end = 0;
+			} else if (plog_IndexOf(packet.payload,OTA_END,SIZEU8(OTA_END),SIZEU8(OTA_END)) != -1) {
+				flag_end++;
+				P_INFO("========================\r\n");
+				P_INFO("** Begin: %d\r\n",flag_begin);
+				P_INFO("** FW   : %d\r\n",fw_size);
+				P_INFO("** End  : %d\r\n",flag_end);
+				P_INFO("** RTT  : %d s\r\n",(u32)(fl_rtc_get()-rtt));
+				P_INFO("========================\r\n");
+				flag_end=0;
+				flag_begin=0;
+				fw_size=0;
 			} else {
-				if (flag_begin_end) {
-					DFU_OTA_CRC128_CAL(&packet.payload[6]);
-					count_echo++;
-					P_INFO("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
-					P_INFO("Downloading:%d/%d",(16*count_echo),fw_size);
-				}
+				fw_size++;
 			}
 		}
 	}
@@ -938,7 +930,7 @@ int _interval_report(void) {
 #endif
 				//increase index if using NWK_HDR_11_REACTIVE
 				//TBS_Device_Index_manage();
-				P_INFO("Auto update (%d s) - indx:%d\r\n",INTERVAL_REPORT_TIME*1000*1000 + offset_spread,G_COUNTER_DEV.data.index-1);
+//				P_INFO("Auto update (%d s) - indx:%d\r\n",INTERVAL_REPORT_TIME*1000*1000 + offset_spread,G_COUNTER_DEV.data.index-1);
 				return INTERVAL_REPORT_TIME*1000*1000 + offset_spread;
 			}
 		}

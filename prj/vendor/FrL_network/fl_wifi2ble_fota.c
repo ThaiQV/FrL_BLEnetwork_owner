@@ -179,9 +179,9 @@ int fl_wifi2ble_fota_system_start(u8 *_payload_start,u8 _len){
 	return rslt;
 }
 
-/*******************************************************************************************************
+/*****************************************************************************
  *    SYSTEM FOTA PROCESSOR - END
- *******************************************************************************************************/
+ *****************************************************************************/
 void fl_wifi2ble_fota_ContainerClear(void){
 	FL_QUEUE_CLEAR(&G_FW_QUEUE_SENDING,G_FW_QUEUE_SENDING.mask+1);
 }
@@ -190,7 +190,6 @@ void fl_wifi2ble_fota_ContainerClear(void){
 /***                      Processing functions 					             **/
 /******************************************************************************/
 /******************************************************************************/
-
 void fl_wifi2ble_fota_init(void){
 	LOG_P(INF_FILE,"FOTA Initilization!!!\r\n");
 	fl_wifi2ble_fota_ContainerClear();

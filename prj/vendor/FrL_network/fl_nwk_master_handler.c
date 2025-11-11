@@ -736,7 +736,7 @@ void fl_nwk_master_StatusNodesRefesh(void) {
 static void _master_updateDB_for_Node(u8 node_indx ,fl_data_frame_u *packet)  {
 	G_NODE_LIST.sla_info[node_indx].active = true;
 	G_NODE_LIST.sla_info[node_indx].timelife = fl_rtc_get();
-	P_INFO_HEX(G_NODE_LIST.sla_info[node_indx].mac,6,"%d->[%02d]",G_NODE_LIST.sla_info[node_indx].timelife,G_NODE_LIST.sla_info[node_indx].slaveID);
+//	P_INFO_HEX(G_NODE_LIST.sla_info[node_indx].mac,6,"[0x02X]%%d->[%02d]",G_NODE_LIST.sla_info[node_indx].timelife,G_NODE_LIST.sla_info[node_indx].slaveID);
 	//create MAC + TIMETAMP + DEV_TYPE
 	u8 size_mac = SIZEU8(G_NODE_LIST.sla_info[node_indx].mac);
 	//memcpy(&G_NODE_LIST.sla_info[node_indx].data[0],G_NODE_LIST.sla_info[node_indx].mac,size_mac); //update mac to pointer data
@@ -1081,7 +1081,7 @@ void fl_nwk_master_CLEARALL_NETWORK(void) {
 int _interval_heartbeat(void) {
 	static u32 sys_tick_hb =0;
 	if(clock_time_exceed(sys_tick_hb,PERIOD_HEARTBEAT*1000)){
-		P_INFO("HeartBeat send:%d\r\n",PERIOD_HEARTBEAT)
+//		P_INFO("HeartBeat send:%d\r\n",PERIOD_HEARTBEAT)
 		fl_pack_t packet_built = fl_master_packet_heartbeat_build();
 		fl_adv_sendFIFO_add(packet_built);
 		sys_tick_hb = clock_time();
