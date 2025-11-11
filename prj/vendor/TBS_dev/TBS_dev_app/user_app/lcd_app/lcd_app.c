@@ -204,6 +204,7 @@ void my_timeout_callback(uint8_t row) {
 			{
 				lcd_ctx.print_type = LCD_PRINT_OFF;
 				lcd_app_clear_all(&app_handle);
+				EVENT_PUBLISH_SIMPLE(EVENT_ENABLE_COUNTER_BT, EVENT_PRIORITY_HIGH);
 				continue;
 			}
 			else

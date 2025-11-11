@@ -429,6 +429,7 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 			fl_db_tbsprofile_save(tbs_profile,SIZEU8(tbs_profile));
 			EVENT_PUBLISH_SIMPLE(EVENT_LED_CALL_OFF, EVENT_PRIORITY_HIGH);
 			EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_PAIRING, EVENT_PRIORITY_HIGH);
+			EVENT_PUBLISH_SIMPLE(EVENT_DISABLE_COUNTER_BT, EVENT_PRIORITY_HIGH);
 
             break;
         case EVENT_BUTTON_RST_PEU_HOLD_5S:
@@ -442,6 +443,7 @@ static void data_app_event_handler(const event_t* event, void* user_data)
             ULOGA("Handle EVENT_BUTTON_CALL_HOLD_3S\n");
 			ULOGA("remove network\n");
 			EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_REMOVE_GW, EVENT_PRIORITY_HIGH);
+			EVENT_PUBLISH_SIMPLE(EVENT_DISABLE_COUNTER_BT, EVENT_PRIORITY_HIGH);
 
 			break;
 
@@ -461,6 +463,12 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 			{
 				EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_PAIRING, EVENT_PRIORITY_HIGH);
 			}
+
+			if (IsJoinedNetwork())
+			{
+				EVENT_PUBLISH_SIMPLE(EVENT_ENABLE_COUNTER_BT, EVENT_PRIORITY_HIGH);
+			}
+			
 			break;
 
         default:
