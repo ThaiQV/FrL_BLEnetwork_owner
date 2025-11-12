@@ -433,7 +433,7 @@ void firmware_check(void)
 	{
 		if(HVP(&header_current_fw) != HEADER_EMPTY)
 		{
-//			if(HVP(&header_ota_fw) > HVP(&header_current_fw))
+			if(HVP(&header_ota_fw) > HVP(&header_current_fw))
 			{
 				DFU_PRINTF("OTA FW\n");
 				// Copy FW from OTA FW to current FW
