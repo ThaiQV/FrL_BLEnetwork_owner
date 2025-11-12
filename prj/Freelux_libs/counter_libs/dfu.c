@@ -1,7 +1,7 @@
 #include "dfu.h"
 
 /* Definition */
-#define DFU_DEBUG	1
+#define DFU_DEBUG	0
 #ifdef DFU_DEBUG
 #define DFU_PRINTF(...)	LOGA(APP,__VA_ARGS__);
 #else
@@ -141,18 +141,18 @@ void fw_copy(fw_header_t *header, uint32_t fw_addr)
 		size += CRC128_LENGTH;
 	}
 
-	DFU_PRINTF("Header CRC128: ");
-	for(i = 0; i < CRC128_LENGTH; i++)
-	{
-		printf("%x ",header->crc128[i]);
-	}
-	printf("\n");
-	DFU_PRINTF("Calculate CRC128: ");
-	for(i = 0; i < CRC128_LENGTH; i++)
-	{
-		printf("%x ",crc128[i]);
-	}
-	printf("\n");
+//	DFU_PRINTF("Header CRC128: ");
+//	for(i = 0; i < CRC128_LENGTH; i++)
+//	{
+//		printf("%x ",header->crc128[i]);
+//	}
+//	printf("\n");
+//	DFU_PRINTF("Calculate CRC128: ");
+//	for(i = 0; i < CRC128_LENGTH; i++)
+//	{
+//		printf("%x ",crc128[i]);
+//	}
+//	printf("\n");
 
 	if(memcmp(crc128,header->crc128,CRC128_LENGTH) == 0)
 	{
@@ -684,6 +684,33 @@ ota_ret_t ota_packet_header_get(ota_fw_header_t *header)
 		return OTA_RET_OK;
 	}
 	return OTA_RET_ERROR;
+}
+
+/**
+* @brief: set current FW verison
+* @param: see below
+*/
+uint8_t set_current_fw_version(uint8_t fw_patch)
+{
+	fw_header_t header_current_fw;
+
+	flash_read_page(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER, sizeof(fw_header_t), (uint8_t *)&header_current_fw);
+
+	// Only set version if it is not set
+	if((header_current_fw.major == 0xFF) && (header_current_fw.minor == 0xFF) && (header_current_fw.patch == 0xFF))
+	{
+		// Erase header page before write new header
+		flash_read_mid();
+		flash_unlock_mid146085();
+		flash_erase_sector(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER);
+
+		// Write Application current FW header
+		header_current_fw.major = 0; // Set default = 1 due to only use 1 byte version
+		header_current_fw.minor = 0; // Set default = 1 due to only use 1 byte version
+		header_current_fw.patch = fw_patch;
+		header_current_fw.size  = 0x40000; // Set default = 0x40000
+		flash_write_page(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER, sizeof(header_current_fw), (uint8_t *)&header_current_fw);
+	}
 }
 
 /**

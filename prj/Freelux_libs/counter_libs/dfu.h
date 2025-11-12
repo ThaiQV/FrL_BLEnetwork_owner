@@ -116,6 +116,7 @@
 	ota_ret_t ota_fw_put(uint8_t *pdata, uint8_t crc);
 	ota_ret_t ota_packet_header_set(ota_fw_header_t *header);
 	ota_ret_t ota_packet_header_get(ota_fw_header_t *header);
+	uint8_t set_current_fw_version(uint8_t fw_patch);
 	uint8_t get_current_fw_version(void);
 	void test_ota(void);
 #endif //__DFU_H__
