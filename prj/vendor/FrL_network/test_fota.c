@@ -35,13 +35,14 @@ u32 VIRTUAL_FW_NUMOFSENDING = 0;
 /******************************************************************************/
 /******************************************************************************/
 int _send_fw(void){
+	static u8 test_version = 0;
 	const u32 address_offset =0;
 	uint32_t	image_size = VIRTUAL_FW_SIZE;		//APP_IMAGE_SIZE_MAX;
 	uint8_t		packet[22];
 	uint8_t		buff[OTA_PACKET_LENGTH];
 	packet[0] = OTA_PACKET_DATA; 			// packet data
 	packet[1] = 0;							// device type
-	packet[2] = 2;							// version
+	packet[2] = test_version;				// version
 //	VIRTUAL_FW_ADDR = 0;
 	//for (i = 0; i < (image_size / sizeof(buff)); i++)
 	if(VIRTUAL_FW_INDX<(image_size / sizeof(buff)))
@@ -71,7 +72,7 @@ int _send_fw(void){
 	// put packet end
 	packet[0] = OTA_PACKET_END; 			// packet begin
 	packet[1] = 0;							// device type
-	packet[2] = 2;							// version
+	packet[2] = test_version;				// version
 	packet[3] = (uint8_t)image_size;		// FW size
 	packet[4] = (uint8_t)(image_size>>8);	// FW size
 	packet[5] = (uint8_t)(image_size>>16);	// FW size
@@ -79,7 +80,8 @@ int _send_fw(void){
 	///
 	if(-1==fl_wifi2ble_fota_system_end(&packet[0],sizeof(packet))) return 0;
 	VIRTUAL_FW_NUMOFSENDING+=1;
-	P_INFO("FOTA num : %d\r\n",VIRTUAL_FW_NUMOFSENDING);
+	test_version++;
+	P_INFO("FOTA num(v.%d) : %d\r\n",test_version,VIRTUAL_FW_NUMOFSENDING);
 	return -1;
 }
 

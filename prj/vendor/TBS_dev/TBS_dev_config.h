@@ -13,7 +13,7 @@
 
 typedef enum{
 	TBS_COUNTER = 0x00,
-	TBS_POWERMETER=0x01
+	TBS_POWERMETER=0x01,
 }__attribute__((__packed__)) tbs_dev_type_e;
 
 #ifndef MASTER_CORE

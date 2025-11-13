@@ -789,7 +789,7 @@ fl_pack_t fl_slave_fota_rsp_packet_build(u8* _data, u8 _len,fl_data_frame_u _REQ
 	return rslt;
 }
 
-void fl_slave_fota_proc(fl_pack_t _fota_pack){
+void fl_slave_fota_proc(fl_pack_t *_fota_pack){
 //	static u32 count_echo=0;
 	static u8 flag_begin=0;
 	static u8 flag_end=0;
@@ -798,18 +798,22 @@ void fl_slave_fota_proc(fl_pack_t _fota_pack){
 
 	extern u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
 	fl_dataframe_format_t packet;
-	if(!fl_packet_parse(_fota_pack,&packet)){
+	if(!fl_packet_parse(*_fota_pack,&packet)){
 		ERR(INF,"Packet parse fail!!!\r\n");
 		return;
 	}
+
+	//filter duplication pack
+	if(fl_wifi2ble_fota_find(_fota_pack)!= -1) return;
+
 	if (packet.hdr == NWK_HDR_FOTA) {
 		if(packet.endpoint.master == FL_FROM_MASTER_ACK){
 			//TEST
 //			u8 version_typefw[4]={'1','2','3',G_INFORMATION.dev_type};
 //			fl_adv_sendFIFO_add(fl_slave_fota_rsp_packet_build(version_typefw,SIZEU8(version_typefw),packet));
 		}else{
-			u8 OTA_BEGIN[3] = { 0, G_INFORMATION.dev_type, 2 };
-			u8 OTA_END[3] = { 2, G_INFORMATION.dev_type, 2 };
+			u8 OTA_BEGIN[2] = {0, G_INFORMATION.dev_type};
+			u8 OTA_END[2] = { 2, G_INFORMATION.dev_type};
 			if (plog_IndexOf(packet.payload,OTA_BEGIN,SIZEU8(OTA_BEGIN),SIZEU8(OTA_BEGIN)) != -1) {
 				flag_begin++;
 				rtt = fl_rtc_get();
@@ -827,6 +831,13 @@ void fl_slave_fota_proc(fl_pack_t _fota_pack){
 			} else {
 				fw_size++;
 			}
+		}
+		//add send repeat and check echo
+		if(fl_wifi2ble_fota_fwpush(_fota_pack) == -1){
+			ERR(APP,"FOTA ECHO Err <Full>\r\n");
+		}
+		else{
+//			P_INFO_HEX(_fota_pack->data_arr,_fota_pack->length,"FOTA(%d):",_fota_pack->length);
 		}
 	}
 }
@@ -912,6 +923,7 @@ int _slave_reconnect(void){
 	}
 	return 0;
 }
+
 int _interval_report(void) {
 	int offset_spread = (fl_rtc_getWithMilliStep().milstep - WIFI_ORIGINAL_GETALL.milstep)*10;
 #define INTERVAL_REPORT_TIME (55 - FL_SLAVEID_MEMID(G_INFORMATION.slaveID))
@@ -954,6 +966,7 @@ void fl_nwk_slave_reconnectNstoragedata(void){
 /***                      Processing functions 					             **/
 /******************************************************************************/
 /******************************************************************************/
+
 /***************************************************
  * @brief 		:filter adv packet with the Freelux HDR
  *

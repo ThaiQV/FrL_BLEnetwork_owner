@@ -58,7 +58,7 @@ fl_data_container_t G_DATA_CONTAINER = { .data = g_data_array, .head_index = 0, 
 /*---------------- ADV SEND QUEUE --------------------------*/
 
 fl_pack_t g_sending_array[QUEUE_SENDING_SIZE];
-fl_data_container_t G_QUEUE_SENDING = { .data = g_sending_array, .head_index = 0, .tail_index = 0, .mask = QUEUE_SENDING_SIZE - 1, .count = 0 };
+ fl_data_container_t G_QUEUE_SENDING = { .data = g_sending_array, .head_index = 0, .tail_index = 0, .mask = QUEUE_SENDING_SIZE - 1, .count = 0 };
 /*---------------- ADV SEND QUEUE --------------------------*/
 
 fl_pack_t g_history_sending_array[QUEUE_HISTORY_SENDING_SIZE];
@@ -190,11 +190,12 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 //				return 0;
 #ifndef MASTER_CORE
 				extern fl_nodeinnetwork_t G_INFORMATION;
+				u8 master_mac[4] = { U32_BYTE0(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE1(G_INFORMATION.profile.nwk.mac_parent),
+									 U32_BYTE2(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE3(G_INFORMATION.profile.nwk.mac_parent) };
 				//IMPORTANT DELETE NETWORK
 				u8 delete_network[32];
 				fl_nwk_decrypt16(FL_NWK_PB_KEY,pa->data,incomming_data.length,delete_network);
 				if (-1 != plog_IndexOf(delete_network,MASTER_CLEARNETWORK,SIZEU8(MASTER_CLEARNETWORK),incomming_data.length)) {
-										u8 master_mac[4] = { U32_BYTE0(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE1(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE2(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE3(G_INFORMATION.profile.nwk.mac_parent) };
 					if (-1 != plog_IndexOf(delete_network,master_mac,SIZEU8(master_mac),incomming_data.length)) {
 						extern int REBOOT_DEV(void);
 						ERR(APP,"DETELE NETWORK!!!!\r\n");
@@ -231,6 +232,12 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 #else
 				if (!fl_nwk_slave_checkHDR(incomming_data.data_arr[0])) {
 					return 0;
+				}
+				//incomming packet is echo pack
+				if (-1 == plog_IndexOf(pa->mac,master_mac,4,6)) {
+					if (incomming_data.data_arr[0] == NWK_HDR_FOTA && fl_wifi2ble_fota_recECHO(incomming_data) != -1) {
+						return 0;
+					}
 				}
 #endif
 				if (FL_QUEUE_FIND(&G_DATA_CONTAINER,&incomming_data,incomming_data.length - 1/*skip rssi*/) == -1) {
@@ -291,11 +298,10 @@ int fl_adv_sendFIFO_add(fl_pack_t _pack) {
 	memcpy(check_hdr_history.bytes,_pack.data_arr,_pack.length);
 	//ADD Repeat and ackECHO of the fota packet
 	char *str_dbg = (check_hdr_history.frame.hdr == NWK_HDR_FOTA)?"echoFOTA":"HISTORY";
-	if (check_hdr_history.frame.hdr == NWK_HDR_A5_HIS || check_hdr_history.frame.hdr == NWK_HDR_FOTA) {
+	if (check_hdr_history.frame.hdr == NWK_HDR_A5_HIS /*|| check_hdr_history.frame.hdr == NWK_HDR_FOTA*/) {
 		if (FL_QUEUE_FIND(&G_QUEUE_HISTORY_SENDING,&_pack,_pack.length -2) == -1) {
 			if (FL_QUEUE_ADD(&G_QUEUE_HISTORY_SENDING,&_pack) < 0) {
 				ERR(BLE,"Err FULL <QUEUE ADD %s SENDING>!!\r\n",str_dbg);
-//				FL_QUEUE_CLEAR(&G_QUEUE_HISTORY_SENDING,G_QUEUE_HISTORY_SENDING.mask+1);
 				return -1;
 			} else {
 				LOGA(BLE,"QUEUE %s SEND ADD: %d/%d (cnt:%d)\r\n",str_dbg,G_QUEUE_HISTORY_SENDING.head_index,
@@ -491,7 +497,7 @@ u8 fl_adv_sendFIFO_run(void) {
 			if (check_heartbeat.frame.hdr == NWK_HDR_HEARTBEAT) {
 //				fl_nwk_slave_SYNC_ORIGIN_MASTER(timetamp_inpack.timetamp,timetamp_inpack.milstep);
 //				ERR(INF,"ORIGINAL MASTER-TIME:%d\r\n",ORIGINAL_MASTER_TIME.milstep);
-				if (inused_slot == 1 && FL_NWK_HISTORY_IsReady() > 0) { // only have HB packet=> send it one times
+				if (inused_slot == 1 && (FL_NWK_HISTORY_IsReady() > 0 || FL_NWK_FOTA_IsReady() > 0)) { // only have HB packet=> send it one times
 				//CLEAR
 					G_QUEUE_SENDING.data[indx_head_cur].length = 0;
 				}
@@ -609,9 +615,9 @@ void fl_adv_init(void) {
 #ifdef MASTER_CORE
 	//Start network
 	fl_nwk_protocol_InitnRun();
+#endif
 	//fota init
 	fl_wifi2ble_fota_init();
-#endif
 }
 /***************************************************
  * @brief 		:init collection channel (0,1,2)
@@ -789,27 +795,20 @@ void fl_adv_run(void) {
 			fl_nwk_master_run(&data_in_queue); //process reponse from the slaves
 
 #else //SLAVE
-			//Todo: Repeat process
-			if (fl_adv_IsFromMe(data_in_queue) == false && data_parsed.endpoint.repeat_cnt > 0) {
-				//check repeat_mode
-				fl_repeat_run(&data_in_queue);
-			}
-			//Todo: FOTA packet
+			//Todo: FOTA process
 			if (data_parsed.hdr == NWK_HDR_FOTA) {
-				for(u16 indx =0;indx<G_DATA_CONTAINER.mask+1;indx++){
-					if(-1!=plog_IndexOf(G_DATA_CONTAINER.data[indx].data_arr,data_parsed.payload,20,G_DATA_CONTAINER.data[indx].length)
-							&& 0!= memcmp(G_DATA_CONTAINER.data[indx].data_arr,data_in_queue.data_arr,6)){
-						goto SKIP_FOTA;
-					}
-				}
-				fl_slave_fota_proc(data_in_queue);
+				fl_slave_fota_proc(&data_in_queue);
 			} else {
+				//Todo: Repeat process
+				if (fl_adv_IsFromMe(data_in_queue) == false && data_parsed.endpoint.repeat_cnt > 0) {
+					//check repeat_mode
+					fl_repeat_run(&data_in_queue);
+				}
 				//Todo: Handle FROM MASTER REQ
 				if (fl_adv_MasterToMe(data_in_queue)) {
 					fl_nwk_slave_run(&data_in_queue);
 				}
 			}
-			SKIP_FOTA:
 #endif
 			//process multiple packet on the circle
 			if (G_DATA_CONTAINER.count > 0) {
@@ -828,18 +827,19 @@ void fl_adv_run(void) {
 	}
 #ifdef  MASTER_CORE
 	fl_nwk_master_process();
-	fl_wifi2ble_fota_retry_proc();
 #else
 	//Features processor
 	fl_nwk_slave_process();
 	//SEND PRIORITY ADV
 //	fl_adv_sendFIFO_PriorityADV_run();
 #endif
+	fl_wifi2ble_fota_retry_proc();
 	/* SEND ADV */
 	if(fl_adv_sendFIFO_run()==0){
 #ifdef MASTER_CORE
 		fl_wifi2ble_fota_run();
 #else
+		fl_wifi2ble_fota_run();
 		fl_adv_sendFIFO_History_run();
 #endif
 	}

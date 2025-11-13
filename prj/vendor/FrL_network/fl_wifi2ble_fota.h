@@ -18,17 +18,19 @@
 #define DFU_OTA_CRC128_CAL				crc128_calculate
 #define DFU_OTA_FW_PUT					ota_fw_put
 
-#ifdef MASTER_CORE
-
 u8 FL_NWK_FOTA_IsReady(void);
-s16 fl_wifi2ble_fota_fwpush(u8 *_fw, u8 _len);
+s16 fl_wifi2ble_fota_find(fl_pack_t *_pack_rec);
 void fl_wifi2ble_fota_ContainerClear(void);
 void fl_wifi2ble_fota_init(void);
 void fl_wifi2ble_fota_run(void);
 void fl_wifi2ble_fota_retry_proc(void);
+s16 fl_wifi2ble_fota_recECHO(fl_pack_t _pack_rec);
+
+#ifdef MASTER_CORE
 int fl_wifi2ble_fota_system_end(u8 *_payload_end,u8 _len);
 int fl_wifi2ble_fota_system_start(u8 *_payload_start,u8 _len);
-void fl_wifi2ble_fota_recECHO(fl_pack_t _pack_rec);
+s16 fl_wifi2ble_fota_fwpush(u8 *_fw, u8 _len);
+#else
+s16 fl_wifi2ble_fota_fwpush(fl_pack_t *fw_pack);
 #endif
-
 #endif /* VENDOR_FRL_NETWORK_FL_WIFI2BLE_FOTA_H_ */
