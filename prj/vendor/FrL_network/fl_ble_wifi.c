@@ -94,6 +94,7 @@ typedef union {
 /***                       Functions declare                   		         **/
 /******************************************************************************/
 /******************************************************************************/
+
 void fl_wifi2ble_Excute(fl_wifi2ble_exc_e cmd);
 void PING_REQ(u8* _pdata, RspFunc rspfnc);
 void PING_RSP(u8* _pdata);
@@ -346,7 +347,7 @@ void TIMETAMP_REQUEST(u8* _pdata, RspFunc rspfnc) {
 		fl_nwk_master_StatusNodesRefesh();
 		timetamp_wifi_set = fl_rtc_get();
 		fl_rtc_timestamp_to_datetime(timetamp_wifi_set,&cur_dt);
-		P_INFO("TIME SET:%02d/%02d/%02d - %02d:%02d:%02d\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second);
+//		P_INFO("TIME SET:%02d/%02d/%02d - %02d:%02d:%02d\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second);
 	}
 }
 void TIMETAMP_RESPONSE(u8* _pdata) {

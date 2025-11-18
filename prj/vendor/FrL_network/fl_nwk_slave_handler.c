@@ -168,7 +168,7 @@ int _informMaster(void){
 }
 
 int _isOnline_check(void) {
-	ERR(INF,"Device -> offline\r\n");
+//	ERR(INF,"Device -> offline\r\n");
 	G_INFORMATION.active = false;
 	blt_soft_timer_restart(_informMaster,INFORM_MASTER);
 	return -1;
@@ -816,28 +816,28 @@ void fl_slave_fota_proc(fl_pack_t *_fota_pack){
 //			u8 version_typefw[4]={'1','2','3',G_INFORMATION.dev_type};
 //			fl_adv_sendFIFO_add(fl_slave_fota_rsp_packet_build(version_typefw,SIZEU8(version_typefw),packet));
 //		}else{
-//			u8 OTA_BEGIN[2] = {0, G_INFORMATION.dev_type};
-//			u8 OTA_END[2] = { 2, G_INFORMATION.dev_type};
-//			if (plog_IndexOf(packet.payload,OTA_BEGIN,SIZEU8(OTA_BEGIN),SIZEU8(OTA_BEGIN)) != -1) {
-//				pack_type=FOTA_PACKET_BEGIN;
-//				flag_begin++;
-//				rtt = fl_rtc_get();
-//			} else if (plog_IndexOf(packet.payload,OTA_END,SIZEU8(OTA_END),SIZEU8(OTA_END)) != -1) {
-//				pack_type=FOTA_PACKET_END;
-//				flag_end++;
-//				P_INFO("========================\r\n");
-//				P_INFO("** Begin: %d\r\n",flag_begin);
-//				P_INFO("** FW   : %d\r\n",fw_size);
-//				P_INFO("** End  : %d\r\n",flag_end);
-//				P_INFO("** RTT  : %d s\r\n",(u32)(fl_rtc_get()-rtt));
-//				P_INFO("========================\r\n");
-//				flag_end=0;
-//				flag_begin=0;
-//				fw_size=0;
-//			} else {
-//				pack_type=FOTA_PACKET_DATA;
-//				fw_size++;
-//			}
+			u8 OTA_BEGIN[2] = {0, G_INFORMATION.dev_type};
+			u8 OTA_END[2] = { 2, G_INFORMATION.dev_type};
+			if (plog_IndexOf(packet.payload,OTA_BEGIN,SIZEU8(OTA_BEGIN),SIZEU8(OTA_BEGIN)) != -1) {
+				pack_type=FOTA_PACKET_BEGIN;
+				flag_begin++;
+				rtt = fl_rtc_get();
+			} else if (plog_IndexOf(packet.payload,OTA_END,SIZEU8(OTA_END),SIZEU8(OTA_END)) != -1) {
+				pack_type=FOTA_PACKET_END;
+				flag_end++;
+				P_INFO("========================\r\n");
+				P_INFO("** Begin: %d\r\n",flag_begin);
+				P_INFO("** FW   : %d\r\n",fw_size);
+				P_INFO("** End  : %d\r\n",flag_end);
+				P_INFO("** RTT  : %d s\r\n",(u32)(fl_rtc_get()-rtt));
+				P_INFO("========================\r\n");
+				flag_end=0;
+				flag_begin=0;
+				fw_size=0;
+			} else {
+				pack_type=FOTA_PACKET_DATA;
+				fw_size++;
+			}
 //		}
 //		//add send repeat and check echo
 		if(fl_wifi2ble_fota_fwpush(_fota_pack,pack_type) == -1){
