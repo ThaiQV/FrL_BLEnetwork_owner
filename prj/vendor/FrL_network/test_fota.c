@@ -59,7 +59,7 @@ int _send_fw(void){
 			return 0;
 		}
 		else if(rslt_send_fota==FOTA_EXIT_VALUE){
-			ERR(APP,"FOTA SUPEND!!!\r\n");
+			ERR(APP,"FOTA SUSPEND!!!\r\n");
 			return -1;
 		}
 		VIRTUAL_FW_NUMOFSENDING++;

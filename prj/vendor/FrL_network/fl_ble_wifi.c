@@ -587,11 +587,39 @@ void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 		fl_datawifi2ble_t wfdata;
 		wfdata.cmd = G_WIFI_CON[_wf_CMD_find(GF_CMD_FOTA_REQUEST)].rsp.cmd;
 		memset(wfdata.data,0,SIZEU8(wfdata.data));
-		//DFU put to flash
 		memset(data_fw,0,SIZEU8(data_fw));
 		memcpy(data_fw,data->data,SIZEU8(data_fw));
-		//P_INFO_HEX(data_fw,SIZEU8(data_fw),"Data:");
-		wfdata.data[0] = DFU_OTA_FW_PUT(data_fw,data->crc8);
+		s16 rslt = -1;
+		if (data_fw[0] <= FOTA_PACKET_END) {
+			if (data_fw[1] == FOTA_DEV_MASTER) {
+				//DFU put to flash
+				wfdata.data[0] = DFU_OTA_FW_PUT(data_fw,data->crc8);
+			} else {
+				if (data_fw[0] == FOTA_PACKET_BEGIN){
+					rslt = fl_wifi2ble_fota_system_begin(data_fw,SIZEU8(data_fw));
+				}
+				else if(data_fw[0] == FOTA_PACKET_DATA){
+					rslt = fl_wifi2ble_fota_system_data(data_fw,SIZEU8(data_fw));
+				}
+				else if(data_fw[0] == FOTA_PACKET_END){
+					rslt = fl_wifi2ble_fota_system_end(data_fw,SIZEU8(data_fw));
+				}
+				//convert return
+				/*-1: BUSY,0x7FFF : ERR , >-1 : OK*/
+				/*0x00: OK, 0x01: BUSY,  0xFF: ERR*/
+				if (rslt < 0) {
+					wfdata.data[0] = 0x01;
+				} else if (rslt == FOTA_EXIT_VALUE) {
+					wfdata.data[0] = 0xFF;
+				} else {
+					wfdata.data[0] = 0;
+				}
+			}
+		} else {
+			ERR(MCU,"FOTA ERR >> Format packet\r\n");
+			return;
+		}
+
 		P_INFO_HEX(data_fw,SIZEU8(data_fw),"Data:");
 		wfdata.len_data = 1; //<OK/ERR> 1 byte
 		wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);

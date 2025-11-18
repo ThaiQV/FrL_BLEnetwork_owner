@@ -19,6 +19,12 @@
 #define DFU_OTA_FW_PUT					ota_fw_put
 
 #define FOTA_EXIT_VALUE					0x7FFF
+typedef enum{
+	FOTA_DEV_COUNTER = 0,
+	FOTA_DEV_PWMETER,
+	FOTA_DEV_MASTER,
+}fl_fota_dev_type_e;
+
 typedef enum {
 	FOTA_PACKET_BEGIN = 0,
 	FOTA_PACKET_DATA = 1,
