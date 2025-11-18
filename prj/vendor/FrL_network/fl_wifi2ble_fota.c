@@ -207,9 +207,11 @@ int fl_wifi2ble_fota_system_begin(u8 *_payload_start,u8 _len){
 	//todo: get rsp of the slave if wifi need
 	return rslt;
 }
-int fl_wifi2ble_fota_system_data(u8 *_payload_start,u8 _len){
-	return fl_wifi2ble_fota_fwpush(_payload_start,_len,FOTA_PACKET_DATA);
+
+int fl_wifi2ble_fota_system_data(u8 *_payload,u8 _len){
+	return fl_wifi2ble_fota_fwpush(_payload,_len,FOTA_PACKET_DATA);
 }
+
 #else
 /***************************************************
  * @brief 		: push fw payload into the sending queues

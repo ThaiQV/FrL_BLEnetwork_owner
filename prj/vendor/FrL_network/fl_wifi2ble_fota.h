@@ -36,7 +36,7 @@ s16 fl_wifi2ble_fota_recECHO(fl_pack_t _pack_rec);
 #ifdef MASTER_CORE
 int fl_wifi2ble_fota_system_end(u8 *_payload_end,u8 _len);
 int fl_wifi2ble_fota_system_begin(u8 *_payload_start,u8 _len);
-int fl_wifi2ble_fota_system_data(u8 *_payload_start,u8 _len);
+int fl_wifi2ble_fota_system_data(u8 *_payload,u8 _len);
 #else
 s16 fl_wifi2ble_fota_fwpush(fl_pack_t *fw_pack,fl_fota_pack_type_e _pack_type);
 #endif
