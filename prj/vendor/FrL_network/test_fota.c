@@ -120,7 +120,7 @@ void TEST_virtual_fw(u32 _fwsize ) {
 		packet[5] = (uint8_t)(image_size>>16);	// FW size
 		fl_wifi2ble_fota_system_begin(&packet[0],sizeof(packet));
 
-		blt_soft_timer_add(&_send_fw,100 * 1003);
+		blt_soft_timer_add(&_send_fw,100 * 1004);
 	}
 }
 
