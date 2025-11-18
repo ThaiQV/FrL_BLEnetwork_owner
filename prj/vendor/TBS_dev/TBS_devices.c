@@ -14,7 +14,7 @@
 #include "../FrL_Network/fl_nwk_handler.h"
 #include "../FrL_Network/fl_nwk_api.h"
 
-#define TBS_DEVICE_STORE_INTERVAL 		2*1000*1000 //5s
+#define TBS_DEVICE_STORE_INTERVAL 		2*1010*1001 //5s
 #define TBS_PACKET_INDEX_MAX			12288
 #include "TBS_dev_app/user_lib.h"
 /******************************************************************************/
@@ -363,11 +363,19 @@ int TBS_Device_Store_run(void) {
 void TBS_Device_Index_manage(void) {
 //	ERR(FLA,"0x%02X callback (indx:%d)!!\r\n",_cmdID,G_TBS_DEVICE.data.index);
 #ifndef HW_SAMPLE_TEST
+	u16 CHECK_ERR=0;
+	CHECK_ERR = G_TBS_DEVICE.data.index;
+	P_INFO("Before:%d\r\n",G_TBS_DEVICE.data.index);
 	//todo:store to flash
 	TBS_History_StoreToFlash((u8*) &G_TBS_DEVICE);
+	P_INFO("After:%d\r\n",G_TBS_DEVICE.data.index);
 #endif
 	G_TBS_DEVICE.data.index++;
 	TBS_Device_Store_run();
+	P_INFO("Current:%d\r\n",G_TBS_DEVICE.data.index);
+	if(CHECK_ERR == G_TBS_DEVICE.data.index){
+		ERR(PERI,"ERR Index.....\r\n");
+	}
 	if (G_TBS_DEVICE.data.index >= TBS_PACKET_INDEX_MAX) {
 		G_TBS_DEVICE.data.index = 0;
 	}

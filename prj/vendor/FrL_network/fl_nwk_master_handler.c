@@ -133,6 +133,7 @@ void fl_master_nodelist_AddRefesh(fl_nodeinnetwork_t _node) {
 fl_pack_t fl_master_packet_heartbeat_build(void) {
 	extern volatile fl_timetamp_withstep_t WIFI_ORIGINAL_GETALL;
 	extern u8 GETINFO_FLAG_EVENTTEST;
+	extern u8 F_EXTITFOTA_TIME;
 	fl_pack_t packet_built;
 	fl_data_frame_u packet;
 	memset(packet.bytes,0,SIZEU8(packet.bytes));
@@ -160,12 +161,17 @@ fl_pack_t fl_master_packet_heartbeat_build(void) {
 	packet.frame.slaveID = 0xFF; // all grps + all members
 
 	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
-	packet.frame.payload[0]=GETINFO_FLAG_EVENTTEST;
+	//flag test event
+	packet.frame.payload[0] = GETINFO_FLAG_EVENTTEST;
+	//timestamp for the period update data
 	packet.frame.payload[1] = U32_BYTE0(WIFI_ORIGINAL_GETALL.timetamp);
 	packet.frame.payload[2] = U32_BYTE1(WIFI_ORIGINAL_GETALL.timetamp);
 	packet.frame.payload[3] = U32_BYTE2(WIFI_ORIGINAL_GETALL.timetamp);
 	packet.frame.payload[4] = U32_BYTE3(WIFI_ORIGINAL_GETALL.timetamp);
-	packet.frame.payload[5]=WIFI_ORIGINAL_GETALL.milstep;
+	packet.frame.payload[5] = WIFI_ORIGINAL_GETALL.milstep;
+	//timestamp for the end of fota
+	packet.frame.payload[6] = F_EXTITFOTA_TIME;
+
 
 	//crc
 	packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));

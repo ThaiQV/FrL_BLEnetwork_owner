@@ -234,11 +234,11 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 					return 0;
 				}
 				//incomming packet is echo pack
-				if (-1 == plog_IndexOf(pa->mac,master_mac,4,6)) {
-					if (incomming_data.data_arr[0] == NWK_HDR_FOTA && fl_wifi2ble_fota_recECHO(incomming_data) != -1) {
-						return 0;
-					}
-				}
+//				if (-1 == plog_IndexOf(pa->mac,master_mac,4,6)) {
+//					if (incomming_data.data_arr[0] == NWK_HDR_FOTA && fl_wifi2ble_fota_recECHO(incomming_data) != -1) {
+//						return 0;
+//					}
+//				}
 #endif
 				if (FL_QUEUE_FIND(&G_DATA_CONTAINER,&incomming_data,incomming_data.length - 1/*skip rssi*/) == -1) {
 //					s8 rssi = (s8) pa->data[pa->len];
@@ -793,7 +793,6 @@ void fl_adv_run(void) {
 		if (fl_packet_parse(data_in_queue,&data_parsed)) {
 #ifdef MASTER_CORE
 			fl_nwk_master_run(&data_in_queue); //process reponse from the slaves
-
 #else //SLAVE
 			//Todo: FOTA process
 			if (data_parsed.hdr == NWK_HDR_FOTA) {
@@ -827,13 +826,14 @@ void fl_adv_run(void) {
 	}
 #ifdef  MASTER_CORE
 	fl_nwk_master_process();
+	fl_wifi2ble_fota_proc();
 #else
 	//Features processor
 	fl_nwk_slave_process();
 	//SEND PRIORITY ADV
 //	fl_adv_sendFIFO_PriorityADV_run();
+//	fl_wifi2ble_fota_proc();
 #endif
-	fl_wifi2ble_fota_retry_proc();
 	/* SEND ADV */
 	if(fl_adv_sendFIFO_run()==0){
 #ifdef MASTER_CORE
