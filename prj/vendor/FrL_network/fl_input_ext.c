@@ -31,7 +31,7 @@
 #define FL_IO_WRITE(x,y)				gpio_set_level(x,y)
 
 #define PRESSnHOLD_DUTY					FL_IO_SCAN_INTERVAL*50  //ms->s
-#define PRESSnRELEASE_DUTY				FL_IO_SCAN_INTERVAL*2  	//ms
+#define PRESSnRELEASE_DUTY				FL_IO_SCAN_INTERVAL*3  	//ms
 
 typedef bool (*FucRead)(gpio_pin_e);
 

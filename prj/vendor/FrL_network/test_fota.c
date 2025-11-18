@@ -79,7 +79,7 @@ int _send_fw(void){
 	///
 	if(-1==fl_wifi2ble_fota_system_end(&packet[0],sizeof(packet))) return 0;
 	VIRTUAL_FW_NUMOFSENDING+=1;
-	P_INFO("FOTA num : %d\r\n",VIRTUAL_FW_NUMOFSENDING);
+	P_INFO("FOTA num : %d \r\n",VIRTUAL_FW_NUMOFSENDING);
 	return -1;
 }
 

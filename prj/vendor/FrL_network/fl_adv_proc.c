@@ -20,6 +20,7 @@
 #include "fl_input_ext.h"
 #include "fl_nwk_protocol.h"
 #include "fl_wifi2ble_fota.h"
+#include "fl_ble_wifi.h"
 
 //Public Key for the freelux network
 u8 MASTER_CLEARNETWORK[18] = {'F','R','E','E','L','U','X','M','A','S','T','E','R','C','L','E','A','R'};
@@ -580,9 +581,12 @@ void fl_adv_init(void) {
 #ifdef MASTER_CORE
 	extern fl_master_config_t G_MASTER_INFO;
 //	fl_input_external_init();
-	//fl_adv_sendtest();
+
 	fl_timetamp_withstep_t init_origin={ORIGINAL_TIME_TRUST,0};
 	fl_master_SYNC_ORIGINAL_TIMETAMP(init_origin);
+
+	fl_wifi2ble_Sync_RTC();
+
 	fl_nwk_master_init();
 
 	G_ADV_SETTINGS.nwk_chn.chn1 = &G_MASTER_INFO.nwk.chn[0];

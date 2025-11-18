@@ -1081,7 +1081,7 @@ void fl_nwk_master_CLEARALL_NETWORK(void) {
 int _interval_heartbeat(void) {
 	static u32 sys_tick_hb =0;
 	if(clock_time_exceed(sys_tick_hb,PERIOD_HEARTBEAT*1000)){
-		P_INFO("HeartBeat send:%d\r\n",PERIOD_HEARTBEAT)
+//		P_INFO("HeartBeat send:%d\r\n",PERIOD_HEARTBEAT)
 		fl_pack_t packet_built = fl_master_packet_heartbeat_build();
 		fl_adv_sendFIFO_add(packet_built);
 		sys_tick_hb = clock_time();
@@ -1090,7 +1090,7 @@ int _interval_heartbeat(void) {
 	return 0; //
 }
 void fl_nwk_master_heartbeat_init(void){
-	fl_send_heartbeat();
+	//fl_send_heartbeat();
 	blt_soft_timer_add(&_interval_heartbeat,999 * 1002);
 }
 void fl_nwk_master_heartbeat_run(void) {
