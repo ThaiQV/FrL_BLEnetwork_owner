@@ -136,8 +136,10 @@ _attribute_no_inline_ void user_init_normal(void) {
 	//blc_ll_initPowerManagement_module();
 	blt_soft_timer_init();
 	///////////////////// TIME SYSTEM initialization///////////////////
-	//TEST
-//	PLOG_Start(ALL);
+#ifdef MASTER_CORE
+	///////////////////// Serial initialization///////////////////
+	fl_input_serial_init(UART1,UART1_TX_PE0,UART1_RX_PE2,115200);
+#endif
 
 	fl_rtc_init();
 
@@ -147,10 +149,7 @@ _attribute_no_inline_ void user_init_normal(void) {
 //	fl_db_clearAll();//FOR CLEAN
 	////////////////// config adv scan /////////////////////
 	fl_adv_init();
-	///////////////////// Serial initialization///////////////////
-#ifdef MASTER_CORE
-	fl_input_serial_init(UART1,UART1_TX_PE0,UART1_RX_PE2,115200);
-#endif
+
 }
 
 /**

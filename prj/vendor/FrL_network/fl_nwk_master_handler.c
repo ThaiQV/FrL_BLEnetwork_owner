@@ -1096,7 +1096,7 @@ int _interval_heartbeat(void) {
 	return 0; //
 }
 void fl_nwk_master_heartbeat_init(void){
-	fl_send_heartbeat();
+	//fl_send_heartbeat();
 	blt_soft_timer_add(&_interval_heartbeat,999 * 1002);
 }
 void fl_nwk_master_heartbeat_run(void) {

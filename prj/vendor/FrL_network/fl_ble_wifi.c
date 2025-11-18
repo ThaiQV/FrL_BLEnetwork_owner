@@ -342,17 +342,11 @@ void TIMETAMP_REQUEST(u8* _pdata, RspFunc rspfnc) {
 	if (rspfnc != 0) {
 		u32 timetamp_wifi_set = MAKE_U32(data->data[3],data->data[2],data->data[1],data->data[0]);
 		datetime_t cur_dt;
-		fl_rtc_timestamp_to_datetime(timetamp_wifi_set,&cur_dt);
-		LOGA(MCU,"TIME SET:%02d/%02d/%02d - %02d:%02d:%02d\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second);
-		//fl_rtc_sync(timetamp_wifi_set);
 		fl_rtc_set(timetamp_wifi_set);
 		fl_nwk_master_StatusNodesRefesh();
-//		fl_rtc_set(timetamp_wifi_set);
-//		/*todo: send heartbeat to network so synchronize timetamp*/
-//		extern int fl_send_heartbeat(void);
-//		fl_send_heartbeat();
-		//RSP only use to req timetamp from master
-		//rspfnc(_pdata);
+		timetamp_wifi_set = fl_rtc_get();
+		fl_rtc_timestamp_to_datetime(timetamp_wifi_set,&cur_dt);
+		P_INFO("TIME SET:%02d/%02d/%02d - %02d:%02d:%02d\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second);
 	}
 }
 void TIMETAMP_RESPONSE(u8* _pdata) {
@@ -704,6 +698,17 @@ void fl_ble2wifi_DEBUG2MQTT(u8* _payload,u8 _size){
 	wfdata.len_data = _size;
 	wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
 	P_PRINTFHEX_A(MCU,wfdata,wfdata.len_data+3,"DEBUG MQTT(%d):",wfdata.len_data+3);
+	fl_ble_send_wifi((u8*)&wfdata,wfdata.len_data+3);//len_data + id_cmd + crc
+}
+
+void fl_wifi2ble_Sync_RTC(void){
+	fl_datawifi2ble_t wfdata;
+	wfdata.cmd = GF_CMD_TIMESTAMP_REQUEST;
+	memset(wfdata.data,0,SIZEU8(wfdata.data));
+	memcpy(wfdata.data,0,0);
+	wfdata.len_data = 0;
+	wfdata.crc8 = 0;
+	P_INFO("RTC Sync......\r\n");
 	fl_ble_send_wifi((u8*)&wfdata,wfdata.len_data+3);//len_data + id_cmd + crc
 }
 
