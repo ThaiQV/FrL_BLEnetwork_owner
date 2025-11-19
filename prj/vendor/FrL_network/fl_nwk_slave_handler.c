@@ -708,7 +708,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 				}
 			} else {
 				//Joined network -> exit collection mode if the master stopped broadcast Collection packet
-				blt_soft_timer_restart(fl_nwk_joinnwk_timeout,3*1000*1000); //exit after 3s
+				blt_soft_timer_restart(fl_nwk_joinnwk_timeout,3*909*1010); //exit after 3s
 				//Non-rsp
 				packet_built.length = 0;
 				return packet_built;
@@ -723,7 +723,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 			s8 mymac_idx = plog_IndexOf(packet.frame.payload,G_INFORMATION.mac,SIZEU8(G_INFORMATION.mac),sizeof(packet.frame.payload));
 			if (mymac_idx != -1) {
 				G_INFORMATION.slaveID = packet.frame.slaveID;
-				LOGA(INF,"UPDATE SlaveID: %d(grpID:%d|memID:%d)\r\n",G_INFORMATION.slaveID,FL_SLAVEID_GRPID(G_INFORMATION.slaveID),FL_SLAVEID_MEMID(G_INFORMATION.slaveID));
+				P_INFO("UPDATE SlaveID: %d(grpID:%d|memID:%d)\r\n",G_INFORMATION.slaveID,FL_SLAVEID_GRPID(G_INFORMATION.slaveID),FL_SLAVEID_MEMID(G_INFORMATION.slaveID));
 				G_INFORMATION.profile.slaveid = G_INFORMATION.slaveID ;
 				G_INFORMATION.profile.run_stt.rst_factory = 0;
 				G_INFORMATION.profile.nwk.chn[0] = packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac)];
@@ -731,6 +731,8 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 				G_INFORMATION.profile.nwk.chn[2] = packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac) + 2];
 				//Get private_key
 				memcpy(G_INFORMATION.profile.nwk.private_key,&packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac) + 3],NWK_PRIVATE_KEY_SIZE);
+				//Joined network -> exit collection mode if the master stopped broadcast Collection packet
+				blt_soft_timer_restart(fl_nwk_joinnwk_timeout,3*909*1010); //exit after 3s
 			}
 			//debug
 			else{
@@ -807,7 +809,7 @@ void fl_slave_fota_proc(fl_pack_t *_fota_pack){
 	}
 
 	//filter duplication pack
-	if(fl_wifi2ble_fota_find(_fota_pack)!= -1) return;
+//	if(fl_wifi2ble_fota_find(_fota_pack)!= -1) return;
 
 	fl_fota_pack_type_e pack_type=FOTA_PACKET_BEGIN;
 	if (packet.hdr == NWK_HDR_FOTA) {

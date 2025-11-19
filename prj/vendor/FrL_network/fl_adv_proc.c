@@ -212,7 +212,6 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 				}
 #ifdef BLOCK_MASTER
 				/*For TESTING REPEATER*/
-				u8 master_mac[4] = { U32_BYTE0(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE1(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE2(G_INFORMATION.profile.nwk.mac_parent), U32_BYTE3(G_INFORMATION.profile.nwk.mac_parent) };
 				if (-1 != plog_IndexOf(pa->mac,master_mac,4,6)) {
 					return 0;
 				}
