@@ -31,7 +31,7 @@ typedef enum {
 	FOTA_PACKET_END = 2,
 } fl_fota_pack_type_e;
 
-u8 FL_NWK_FOTA_IsReady(void);
+u16 FL_NWK_FOTA_IsReady(void);
 s16 fl_wifi2ble_fota_find(fl_pack_t *_pack_rec);
 void fl_wifi2ble_fota_ContainerClear(void);
 void fl_wifi2ble_fota_init(void);
