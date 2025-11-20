@@ -251,7 +251,6 @@ void FLASH_WriteDisable(void)
 uint8_t FLASH_ReadStatusReg(void)
 {
     uint8_t  status;
-
     PIN_CLEAR(PIN_CS);
     SPI_FLASH_SendByte(CMD_FLASH_RDSR);
     status = SPI_FLASH_ReadByte();

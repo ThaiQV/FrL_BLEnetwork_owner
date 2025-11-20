@@ -25,9 +25,8 @@
 #include "drivers.h"
 #include "stack/ble/ble.h"
 #include "app.h"
-#include "dfu.h"
-
-#include "storage_weekly_data.h"
+#include "../Freelux_libs/dfu.h"
+#include "../Freelux_libs/storage_weekly_data.h"
 
 /**
  * @brief      uart1 irq code for application
@@ -121,8 +120,8 @@ void stimer_irq_handler(void) {
  * @param[in]	none
  * @return      none
  */
-fl_version_t _bootloader = { 0, 0, 0 };
-fl_version_t _fw = { 1, 0, 0 };
+fl_version_t _bootloader = { 1, 0, 1 };
+fl_version_t _fw = { 0, 0, 0 };
 fl_version_t _hw = { 0, 0, 0 };
 
 uint8_t buff[20] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};

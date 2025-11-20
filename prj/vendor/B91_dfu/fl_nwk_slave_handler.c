@@ -172,7 +172,7 @@ void _nwk_slave_syncFromPack(fl_dataframe_format_t *packet){
 	master_timetamp = MAKE_U32(packet->timetamp[3],packet->timetamp[2],packet->timetamp[1],packet->timetamp[0]);
 	datetime_t cur_dt;
 	fl_rtc_timestamp_to_datetime(master_timetamp,&cur_dt);
-	LOGA(APP,"(%d)MASTER-TIME:%02d/%02d/%02d - %02d:%02d:%02d\r\n",packet->endpoint.dbg,cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,
+	LOGA(APP,"(%d)MASTER-TIME:%02d/%02d/%02d-%02d:%02d:%02d\r\n",packet->endpoint.dbg,cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,
 			cur_dt.minute,cur_dt.second);
 	fl_rtc_sync(master_timetamp);
 	//Synchronize debug log

@@ -224,7 +224,7 @@
 //the baud rate should not bigger than 115200 when MCU clock is 16M)
 //the baud rate should not bigger than 1000000 when MCU clock is 24M)
 #define PRINT_BAUD_RATE             		115200
-#define DEBUG_INFO_TX_PIN           		GPIO_PD3 //GPIO_PA7
+#define DEBUG_INFO_TX_PIN           		GPIO_PA7//GPIO_PD3
 #define PULL_WAKEUP_SRC_PA7         		PM_PIN_PULLUP_10K
 #define PA7_OUTPUT_ENABLE         			1
 #define PA7_DATA_OUT                     	1 //must
