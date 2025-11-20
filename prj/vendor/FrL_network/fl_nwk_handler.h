@@ -366,7 +366,7 @@ void fl_nwk_slave_nwkclear(void);
 void fl_nwk_slave_run(fl_pack_t *_pack_handle);
 u8 fl_adv_sendFIFO_PriorityADV_run(void) ;
 void fl_nwk_slave_process(void);
-void fl_slave_fota_proc(fl_pack_t _fota_pack);
+void fl_slave_fota_proc(fl_pack_t *_fota_pack);
 bool fl_nwk_slave_checkHDR(u8 _hdr);
 void fl_nwk_slave_SYNC_ORIGIN_MASTER(u32 _timetamp,u8 _mil);
 u64 fl_req_slave_packet_createNsend(u8 _cmdid, u8* _data, u8 _len,u32 *_timequeues);

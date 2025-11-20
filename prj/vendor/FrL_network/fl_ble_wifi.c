@@ -94,6 +94,7 @@ typedef union {
 /***                       Functions declare                   		         **/
 /******************************************************************************/
 /******************************************************************************/
+
 void fl_wifi2ble_Excute(fl_wifi2ble_exc_e cmd);
 void PING_REQ(u8* _pdata, RspFunc rspfnc);
 void PING_RSP(u8* _pdata);
@@ -241,7 +242,7 @@ void REPORT_RESPONSE(u8* _pdata) {
 //			LOGA(MCU,"Devtype:%d\r\n",G_NODE_LIST.sla_info[var].dev_type);
 			//addnew: only send offline nodes bcs the online nodes has automatically sent yet
 			if (G_NODE_LIST.sla_info[var].active == false) {
-				P_INFO_HEX(G_NODE_LIST.sla_info[var].mac,6,"[%d]Mac:",G_NODE_LIST.sla_info[var].slaveID);
+//				P_INFO_HEX(G_NODE_LIST.sla_info[var].mac,6,"[%d]Mac:",G_NODE_LIST.sla_info[var].slaveID);
 				_getnsend_data_report(var,G_WIFI_CON[_wf_CMD_find(data->cmd)].rsp.cmd);
 			}
 		}
@@ -346,7 +347,7 @@ void TIMETAMP_REQUEST(u8* _pdata, RspFunc rspfnc) {
 		fl_nwk_master_StatusNodesRefesh();
 		timetamp_wifi_set = fl_rtc_get();
 		fl_rtc_timestamp_to_datetime(timetamp_wifi_set,&cur_dt);
-		P_INFO("TIME SET:%02d/%02d/%02d - %02d:%02d:%02d\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second);
+//		P_INFO("TIME SET:%02d/%02d/%02d - %02d:%02d:%02d\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second);
 	}
 }
 void TIMETAMP_RESPONSE(u8* _pdata) {
@@ -586,11 +587,39 @@ void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 		fl_datawifi2ble_t wfdata;
 		wfdata.cmd = G_WIFI_CON[_wf_CMD_find(GF_CMD_FOTA_REQUEST)].rsp.cmd;
 		memset(wfdata.data,0,SIZEU8(wfdata.data));
-		//DFU put to flash
 		memset(data_fw,0,SIZEU8(data_fw));
 		memcpy(data_fw,data->data,SIZEU8(data_fw));
-		//P_INFO_HEX(data_fw,SIZEU8(data_fw),"Data:");
-		wfdata.data[0] = DFU_OTA_FW_PUT(data_fw,data->crc8);
+		s16 rslt = -1;
+		if (data_fw[0] <= FOTA_PACKET_END) {
+			if (data_fw[1] == FOTA_DEV_MASTER) {
+				//DFU put to flash
+				wfdata.data[0] = DFU_OTA_FW_PUT(data_fw,data->crc8);
+			} else {
+				if (data_fw[0] == FOTA_PACKET_BEGIN){
+					rslt = fl_wifi2ble_fota_system_begin(data_fw,SIZEU8(data_fw));
+				}
+				else if(data_fw[0] == FOTA_PACKET_DATA){
+					rslt = fl_wifi2ble_fota_system_data(data_fw,SIZEU8(data_fw));
+				}
+				else if(data_fw[0] == FOTA_PACKET_END){
+					rslt = fl_wifi2ble_fota_system_end(data_fw,SIZEU8(data_fw));
+				}
+				//convert return
+				/*-1: BUSY,0x7FFF : ERR , >-1 : OK*/
+				/*0x00: OK, 0x01: BUSY,  0xFF: ERR*/
+				if (rslt < 0) {
+					wfdata.data[0] = 0x01;
+				} else if (rslt == FOTA_EXIT_VALUE) {
+					wfdata.data[0] = 0xFF;
+				} else {
+					wfdata.data[0] = 0;
+				}
+			}
+		} else {
+			ERR(MCU,"FOTA ERR >> Format packet\r\n");
+			return;
+		}
+
 		P_INFO_HEX(data_fw,SIZEU8(data_fw),"Data:");
 		wfdata.len_data = 1; //<OK/ERR> 1 byte
 		wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);

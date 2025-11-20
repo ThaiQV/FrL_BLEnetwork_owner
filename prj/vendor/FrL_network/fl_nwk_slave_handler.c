@@ -112,7 +112,7 @@ void fl_nwk_LedSignal_init(void) {
 #ifndef HW_SAMPLE_TEST
 	gpio_function_en(GPIO_PA6);
 	gpio_set_output(GPIO_PA6,1);	//enable output
-	gpio_set_input(GPIO_PA6,0);	//disable input
+	gpio_set_input(GPIO_PA6,0);		//disable input
 	gpio_set_level(GPIO_PA6,0);
 #endif
 #endif
@@ -168,7 +168,7 @@ int _informMaster(void){
 }
 
 int _isOnline_check(void) {
-	ERR(INF,"Device -> offline\r\n");
+//	ERR(INF,"Device -> offline\r\n");
 	G_INFORMATION.active = false;
 	blt_soft_timer_restart(_informMaster,INFORM_MASTER);
 	return -1;
@@ -325,7 +325,7 @@ s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 
 	if (_cb != 0 && ( _timeout_ms*1000 >= 2*QUEUQ_REQcRSP_INTERVAL || _timeout_ms==0)) {
 		u64 seq_timetamp=fl_req_slave_packet_createNsend(_cmdid,_data,_len,&waittime);
 		if(seq_timetamp){
-			P_INFO("REQ waittime:%d\r\n",waittime);
+//			P_INFO("REQ waittime:%d\r\n",waittime);
 			waittime = _timeout_ms+waittime*G_ADV_SETTINGS.adv_duration;
 			rslt=fl_queueREQcRSP_add(G_INFORMATION.slaveID,_cmdid,seq_timetamp,_data,_len,&_cb,waittime,_retry);
 		}
@@ -397,7 +397,7 @@ u64 fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len,u32 *_timequeue
 			req_pack.frame.endpoint.master = FL_FROM_SLAVE_ACK;
 			//tbs index manage
 			TBS_Device_Index_manage();
-			P_INFO("EVENT update - indx:%d \r\n",G_COUNTER_DEV.data.index-1);
+//			P_INFO("EVENT update - indx:%d \r\n",G_COUNTER_DEV.data.index-1);
 		}
 		break;
 		case NWK_HDR_11_REACTIVE: {
@@ -462,6 +462,7 @@ u64 fl_req_slave_packet_createNsend(u8 _cmdid,u8* _data, u8 _len,u32 *_timequeue
  *
  ***************************************************/
 fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
+	extern u8 F_EXTITFOTA_TIME;
 	fl_pack_t packet_built;
 	packet_built.length = 0;
 	memset(packet_built.data_arr,0,SIZEU8(packet_built.data_arr));
@@ -485,10 +486,12 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 		case NWK_HDR_HEARTBEAT:
 			_nwk_slave_syncFromPack(&packet.frame);
 			GETINFO_FLAG_EVENTTEST = packet.frame.payload[0];
-			WIFI_ORIGINAL_GETALL.milstep = packet.frame.payload[5];
 //			memcpy((u8*)WIFI_ORIGINAL_GETALL.timetamp,&packet.frame.payload[1],4);
 			WIFI_ORIGINAL_GETALL.timetamp = MAKE_U32(packet.frame.payload[4],packet.frame.payload[3],packet.frame.payload[2],packet.frame.payload[1]);
+			WIFI_ORIGINAL_GETALL.milstep = packet.frame.payload[5];
 			LOGA(INF,"WIFI_ORIGINAL_GETALL :%d (%d) \r\n",WIFI_ORIGINAL_GETALL.timetamp,WIFI_ORIGINAL_GETALL.milstep);
+			F_EXTITFOTA_TIME = packet.frame.payload[6];
+			////
 			if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
 				//Process rsp
 				memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
@@ -705,7 +708,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 				}
 			} else {
 				//Joined network -> exit collection mode if the master stopped broadcast Collection packet
-				blt_soft_timer_restart(fl_nwk_joinnwk_timeout,3*1000*1000); //exit after 3s
+				blt_soft_timer_restart(fl_nwk_joinnwk_timeout,3*909*1010); //exit after 3s
 				//Non-rsp
 				packet_built.length = 0;
 				return packet_built;
@@ -720,7 +723,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 			s8 mymac_idx = plog_IndexOf(packet.frame.payload,G_INFORMATION.mac,SIZEU8(G_INFORMATION.mac),sizeof(packet.frame.payload));
 			if (mymac_idx != -1) {
 				G_INFORMATION.slaveID = packet.frame.slaveID;
-				LOGA(INF,"UPDATE SlaveID: %d(grpID:%d|memID:%d)\r\n",G_INFORMATION.slaveID,FL_SLAVEID_GRPID(G_INFORMATION.slaveID),FL_SLAVEID_MEMID(G_INFORMATION.slaveID));
+				P_INFO("UPDATE SlaveID: %d(grpID:%d|memID:%d)\r\n",G_INFORMATION.slaveID,FL_SLAVEID_GRPID(G_INFORMATION.slaveID),FL_SLAVEID_MEMID(G_INFORMATION.slaveID));
 				G_INFORMATION.profile.slaveid = G_INFORMATION.slaveID ;
 				G_INFORMATION.profile.run_stt.rst_factory = 0;
 				G_INFORMATION.profile.nwk.chn[0] = packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac)];
@@ -728,6 +731,8 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 				G_INFORMATION.profile.nwk.chn[2] = packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac) + 2];
 				//Get private_key
 				memcpy(G_INFORMATION.profile.nwk.private_key,&packet.frame.payload[mymac_idx+SIZEU8(G_INFORMATION.mac) + 3],NWK_PRIVATE_KEY_SIZE);
+				//Joined network -> exit collection mode if the master stopped broadcast Collection packet
+				blt_soft_timer_restart(fl_nwk_joinnwk_timeout,3*909*1010); //exit after 3s
 			}
 			//debug
 			else{
@@ -789,52 +794,59 @@ fl_pack_t fl_slave_fota_rsp_packet_build(u8* _data, u8 _len,fl_data_frame_u _REQ
 	return rslt;
 }
 
-void fl_slave_fota_proc(fl_pack_t _fota_pack){
-	static u32 count_echo=0;
-	static u8 flag_begin_end=0;
-	static u32 rtt=0;
-	static u32 fw_size=0;
+void fl_slave_fota_proc(fl_pack_t *_fota_pack){
 	extern u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
 	fl_dataframe_format_t packet;
-	if(!fl_packet_parse(_fota_pack,&packet)){
+	if(!fl_packet_parse(*_fota_pack,&packet)){
 		ERR(INF,"Packet parse fail!!!\r\n");
 		return;
 	}
-	if (packet.hdr == NWK_HDR_FOTA) {
-		if(packet.endpoint.master == FL_FROM_MASTER_ACK){
-			//TEST
-//			u8 version_typefw[4]={'1','2','3',G_INFORMATION.dev_type};
-//			fl_adv_sendFIFO_add(fl_slave_fota_rsp_packet_build(version_typefw,SIZEU8(version_typefw),packet));
-		}else{
-			u8 OTA_BEGIN[3] = { 0, G_INFORMATION.dev_type, 2 };
-			u8 OTA_END[3] = { 2, G_INFORMATION.dev_type, 2 };
-			if (plog_IndexOf(packet.payload,OTA_BEGIN,SIZEU8(OTA_BEGIN),SIZEU8(OTA_BEGIN)) != -1) {
-				count_echo = 0;
-				flag_begin_end = 1;
-				rtt = fl_rtc_get();
-				fw_size = MAKE_U32(0,packet.payload[5],packet.payload[4],packet.payload[3]);
-				DFU_OTA_CRC128_INIT();
-				P_INFO("\r\n============ FOTA BEGIN ============ \r\n");
+	//filter duplication pack
+//	if(fl_wifi2ble_fota_find(_fota_pack)!= -1) return;
 
-			} else if (flag_begin_end && plog_IndexOf(packet.payload,OTA_END,SIZEU8(OTA_END),SIZEU8(OTA_END)) != -1) {
-				P_INFO("\r\n============ FOTA END ==============\r\n");
-				u8 crc128[16];
-				memcpy(crc128,DFU_OTA_CRC128_GET(),16);
-				P_INFO_HEX(crc128,16,"** CRC      :");
-				P_INFO_HEX(packet.payload+6,16,"** CRC CHECK:");
-				P_INFO("** File     : %d/%d (%d)\r\n",count_echo*16,fw_size,count_echo);
-				P_INFO("** RTT      : %d s\r\n",(u32)(fl_rtc_get()-rtt));
-				P_INFO("=====================================\r\n");
-				count_echo = 0;
-				flag_begin_end = 0;
-			} else {
-				if (flag_begin_end) {
-					DFU_OTA_CRC128_CAL(&packet.payload[6]);
-					count_echo++;
-					P_INFO("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
-					P_INFO("Downloading:%d/%d",(16*count_echo),fw_size);
-				}
+	static u8 flag_begin = 0;
+	static u8 flag_end = 0;
+	static u32 rtt = 0;
+	static u32 fw_size = 0;
+	fl_fota_pack_type_e pack_type = FOTA_PACKET_BEGIN;
+	if (packet.hdr == NWK_HDR_FOTA) {
+		u8 OTA_BEGIN[2] = { FOTA_PACKET_BEGIN, G_INFORMATION.dev_type };
+//		u8 OTA_DATA[2] = { FOTA_PACKET_DATA, G_INFORMATION.dev_type };
+		u8 OTA_END[2] = { FOTA_PACKET_END, G_INFORMATION.dev_type };
+		/*DEBUG*/
+		if (plog_IndexOf(packet.payload,OTA_BEGIN,SIZEU8(OTA_BEGIN),SIZEU8(OTA_BEGIN)) != -1) {
+			pack_type = FOTA_PACKET_BEGIN;
+			flag_begin++;
+			rtt = fl_rtc_get();
+		} else if (plog_IndexOf(packet.payload,OTA_END,SIZEU8(OTA_END),SIZEU8(OTA_END)) != -1) {
+			pack_type = FOTA_PACKET_END;
+			flag_end++;
+			P_INFO("========================\r\n");
+			P_INFO("** Begin: %d\r\n",flag_begin);
+			P_INFO("** FW   : %d\r\n",fw_size);
+			P_INFO("** End  : %d\r\n",flag_end);
+			P_INFO("** RTT  : %d s\r\n",(u32 )(fl_rtc_get() - rtt));
+			P_INFO("========================\r\n");
+			flag_end = 0;
+			flag_begin = 0;
+			fw_size = 0;
+		} else {
+			pack_type = FOTA_PACKET_DATA;
+			fw_size++;
+		}
+		/*END DEBUG*/
+		fl_nwk_LedSignal_run();
+		/*todo: load fw into the dfu*/
+		if (packet.payload[1] == G_INFORMATION.dev_type && (packet.payload[0] <= FOTA_PACKET_END)) {
+			if (OTA_RET_OK != DFU_OTA_FW_PUT(packet.payload,fl_crc8(packet.payload,SIZEU8(packet.payload)))) {
+				ERR(APP,"FOTA DFU Err <RET ERR>\r\n");
 			}
+		}
+		//add send repeat and check echo
+		if (fl_wifi2ble_fota_fwpush(_fota_pack,pack_type) == -1) {
+			ERR(APP,"FOTA ECHO Err <Full>\r\n");
+		} else {
+//				P_INFO_HEX(_fota_pack->data_arr,_fota_pack->length,"FOTA(%d):",_fota_pack->length);
 		}
 	}
 }
@@ -920,6 +932,7 @@ int _slave_reconnect(void){
 	}
 	return 0;
 }
+
 int _interval_report(void) {
 	int offset_spread = (fl_rtc_getWithMilliStep().milstep - WIFI_ORIGINAL_GETALL.milstep)*10;
 #define INTERVAL_REPORT_TIME (55 - FL_SLAVEID_MEMID(G_INFORMATION.slaveID))
@@ -938,7 +951,7 @@ int _interval_report(void) {
 #endif
 				//increase index if using NWK_HDR_11_REACTIVE
 				//TBS_Device_Index_manage();
-				P_INFO("Auto update (%d s) - indx:%d\r\n",INTERVAL_REPORT_TIME*1000*1000 + offset_spread,G_COUNTER_DEV.data.index-1);
+//				P_INFO("Auto update (%d s) - indx:%d\r\n",INTERVAL_REPORT_TIME*1000*1000 + offset_spread,G_COUNTER_DEV.data.index-1);
 				return INTERVAL_REPORT_TIME*1000*1000 + offset_spread;
 			}
 		}
@@ -962,6 +975,7 @@ void fl_nwk_slave_reconnectNstoragedata(void){
 /***                      Processing functions 					             **/
 /******************************************************************************/
 /******************************************************************************/
+
 /***************************************************
  * @brief 		:filter adv packet with the Freelux HDR
  *

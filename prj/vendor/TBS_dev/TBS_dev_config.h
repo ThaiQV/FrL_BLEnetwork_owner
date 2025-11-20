@@ -13,12 +13,13 @@
 
 typedef enum{
 	TBS_COUNTER = 0x00,
-	TBS_POWERMETER=0x01
+	TBS_POWERMETER=0x01,
 }__attribute__((__packed__)) tbs_dev_type_e;
 
+#define OTA_ENABLE
 #ifndef MASTER_CORE
 //#define HW_SAMPLE_TEST
-#define BLOCK_MASTER
+//#define BLOCK_MASTER
 #define COUNTER_DEVICE
 #define COUNTER_LCD_MESS_MAX		10
 #ifndef COUNTER_DEVICE

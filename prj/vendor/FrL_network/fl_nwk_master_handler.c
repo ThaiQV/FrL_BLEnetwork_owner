@@ -133,6 +133,7 @@ void fl_master_nodelist_AddRefesh(fl_nodeinnetwork_t _node) {
 fl_pack_t fl_master_packet_heartbeat_build(void) {
 	extern volatile fl_timetamp_withstep_t WIFI_ORIGINAL_GETALL;
 	extern u8 GETINFO_FLAG_EVENTTEST;
+	extern u8 F_EXTITFOTA_TIME;
 	fl_pack_t packet_built;
 	fl_data_frame_u packet;
 	memset(packet.bytes,0,SIZEU8(packet.bytes));
@@ -160,12 +161,17 @@ fl_pack_t fl_master_packet_heartbeat_build(void) {
 	packet.frame.slaveID = 0xFF; // all grps + all members
 
 	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
-	packet.frame.payload[0]=GETINFO_FLAG_EVENTTEST;
+	//flag test event
+	packet.frame.payload[0] = GETINFO_FLAG_EVENTTEST;
+	//timestamp for the period update data
 	packet.frame.payload[1] = U32_BYTE0(WIFI_ORIGINAL_GETALL.timetamp);
 	packet.frame.payload[2] = U32_BYTE1(WIFI_ORIGINAL_GETALL.timetamp);
 	packet.frame.payload[3] = U32_BYTE2(WIFI_ORIGINAL_GETALL.timetamp);
 	packet.frame.payload[4] = U32_BYTE3(WIFI_ORIGINAL_GETALL.timetamp);
-	packet.frame.payload[5]=WIFI_ORIGINAL_GETALL.milstep;
+	packet.frame.payload[5] = WIFI_ORIGINAL_GETALL.milstep;
+	//timestamp for the end of fota
+	packet.frame.payload[6] = F_EXTITFOTA_TIME;
+
 
 	//crc
 	packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
@@ -736,7 +742,7 @@ void fl_nwk_master_StatusNodesRefesh(void) {
 static void _master_updateDB_for_Node(u8 node_indx ,fl_data_frame_u *packet)  {
 	G_NODE_LIST.sla_info[node_indx].active = true;
 	G_NODE_LIST.sla_info[node_indx].timelife = fl_rtc_get();
-	P_INFO_HEX(G_NODE_LIST.sla_info[node_indx].mac,6,"%d->[%02d]",G_NODE_LIST.sla_info[node_indx].timelife,G_NODE_LIST.sla_info[node_indx].slaveID);
+//	P_INFO_HEX(G_NODE_LIST.sla_info[node_indx].mac,6,"[0x02X]%%d->[%02d]",G_NODE_LIST.sla_info[node_indx].timelife,G_NODE_LIST.sla_info[node_indx].slaveID);
 	//create MAC + TIMETAMP + DEV_TYPE
 	u8 size_mac = SIZEU8(G_NODE_LIST.sla_info[node_indx].mac);
 	//memcpy(&G_NODE_LIST.sla_info[node_indx].data[0],G_NODE_LIST.sla_info[node_indx].mac,size_mac); //update mac to pointer data
