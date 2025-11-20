@@ -88,9 +88,7 @@ void crc128_calculate(uint8_t *pdata)
 		crc128[i] = (crc128[i] ^ pdata[i]);
 	}
 }
-u8* ota_crc128_get(void){
-	return &crc128[0];
-}
+
 /**
 * @brief: parse header version for FW
 * @param: see below
@@ -122,25 +120,15 @@ void disorder_data(uint8_t *p)
 */
 void fw_copy(fw_header_t *header, uint32_t fw_addr)
 {
-	uint32_t 	i;
+	uint32_t 	i,j;
 	uint32_t 	size;
-//	uint32_t 	remain;
+	uint32_t 	remain;
 	uint8_t		buff[1024];
-	uint8_t		buff_ex[32];
+//	uint8_t		buff_ex[32];
 //	uint8_t		packet[22];
-//	fw_header_t	header_app = {0};
+	fw_header_t	header_app = {0};
 
 	DFU_PRINTF("Copy FW: ver: %d.%d.%d - size: %d\n",header->major,header->minor,header->patch,header->size);
-//	// Check FW is correct or not
-//	if(check_valid_ota_fw(fw_addr) == 1)
-//	{
-//		DFU_PRINTF("OTA FW is valid\n");
-//	}
-//	else
-//	{
-//		DFU_PRINTF("OTA FW is invalid\n");
-//		return;
-//	}
 
 	// Check CRC128 of OTA FW in external flash before load into internal flash
 	crc128_init();
@@ -148,25 +136,23 @@ void fw_copy(fw_header_t *header, uint32_t fw_addr)
 	while(size < header->size)
 	{
 		W25XXX_Read((uint8_t *)buff,fw_addr + size,CRC128_LENGTH);
-
 		disorder_data(buff);
-
 		crc128_calculate(buff);
 		size += CRC128_LENGTH;
 	}
 
-	DFU_PRINTF("Header CRC128: ");
-	for(i = 0; i < CRC128_LENGTH; i++)
-	{
-		printf("%x ",header->crc128[i]);
-	}
-	printf("\n");
-	DFU_PRINTF("Calculate CRC128: ");
-	for(i = 0; i < CRC128_LENGTH; i++)
-	{
-		printf("%x ",crc128[i]);
-	}
-	printf("\n");
+//	DFU_PRINTF("Header CRC128: ");
+//	for(i = 0; i < CRC128_LENGTH; i++)
+//	{
+//		printf("%x ",header->crc128[i]);
+//	}
+//	printf("\n");
+//	DFU_PRINTF("Calculate CRC128: ");
+//	for(i = 0; i < CRC128_LENGTH; i++)
+//	{
+//		printf("%x ",crc128[i]);
+//	}
+//	printf("\n");
 
 	if(memcmp(crc128,header->crc128,CRC128_LENGTH) == 0)
 	{
@@ -175,112 +161,124 @@ void fw_copy(fw_header_t *header, uint32_t fw_addr)
 	else
 	{
 		DFU_PRINTF("OTA FW CRC128 is invalid\n");
+		return;
 	}
 
-	// Compare FW in flash vs ex-flash
-	crc128_init();
-	size = 0;
-	while(size < header->size)
+//	// Compare FW in flash vs ex-flash
+//	crc128_init();
+//	size = 0;
+//	while(size < header->size)
+//	{
+//		flash_read_page(FLASH_R_BASE_ADDR + APP_IMAGE_ADDR + size, CRC128_LENGTH, (uint8_t *)buff);
+//		crc128_calculate(buff);
+//		size += CRC128_LENGTH;
+//	}
+//
+//	DFU_PRINTF("FW Calculate CRC128: ");
+//	for(i = 0; i < CRC128_LENGTH; i++)
+//	{
+//		printf("%x ",crc128[i]);
+//	}
+//	printf("\n");
+//
+//	size = 0;
+//	while(size < header->size)
+//	{
+//		flash_read_page(FLASH_R_BASE_ADDR + APP_IMAGE_ADDR + size, CRC128_LENGTH, (uint8_t *)buff);
+//		W25XXX_Read((uint8_t *)buff_ex,fw_addr + size,CRC128_LENGTH);
+//
+//		disorder_data(buff_ex);
+//
+//		if(memcmp(buff_ex,buff,CRC128_LENGTH) != 0)
+//		{
+//			DFU_PRINTF("Wrong compare: %x\n",size);
+//			for(i = 0; i < CRC128_LENGTH; i++)
+//			{
+//				printf("%x ",buff[i]);
+//			}
+//			printf("\n");
+//			for(i = 0; i < CRC128_LENGTH; i++)
+//			{
+//				printf("%x ",buff_ex[i]);
+//			}
+//			printf("\n");
+//
+////			W25XXX_WR_Block((uint8_t*)buff,fw_addr + size,OTA_PACKET_LENGTH);
+//		}
+//		size += CRC128_LENGTH;
+//	}
+
+
+	// Erase running region to copy OTA FW
+	flash_read_mid();
+	flash_unlock_mid146085();
+	DFU_PRINTF("Erase Running region\n");
+	for(i = 0; i < (APP_IMAGE_SIZE_MAX/APP_PAGE_SIZE); i++)
 	{
-		flash_read_page(FLASH_R_BASE_ADDR + APP_IMAGE_ADDR + size, CRC128_LENGTH, (uint8_t *)buff);
-		crc128_calculate(buff);
-		size += CRC128_LENGTH;
+		flash_erase_sector(FLASH_R_BASE_ADDR + APP_IMAGE_ADDR + i*APP_PAGE_SIZE);
 	}
-
-	DFU_PRINTF("FW Calculate CRC128: ");
-	for(i = 0; i < CRC128_LENGTH; i++)
+	// Copy OTA FW into running region
+	size = header->size/sizeof(buff);
+	for(i = 0; i < size; i++)
 	{
-		printf("%x ",crc128[i]);
-	}
-	printf("\n");
-
-	size = 0;
-	while(size < header->size)
-	{
-		flash_read_page(FLASH_R_BASE_ADDR + APP_IMAGE_ADDR + size, CRC128_LENGTH, (uint8_t *)buff);
-		W25XXX_Read((uint8_t *)buff_ex,fw_addr + size,CRC128_LENGTH);
-
-		disorder_data(buff_ex);
-
-		if(memcmp(buff_ex,buff,CRC128_LENGTH) != 0)
+		W25XXX_Read((uint8_t *)buff,fw_addr + i*sizeof(buff),sizeof(buff));
+		for(j = 0; j < (sizeof(buff)/CRC128_LENGTH); j++)
 		{
-			DFU_PRINTF("Wrong compare: %x\n",size);
-			for(i = 0; i < CRC128_LENGTH; i++)
-			{
-				printf("%x ",buff[i]);
-			}
-			printf("\n");
-			for(i = 0; i < CRC128_LENGTH; i++)
-			{
-				printf("%x ",buff_ex[i]);
-			}
-			printf("\n");
+			disorder_data((uint8_t*)&buff[j*CRC128_LENGTH]);
+		}
+		flash_write_page(FLASH_R_BASE_ADDR + APP_IMAGE_ADDR + i*sizeof(buff), sizeof(buff), (uint8_t *)buff);
+		DFU_PRINTF("Copy: %d%%\n",(((i+1)*100)/size));
+	}
 
-//			W25XXX_WR_Block((uint8_t*)buff,fw_addr + size,OTA_PACKET_LENGTH);
+	remain = header->size%sizeof(buff);
+	if(remain > 0)
+	{
+		W25XXX_Read((uint8_t *)buff,fw_addr + size*sizeof(buff),sizeof(buff));
+		for(j = 0; j < (sizeof(buff)/CRC128_LENGTH); j++)
+		{
+			disorder_data((uint8_t*)&buff[j*CRC128_LENGTH]);
+		}
+		flash_write_page(FLASH_R_BASE_ADDR + APP_IMAGE_ADDR + size*sizeof(buff), sizeof(buff), (uint8_t *)buff);
+		DFU_PRINTF("Copy remain: %d bytes\n",size);
+	}
+
+	// Verify new FW
+	size = 0;
+	crc128_init();
+	while(size < header->size)
+	{
+		flash_read_page(FLASH_R_BASE_ADDR + APP_IMAGE_ADDR + size, CRC128_LENGTH, (uint8_t *)buff);
+		disorder_data(buff);
+		crc128_calculate(buff);
+		if((size%0x1000) == 0)
+		{
+			DFU_PRINTF("Verify: %d%%\n",((size*100)/header->size));
 		}
 		size += CRC128_LENGTH;
 	}
+	DFU_PRINTF("Verify: 100%%\n");
+	// Check CRC128
+	if(memcmp(crc128,header->crc128,CRC128_LENGTH) == 0)
+	{
+		DFU_PRINTF("CRC128 is correct\n");
+		// Write Application FW header
+		header_app.major = header->major;
+		header_app.minor = header->minor;
+		header_app.patch = header->patch;
+		header_app.size  = header->size;
+		memcpy(header_app.crc128,crc128,CRC128_LENGTH);
+		// Erase header page before write new header
+		flash_erase_sector(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER);
+		flash_write_page(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER, sizeof(header_app), (uint8_t *)&header_app);
 
-
-//	// Erase running region to copy OTA FW
-//	flash_read_mid();
-//	flash_unlock_mid146085();
-//	DFU_PRINTF("Erase Running region\n");
-//	for(i = 0; i < (APP_IMAGE_SIZE_MAX/APP_PAGE_SIZE); i++)
-//	{
-//		flash_erase_sector(FLASH_R_BASE_ADDR + APP_IMAGE_ADDR + i*APP_PAGE_SIZE);
-//	}
-//	// Copy OTA FW into running region
-//	size = header->size/sizeof(buff);
-//	for(i = 0; i < size; i++)
-//	{
-//		W25XXX_Read((uint8_t *)buff,fw_addr + i*sizeof(buff),sizeof(buff));
-//		flash_write_page(FLASH_R_BASE_ADDR + APP_IMAGE_ADDR + i*sizeof(buff), sizeof(buff), (uint8_t *)buff);
-//		DFU_PRINTF("Copy: %d%%\n",(((i+1)*100)/size));
-//	}
-//
-//	remain = header->size%sizeof(buff);
-//	if(remain > 0)
-//	{
-//		W25XXX_Read((uint8_t *)buff,fw_addr + size*sizeof(buff),remain);
-//		flash_write_page(FLASH_R_BASE_ADDR + APP_IMAGE_ADDR + size*sizeof(buff), remain, (uint8_t *)buff);
-//		DFU_PRINTF("Copy remain: %d bytes\n",size);
-//	}
-//
-//	// Verify new FW
-//	crc128_init();
-//	for(i = 0; i < size; i++)
-//	{
-//		flash_read_page(FLASH_R_BASE_ADDR + APP_IMAGE_ADDR + i*sizeof(buff), sizeof(buff), (uint8_t *)buff);
-//		// calculate crc128
-//		for(j = 0; j < (sizeof(buff)/CRC128_LENGTH); j++)
-//		{
-//			crc128_calculate(&buff[j*CRC128_LENGTH]);
-//		}
-//		DFU_PRINTF("Verify: %d%%\n",(((i+1)*100)/size));
-//	}
-//	// Check CRC128
-//	if(memcmp(crc128,header->crc128,CRC128_LENGTH) == 0)
-//	{
-//		DFU_PRINTF("CRC128 is correct\n");
-//		// Write Application FW header
-//		header_app.major = header->major;
-//		header_app.minor = header->minor;
-//		header_app.patch = header->patch;
-//		header_app.size  = header->size;
-//		memcpy(header_app.crc128,crc128,CRC128_LENGTH);
-//		// Erase header page before write new header
-//		flash_erase_sector(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER);
-//		flash_write_page(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER, sizeof(header_app), (uint8_t *)&header_app);
-//
-//		jump_to_application();
-//	}
-//	else
-//	{
-//		// Erase OTA FW header if the CRC128 is wrong
-////		FLASH_Erase_Sector(OTA_FW_HEADER);
-//		DFU_PRINTF("CRC128 is incorrect\n");
-//	}
+		jump_to_application();
+	}
+	else
+	{
+//		 Erase OTA FW header if the CRC128 is wrong
+//		FLASH_Erase_Sector(OTA_FW_HEADER);
+		DFU_PRINTF("CRC128 is incorrect\n");
+	}
 }
 
 /**
@@ -359,12 +357,13 @@ void put_fw_into_ex_flash(uint32_t fw_addr)
 	for(i = 0; i < (image_size/sizeof(buff)); i++)
 	{
 		flash_read_page(FLASH_R_BASE_ADDR + APP_IMAGE_ADDR + i*sizeof(buff), sizeof(buff), (uint8_t *)buff);
-		W25XXX_WR_Block((uint8_t *)buff,fw_addr + i*sizeof(buff),sizeof(buff));
 		// calculate crc128
 		for(j = 0; j < (sizeof(buff)/CRC128_LENGTH); j++)
 		{
 			crc128_calculate(&buff[j*CRC128_LENGTH]);
+			disorder_data((uint8_t*)&buff[j*CRC128_LENGTH]);
 		}
+		W25XXX_WR_Block((uint8_t *)buff,fw_addr + i*sizeof(buff),sizeof(buff));
 		DFU_PRINTF("Copy: %d%%\n",(((i+1)*100)/(image_size/sizeof(buff))));
 	}
 
@@ -393,7 +392,7 @@ void put_fw_into_ex_flash(uint32_t fw_addr)
 */
 void firmware_check(void)
 {
-	// Check valid F
+	// Check valid FW
 	fw_header_t header_current_fw;
 	fw_header_t header_ota_fw;
 	fw_header_t header_original_fw;
@@ -418,8 +417,6 @@ void firmware_check(void)
 	flash_read_page(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER, sizeof(fw_header_t), (uint8_t *)&header_current_fw);
 	DFU_PRINTF("Current FW ver: %x.%x.%x\n",header_current_fw.major,header_current_fw.minor,header_current_fw.patch);
 	DFU_PRINTF("Size: %x\n",header_current_fw.size);
-
-//	fw_copy(&header_ota_fw,OTA_FW_ADDRESS);
 
 	// Check original FW
 	if(HVP(&header_original_fw) == HEADER_EMPTY) // No original FW
@@ -555,7 +552,7 @@ uint8_t ota_packet_crc(uint8_t *pdata)
 * -------------------------------------------------------------------------
 * @retval: ota_ret_t
 */
-ota_ret_t ota_fw_put(uint8_t *p_data_buffer, uint8_t crc)
+ota_ret_t ota_fw_put(uint8_t *pdata, uint8_t crc)
 {
 	ota_packet_type_t	packet_type;
 	ota_device_type_t 	device_type;
@@ -566,9 +563,6 @@ ota_ret_t ota_fw_put(uint8_t *p_data_buffer, uint8_t crc)
 	uint32_t			i,j;
 	uint32_t			sector;
 	uint8_t				slot;
-
-	u8 pdata[22];
-	memcpy(pdata,p_data_buffer,sizeof(pdata));
 
 	packet_type = pdata[0];
 
@@ -656,7 +650,6 @@ ota_ret_t ota_fw_put(uint8_t *p_data_buffer, uint8_t crc)
 					memory_addr = OTA_FW_ADDRESS + memory_addr;
 					if(ota_packet_crc(pdata) != crc)
 					{
-						P_INFO_HEX(pdata,22,"FW(%02X):",crc);
 						return OTA_RET_ERROR;
 					}
 					W25XXX_WR_Block((uint8_t*)&pdata[6],memory_addr,OTA_PACKET_LENGTH);
@@ -666,7 +659,6 @@ ota_ret_t ota_fw_put(uint8_t *p_data_buffer, uint8_t crc)
 			}
 		}
 	}
-	P_INFO_HEX(pdata,22,"FW(%02X):",crc);
 	return OTA_RET_ERROR;
 }
 
@@ -694,26 +686,68 @@ ota_ret_t ota_packet_header_get(ota_fw_header_t *header)
 	return OTA_RET_ERROR;
 }
 
-/*
-void test_ota(void)
+/**
+* @brief: set current FW verison
+* @param: see below
+*/
+uint8_t set_current_fw_version(uint8_t fw_patch)
 {
-	uint32_t 	i,j;
-	uint8_t		buff[1024];
-	uint8_t		packet[22];
-	uint32_t	address;
-	uint32_t	image_size = 0x40000;//APP_IMAGE_SIZE_MAX;
+	fw_header_t header_current_fw;
+
+	flash_read_page(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER, sizeof(fw_header_t), (uint8_t *)&header_current_fw);
+
+	// Only set version if it is not set
+	if((header_current_fw.major == 0xFF) && (header_current_fw.minor == 0xFF) && (header_current_fw.patch == 0xFF))
+	{
+		// Erase header page before write new header
+		flash_read_mid();
+		flash_unlock_mid146085();
+		flash_erase_sector(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER);
+
+		// Write Application current FW header
+		header_current_fw.major = 0; // Set default = 1 due to only use 1 byte version
+		header_current_fw.minor = 0; // Set default = 1 due to only use 1 byte version
+		header_current_fw.patch = fw_patch;
+		header_current_fw.size  = 0x40000; // Set default = 0x40000
+		flash_write_page(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER, sizeof(header_current_fw), (uint8_t *)&header_current_fw);
+	}
+	return 0;
+}
+
+/**
+* @brief: Get current FW version, due to OTA only send 1 byte version so return only "patch" of version
+* @param: see below
+*/
+uint8_t get_current_fw_version(void)
+{
+	fw_header_t header_current_fw;
+
+	// Read header of current FW in internal-flash
+	flash_read_page(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER, sizeof(fw_header_t), (uint8_t *)&header_current_fw);
+	DFU_PRINTF("Current FW ver: %x.%x.%x\n",header_current_fw.major,header_current_fw.minor,header_current_fw.patch);
+	DFU_PRINTF("Size: %x\n",header_current_fw.size);
+	return header_current_fw.patch;
+}
+
+void test_ota(void) {
+	uint32_t i, j;
+	uint8_t buff[1024];
+	uint8_t packet[22];
+	uint32_t address;
+	uint32_t image_size = 0x40000; //APP_IMAGE_SIZE_MAX;
 //	uint32_t	image_size = 0x1000;//APP_IMAGE_SIZE_MAX;
-	ota_ret_t	ret;
-	uint8_t		crc = 0;
+//	ota_ret_t	ret;
+	uint8_t crc = 0;
 
 	// put packet begin
 	packet[0] = OTA_PACKET_BEGIN; 			// packet begin
 	packet[1] = 0;							// device type
 	packet[2] = 2;							// version
-	packet[3] = (uint8_t)image_size;		// FW size
-	packet[4] = (uint8_t)(image_size>>8);	// FW size
-	packet[5] = (uint8_t)(image_size>>16);	// FW size
-	ret = ota_fw_put(packet,crc);
+	packet[3] = (uint8_t) image_size;		// FW size
+	packet[4] = (uint8_t) (image_size >> 8);	// FW size
+	packet[5] = (uint8_t) (image_size >> 16);	// FW size
+//	ret =
+	ota_fw_put(packet,crc);
 	DFU_PRINTF("Begin: %d\n",ret);
 
 	flash_read_mid();
@@ -725,35 +759,32 @@ void test_ota(void)
 	packet[1] = 0;							// device type
 	packet[2] = 2;							// version
 	address = 0;
-	for(i = 0; i < (image_size/sizeof(buff)); i++)
-	{
-		flash_read_page(FLASH_R_BASE_ADDR + APP_IMAGE_ADDR + i*sizeof(buff), sizeof(buff), (uint8_t *)buff);
-		for(j = 0; j < (sizeof(buff)/OTA_PACKET_LENGTH); j++)
-		{
-			packet[3] = (uint8_t)address;		// address
-			packet[4] = (uint8_t)(address>>8);	// address
-			packet[5] = (uint8_t)(address>>16);	// address
-			memcpy(&packet[6],&buff[j*OTA_PACKET_LENGTH],OTA_PACKET_LENGTH);
-			ret = ota_fw_put(packet,crc);
+	for (i = 0; i < (image_size / sizeof(buff)); i++) {
+		flash_read_page(FLASH_R_BASE_ADDR + APP_IMAGE_ADDR + i * sizeof(buff),sizeof(buff),(uint8_t *) buff);
+		for (j = 0; j < (sizeof(buff) / OTA_PACKET_LENGTH); j++) {
+			packet[3] = (uint8_t) address;		// address
+			packet[4] = (uint8_t) (address >> 8);	// address
+			packet[5] = (uint8_t) (address >> 16);	// address
+			memcpy(&packet[6],&buff[j * OTA_PACKET_LENGTH],OTA_PACKET_LENGTH);
+//			ret =
+			ota_fw_put(packet,crc);
 			address += OTA_PACKET_LENGTH;
 		}
 		// calculate crc128
-		for(j = 0; j < (sizeof(buff)/CRC128_LENGTH); j++)
-		{
-			crc128_calculate(&buff[j*CRC128_LENGTH]);
-		}
-		DFU_PRINTF("Copy: %d%% - %d\n",(((i+1)*100)/(image_size/sizeof(buff))),ret);
+		for (j = 0; j < (sizeof(buff) / CRC128_LENGTH); j++) {
+			crc128_calculate(&buff[j * CRC128_LENGTH]);
+		} DFU_PRINTF("Copy: %d%% - %d\n",(((i+1)*100)/(image_size/sizeof(buff))),ret);
 	}
 
 	// put packet begin
 	packet[0] = OTA_PACKET_END; 			// packet begin
 	packet[1] = 0;							// device type
 	packet[2] = 2;							// version
-	packet[3] = (uint8_t)image_size;		// FW size
-	packet[4] = (uint8_t)(image_size>>8);	// FW size
-	packet[5] = (uint8_t)(image_size>>16);	// FW size
+	packet[3] = (uint8_t) image_size;		// FW size
+	packet[4] = (uint8_t) (image_size >> 8);	// FW size
+	packet[5] = (uint8_t) (image_size >> 16);	// FW size
 	memcpy(&packet[6],crc128,OTA_PACKET_LENGTH);
-	ret = ota_fw_put(packet,crc);
+//	ret =
+	ota_fw_put(packet,crc);
 	DFU_PRINTF("End: %d\n",ret);
 }
-*/

@@ -166,8 +166,7 @@ void FLASH_Port_Init(void)
  *
  * @return  Read one byte data.
  */
-uint8_t SPI1_ReadWriteByte(uint8_t TxData)
-{
+uint8_t SPI1_ReadWriteByte(uint8_t TxData) {
 	return 0;
 }
 
@@ -252,7 +251,6 @@ void FLASH_WriteDisable(void)
 uint8_t FLASH_ReadStatusReg(void)
 {
     uint8_t  status;
-
     PIN_CLEAR(PIN_CS);
     SPI_FLASH_SendByte(CMD_FLASH_RDSR);
     status = SPI_FLASH_ReadByte();
