@@ -448,18 +448,18 @@ void firmware_check(void)
 		// First time start or no current FW
 		if(check_valid_current_fw() == 1)
 		{
-			// Erase header page before write new header
-			flash_read_mid();
-			flash_unlock_mid146085();
-			flash_erase_sector(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER);
-
-			// Write Application current FW header
-			header_current_fw.major = 0;
-			header_current_fw.minor = 0;
-			header_current_fw.patch = 1;
-			header_current_fw.size  = 0x40000;
-			memcpy(header_current_fw.crc128,crc128,CRC128_LENGTH);
-			flash_write_page(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER, sizeof(header_current_fw), (uint8_t *)&header_current_fw);
+//			// Erase header page before write new header
+//			flash_read_mid();
+//			flash_unlock_mid146085();
+//			flash_erase_sector(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER);
+//
+//			// Write Application current FW header
+//			header_current_fw.major = 0;
+//			header_current_fw.minor = 0;
+//			header_current_fw.patch = 1;
+//			header_current_fw.size  = 0x40000;
+//			memcpy(header_current_fw.crc128,crc128,CRC128_LENGTH);
+//			flash_write_page(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER, sizeof(header_current_fw), (uint8_t *)&header_current_fw);
 
 			jump_to_application();
 		}
