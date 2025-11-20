@@ -299,9 +299,9 @@ static nvm_status_t nvm_reroll(uint16_t current_key_id)
 * @des:
 *	[---------------------NVM Space---------------------]
 *	[---[Record][Record][Record]...[NVM Remain bytes]---]
-*	[													 ^										    ]
-*	[													 |										    ]
-*	[									 [NVM current pos]		 						]
+*	[				         ^						    ]
+*	[						 |						    ]
+*	[				 [NVM current pos]		 			]
 */
 nvm_status_t nvm_record_write(uint16_t key_id, uint8_t *p_data, uint32_t len)
 {

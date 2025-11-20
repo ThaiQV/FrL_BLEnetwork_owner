@@ -104,7 +104,6 @@
 	uint8_t check_valid_ota_fw(uint32_t address);
 	void crc128_init(void);
 	void crc128_calculate(uint8_t *pdata);
-	u8* ota_crc128_get(void);
 	uint32_t header_version_parse(fw_header_t *header);
 	void fw_copy(fw_header_t *header, uint32_t fw_addr);
 	void ex_flash_region_erase(uint32_t region);
@@ -114,8 +113,10 @@
 	/* For OTA */
 	void ota_init(void);
 	uint8_t ota_packet_crc(uint8_t *pdata);
-	ota_ret_t ota_fw_put(uint8_t *p_data_buffer, uint8_t crc);
+	ota_ret_t ota_fw_put(uint8_t *pdata, uint8_t crc);
 	ota_ret_t ota_packet_header_set(ota_fw_header_t *header);
 	ota_ret_t ota_packet_header_get(ota_fw_header_t *header);
+	uint8_t set_current_fw_version(uint8_t fw_patch);
+	uint8_t get_current_fw_version(void);
 	void test_ota(void);
 #endif //__DFU_H__

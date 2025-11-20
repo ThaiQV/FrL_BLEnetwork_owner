@@ -66,7 +66,7 @@ void storage_clean(void)
 * @param: see below
 * @retval: see below
 */
-bool check_sector_available(uint32_t sector)
+static bool check_sector_available(uint32_t sector)
 {
 	uint32_t i,j;
 	uint8_t	 slot = 0;
@@ -149,8 +149,7 @@ void storage_map_fill_status(uint32_t index, uint32_t len)
 	// Set status of previous sector is written
 	if(sector > 0)
 	{
-//		if((map[(sector/8)] && (0x01 << ((sector%8) - 1))) == 0x00)
-		if ((map[sector / 8] & (0x01 << (sector % 8))) == 0x00)
+		if((map[(sector/8)] && (0x01 << ((sector%8) - 1))) == 0x00)
 		{
 			map[(sector/8)] |= (0x01 << ((sector%8) - 1));
 			nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));

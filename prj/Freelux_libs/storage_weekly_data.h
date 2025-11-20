@@ -22,7 +22,7 @@ typedef enum
 /* For storage */
 void storage_init(void);
 void storage_clean(void);
-bool check_sector_available(uint32_t sector);
+static bool check_sector_available(uint32_t sector);
 storage_ret_t storage_map_check(uint16_t index, uint32_t len);
 void storage_timeslot_map_fill_status(uint16_t index, uint32_t len);
 void storage_timeslot_map_set(uint16_t index, uint32_t len);
