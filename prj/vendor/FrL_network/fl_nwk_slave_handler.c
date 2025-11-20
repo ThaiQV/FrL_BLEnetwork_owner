@@ -112,7 +112,7 @@ void fl_nwk_LedSignal_init(void) {
 #ifndef HW_SAMPLE_TEST
 	gpio_function_en(GPIO_PA6);
 	gpio_set_output(GPIO_PA6,1);	//enable output
-	gpio_set_input(GPIO_PA6,0);	//disable input
+	gpio_set_input(GPIO_PA6,0);		//disable input
 	gpio_set_level(GPIO_PA6,0);
 #endif
 #endif
@@ -795,61 +795,59 @@ fl_pack_t fl_slave_fota_rsp_packet_build(u8* _data, u8 _len,fl_data_frame_u _REQ
 }
 
 void fl_slave_fota_proc(fl_pack_t *_fota_pack){
-//	static u32 count_echo=0;
-	static u8 flag_begin=0;
-	static u8 flag_end=0;
-	static u32 rtt=0;
-	static u32 fw_size=0;
-
 	extern u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
 	fl_dataframe_format_t packet;
 	if(!fl_packet_parse(*_fota_pack,&packet)){
 		ERR(INF,"Packet parse fail!!!\r\n");
 		return;
 	}
-
 	//filter duplication pack
 //	if(fl_wifi2ble_fota_find(_fota_pack)!= -1) return;
 
-	fl_fota_pack_type_e pack_type=FOTA_PACKET_BEGIN;
+	static u8 flag_begin = 0;
+	static u8 flag_end = 0;
+	static u32 rtt = 0;
+	static u32 fw_size = 0;
+	fl_fota_pack_type_e pack_type = FOTA_PACKET_BEGIN;
 	if (packet.hdr == NWK_HDR_FOTA) {
-//		if(packet.endpoint.master == FL_FROM_MASTER_ACK){
-			//TEST
-//			u8 version_typefw[4]={'1','2','3',G_INFORMATION.dev_type};
-//			fl_adv_sendFIFO_add(fl_slave_fota_rsp_packet_build(version_typefw,SIZEU8(version_typefw),packet));
-//		}else{
-			u8 OTA_BEGIN[2] = {0, G_INFORMATION.dev_type};
-			u8 OTA_END[2] = { 2, G_INFORMATION.dev_type};
-			if (plog_IndexOf(packet.payload,OTA_BEGIN,SIZEU8(OTA_BEGIN),SIZEU8(OTA_BEGIN)) != -1) {
-				pack_type=FOTA_PACKET_BEGIN;
-				flag_begin++;
-				rtt = fl_rtc_get();
-			} else if (plog_IndexOf(packet.payload,OTA_END,SIZEU8(OTA_END),SIZEU8(OTA_END)) != -1) {
-				pack_type=FOTA_PACKET_END;
-				flag_end++;
-				P_INFO("========================\r\n");
-				P_INFO("** Begin: %d\r\n",flag_begin);
-				P_INFO("** FW   : %d\r\n",fw_size);
-				P_INFO("** End  : %d\r\n",flag_end);
-				P_INFO("** RTT  : %d s\r\n",(u32)(fl_rtc_get()-rtt));
-				P_INFO("========================\r\n");
-				flag_end=0;
-				flag_begin=0;
-				fw_size=0;
-			} else {
-				pack_type=FOTA_PACKET_DATA;
-				fw_size++;
+		u8 OTA_BEGIN[2] = { FOTA_PACKET_BEGIN, G_INFORMATION.dev_type };
+//		u8 OTA_DATA[2] = { FOTA_PACKET_DATA, G_INFORMATION.dev_type };
+		u8 OTA_END[2] = { FOTA_PACKET_END, G_INFORMATION.dev_type };
+		/*DEBUG*/
+		if (plog_IndexOf(packet.payload,OTA_BEGIN,SIZEU8(OTA_BEGIN),SIZEU8(OTA_BEGIN)) != -1) {
+			pack_type = FOTA_PACKET_BEGIN;
+			flag_begin++;
+			rtt = fl_rtc_get();
+		} else if (plog_IndexOf(packet.payload,OTA_END,SIZEU8(OTA_END),SIZEU8(OTA_END)) != -1) {
+			pack_type = FOTA_PACKET_END;
+			flag_end++;
+			P_INFO("========================\r\n");
+			P_INFO("** Begin: %d\r\n",flag_begin);
+			P_INFO("** FW   : %d\r\n",fw_size);
+			P_INFO("** End  : %d\r\n",flag_end);
+			P_INFO("** RTT  : %d s\r\n",(u32 )(fl_rtc_get() - rtt));
+			P_INFO("========================\r\n");
+			flag_end = 0;
+			flag_begin = 0;
+			fw_size = 0;
+		} else {
+			pack_type = FOTA_PACKET_DATA;
+			fw_size++;
+		}
+		/*END DEBUG*/
+		fl_nwk_LedSignal_run();
+		/*todo: load fw into the dfu*/
+		if (packet.payload[1] == G_INFORMATION.dev_type && (packet.payload[0] <= FOTA_PACKET_END)) {
+			if (OTA_RET_OK != DFU_OTA_FW_PUT(packet.payload,fl_crc8(packet.payload,SIZEU8(packet.payload)))) {
+				ERR(APP,"FOTA DFU Err <RET ERR>\r\n");
 			}
-//		}
-//		//add send repeat and check echo
-		if(fl_wifi2ble_fota_fwpush(_fota_pack,pack_type) == -1){
+		}
+		//add send repeat and check echo
+		if (fl_wifi2ble_fota_fwpush(_fota_pack,pack_type) == -1) {
 			ERR(APP,"FOTA ECHO Err <Full>\r\n");
+		} else {
+//				P_INFO_HEX(_fota_pack->data_arr,_fota_pack->length,"FOTA(%d):",_fota_pack->length);
 		}
-		else{
-//			P_INFO_HEX(_fota_pack->data_arr,_fota_pack->length,"FOTA(%d):",_fota_pack->length);
-		}
-
-
 	}
 }
 

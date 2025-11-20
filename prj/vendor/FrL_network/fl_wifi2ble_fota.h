@@ -12,11 +12,22 @@
 #define VENDOR_FRL_NETWORK_FL_WIFI2BLE_FOTA_H_
 
 #include "../Freelux_libs/dfu.h"
+
+#ifdef OTA_ENABLE
 #define DFU_OTA_INIT					ota_init
 #define DFU_OTA_CRC128_INIT				crc128_init
 #define DFU_OTA_CRC128_GET				ota_crc128_get
 #define DFU_OTA_CRC128_CAL				crc128_calculate
 #define DFU_OTA_FW_PUT					ota_fw_put
+#else
+#define DFU_OTA_INIT()         			((void)0)
+#define DFU_OTA_CRC128_INIT   			((void)0)
+#define DFU_OTA_CRC128_GET(...) 		(0)
+#define DFU_OTA_CRC128_CAL 				(0)
+#define DFU_OTA_FW_PUT(...)     		(0)
+
+
+#endif
 
 #define FOTA_EXIT_VALUE					0x7FFF
 typedef enum{

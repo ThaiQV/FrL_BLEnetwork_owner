@@ -841,8 +841,8 @@ void fl_adv_run(void) {
 #ifdef MASTER_CORE
 		fl_wifi2ble_fota_run();
 #else
-		fl_wifi2ble_fota_run();
 		fl_adv_sendFIFO_History_run();
+		fl_wifi2ble_fota_run();
 #endif
 	}
 }
