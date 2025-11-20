@@ -174,7 +174,7 @@ void proto_task( void *pvParameters );
  * @param[in]	none
  * @return      none
  */
-fl_version_t _bootloader = { 1, 0, 0 };
+fl_version_t _bootloader = { 0, 0, 0 };
 fl_version_t _fw = { 1, 4, 3 };
 fl_version_t _hw = { 1, 0, 0 };
 
