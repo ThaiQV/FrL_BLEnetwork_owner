@@ -68,6 +68,7 @@ fl_wifi2ble_fota_runtime_t G_FOTA = {
 /***                       Functions declare                   		         **/
 /******************************************************************************/
 /******************************************************************************/
+#define IsFOTA_Run() 			{if(G_FOTA.runtime.push_return == FOTA_EXIT_VALUE)return G_FOTA.runtime.push_return;}
 
 u16 FL_NWK_FOTA_IsReady(void){
 	return G_FW_QUEUE_SENDING.count;
