@@ -53,7 +53,7 @@ fl_data_container_t G_FW_QUEUE_SENDING = { .data = g_fw_sending_array, .head_ind
 
 #define FOTA_RETRY_MAX				(4)
 
-u8 F_EXTITFOTA_TIME = 20;//s
+u8 F_EXTITFOTA_TIME = 120;//s
 
 /*------------------ MAIN STRUCT -------------------------------*/
 fl_wifi2ble_fota_runtime_t G_FOTA = {
@@ -198,14 +198,15 @@ int fl_wifi2ble_fota_system_end(u8 *_payload_end, u8 _len) {
 		rslt = fl_wifi2ble_fota_fwpush(_payload_end,_len,FOTA_PACKET_END);
 	}
 	//todo: get rsp of the slave and recheck missing packet
+//	P_INFO_HEX(_payload_end,_len,"%d|-> FOTA END:",rslt);
 	return rslt;
 }
 
 int fl_wifi2ble_fota_system_begin(u8 *_payload_start,u8 _len){
 	G_FOTA.runtime.push_return = -1;
 	fl_wifi2ble_fota_ContainerClear();
-//	P_INFO_HEX(_payload_start,_len,"|-> FOTA START PACKET:");
 	int rslt = fl_wifi2ble_fota_fwpush(_payload_start,_len,FOTA_PACKET_BEGIN);
+
 	//todo: get rsp of the slave if wifi need
 	return rslt;
 }
@@ -288,6 +289,8 @@ void fl_wifi2ble_fota_init(void){
 	LOG_P(INF_FILE,"FOTA Initilization!!!\r\n");
 	fl_wifi2ble_fota_ContainerClear();
 	DFU_OTA_INIT();
+	//change version
+	DFU_OTA_VERISON_SET(4);
 }
 
 s16 fl_wifi2ble_fota_recECHO(fl_pack_t _pack_rec){

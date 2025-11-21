@@ -18,7 +18,7 @@
 
 /* SENDING QUEUE */
 #ifdef MASTER_CORE
-#define FOTA_SIZE 						32
+#define FOTA_SIZE 						16
 #else
 #define FOTA_SIZE 						256
 #endif

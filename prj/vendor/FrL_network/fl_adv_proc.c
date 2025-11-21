@@ -118,10 +118,6 @@ static bool fl_nwk_decrypt16(unsigned char * key,u8* _data,u8 _size, u8* decrypt
 	memcpy(data_buffer,_data,SIZEU8(data_buffer));
 	aes_decrypt(key,headbytes,data_buffer);
 	memcpy(decrypted,data_buffer,_size);
-//	//Todo: Skip check crc with FOTA pack
-//	if(decrypted[0] == NWK_HDR_FOTA){
-//		return 1;
-//	}
 
 /*Checking result decrypt*/
 	//u32 timetamp_hdr = MAKE_U32(decrypted[4],decrypted[3],decrypted[2],decrypted[1]);

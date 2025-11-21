@@ -293,10 +293,16 @@ void TBS_PowerMeter_Run(void){
 /******************************************************************************/
 /******************************************************************************/
 
-void TBS_Device_Flash_Init_n_Reload(void){
+void TBS_Device_Flash_Init_n_Reload(void) {
 	LOGA(FLA,"TBS_Device flash init and reload  !! \r\n");
 	fl_db_userdata_t userdata = fl_db_slaveuserdata_init();
-	memcpy((u8*)&G_TBS_DEVICE.timetamp,userdata.payload,SIZEU8(G_TBS_DEVICE)-6);
+	memcpy((u8*) &G_TBS_DEVICE.timetamp,userdata.payload,SIZEU8(G_TBS_DEVICE) - 6);
+//
+//	///FOR TESTING DEBUG 2621
+//	if (G_TBS_DEVICE.data.index == 0) {
+//		G_TBS_DEVICE.data.index = 2600;
+//		ERR(APP,"DEBUG 2621:%d\r\n",G_TBS_DEVICE.data.index);
+//	}
 }
 
 /******************************************************************************/

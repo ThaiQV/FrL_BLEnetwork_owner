@@ -174,9 +174,9 @@ void proto_task( void *pvParameters );
  * @param[in]	none
  * @return      none
  */
-fl_version_t _bootloader = { 0, 0, 0 };
-fl_version_t _fw = { 1, 4, 3 };
-fl_version_t _hw = { 1, 0, 0 };
+fl_version_t _bootloader = { 1, 0, 1 };
+fl_version_t _fw = { 1, 4, 7 };
+fl_version_t _hw = { 1, 0, 4 };
 
 _attribute_ram_code_ int main(void)   //must on ramcode
 {
@@ -209,13 +209,12 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 	}
 	P_INFO("ok\r\n");
 #endif
+//	while(1){
+//		delay_ms(2000);
+//		ERR(APP,"FOTA ok.....\r\n");
+//	}
 	//OFF ALL LOG
 	PLOG_Stop(ALL);
-////	PLOG_Start(ALL);
-//	PLOG_Start(APP);
-//	PLOG_Start(BLE);
-//	PLOG_Start(INF_FILE);
-
 	if (!deepRetWakeUp) {  //read flash size
 #if (BATT_CHECK_ENABLE)
 	user_battery_power_check();

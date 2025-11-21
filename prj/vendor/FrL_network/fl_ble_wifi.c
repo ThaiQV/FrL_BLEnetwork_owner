@@ -563,11 +563,13 @@ void RSTFACTORY_REQUEST(u8* _pdata, RspFunc rspfnc){
 	}
 }
 void RSTFACTORY_RESPONSE(u8* _pdata){}
+
 /******************************************************************************/
 /******************************************************************************/
 /***                            FOTA Nwk Processor                           **/
 /******************************************************************************/
 /******************************************************************************/
+
 u8 data_fw[22];
 void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 	extern fl_slaves_list_t G_NODE_LIST;
@@ -597,17 +599,19 @@ void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 			} else {
 				if (data_fw[0] == FOTA_PACKET_BEGIN){
 					rslt = fl_wifi2ble_fota_system_begin(data_fw,SIZEU8(data_fw));
+					if(rslt==0)P_INFO_HEX(data_fw,SIZEU8(data_fw),"%d|-> FOTA BEGIN:",rslt);
 				}
 				else if(data_fw[0] == FOTA_PACKET_DATA){
 					rslt = fl_wifi2ble_fota_system_data(data_fw,SIZEU8(data_fw));
 				}
 				else if(data_fw[0] == FOTA_PACKET_END){
 					rslt = fl_wifi2ble_fota_system_end(data_fw,SIZEU8(data_fw));
+					if(rslt==0)P_INFO_HEX(data_fw,SIZEU8(data_fw),"%d|-> FOTA END:",rslt);
 				}
 				//convert return
 				/*-1: BUSY,0x7FFF : ERR , >-1 : OK*/
 				/*0x00: OK, 0x01: BUSY,  0xFF: ERR*/
-				if (rslt < 0) {
+				if (rslt == -1) {
 					wfdata.data[0] = 0x01;
 				} else if (rslt == FOTA_EXIT_VALUE) {
 					wfdata.data[0] = 0xFF;
@@ -619,11 +623,10 @@ void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 			ERR(MCU,"FOTA ERR >> Format packet\r\n");
 			return;
 		}
-
-		P_INFO_HEX(data_fw,SIZEU8(data_fw),"Data:");
 		wfdata.len_data = 1; //<OK/ERR> 1 byte
 		wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
 		u8 payload_len = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
+//		P_INFO_HEX(data_fw,SIZEU8(data_fw),"WIFI2BLE[%d](%d):",data_fw[0],wfdata.data[0]);
 		fl_ble_send_wifi((u8*) &wfdata,payload_len);
 	}
 }
