@@ -8,9 +8,9 @@ ELF Header:
   Type:                              EXEC (Executable file)
   Machine:                           RISC-V
   Version:                           0x1
-  Entry point address:               0x20000000
+  Entry point address:               0x20010000
   Start of program headers:          52 (bytes into file)
-  Start of section headers:          145676 (bytes into file)
+  Start of section headers:          145732 (bytes into file)
   Flags:                             0x3, RVC, single-float ABI
   Size of this header:               52 (bytes)
   Size of program headers:           32 (bytes)
@@ -22,29 +22,29 @@ ELF Header:
 Section Headers:
   [Nr] Name              Type            Addr     Off    Size   ES Flg Lk Inf Al
   [ 0]                   NULL            00000000 000000 000000 00      0   0  0
-  [ 1] .vectors          PROGBITS        20000000 001000 00018a 00  AX  0   0  4
+  [ 1] .vectors          PROGBITS        20010000 001000 00018a 00  AX  0   0  4
   [ 2] .retention_reset  PROGBITS        00000000 002000 000154 00  AX  0   0  4
   [ 3] .retention_data   PROGBITS        00000158 002158 00024e 00  WA  0   0  4
   [ 4] .ram_code         PROGBITS        00000400 002400 003102 00  AX  0   0 256
-  [ 5] .text             PROGBITS        20003640 005640 001e28 00  AX  0   0  4
-  [ 6] .rodata           PROGBITS        20005468 007468 0001f1 00   A  0   0  4
-  [ 7] .eh_frame         PROGBITS        20005660 007660 0000f8 00   A  0   0  4
+  [ 5] .text             PROGBITS        20013640 005640 001e70 00  AX  0   0  4
+  [ 6] .rodata           PROGBITS        200154b0 0074b0 0001f1 00   A  0   0  4
+  [ 7] .eh_frame         PROGBITS        200156c0 0076c0 0000f8 00   A  0   0  4
   [ 8] .data             PROGBITS        00080000 008000 000016 00  WA  0   0  4
   [ 9] .sbss             NOBITS          00080018 008016 00001c 00  WA  0   0  4
   [10] .bss              NOBITS          00080034 008016 000014 00  WA  0   0  4
-  [11] .debug_info       PROGBITS        00000000 008016 009719 00      0   0  1
-  [12] .debug_abbrev     PROGBITS        00000000 01172f 000b32 00      0   0  1
-  [13] .debug_loc        PROGBITS        00000000 012261 003fcc 00      0   0  1
-  [14] .debug_aranges    PROGBITS        00000000 016230 000448 00      0   0  8
-  [15] .debug_ranges     PROGBITS        00000000 016678 001020 00      0   0  8
-  [16] .debug_line       PROGBITS        00000000 017698 0049ed 00      0   0  1
-  [17] .debug_str        PROGBITS        00000000 01c085 0041c2 01  MS  0   0  1
-  [18] .comment          PROGBITS        00000000 020247 000037 01  MS  0   0  1
-  [19] .riscv.attributes RISCV_ATTRIBUTE 00000000 02027e 00003b 00      0   0  1
-  [20] .debug_frame      PROGBITS        00000000 0202bc 001274 00      0   0  4
-  [21] .symtab           SYMTAB          00000000 021530 001300 10     22 165  4
-  [22] .strtab           STRTAB          00000000 022830 000fe1 00      0   0  1
-  [23] .shstrtab         STRTAB          00000000 023811 0000f9 00      0   0  1
+  [11] .debug_info       PROGBITS        00000000 008016 00972e 00      0   0  1
+  [12] .debug_abbrev     PROGBITS        00000000 011744 000b32 00      0   0  1
+  [13] .debug_loc        PROGBITS        00000000 012276 003f9a 00      0   0  1
+  [14] .debug_aranges    PROGBITS        00000000 016210 000450 00      0   0  8
+  [15] .debug_ranges     PROGBITS        00000000 016660 001028 00      0   0  8
+  [16] .debug_line       PROGBITS        00000000 017688 0049e3 00      0   0  1
+  [17] .debug_str        PROGBITS        00000000 01c06b 0041c8 01  MS  0   0  1
+  [18] .comment          PROGBITS        00000000 020233 000037 01  MS  0   0  1
+  [19] .riscv.attributes RISCV_ATTRIBUTE 00000000 02026a 00003b 00      0   0  1
+  [20] .debug_frame      PROGBITS        00000000 0202a8 00129c 00      0   0  4
+  [21] .symtab           SYMTAB          00000000 021544 001310 10     22 166  4
+  [22] .strtab           STRTAB          00000000 022854 000ff4 00      0   0  1
+  [23] .shstrtab         STRTAB          00000000 023848 0000f9 00      0   0  1
 Key to Flags:
   W (write), A (alloc), X (execute), M (merge), S (strings), I (info),
   L (link order), O (extra OS processing required), G (group), T (TLS),
@@ -55,12 +55,12 @@ There are no section groups in this file.
 
 Program Headers:
   Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align
-  LOAD           0x001000 0x20000000 0x20000000 0x0018a 0x0018a R E 0x1000
-  LOAD           0x002000 0x00000000 0x20000190 0x003a6 0x003a6 RWE 0x1000
-  LOAD           0x002400 0x00000400 0x20000538 0x03102 0x03102 R E 0x1000
-  LOAD           0x005640 0x20003640 0x20003640 0x02118 0x02118 R E 0x1000
-  LOAD           0x008000 0x00080000 0x20005758 0x00016 0x00048 RW  0x1000
-  RISCV_ATTRIBUT 0x02027e 0x00000000 0x00000000 0x0003b 0x00000 R   0x1
+  LOAD           0x001000 0x20010000 0x20010000 0x0018a 0x0018a R E 0x1000
+  LOAD           0x002000 0x00000000 0x20010190 0x003a6 0x003a6 RWE 0x1000
+  LOAD           0x002400 0x00000400 0x20010538 0x03102 0x03102 R E 0x1000
+  LOAD           0x005640 0x20013640 0x20013640 0x02178 0x02178 R E 0x1000
+  LOAD           0x008000 0x00080000 0x200157b8 0x00016 0x00048 RW  0x1000
+  RISCV_ATTRIBUT 0x02026a 0x00000000 0x00000000 0x0003b 0x00000 R   0x1
 
  Section to Segment mapping:
   Segment Sections...
@@ -77,16 +77,16 @@ There are no relocations in this file.
 
 The decoding of unwind sections for machine type RISC-V is not currently supported.
 
-Symbol table '.symtab' contains 304 entries:
+Symbol table '.symtab' contains 305 entries:
    Num:    Value  Size Type    Bind   Vis      Ndx Name
      0: 00000000     0 NOTYPE  LOCAL  DEFAULT  UND 
-     1: 20000000     0 SECTION LOCAL  DEFAULT    1 
+     1: 20010000     0 SECTION LOCAL  DEFAULT    1 
      2: 00000000     0 SECTION LOCAL  DEFAULT    2 
      3: 00000158     0 SECTION LOCAL  DEFAULT    3 
      4: 00000400     0 SECTION LOCAL  DEFAULT    4 
-     5: 20003640     0 SECTION LOCAL  DEFAULT    5 
-     6: 20005468     0 SECTION LOCAL  DEFAULT    6 
-     7: 20005660     0 SECTION LOCAL  DEFAULT    7 
+     5: 20013640     0 SECTION LOCAL  DEFAULT    5 
+     6: 200154b0     0 SECTION LOCAL  DEFAULT    6 
+     7: 200156c0     0 SECTION LOCAL  DEFAULT    7 
      8: 00080000     0 SECTION LOCAL  DEFAULT    8 
      9: 00080018     0 SECTION LOCAL  DEFAULT    9 
     10: 00080034     0 SECTION LOCAL  DEFAULT   10 
@@ -101,23 +101,23 @@ Symbol table '.symtab' contains 304 entries:
     19: 00000000     0 SECTION LOCAL  DEFAULT   19 
     20: 00000000     0 SECTION LOCAL  DEFAULT   20 
     21: 00000000     0 FILE    LOCAL  DEFAULT  ABS ./boot/B91/cstartup_B91.o
-    22: 20000028     0 NOTYPE  LOCAL  DEFAULT    1 _START
-    23: 20000030     0 NOTYPE  LOCAL  DEFAULT    1 _SWS_USB_DIS
-    24: 2000008e     0 NOTYPE  LOCAL  DEFAULT    1 _RETENTION_RESET_INIT
-    25: 200000a6     0 NOTYPE  LOCAL  DEFAULT    1 _RETENTION_RESET_BEGIN
-    26: 200000b8     0 NOTYPE  LOCAL  DEFAULT    1 _RETENTION_DATA_INIT
-    27: 200000cc     0 NOTYPE  LOCAL  DEFAULT    1 _RETENTION_DATA_INIT_BEGI
-    28: 200000de     0 NOTYPE  LOCAL  DEFAULT    1 _RAMCODE_INIT
-    29: 200000f6     0 NOTYPE  LOCAL  DEFAULT    1 _RAMCODE_INIT_BEGIN
-    30: 20000108     0 NOTYPE  LOCAL  DEFAULT    1 _DATA_INIT
-    31: 20000120     0 NOTYPE  LOCAL  DEFAULT    1 _DATA_INIT_BEGIN
-    32: 20000132     0 NOTYPE  LOCAL  DEFAULT    1 _ZERO_BSS
-    33: 20000146     0 NOTYPE  LOCAL  DEFAULT    1 _ZERO_BSS_BEGIN
-    34: 20000152     0 NOTYPE  LOCAL  DEFAULT    1 _ZERO_AES
-    35: 20000166     0 NOTYPE  LOCAL  DEFAULT    1 _ZERO_AES_BEGIN
-    36: 20000172     0 NOTYPE  LOCAL  DEFAULT    1 _FILL_STK
-    37: 20000172     0 NOTYPE  LOCAL  DEFAULT    1 _MAIN_FUNC
-    38: 20000188     0 NOTYPE  LOCAL  DEFAULT    1 _END
+    22: 20010028     0 NOTYPE  LOCAL  DEFAULT    1 _START
+    23: 20010030     0 NOTYPE  LOCAL  DEFAULT    1 _SWS_USB_DIS
+    24: 2001008e     0 NOTYPE  LOCAL  DEFAULT    1 _RETENTION_RESET_INIT
+    25: 200100a6     0 NOTYPE  LOCAL  DEFAULT    1 _RETENTION_RESET_BEGIN
+    26: 200100b8     0 NOTYPE  LOCAL  DEFAULT    1 _RETENTION_DATA_INIT
+    27: 200100cc     0 NOTYPE  LOCAL  DEFAULT    1 _RETENTION_DATA_INIT_BEGI
+    28: 200100de     0 NOTYPE  LOCAL  DEFAULT    1 _RAMCODE_INIT
+    29: 200100f6     0 NOTYPE  LOCAL  DEFAULT    1 _RAMCODE_INIT_BEGIN
+    30: 20010108     0 NOTYPE  LOCAL  DEFAULT    1 _DATA_INIT
+    31: 20010120     0 NOTYPE  LOCAL  DEFAULT    1 _DATA_INIT_BEGIN
+    32: 20010132     0 NOTYPE  LOCAL  DEFAULT    1 _ZERO_BSS
+    33: 20010146     0 NOTYPE  LOCAL  DEFAULT    1 _ZERO_BSS_BEGIN
+    34: 20010152     0 NOTYPE  LOCAL  DEFAULT    1 _ZERO_AES
+    35: 20010166     0 NOTYPE  LOCAL  DEFAULT    1 _ZERO_AES_BEGIN
+    36: 20010172     0 NOTYPE  LOCAL  DEFAULT    1 _FILL_STK
+    37: 20010172     0 NOTYPE  LOCAL  DEFAULT    1 _MAIN_FUNC
+    38: 20010188     0 NOTYPE  LOCAL  DEFAULT    1 _END
     39: 00000022     0 NOTYPE  LOCAL  DEFAULT    2 _ISTART
     40: 0000002a     0 NOTYPE  LOCAL  DEFAULT    2 _ISWS_USB_DIS
     41: 00000088     0 NOTYPE  LOCAL  DEFAULT    2 _WAKEUP_FLASH
@@ -146,243 +146,244 @@ Symbol table '.symtab' contains 304 entries:
     64: 00000920     4 FUNC    LOCAL  DEFAULT    4 stimer_irq_handler
     65: 00000924     4 FUNC    LOCAL  DEFAULT    4 rf_irq_handler
     66: 00000928    36 FUNC    LOCAL  DEFAULT    4 delay_ms
-    67: 20003774   104 FUNC    LOCAL  DEFAULT    5 pwm_kick_32k_pad.constpro
+    67: 20013774   104 FUNC    LOCAL  DEFAULT    5 pwm_kick_32k_pad.constpro
     68: 0000094c    28 FUNC    LOCAL  DEFAULT    4 delay_us
     69: 00000968    68 FUNC    LOCAL  DEFAULT    4 flash_send_addr
     70: 000009ac    76 FUNC    LOCAL  DEFAULT    4 flash_send_cmd
     71: 000009f8   360 FUNC    LOCAL  DEFAULT    4 flash_mspi_read_ram
-    72: 20003640    48 FUNC    LOCAL  DEFAULT    5 flash_read_status
+    72: 20013640    48 FUNC    LOCAL  DEFAULT    5 flash_read_status
     73: 00000b60    72 FUNC    LOCAL  DEFAULT    4 flash_wait_done
     74: 00000ba8   216 FUNC    LOCAL  DEFAULT    4 flash_mspi_write_ram
-    75: 20003670    44 FUNC    LOCAL  DEFAULT    5 flash_read_mid
-    76: 200037dc   102 FUNC    LOCAL  DEFAULT    5 blc_readFlashSize_autoCon
-    77: 2000369c    92 FUNC    LOCAL  DEFAULT    5 flash_page_program
-    78: 200036f8    44 FUNC    LOCAL  DEFAULT    5 flash_dread
-    79: 20003724    52 FUNC    LOCAL  DEFAULT    5 flash_erase_sector
+    75: 20013670    44 FUNC    LOCAL  DEFAULT    5 flash_read_mid
+    76: 200137dc   102 FUNC    LOCAL  DEFAULT    5 blc_readFlashSize_autoCon
+    77: 2001369c    92 FUNC    LOCAL  DEFAULT    5 flash_page_program
+    78: 200136f8    44 FUNC    LOCAL  DEFAULT    5 flash_dread
+    79: 20013724    52 FUNC    LOCAL  DEFAULT    5 flash_erase_sector
     80: 00000c80    96 FUNC    LOCAL  DEFAULT    4 clock_set_32k_tick
-    81: 20003844   150 FUNC    LOCAL  DEFAULT    5 writeSPIByte
-    82: 200038dc   108 FUNC    LOCAL  DEFAULT    5 W25XXX_Read
-    83: 20003948    60 FUNC    LOCAL  DEFAULT    5 FLASH_ReadStatusReg
-    84: 20003984   174 FUNC    LOCAL  DEFAULT    5 W25XXX_WR_Page
-    85: 20003a34   280 FUNC    LOCAL  DEFAULT    5 W25XXX_WR_Block
-    86: 20003b4c    66 FUNC    LOCAL  DEFAULT    5 analog_read_reg32.constpr
-    87: 00000ce0    48 FUNC    LOCAL  DEFAULT    4 clock_get_32k_tick
-    88: 00000d10    60 FUNC    LOCAL  DEFAULT    4 analog_write_reg8
-    89: 20003b90   128 FUNC    LOCAL  DEFAULT    5 pwm_kick_32k_pad_times.co
-    90: 00000d4c    68 FUNC    LOCAL  DEFAULT    4 analog_read_reg8
-    91: 00000d90   320 FUNC    LOCAL  DEFAULT    4 clock_init.constprop.6
-    92: 00000ed0   180 FUNC    LOCAL  DEFAULT    4 pm_wait_bbpll_done
-    93: 00000f84   420 FUNC    LOCAL  DEFAULT    4 pm_sleep_start
-    94: 00001128  1124 FUNC    LOCAL  DEFAULT    4 cpu_sleep_wakeup_32k_rc_r
-    95: 20003758    26 FUNC    LOCAL  DEFAULT    5 cpu_sleep_wakeup_32k_rc
-    96: 20003c14   422 FUNC    LOCAL  DEFAULT    5 cpu_wakeup_no_deepretn_ba
-    97: 20003dbc   150 FUNC    LOCAL  DEFAULT    5 gpio_set_up_down_res
-    98: 20003e54   500 FUNC    LOCAL  DEFAULT    5 hspi_set_pin_mux.part.0
-    99: 0000158c   140 FUNC    LOCAL  DEFAULT    4 clock_cal_24m_rc
-   100: 00001618   216 FUNC    LOCAL  DEFAULT    4 dr_putchar
-   101: 000016f0   596 FUNC    LOCAL  DEFAULT    4 sys_init.constprop.0
-   102: 00001944   180 FUNC    LOCAL  DEFAULT    4 gpio_irq_handler
-   103: 20004048   534 FUNC    LOCAL  DEFAULT    5 main_loop
-   104: 20004260    88 FUNC    LOCAL  DEFAULT    5 flash_unlock_mid146085
-   105: 200042bc   922 FUNC    LOCAL  DEFAULT    5 fw_copy
-   106: 00080034    16 OBJECT  LOCAL  DEFAULT   10 crc128
-   107: 00000158    44 OBJECT  LOCAL  DEFAULT    3 bltParam
-   108: 00000184     4 OBJECT  LOCAL  DEFAULT    3 ll_irq_systemTick_conn_cb
-   109: 00000188    16 OBJECT  LOCAL  DEFAULT    3 blt_rxfifo
-   110: 00000198    12 OBJECT  LOCAL  DEFAULT    3 blt_conn_phy
-   111: 000001a4    20 OBJECT  LOCAL  DEFAULT    3 bltData
-   112: 000001b8    88 OBJECT  LOCAL  DEFAULT    3 blttcon
-   113: 00000210     4 OBJECT  LOCAL  DEFAULT    3 ll_irq_rx_data_cb
-   114: 00000214     4 OBJECT  LOCAL  DEFAULT    3 blc_tlkEvent_pending
-   115: 00000218     4 OBJECT  LOCAL  DEFAULT    3 ll_irq_scan_rx_pri_chn_cb
-   116: 0000021c     4 OBJECT  LOCAL  DEFAULT    3 blc_rf_pa_cb
-   117: 00000220     4 OBJECT  LOCAL  DEFAULT    3 ll_irq_tx_cb
-   118: 00000224    16 OBJECT  LOCAL  DEFAULT    3 blt_txfifo
-   119: 00000234     4 OBJECT  LOCAL  DEFAULT    3 g_rnd_m_w
-   120: 00000238     4 OBJECT  LOCAL  DEFAULT    3 g_rnd_m_z
-   121: 0000023c    41 OBJECT  LOCAL  DEFAULT    3 pmcd
-   122: 00000268     4 OBJECT  LOCAL  DEFAULT    3 g_pm_tick_32k_calib
-   123: 0000026c     1 OBJECT  LOCAL  DEFAULT    3 g_pm_long_suspend
-   124: 00000270     4 OBJECT  LOCAL  DEFAULT    3 flash_sector_calibration
-   125: 00000274     4 OBJECT  LOCAL  DEFAULT    3 pm_get_32k_tick
-   126: 00000278     1 OBJECT  LOCAL  DEFAULT    3 g_pm_suspend_power_cfg
-   127: 0000027c     4 OBJECT  LOCAL  DEFAULT    3 func_before_suspend
-   128: 00000280     4 OBJECT  LOCAL  DEFAULT    3 g_pm_tick_32k_cur
-   129: 00000284     4 OBJECT  LOCAL  DEFAULT    3 g_pm_tick_cur
-   130: 0000028c     4 OBJECT  LOCAL  DEFAULT    3 blt_miscParam
-   131: 00000290     6 OBJECT  LOCAL  DEFAULT    3 adc_vref_cfg
-   132: 00000298     4 OBJECT  LOCAL  DEFAULT    3 pm_tim_recover
-   133: 0000029c     4 OBJECT  LOCAL  DEFAULT    3 cpu_sleep_wakeup
-   134: 000002a0   241 OBJECT  LOCAL  DEFAULT    3 blt_timer
-   135: 00000394     4 OBJECT  LOCAL  DEFAULT    3 flash_write_page
-   136: 00000398     4 OBJECT  LOCAL  DEFAULT    3 flash_read_page
-   137: 0000039c     1 OBJECT  LOCAL  DEFAULT    3 F_SENDING_STATE
-   138: 000003a0     5 OBJECT  LOCAL  DEFAULT    3 ORIGINAL_MASTER_TIME
-   139: 000003a5     1 OBJECT  LOCAL  DEFAULT    3 g_plic_preempt_en
-   140: 20005478    23 OBJECT  LOCAL  DEFAULT    6 __FUNCTION__.13001
-   141: 20005490    17 OBJECT  LOCAL  DEFAULT    6 __FUNCTION__.13158
-   142: 00080018     4 OBJECT  LOCAL  DEFAULT    9 g_chip_version
-   143: 0008001c     4 OBJECT  LOCAL  DEFAULT    9 g_pm_status_info
-   144: 00080020     4 OBJECT  LOCAL  DEFAULT    9 mcause
-   145: 00080024     4 OBJECT  LOCAL  DEFAULT    9 mepc
-   146: 00080000     2 OBJECT  LOCAL  DEFAULT    8 FmDebug
-   147: 00080004     8 OBJECT  LOCAL  DEFAULT    8 g_pm_early_wakeup_time_us
-   148: 0008000c     4 OBJECT  LOCAL  DEFAULT    8 g_pm_r_delay_cycle
-   149: 00080010     6 OBJECT  LOCAL  DEFAULT    8 sys_clk
-   150: 20005654     5 OBJECT  LOCAL  DEFAULT    6 __FUNCTION__.13195
-   151: 00000000     0 FILE    LOCAL  DEFAULT  ABS memcpy.c
-   152: 00000000     0 FILE    LOCAL  DEFAULT  ABS printf.c
-   153: 00000000     0 FILE    LOCAL  DEFAULT  ABS strrchr.c
-   154: 00000000     0 FILE    LOCAL  DEFAULT  ABS vprintf.c
-   155: 200048e2    56 FUNC    LOCAL  DEFAULT    5 __vprintf_help
-   156: 00080028     4 OBJECT  LOCAL  DEFAULT    9 __vprintf_buf
-   157: 0008002c     4 OBJECT  LOCAL  DEFAULT    9 __vprintf_buf_len
-   158: 00000000     0 FILE    LOCAL  DEFAULT  ABS printf_impl.c
-   159: 00000000     0 FILE    LOCAL  DEFAULT  ABS printf_impl_float.c
-   160: 00000000     0 FILE    LOCAL  DEFAULT  ABS strcpy.c
-   161: 00000000     0 FILE    LOCAL  DEFAULT  ABS strnlen.c
-   162: 00000000     0 FILE    LOCAL  DEFAULT  ABS libgcc2.c
+    81: 20013844   150 FUNC    LOCAL  DEFAULT    5 writeSPIByte
+    82: 200138dc   108 FUNC    LOCAL  DEFAULT    5 W25XXX_Read
+    83: 20013948    60 FUNC    LOCAL  DEFAULT    5 FLASH_ReadStatusReg
+    84: 20013984   174 FUNC    LOCAL  DEFAULT    5 W25XXX_WR_Page
+    85: 20013a34   280 FUNC    LOCAL  DEFAULT    5 W25XXX_WR_Block
+    86: 20013b4c   126 FUNC    LOCAL  DEFAULT    5 FLASH_Erase_Sector
+    87: 20013bcc    66 FUNC    LOCAL  DEFAULT    5 analog_read_reg32.constpr
+    88: 00000ce0    48 FUNC    LOCAL  DEFAULT    4 clock_get_32k_tick
+    89: 00000d10    60 FUNC    LOCAL  DEFAULT    4 analog_write_reg8
+    90: 20013c10   128 FUNC    LOCAL  DEFAULT    5 pwm_kick_32k_pad_times.co
+    91: 00000d4c    68 FUNC    LOCAL  DEFAULT    4 analog_read_reg8
+    92: 00000d90   320 FUNC    LOCAL  DEFAULT    4 clock_init.constprop.6
+    93: 00000ed0   180 FUNC    LOCAL  DEFAULT    4 pm_wait_bbpll_done
+    94: 00000f84   420 FUNC    LOCAL  DEFAULT    4 pm_sleep_start
+    95: 00001128  1124 FUNC    LOCAL  DEFAULT    4 cpu_sleep_wakeup_32k_rc_r
+    96: 20013758    26 FUNC    LOCAL  DEFAULT    5 cpu_sleep_wakeup_32k_rc
+    97: 20013c94   422 FUNC    LOCAL  DEFAULT    5 cpu_wakeup_no_deepretn_ba
+    98: 20013e3c   150 FUNC    LOCAL  DEFAULT    5 gpio_set_up_down_res
+    99: 20013ed4   500 FUNC    LOCAL  DEFAULT    5 hspi_set_pin_mux.part.0
+   100: 0000158c   140 FUNC    LOCAL  DEFAULT    4 clock_cal_24m_rc
+   101: 00001618   216 FUNC    LOCAL  DEFAULT    4 dr_putchar
+   102: 000016f0   596 FUNC    LOCAL  DEFAULT    4 sys_init.constprop.0
+   103: 00001944   180 FUNC    LOCAL  DEFAULT    4 gpio_irq_handler
+   104: 200140c8    88 FUNC    LOCAL  DEFAULT    5 flash_unlock_mid146085
+   105: 20014124   534 FUNC    LOCAL  DEFAULT    5 main_loop
+   106: 2001433c   866 FUNC    LOCAL  DEFAULT    5 fw_copy
+   107: 00080034    16 OBJECT  LOCAL  DEFAULT   10 crc128
+   108: 00000158    44 OBJECT  LOCAL  DEFAULT    3 bltParam
+   109: 00000184     4 OBJECT  LOCAL  DEFAULT    3 ll_irq_systemTick_conn_cb
+   110: 00000188    16 OBJECT  LOCAL  DEFAULT    3 blt_rxfifo
+   111: 00000198    12 OBJECT  LOCAL  DEFAULT    3 blt_conn_phy
+   112: 000001a4    20 OBJECT  LOCAL  DEFAULT    3 bltData
+   113: 000001b8    88 OBJECT  LOCAL  DEFAULT    3 blttcon
+   114: 00000210     4 OBJECT  LOCAL  DEFAULT    3 ll_irq_rx_data_cb
+   115: 00000214     4 OBJECT  LOCAL  DEFAULT    3 blc_tlkEvent_pending
+   116: 00000218     4 OBJECT  LOCAL  DEFAULT    3 ll_irq_scan_rx_pri_chn_cb
+   117: 0000021c     4 OBJECT  LOCAL  DEFAULT    3 blc_rf_pa_cb
+   118: 00000220     4 OBJECT  LOCAL  DEFAULT    3 ll_irq_tx_cb
+   119: 00000224    16 OBJECT  LOCAL  DEFAULT    3 blt_txfifo
+   120: 00000234     4 OBJECT  LOCAL  DEFAULT    3 g_rnd_m_w
+   121: 00000238     4 OBJECT  LOCAL  DEFAULT    3 g_rnd_m_z
+   122: 0000023c    41 OBJECT  LOCAL  DEFAULT    3 pmcd
+   123: 00000268     4 OBJECT  LOCAL  DEFAULT    3 g_pm_tick_32k_calib
+   124: 0000026c     1 OBJECT  LOCAL  DEFAULT    3 g_pm_long_suspend
+   125: 00000270     4 OBJECT  LOCAL  DEFAULT    3 flash_sector_calibration
+   126: 00000274     4 OBJECT  LOCAL  DEFAULT    3 pm_get_32k_tick
+   127: 00000278     1 OBJECT  LOCAL  DEFAULT    3 g_pm_suspend_power_cfg
+   128: 0000027c     4 OBJECT  LOCAL  DEFAULT    3 func_before_suspend
+   129: 00000280     4 OBJECT  LOCAL  DEFAULT    3 g_pm_tick_32k_cur
+   130: 00000284     4 OBJECT  LOCAL  DEFAULT    3 g_pm_tick_cur
+   131: 0000028c     4 OBJECT  LOCAL  DEFAULT    3 blt_miscParam
+   132: 00000290     6 OBJECT  LOCAL  DEFAULT    3 adc_vref_cfg
+   133: 00000298     4 OBJECT  LOCAL  DEFAULT    3 pm_tim_recover
+   134: 0000029c     4 OBJECT  LOCAL  DEFAULT    3 cpu_sleep_wakeup
+   135: 000002a0   241 OBJECT  LOCAL  DEFAULT    3 blt_timer
+   136: 00000394     4 OBJECT  LOCAL  DEFAULT    3 flash_write_page
+   137: 00000398     4 OBJECT  LOCAL  DEFAULT    3 flash_read_page
+   138: 0000039c     1 OBJECT  LOCAL  DEFAULT    3 F_SENDING_STATE
+   139: 000003a0     5 OBJECT  LOCAL  DEFAULT    3 ORIGINAL_MASTER_TIME
+   140: 000003a5     1 OBJECT  LOCAL  DEFAULT    3 g_plic_preempt_en
+   141: 200154c0    23 OBJECT  LOCAL  DEFAULT    6 __FUNCTION__.13001
+   142: 200154d8    17 OBJECT  LOCAL  DEFAULT    6 __FUNCTION__.13159
+   143: 00080018     4 OBJECT  LOCAL  DEFAULT    9 g_chip_version
+   144: 0008001c     4 OBJECT  LOCAL  DEFAULT    9 g_pm_status_info
+   145: 00080020     4 OBJECT  LOCAL  DEFAULT    9 mcause
+   146: 00080024     4 OBJECT  LOCAL  DEFAULT    9 mepc
+   147: 00080000     2 OBJECT  LOCAL  DEFAULT    8 FmDebug
+   148: 00080004     8 OBJECT  LOCAL  DEFAULT    8 g_pm_early_wakeup_time_us
+   149: 0008000c     4 OBJECT  LOCAL  DEFAULT    8 g_pm_r_delay_cycle
+   150: 00080010     6 OBJECT  LOCAL  DEFAULT    8 sys_clk
+   151: 2001569c     5 OBJECT  LOCAL  DEFAULT    6 __FUNCTION__.13196
+   152: 00000000     0 FILE    LOCAL  DEFAULT  ABS memcpy.c
+   153: 00000000     0 FILE    LOCAL  DEFAULT  ABS printf.c
+   154: 00000000     0 FILE    LOCAL  DEFAULT  ABS strrchr.c
+   155: 00000000     0 FILE    LOCAL  DEFAULT  ABS vprintf.c
+   156: 2001492a    56 FUNC    LOCAL  DEFAULT    5 __vprintf_help
+   157: 00080028     4 OBJECT  LOCAL  DEFAULT    9 __vprintf_buf
+   158: 0008002c     4 OBJECT  LOCAL  DEFAULT    9 __vprintf_buf_len
+   159: 00000000     0 FILE    LOCAL  DEFAULT  ABS printf_impl.c
+   160: 00000000     0 FILE    LOCAL  DEFAULT  ABS printf_impl_float.c
+   161: 00000000     0 FILE    LOCAL  DEFAULT  ABS strcpy.c
+   162: 00000000     0 FILE    LOCAL  DEFAULT  ABS strnlen.c
    163: 00000000     0 FILE    LOCAL  DEFAULT  ABS libgcc2.c
-   164: 00000000     0 FILE    LOCAL  DEFAULT  ABS printf_data.c
-   165: 00002524    72 FUNC    GLOBAL DEFAULT    4 entry_irq55
-   166: 00002fac    68 FUNC    GLOBAL DEFAULT    4 entry_irq13
-   167: 20005310   124 FUNC    GLOBAL DEFAULT    5 strcpy
-   168: 00002e94   212 FUNC    GLOBAL DEFAULT    4 entry_irq15
-   169: 200053d8    46 FUNC    GLOBAL HIDDEN     5 __ashldi3
-   170: 00002ad4    68 FUNC    GLOBAL DEFAULT    4 entry_irq27
-   171: 000023bc    72 FUNC    GLOBAL DEFAULT    4 entry_irq60
-   172: 000032dc   212 FUNC    GLOBAL DEFAULT    4 entry_irq1
-   173: 000025fc    72 FUNC    GLOBAL DEFAULT    4 entry_irq52
-   174: 0000268c    72 FUNC    GLOBAL DEFAULT    4 entry_irq50
-   175: 0000232c    72 FUNC    GLOBAL DEFAULT    4 entry_irq62
-   176: 20004898    30 FUNC    GLOBAL DEFAULT    5 printf
-   177: 00080800     0 NOTYPE  GLOBAL DEFAULT    8 __global_pointer$
-   178: 20005410     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_8
-   179: 0000244c    72 FUNC    GLOBAL DEFAULT    4 entry_irq58
-   180: 2000545c     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_3
-   181: 000003a6     0 NOTYPE  GLOBAL DEFAULT    3 _RETENTION_DATA_VMA_END
-   182: 20005448     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_10
-   183: 20005410     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_11
-   184: 20004964    76 FUNC    GLOBAL DEFAULT    5 __print_integral
-   185: 00000000     0 NOTYPE  GLOBAL DEFAULT    2 _RETENTION_RESET_VMA_STAR
-   186: 00003078    68 FUNC    GLOBAL DEFAULT    4 entry_irq10
-   187: 00002cfc    68 FUNC    GLOBAL DEFAULT    4 entry_irq21
-   188: 00000158     0 NOTYPE  GLOBAL DEFAULT    3 _AES_VMA_START
-   189: 000026d8     4 FUNC    GLOBAL DEFAULT    4 entry_irq48
-   190: 2000545c     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_2
-   191: 00003100    68 FUNC    GLOBAL DEFAULT    4 entry_irq8
-   192: 00002934    72 FUNC    GLOBAL DEFAULT    4 entry_irq33
-   193: 00080048     0 NOTYPE  GLOBAL DEFAULT   10 _BSS_VMA_END
-   194: 200046f4   250 FUNC    GLOBAL DEFAULT    5 memcpy
-   195: 20000190     0 NOTYPE  GLOBAL DEFAULT  ABS _RETENTION_RESET_LMA_STAR
-   196: 200049b0  1146 FUNC    GLOBAL DEFAULT    5 __printf_impl
-   197: 00002ff0    68 FUNC    GLOBAL DEFAULT    4 entry_irq12
-   198: 00002f68    68 FUNC    GLOBAL DEFAULT    4 entry_irq14
-   199: 20005408     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_12
-   200: 00003298    68 FUNC    GLOBAL DEFAULT    4 entry_irq2
-   201: 00002644    72 FUNC    GLOBAL DEFAULT    4 entry_irq51
-   202: 20005448     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_11
-   203: 00002a90    68 FUNC    GLOBAL DEFAULT    4 entry_irq28
-   204: 00002774    72 FUNC    GLOBAL DEFAULT    4 entry_irq43
-   205: 20005438     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_1
-   206: 2000545c     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_0
-   207: 00002d40    68 FUNC    GLOBAL DEFAULT    4 entry_irq20
-   208: 2000541e     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_7
-   209: 00080018     0 NOTYPE  GLOBAL DEFAULT    9 _BSS_VMA_START
-   210: 000022e4    72 FUNC    GLOBAL DEFAULT    4 entry_irq63
-   211: 00080016     0 NOTYPE  GLOBAL DEFAULT    8 _DATA_VMA_END
-   212: 000026e0    72 FUNC    GLOBAL DEFAULT    4 entry_irq46
-   213: 000029c4    68 FUNC    GLOBAL DEFAULT    4 entry_irq31
-   214: 00002e50    68 FUNC    GLOBAL DEFAULT    4 entry_irq16
-   215: 00100000     0 NOTYPE  GLOBAL DEFAULT  ABS FLASH_SIZE
-   216: 20005452     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_5
-   217: 00080000     0 NOTYPE  GLOBAL DEFAULT    8 _DATA_VMA_START
-   218: 000025b4    72 FUNC    GLOBAL DEFAULT    4 entry_irq53
-   219: 00003034    68 FUNC    GLOBAL DEFAULT    4 entry_irq11
-   220: 00000154     0 NOTYPE  GLOBAL DEFAULT    2 _RETENTION_RESET_VMA_END
-   221: 2000538e    24 FUNC    GLOBAL DEFAULT    5 strnlen
-   222: 20005452     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_6
-   223: 200048b6    44 FUNC    GLOBAL DEFAULT    5 strrchr
-   224: 000031cc    68 FUNC    GLOBAL DEFAULT    4 entry_irq5
-   225: 00002c74    68 FUNC    GLOBAL DEFAULT    4 entry_irq23
-   226: 000028ec    72 FUNC    GLOBAL DEFAULT    4 entry_irq34
-   227: 200053a8    46 FUNC    GLOBAL HIDDEN     5 __lshrdi3
-   228: 0000285c    72 FUNC    GLOBAL DEFAULT    4 entry_irq36
-   229: 20005410     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_9
-   230: 0000272c    72 FUNC    GLOBAL DEFAULT    4 entry_irq44
-   231: 2000491a    74 FUNC    GLOBAL DEFAULT    5 vprintf
-   232: 00002728     4 FUNC    GLOBAL DEFAULT    4 entry_irq45
-   233: 00002b18    68 FUNC    GLOBAL DEFAULT    4 entry_irq26
-   234: 2000541e     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_4
-   235: 00002804     4 FUNC    GLOBAL DEFAULT    4 entry_irq41
-   236: 00002374    72 FUNC    GLOBAL DEFAULT    4 entry_irq61
-   237: 20000000     0 NOTYPE  GLOBAL DEFAULT    1 BIN_BEGIN
-   238: 20005438     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_3
-   239: 00002810     4 FUNC    GLOBAL DEFAULT    4 entry_irq38
-   240: 00003400     0 NOTYPE  GLOBAL DEFAULT    4 __vectors
-   241: 0000576e     0 NOTYPE  GLOBAL DEFAULT  ABS BIN_SIZE
-   242: 2000563c    16 OBJECT  GLOBAL DEFAULT    6 __digits
-   243: 20000538     0 NOTYPE  GLOBAL DEFAULT  ABS _RAMCODE_LMA_START
-   244: 00080030     4 OBJECT  GLOBAL DEFAULT    9 __printf_count
-   245: 00002404    72 FUNC    GLOBAL DEFAULT    4 entry_irq59
-   246: 200046a4    78 FUNC    GLOBAL DEFAULT    5 memcmp
-   247: 00003188    68 FUNC    GLOBAL DEFAULT    4 entry_irq6
-   248: 20005410     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_10
-   249: 20005758     0 NOTYPE  GLOBAL DEFAULT  ABS _DATA_LMA_START
-   250: 20004e4a   144 FUNC    GLOBAL DEFAULT    5 __print_integral_poly
-   251: 20000000     0 NOTYPE  GLOBAL DEFAULT  ABS NDS_SAG_LMA_FLASH
-   252: 20005452     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_4
-   253: 20005448     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_8
-   254: 2000541e     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_6
-   255: 20000000     0 NOTYPE  WEAK   DEFAULT    1 _RELAX_END_
-   256: 20004eda  1026 FUNC    GLOBAL DEFAULT    5 __printf_float_impl
-   257: 200047ee   170 FUNC    GLOBAL DEFAULT    5 memset
-   258: 20005448     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_9
-   259: 20005452     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_7
-   260: 000019f8  2284 FUNC    GLOBAL DEFAULT    4 main
-   261: 00003254    68 FUNC    GLOBAL DEFAULT    4 entry_irq3
-   262: 000033b0    52 FUNC    GLOBAL DEFAULT    4 trap_entry
-   263: 00000158     0 NOTYPE  GLOBAL DEFAULT    3 _AES_VMA_END
-   264: 0000280c     4 FUNC    GLOBAL DEFAULT    4 entry_irq39
-   265: 000026d4     4 FUNC    GLOBAL DEFAULT    4 entry_irq49
-   266: 00000288     4 OBJECT  GLOBAL DEFAULT    3 g_pm_multi_addr
-   267: 00002494    72 FUNC    GLOBAL DEFAULT    4 entry_irq57
-   268: 000026dc     4 FUNC    GLOBAL DEFAULT    4 entry_irq47
-   269: 200002e8     0 NOTYPE  GLOBAL DEFAULT  ABS _RETENTION_DATA_LMA_START
-   270: 20000000     0 FUNC    GLOBAL DEFAULT    1 _RESET_ENTRY
-   271: 00000158     0 NOTYPE  GLOBAL DEFAULT    3 _RETENTION_DATA_VMA_START
-   272: 00003210    68 FUNC    GLOBAL DEFAULT    4 entry_irq4
-   273: 000a0000     0 NOTYPE  GLOBAL DEFAULT  ABS _STACK_TOP
-   274: 00002cb8    68 FUNC    GLOBAL DEFAULT    4 entry_irq22
-   275: 00002a08    68 FUNC    GLOBAL DEFAULT    4 entry_irq30
-   276: 000027bc    72 FUNC    GLOBAL DEFAULT    4 entry_irq42
-   277: 00002c30    68 FUNC    GLOBAL DEFAULT    4 entry_irq24
-   278: 20005438     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_2
-   279: 00003502     0 NOTYPE  GLOBAL DEFAULT    4 _RAMCODE_VMA_END
-   280: 00000000     0 NOTYPE  WEAK   DEFAULT  ABS _ITB_BASE_
-   281: 2000541e     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_5
-   282: 00002d84    68 FUNC    GLOBAL DEFAULT    4 entry_irq19
-   283: 20004658    76 FUNC    GLOBAL DEFAULT    5 _write
-   284: 00080048     0 NOTYPE  GLOBAL DEFAULT   10 _end
-   285: 00002e0c    68 FUNC    GLOBAL DEFAULT    4 entry_irq17
-   286: 000030bc    68 FUNC    GLOBAL DEFAULT    4 entry_irq9
-   287: 000024dc    72 FUNC    GLOBAL DEFAULT    4 entry_irq56
-   288: 000028a4    72 FUNC    GLOBAL DEFAULT    4 entry_irq35
-   289: 00002814    72 FUNC    GLOBAL DEFAULT    4 entry_irq37
-   290: 0000256c    72 FUNC    GLOBAL DEFAULT    4 entry_irq54
-   291: 00002808     4 FUNC    GLOBAL DEFAULT    4 entry_irq40
-   292: 20005444     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_12
-   293: 00000400     0 NOTYPE  GLOBAL DEFAULT    4 _RAMCODE_VMA_START
-   294: 20005438     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_0
-   295: 00002a4c    68 FUNC    GLOBAL DEFAULT    4 entry_irq29
-   296: 200052dc    48 FUNC    GLOBAL DEFAULT    5 strchr
-   297: 2000545c     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_1
-   298: 00003144    68 FUNC    GLOBAL DEFAULT    4 entry_irq7
-   299: 0000297c    72 FUNC    GLOBAL DEFAULT    4 entry_irq32
-   300: 00000000     0 FUNC    GLOBAL DEFAULT    2 _IRESET_ENTRY
-   301: 00002dc8    68 FUNC    GLOBAL DEFAULT    4 entry_irq18
-   302: 20004e2a    32 FUNC    GLOBAL DEFAULT    5 __int_to_poly
-   303: 00002b5c   212 FUNC    GLOBAL DEFAULT    4 entry_irq25
+   164: 00000000     0 FILE    LOCAL  DEFAULT  ABS libgcc2.c
+   165: 00000000     0 FILE    LOCAL  DEFAULT  ABS printf_data.c
+   166: 00002494    72 FUNC    GLOBAL DEFAULT    4 entry_irq55
+   167: 00002f1c    68 FUNC    GLOBAL DEFAULT    4 entry_irq13
+   168: 20015358   124 FUNC    GLOBAL DEFAULT    5 strcpy
+   169: 00002e04   212 FUNC    GLOBAL DEFAULT    4 entry_irq15
+   170: 20015420    46 FUNC    GLOBAL HIDDEN     5 __ashldi3
+   171: 00002a44    68 FUNC    GLOBAL DEFAULT    4 entry_irq27
+   172: 0000232c    72 FUNC    GLOBAL DEFAULT    4 entry_irq60
+   173: 0000324c   212 FUNC    GLOBAL DEFAULT    4 entry_irq1
+   174: 0000256c    72 FUNC    GLOBAL DEFAULT    4 entry_irq52
+   175: 000025fc    72 FUNC    GLOBAL DEFAULT    4 entry_irq50
+   176: 0000229c    72 FUNC    GLOBAL DEFAULT    4 entry_irq62
+   177: 200148e0    30 FUNC    GLOBAL DEFAULT    5 printf
+   178: 00080800     0 NOTYPE  GLOBAL DEFAULT    8 __global_pointer$
+   179: 20015458     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_8
+   180: 000023bc    72 FUNC    GLOBAL DEFAULT    4 entry_irq58
+   181: 200154a4     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_3
+   182: 000003a6     0 NOTYPE  GLOBAL DEFAULT    3 _RETENTION_DATA_VMA_END
+   183: 20015490     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_10
+   184: 20015458     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_11
+   185: 200149ac    76 FUNC    GLOBAL DEFAULT    5 __print_integral
+   186: 00000000     0 NOTYPE  GLOBAL DEFAULT    2 _RETENTION_RESET_VMA_STAR
+   187: 00002fe8    68 FUNC    GLOBAL DEFAULT    4 entry_irq10
+   188: 00002c6c    68 FUNC    GLOBAL DEFAULT    4 entry_irq21
+   189: 00000158     0 NOTYPE  GLOBAL DEFAULT    3 _AES_VMA_START
+   190: 00002648     4 FUNC    GLOBAL DEFAULT    4 entry_irq48
+   191: 200154a4     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_2
+   192: 00003070    68 FUNC    GLOBAL DEFAULT    4 entry_irq8
+   193: 000028a4    72 FUNC    GLOBAL DEFAULT    4 entry_irq33
+   194: 00080048     0 NOTYPE  GLOBAL DEFAULT   10 _BSS_VMA_END
+   195: 2001473c   250 FUNC    GLOBAL DEFAULT    5 memcpy
+   196: 20010190     0 NOTYPE  GLOBAL DEFAULT  ABS _RETENTION_RESET_LMA_STAR
+   197: 200149f8  1146 FUNC    GLOBAL DEFAULT    5 __printf_impl
+   198: 00002f60    68 FUNC    GLOBAL DEFAULT    4 entry_irq12
+   199: 00002ed8    68 FUNC    GLOBAL DEFAULT    4 entry_irq14
+   200: 20015450     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_12
+   201: 00003208    68 FUNC    GLOBAL DEFAULT    4 entry_irq2
+   202: 000025b4    72 FUNC    GLOBAL DEFAULT    4 entry_irq51
+   203: 20015490     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_11
+   204: 00002a00    68 FUNC    GLOBAL DEFAULT    4 entry_irq28
+   205: 000026e4    72 FUNC    GLOBAL DEFAULT    4 entry_irq43
+   206: 20015480     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_1
+   207: 200154a4     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_0
+   208: 00002cb0    68 FUNC    GLOBAL DEFAULT    4 entry_irq20
+   209: 20015466     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_7
+   210: 00080018     0 NOTYPE  GLOBAL DEFAULT    9 _BSS_VMA_START
+   211: 00002254    72 FUNC    GLOBAL DEFAULT    4 entry_irq63
+   212: 00080016     0 NOTYPE  GLOBAL DEFAULT    8 _DATA_VMA_END
+   213: 00002650    72 FUNC    GLOBAL DEFAULT    4 entry_irq46
+   214: 00002934    68 FUNC    GLOBAL DEFAULT    4 entry_irq31
+   215: 00002dc0    68 FUNC    GLOBAL DEFAULT    4 entry_irq16
+   216: 00100000     0 NOTYPE  GLOBAL DEFAULT  ABS FLASH_SIZE
+   217: 2001549a     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_5
+   218: 00080000     0 NOTYPE  GLOBAL DEFAULT    8 _DATA_VMA_START
+   219: 00002524    72 FUNC    GLOBAL DEFAULT    4 entry_irq53
+   220: 00002fa4    68 FUNC    GLOBAL DEFAULT    4 entry_irq11
+   221: 00000154     0 NOTYPE  GLOBAL DEFAULT    2 _RETENTION_RESET_VMA_END
+   222: 200153d6    24 FUNC    GLOBAL DEFAULT    5 strnlen
+   223: 2001549a     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_6
+   224: 200148fe    44 FUNC    GLOBAL DEFAULT    5 strrchr
+   225: 0000313c    68 FUNC    GLOBAL DEFAULT    4 entry_irq5
+   226: 00002be4    68 FUNC    GLOBAL DEFAULT    4 entry_irq23
+   227: 0000285c    72 FUNC    GLOBAL DEFAULT    4 entry_irq34
+   228: 200153f0    46 FUNC    GLOBAL HIDDEN     5 __lshrdi3
+   229: 000027cc    72 FUNC    GLOBAL DEFAULT    4 entry_irq36
+   230: 20015458     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_9
+   231: 0000269c    72 FUNC    GLOBAL DEFAULT    4 entry_irq44
+   232: 20014962    74 FUNC    GLOBAL DEFAULT    5 vprintf
+   233: 00002698     4 FUNC    GLOBAL DEFAULT    4 entry_irq45
+   234: 00002a88    68 FUNC    GLOBAL DEFAULT    4 entry_irq26
+   235: 20015466     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_4
+   236: 00002774     4 FUNC    GLOBAL DEFAULT    4 entry_irq41
+   237: 000022e4    72 FUNC    GLOBAL DEFAULT    4 entry_irq61
+   238: 20010000     0 NOTYPE  GLOBAL DEFAULT    1 BIN_BEGIN
+   239: 20015480     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_3
+   240: 00002780     4 FUNC    GLOBAL DEFAULT    4 entry_irq38
+   241: 00003400     0 NOTYPE  GLOBAL DEFAULT    4 __vectors
+   242: 000057ce     0 NOTYPE  GLOBAL DEFAULT  ABS BIN_SIZE
+   243: 20015684    16 OBJECT  GLOBAL DEFAULT    6 __digits
+   244: 20010538     0 NOTYPE  GLOBAL DEFAULT  ABS _RAMCODE_LMA_START
+   245: 00080030     4 OBJECT  GLOBAL DEFAULT    9 __printf_count
+   246: 00002374    72 FUNC    GLOBAL DEFAULT    4 entry_irq59
+   247: 200146ec    78 FUNC    GLOBAL DEFAULT    5 memcmp
+   248: 000030f8    68 FUNC    GLOBAL DEFAULT    4 entry_irq6
+   249: 20015458     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_10
+   250: 200157b8     0 NOTYPE  GLOBAL DEFAULT  ABS _DATA_LMA_START
+   251: 20014e92   144 FUNC    GLOBAL DEFAULT    5 __print_integral_poly
+   252: 20010000     0 NOTYPE  GLOBAL DEFAULT  ABS NDS_SAG_LMA_FLASH
+   253: 2001549a     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_4
+   254: 20015490     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_8
+   255: 20015466     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_6
+   256: 20010000     0 NOTYPE  WEAK   DEFAULT    1 _RELAX_END_
+   257: 20014f22  1026 FUNC    GLOBAL DEFAULT    5 __printf_float_impl
+   258: 20014836   170 FUNC    GLOBAL DEFAULT    5 memset
+   259: 20015490     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_9
+   260: 2001549a     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_7
+   261: 000019f8  2140 FUNC    GLOBAL DEFAULT    4 main
+   262: 000031c4    68 FUNC    GLOBAL DEFAULT    4 entry_irq3
+   263: 00003320    52 FUNC    GLOBAL DEFAULT    4 trap_entry
+   264: 00000158     0 NOTYPE  GLOBAL DEFAULT    3 _AES_VMA_END
+   265: 0000277c     4 FUNC    GLOBAL DEFAULT    4 entry_irq39
+   266: 00002644     4 FUNC    GLOBAL DEFAULT    4 entry_irq49
+   267: 00000288     4 OBJECT  GLOBAL DEFAULT    3 g_pm_multi_addr
+   268: 00002404    72 FUNC    GLOBAL DEFAULT    4 entry_irq57
+   269: 0000264c     4 FUNC    GLOBAL DEFAULT    4 entry_irq47
+   270: 200102e8     0 NOTYPE  GLOBAL DEFAULT  ABS _RETENTION_DATA_LMA_START
+   271: 20010000     0 FUNC    GLOBAL DEFAULT    1 _RESET_ENTRY
+   272: 00000158     0 NOTYPE  GLOBAL DEFAULT    3 _RETENTION_DATA_VMA_START
+   273: 00003180    68 FUNC    GLOBAL DEFAULT    4 entry_irq4
+   274: 000a0000     0 NOTYPE  GLOBAL DEFAULT  ABS _STACK_TOP
+   275: 00002c28    68 FUNC    GLOBAL DEFAULT    4 entry_irq22
+   276: 00002978    68 FUNC    GLOBAL DEFAULT    4 entry_irq30
+   277: 0000272c    72 FUNC    GLOBAL DEFAULT    4 entry_irq42
+   278: 00002ba0    68 FUNC    GLOBAL DEFAULT    4 entry_irq24
+   279: 20015480     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_2
+   280: 00003502     0 NOTYPE  GLOBAL DEFAULT    4 _RAMCODE_VMA_END
+   281: 00000000     0 NOTYPE  WEAK   DEFAULT  ABS _ITB_BASE_
+   282: 20015466     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_5
+   283: 00002cf4    68 FUNC    GLOBAL DEFAULT    4 entry_irq19
+   284: 200146a0    76 FUNC    GLOBAL DEFAULT    5 _write
+   285: 00080048     0 NOTYPE  GLOBAL DEFAULT   10 _end
+   286: 00002d7c    68 FUNC    GLOBAL DEFAULT    4 entry_irq17
+   287: 0000302c    68 FUNC    GLOBAL DEFAULT    4 entry_irq9
+   288: 0000244c    72 FUNC    GLOBAL DEFAULT    4 entry_irq56
+   289: 00002814    72 FUNC    GLOBAL DEFAULT    4 entry_irq35
+   290: 00002784    72 FUNC    GLOBAL DEFAULT    4 entry_irq37
+   291: 000024dc    72 FUNC    GLOBAL DEFAULT    4 entry_irq54
+   292: 00002778     4 FUNC    GLOBAL DEFAULT    4 entry_irq40
+   293: 2001548c     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_12
+   294: 00000400     0 NOTYPE  GLOBAL DEFAULT    4 _RAMCODE_VMA_START
+   295: 20015480     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_0
+   296: 000029bc    68 FUNC    GLOBAL DEFAULT    4 entry_irq29
+   297: 20015324    48 FUNC    GLOBAL DEFAULT    5 strchr
+   298: 200154a4     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_1
+   299: 000030b4    68 FUNC    GLOBAL DEFAULT    4 entry_irq7
+   300: 000028ec    72 FUNC    GLOBAL DEFAULT    4 entry_irq32
+   301: 00000000     0 FUNC    GLOBAL DEFAULT    2 _IRESET_ENTRY
+   302: 00002d38    68 FUNC    GLOBAL DEFAULT    4 entry_irq18
+   303: 20014e72    32 FUNC    GLOBAL DEFAULT    5 __int_to_poly
+   304: 00002acc   212 FUNC    GLOBAL DEFAULT    4 entry_irq25
 
 No version information found in this file.
 Attribute Section: riscv

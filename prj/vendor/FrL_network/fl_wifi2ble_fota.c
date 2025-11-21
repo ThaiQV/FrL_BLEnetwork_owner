@@ -290,7 +290,7 @@ void fl_wifi2ble_fota_init(void){
 	fl_wifi2ble_fota_ContainerClear();
 	DFU_OTA_INIT();
 	//change version
-	DFU_OTA_VERISON_SET(4);
+	DFU_OTA_VERISON_SET(5);
 }
 
 s16 fl_wifi2ble_fota_recECHO(fl_pack_t _pack_rec){

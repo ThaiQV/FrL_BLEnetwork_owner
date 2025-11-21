@@ -25,7 +25,7 @@
 	#define FLASH_R_BASE_ADDR   			0x20000000
 	#define APP_IMAGE_HEADER				0xF000
 	#define APP_IMAGE_ADDR					0x10000
-	#define APP_IMAGE_SIZE_MAX				0x50000
+	#define APP_IMAGE_SIZE_MAX				0x40000
 	#define APP_PAGE_SIZE					0x1000
 	#define FLASH_TLNK_FLAG_OFFSET			32
 	#define FW_START_UP_FLAG				0x4B
@@ -45,8 +45,8 @@
 	#define JUMP_TO_APP()					((void(*)(void))(FLASH_R_BASE_ADDR + APP_IMAGE_ADDR))()
 
 	/* For OTA */
-	#define OTA_PACKET_LENGTH		16
-
+	#define OTA_PACKET_LENGTH				16
+	#define OTA_FORCE_UPDATE_VALUE			0x11F0ACE1
 /* Structures */
 	/* For bootloader */
 	typedef struct
@@ -57,6 +57,7 @@
 		uint8_t 	patch;
 		uint32_t 	size;
 		uint8_t		crc128[CRC128_LENGTH];
+		uint32_t	force;
 	}fw_header_t;
 
 	/* For OTA */

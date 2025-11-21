@@ -801,19 +801,18 @@ void fl_slave_fota_proc(fl_pack_t *_fota_pack){
 		ERR(INF,"Packet parse fail!!!\r\n");
 		return;
 	}
-	//filter duplication pack
-//	if(fl_wifi2ble_fota_find(_fota_pack)!= -1) return;
 
-	static u8 flag_begin = 0;
-	static u8 flag_end = 0;
-	static u32 rtt = 0;
-	static u32 fw_size = 0;
-	fl_fota_pack_type_e pack_type = FOTA_PACKET_BEGIN;
 	if (packet.hdr == NWK_HDR_FOTA) {
+		/*DEBUG*/
+		static u8 flag_begin = 0;
+		static u8 flag_end = 0;
+		static u32 rtt = 0;
+		static u32 fw_size = 0;
+		fl_fota_pack_type_e pack_type = FOTA_PACKET_BEGIN;
 		u8 OTA_BEGIN[2] = { FOTA_PACKET_BEGIN, G_INFORMATION.dev_type };
 //		u8 OTA_DATA[2] = { FOTA_PACKET_DATA, G_INFORMATION.dev_type };
 		u8 OTA_END[2] = { FOTA_PACKET_END, G_INFORMATION.dev_type };
-		/*DEBUG*/
+
 		if (plog_IndexOf(packet.payload,OTA_BEGIN,SIZEU8(OTA_BEGIN),SIZEU8(OTA_BEGIN)) != -1) {
 			pack_type = FOTA_PACKET_BEGIN;
 			flag_begin++;
@@ -835,6 +834,7 @@ void fl_slave_fota_proc(fl_pack_t *_fota_pack){
 			fw_size++;
 		}
 		/*END DEBUG*/
+
 		fl_nwk_LedSignal_run();
 		/*todo: load fw into the dfu*/
 		if (packet.payload[1] == G_INFORMATION.dev_type && (packet.payload[0] <= FOTA_PACKET_END)) {
@@ -843,10 +843,8 @@ void fl_slave_fota_proc(fl_pack_t *_fota_pack){
 			}
 		}
 		//add send repeat and check echo
-		if (fl_wifi2ble_fota_fwpush(_fota_pack,pack_type) == -1) {
+		if (fl_wifi2ble_fota_fwpush(_fota_pack,packet.payload[0]) == -1) {
 			ERR(APP,"FOTA ECHO Err <Full>\r\n");
-		} else {
-//				P_INFO_HEX(_fota_pack->data_arr,_fota_pack->length,"FOTA(%d):",_fota_pack->length);
 		}
 	}
 }
