@@ -25,7 +25,7 @@
 	#define FLASH_R_BASE_ADDR   			0x20000000
 	#define APP_IMAGE_HEADER				0xF000
 	#define APP_IMAGE_ADDR					0x10000
-	#define APP_IMAGE_SIZE_MAX				0x40000
+	#define APP_IMAGE_SIZE_MAX				0x30000
 	#define APP_PAGE_SIZE					0x1000
 	#define FLASH_TLNK_FLAG_OFFSET			32
 	#define FW_START_UP_FLAG				0x4B
@@ -99,7 +99,7 @@
 	}ota_fw_header_t;
 
 /* Prototypes */
-	/* For bootloader */
+	/* For bootloader t */
 	void jump_to_application(void);
 	uint8_t check_valid_current_fw(void);
 	uint8_t check_valid_ota_fw(uint32_t address);
