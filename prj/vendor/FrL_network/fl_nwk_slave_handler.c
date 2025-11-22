@@ -673,7 +673,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 					if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
 						u8 ok[2] = { 'o', 'k' };
 						memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
-						packet.frame.payload[0]= 8;//test version
+						packet.frame.payload[0]= DFU_OTA_VERISON_GET();//test version
 						memcpy(packet.frame.payload+1,ok,SIZEU8(ok));
 						//change endpoint to node source
 						packet.frame.endpoint.master = FL_FROM_SLAVE;
@@ -808,17 +808,17 @@ void fl_slave_fota_proc(fl_pack_t *_fota_pack){
 		static u8 flag_end = 0;
 		static u32 rtt = 0;
 		static u32 fw_size = 0;
-		fl_fota_pack_type_e pack_type = FOTA_PACKET_BEGIN;
+//		fl_fota_pack_type_e pack_type = FOTA_PACKET_BEGIN;
 		u8 OTA_BEGIN[2] = { FOTA_PACKET_BEGIN, G_INFORMATION.dev_type };
 //		u8 OTA_DATA[2] = { FOTA_PACKET_DATA, G_INFORMATION.dev_type };
 		u8 OTA_END[2] = { FOTA_PACKET_END, G_INFORMATION.dev_type };
 
 		if (plog_IndexOf(packet.payload,OTA_BEGIN,SIZEU8(OTA_BEGIN),SIZEU8(OTA_BEGIN)) != -1) {
-			pack_type = FOTA_PACKET_BEGIN;
+//			pack_type = FOTA_PACKET_BEGIN;
 			flag_begin++;
 			rtt = fl_rtc_get();
 		} else if (plog_IndexOf(packet.payload,OTA_END,SIZEU8(OTA_END),SIZEU8(OTA_END)) != -1) {
-			pack_type = FOTA_PACKET_END;
+//			pack_type = FOTA_PACKET_END;
 			flag_end++;
 			P_INFO("========================\r\n");
 			P_INFO("** Begin: %d\r\n",flag_begin);
@@ -830,7 +830,7 @@ void fl_slave_fota_proc(fl_pack_t *_fota_pack){
 			flag_begin = 0;
 			fw_size = 0;
 		} else {
-			pack_type = FOTA_PACKET_DATA;
+//			pack_type = FOTA_PACKET_DATA;
 			fw_size++;
 		}
 		/*END DEBUG*/
