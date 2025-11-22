@@ -1,7 +1,7 @@
 #include "storage_weekly_data.h"
 
 /*------------Definitions------------*/
-#define	STORAGE_DEBUG		0
+//#define	STORAGE_DEBUG		0
 #if STORAGE_DEBUG
 #define STORAGE_LOG(...)	LOGA(DRV,__VA_ARGS__)
 #else
@@ -216,8 +216,8 @@ storage_ret_t storage_put_data(uint8_t *pdata,uint32_t pdata_len)
 	uint8_t 		read[40];
 	uint8_t 		write[40];
 	uint8_t			len = 0;
-	uint32_t 		sector = 0;
-	uint8_t 		sector_data[DEF_UDISK_SECTOR_SIZE];
+//	uint32_t 		sector = 0;
+//	uint8_t 		sector_data[DEF_UDISK_SECTOR_SIZE + 40];
 	uint16_t		pdata_index;
 
 	// Get index from pdata
@@ -241,25 +241,25 @@ storage_ret_t storage_put_data(uint8_t *pdata,uint32_t pdata_len)
 	{
 		return STORAGE_RET_OK;
 	}
-	else // write fail -> re-write the whole sector
-	{
-		STORAGE_LOG("re-write\n");
-		sector = ((pdata_index*len)/DEF_UDISK_SECTOR_SIZE);
-		// read data from sector
-		W25XXX_Read(sector_data,EX_FLASH_DEVICE_STORAGE_ADDRESS + sector*DEF_UDISK_SECTOR_SIZE,DEF_UDISK_SECTOR_SIZE);
-		// erase this sector
-		FLASH_Erase_Sector(EX_FLASH_DEVICE_STORAGE_ADDRESS + sector*DEF_UDISK_SECTOR_SIZE);
-		// write new data into sector_data
-		memcpy(&sector_data[(pdata_index*len)%DEF_UDISK_SECTOR_SIZE],write,len);
-		// write sector_data into erase sector
-		W25XXX_WR_Block(sector_data,EX_FLASH_DEVICE_STORAGE_ADDRESS + sector*DEF_UDISK_SECTOR_SIZE,DEF_UDISK_SECTOR_SIZE);
-
-		W25XXX_Read(read,address,len);
-		if(memcmp(read,write,len) == 0) // check write successfully
-		{
-			return STORAGE_RET_OK;
-		}
-	}
+//	else // write fail -> re-write the whole sector
+//	{
+//		STORAGE_LOG("re-write\n");
+//		sector = ((pdata_index*len)/DEF_UDISK_SECTOR_SIZE);
+//		// read data from sector
+//		W25XXX_Read(sector_data,EX_FLASH_DEVICE_STORAGE_ADDRESS + sector*DEF_UDISK_SECTOR_SIZE,DEF_UDISK_SECTOR_SIZE);
+//		// erase this sector
+//		FLASH_Erase_Sector(EX_FLASH_DEVICE_STORAGE_ADDRESS + sector*DEF_UDISK_SECTOR_SIZE);
+//		// write new data into sector_data
+//		memcpy(&sector_data[(pdata_index*len)%DEF_UDISK_SECTOR_SIZE],write,len);
+//		// write sector_data into erase sector
+//		W25XXX_WR_Block(sector_data,EX_FLASH_DEVICE_STORAGE_ADDRESS + sector*DEF_UDISK_SECTOR_SIZE,DEF_UDISK_SECTOR_SIZE);
+//
+//		W25XXX_Read(read,address,len);
+//		if(memcmp(read,write,len) == 0) // check write successfully
+//		{
+//			return STORAGE_RET_OK;
+//		}
+//	}
 	return STORAGE_RET_ERROR;
 }
 

@@ -19,14 +19,16 @@
 #define DFU_OTA_CRC128_GET				ota_crc128_get
 #define DFU_OTA_CRC128_CAL				crc128_calculate
 #define DFU_OTA_FW_PUT					ota_fw_put
+#define DFU_OTA_VERISON_SET				set_current_fw_version
+#define DFU_OTA_VERISON_GET				get_current_fw_version
 #else
 #define DFU_OTA_INIT()         			((void)0)
 #define DFU_OTA_CRC128_INIT   			((void)0)
 #define DFU_OTA_CRC128_GET(...) 		(0)
 #define DFU_OTA_CRC128_CAL 				(0)
 #define DFU_OTA_FW_PUT(...)     		(0)
-
-
+#define DFU_OTA_VERISON_SET				(0)
+#define DFU_OTA_VERISON_GET(...)		(0)
 #endif
 
 #define FOTA_EXIT_VALUE					0x7FFF
