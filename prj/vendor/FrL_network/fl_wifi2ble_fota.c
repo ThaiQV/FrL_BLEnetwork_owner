@@ -293,7 +293,7 @@ void fl_wifi2ble_fota_init(void){
 	fl_wifi2ble_fota_ContainerClear();
 	DFU_OTA_INIT();
 	//change version
-	DFU_OTA_VERISON_SET(11);
+	DFU_OTA_VERISON_SET(15);
 }
 
 s16 fl_wifi2ble_fota_recECHO(fl_pack_t _pack_rec){
@@ -372,7 +372,6 @@ s16 fl_wifi2ble_fota_run(void) {
 	fl_pack_t his_data_in_queue;
 	if (!F_SENDING_STATE) {
 #ifndef MASTER_CORE
-
 		for (u16 sample_scan = 0; sample_scan < FOTA_FW_QUEUE_SIZE && G_FW_QUEUE_SENDING.count>0; sample_scan++) {
 			his_data_in_queue = G_FW_QUEUE_SENDING.data[G_FW_QUEUE_SENDING.head_index];
 			if (his_data_in_queue.length > FOTA_PACK_SIZE_MIN) { //minimun size of the fota

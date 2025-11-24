@@ -637,7 +637,6 @@ ota_ret_t ota_packet_header_get(ota_fw_header_t *header)
 	}
 	return OTA_RET_ERROR;
 }
-
 /**
 * @brief: set current FW verison
 * @param: see below
@@ -645,9 +644,7 @@ ota_ret_t ota_packet_header_get(ota_fw_header_t *header)
 uint8_t set_current_fw_version(uint8_t fw_patch)
 {
 	fw_header_t header_current_fw;
-
 	flash_read_page(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER, sizeof(fw_header_t), (uint8_t *)&header_current_fw);
-
 	// Only set version if it is not set
 	if((header_current_fw.major == 0xFF) && (header_current_fw.minor == 0xFF) && (header_current_fw.patch == 0xFF))
 	{
