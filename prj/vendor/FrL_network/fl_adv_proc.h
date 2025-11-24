@@ -20,6 +20,7 @@
 #ifdef MASTER_CORE
 #define FOTA_SIZE 						16
 #else
+#define FOTA_REC_SIZE					512
 #define FOTA_SIZE 						256
 #endif
 

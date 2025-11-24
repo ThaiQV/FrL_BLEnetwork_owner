@@ -78,7 +78,7 @@ fl_pack_t fl_repeat_packet_build(fl_pack_t _pack) {
  ***************************************************/
 int fl_repeat_send_cbk(void) {
 	fl_pack_t data_in_queue;
-	if (FL_QUEUE_GET(&G_REPEAT_CONTAINER,&data_in_queue)) {
+	if (FL_QUEUE_GET(&G_REPEAT_CONTAINER,&data_in_queue)>-1) {
 		//u8 pack_arr[SIZEU8(fl_dataframe_format_t) - 1];
 		fl_pack_t packet_built;
 		packet_built = fl_repeat_packet_build(data_in_queue);

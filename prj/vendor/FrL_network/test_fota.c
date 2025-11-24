@@ -114,7 +114,7 @@ void TEST_virtual_fw(u32 _fwsize ) {
 		//	// put packet begin
 		packet[0] = OTA_PACKET_BEGIN; 			// packet begin
 		packet[1] = 0;							// device type
-		packet[2] = 2;							// version
+		packet[2] = VIRTUAL_FW_VERSION;			// version
 		packet[3] = (uint8_t)image_size;		// FW size
 		packet[4] = (uint8_t)(image_size>>8);	// FW size
 		packet[5] = (uint8_t)(image_size>>16);	// FW size
