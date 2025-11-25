@@ -819,6 +819,9 @@ s16 fl_slave_fota_proc(void) {
 	extern u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
 	fl_dataframe_format_t packet;
 	fl_pack_t fota_pack;
+	u16 curr_head = G_FW_QUEUE_REC.head_index;
+	//For debuging log
+	static u16 head_err =0;
 	while (FL_QUEUE_GET(&G_FW_QUEUE_REC,&fota_pack) > -1) {
 		if (!fl_packet_parse(fota_pack,&packet)) {
 			ERR(INF,"Packet parse fail!!!\r\n");
@@ -826,6 +829,24 @@ s16 fl_slave_fota_proc(void) {
 			return -1;
 		}
 		if (packet.hdr == NWK_HDR_FOTA) {
+			fl_nwk_LedSignal_run();
+			/*todo: load fw into the dfu*/
+			if (packet.payload[1] == G_INFORMATION.dev_type && (packet.payload[0] <= FOTA_PACKET_END)) {
+				if (OTA_RET_OK != DFU_OTA_FW_PUT(packet.payload,fl_crc8(packet.payload,SIZEU8(packet.payload)))) {
+					ERR(APP,"FOTA DFU Err <RET ERR>\r\n");
+				}
+			}
+			//add send repeat and check echo
+			if (fl_wifi2ble_fota_fwpush(&fota_pack,packet.payload[0]) == -1) {
+				//re-send this slot
+				G_FW_QUEUE_REC.head_index = curr_head;
+				G_FW_QUEUE_REC.count++;
+				if (head_err != curr_head) {
+					head_err =  curr_head;
+					ERR(APP,"FOTA ECHO Err <Full>\r\n");
+				}
+				return -1;
+			}
 			/*DEBUG*/
 			static u8 flag_begin = 0;
 			static u8 flag_end = 0;
@@ -857,18 +878,6 @@ s16 fl_slave_fota_proc(void) {
 				fw_size++;
 			}
 			/*END DEBUG*/
-
-			fl_nwk_LedSignal_run();
-			/*todo: load fw into the dfu*/
-			if (packet.payload[1] == G_INFORMATION.dev_type && (packet.payload[0] <= FOTA_PACKET_END)) {
-				if (OTA_RET_OK != DFU_OTA_FW_PUT(packet.payload,fl_crc8(packet.payload,SIZEU8(packet.payload)))) {
-					ERR(APP,"FOTA DFU Err <RET ERR>\r\n");
-				}
-			}
-			//add send repeat and check echo
-			if (fl_wifi2ble_fota_fwpush(&fota_pack,packet.payload[0]) == -1) {
-				ERR(APP,"FOTA ECHO Err <Full>\r\n");
-			}
 		}
 	}
 	return -1;
