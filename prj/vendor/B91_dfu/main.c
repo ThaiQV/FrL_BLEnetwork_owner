@@ -120,8 +120,8 @@ void stimer_irq_handler(void) {
  * @param[in]	none
  * @return      none
  */
-fl_version_t _bootloader = { 1, 0, 1 };
-fl_version_t _fw = { 0, 0, 0 };
+fl_version_t _bootloader = { 1, 0, 3 };
+fl_version_t _fw = { 1, 4, 0 };
 fl_version_t _hw = { 0, 0, 0 };
 
 uint8_t buff[20] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
@@ -145,6 +145,7 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 	DEBUG_TX_PIN_INIT()
 	;
 #endif
+	_fw.patch = get_current_fw_version();
 	PLOG_DEVICE_PROFILE(_bootloader,_fw,_hw);
 
 	if (!deepRetWakeUp)  //read flash size
