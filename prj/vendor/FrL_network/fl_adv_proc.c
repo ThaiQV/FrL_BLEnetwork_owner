@@ -234,15 +234,15 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 				if (!fl_nwk_slave_checkHDR(incomming_data.data_arr[0])) {
 					return 0;
 				}
-				//incomming packet is echo pack
-				if (-1 == plog_IndexOf(pa->mac,master_mac,4,6)) {
-					if (incomming_data.data_arr[0] == NWK_HDR_FOTA && fl_wifi2ble_fota_recECHO(incomming_data,pa->mac) != -1) {
-						return 0;
-					}
-				}
 				//Store FOTA pack
-				if(incomming_data.data_arr[0] == NWK_HDR_FOTA && incomming_data.length>20){
-					return fl_slave_fota_rec(incomming_data,pa->mac);
+				if (incomming_data.data_arr[0] == NWK_HDR_FOTA && incomming_data.length > 20) {
+					//incomming packet is echo pack
+					if (-1 == plog_IndexOf(pa->mac,master_mac,4,6)) {
+						fl_wifi2ble_fota_recECHO(incomming_data,pa->mac);
+					}
+					if (fl_slave_fota_rec(&incomming_data,pa->mac) ==-1) {
+					}
+					return 0;
 				}
 #endif
 				if (FL_QUEUE_FIND(&G_DATA_CONTAINER,&incomming_data,incomming_data.length - 1/*skip rssi*/) == -1) {
@@ -762,9 +762,8 @@ bool fl_adv_MasterToMe(fl_pack_t data_in_queue) {
 	fl_dataframe_format_t data_parsed;
 	if (fl_packet_parse(data_in_queue,&data_parsed)) {
 		if((data_parsed.endpoint.master == FL_FROM_MASTER|| data_parsed.endpoint.master == FL_FROM_MASTER_ACK)
-				&& (
-						(data_parsed.slaveID == G_INFORMATION.slaveID && G_INFORMATION.slaveID != 0xFF)
-						|| (data_parsed.slaveID == 0xFF ||  G_INFORMATION.slaveID == 0xFF)
+				&& ((data_parsed.slaveID == G_INFORMATION.slaveID && G_INFORMATION.slaveID != 0xFF)
+					|| (data_parsed.slaveID == 0xFF ||  G_INFORMATION.slaveID == 0xFF)
 					)
 			){
 			return true;

@@ -368,7 +368,7 @@ u8 fl_adv_sendFIFO_PriorityADV_run(void) ;
 void fl_nwk_slave_process(void);
 s16 fl_slave_fota_proc(void);
 void fl_slave_fota_RECclear(void);
-s16 fl_slave_fota_rec(fl_pack_t _fw_pack,u8* _mac_source);
+s16 fl_slave_fota_rec(fl_pack_t *_fw_pack,u8* _mac_source);
 bool fl_nwk_slave_checkHDR(u8 _hdr);
 void fl_nwk_slave_SYNC_ORIGIN_MASTER(u32 _timetamp,u8 _mil);
 u64 fl_req_slave_packet_createNsend(u8 _cmdid, u8* _data, u8 _len,u32 *_timequeues);

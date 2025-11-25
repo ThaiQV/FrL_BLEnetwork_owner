@@ -801,16 +801,19 @@ fl_pack_t fl_slave_fota_rsp_packet_build(u8* _data, u8 _len,fl_data_frame_u _REQ
 void fl_slave_fota_RECclear(void){
 	FL_QUEUE_CLEAR(&G_FW_QUEUE_REC,G_FW_QUEUE_REC.mask+1);
 }
-s16 fl_slave_fota_rec(fl_pack_t _fw_pack,u8* _mac_source) {
-	if (FL_QUEUE_DATA_FIND(&G_FW_QUEUE_REC,&_fw_pack.data_arr[FOTA_FW_DATA_POSITION],FOTA_FW_DATA_POSITION,22) == -1) {
-		if (FL_QUEUE_ADD(&G_FW_QUEUE_REC,&_fw_pack) < 0) {
+s16 fl_slave_fota_rec(fl_pack_t *_fw_pack, u8* _mac_source) {
+	if (FL_QUEUE_DATA_FIND(&G_FW_QUEUE_REC,&_fw_pack->data_arr[FOTA_FW_DATA_POSITION],FOTA_FW_DATA_POSITION,22) == -1)
+	//if(FL_QUEUE_FIND(&G_FW_QUEUE_REC,_fw_pack,_fw_pack->length-1)==-1)
+	{
+		if (FL_QUEUE_ADD(&G_FW_QUEUE_REC,_fw_pack) < 0) {
 			ERR(BLE,"Err <G_FW_QUEUE_REC ADD>!!\r\n");
+			return -1;
 		} else {
 			//Add mac incomming
-			u16 current_slot = (G_FW_QUEUE_REC.tail_index-1)&(G_FW_QUEUE_REC.mask);
+			u16 current_slot = (G_FW_QUEUE_REC.tail_index - 1) & (G_FW_QUEUE_REC.mask);
 			memcpy(&G_FW_QUEUE_REC.data[current_slot].data_arr[ FOTA_MAC_INCOM_POSITION],_mac_source,6);
 //			P_INFO_HEX(G_FW_QUEUE_REC.data[current_slot].data_arr,SIZEU8(G_FW_QUEUE_REC.data[current_slot].data_arr),"FOTA-ADD(%d):",G_FW_QUEUE_REC.data[current_slot].length);
-//			return current_slot;
+			return current_slot;
 		}
 	}
 	return 0;
@@ -839,45 +842,48 @@ s16 fl_slave_fota_proc(void) {
 			//add send repeat and check echo
 			if (fl_wifi2ble_fota_fwpush(&fota_pack,packet.payload[0]) == -1) {
 				//re-send this slot
-				G_FW_QUEUE_REC.head_index = curr_head;
-				G_FW_QUEUE_REC.count++;
-				if (head_err != curr_head) {
-					head_err =  curr_head;
+//				G_FW_QUEUE_REC.head_index = curr_head;
+//				G_FW_QUEUE_REC.count++;
+				if (head_err ==0) {
+					head_err=1;
 					ERR(APP,"FOTA ECHO Err <Full>\r\n");
 				}
 				return -1;
-			}
-			/*DEBUG*/
-			static u8 flag_begin = 0;
-			static u8 flag_end = 0;
-			static u32 rtt = 0;
-			static u32 fw_size = 0;
-			//		fl_fota_pack_type_e pack_type = FOTA_PACKET_BEGIN;
-			u8 OTA_BEGIN[2] = { FOTA_PACKET_BEGIN, G_INFORMATION.dev_type };
-			//		u8 OTA_DATA[2] = { FOTA_PACKET_DATA, G_INFORMATION.dev_type };
-			u8 OTA_END[2] = { FOTA_PACKET_END, G_INFORMATION.dev_type };
-
-			if (plog_IndexOf(packet.payload,OTA_BEGIN,SIZEU8(OTA_BEGIN),SIZEU8(OTA_BEGIN)) != -1) {
-				//			pack_type = FOTA_PACKET_BEGIN;
-				flag_begin++;
-				rtt = fl_rtc_get();
-			} else if (plog_IndexOf(packet.payload,OTA_END,SIZEU8(OTA_END),SIZEU8(OTA_END)) != -1) {
-				//			pack_type = FOTA_PACKET_END;
-				flag_end++;
-				P_INFO("========================\r\n");
-				P_INFO("** Begin: %d\r\n",flag_begin);
-				P_INFO("** FW   : %d\r\n",fw_size);
-				P_INFO("** End  : %d\r\n",flag_end);
-				P_INFO("** RTT  : %d s\r\n",(u32 )(fl_rtc_get() - rtt));
-				P_INFO("========================\r\n");
-				flag_end = 0;
-				flag_begin = 0;
-				fw_size = 0;
 			} else {
-				//			pack_type = FOTA_PACKET_DATA;
-				fw_size++;
+				head_err = 0;
+				curr_head = G_FW_QUEUE_REC.head_index;
+				/*DEBUG*/
+				static u8 flag_begin = 0;
+				static u8 flag_end = 0;
+				static u32 rtt = 0;
+				static u32 fw_size = 0;
+				//		fl_fota_pack_type_e pack_type = FOTA_PACKET_BEGIN;
+				u8 OTA_BEGIN[2] = { FOTA_PACKET_BEGIN, G_INFORMATION.dev_type };
+				//		u8 OTA_DATA[2] = { FOTA_PACKET_DATA, G_INFORMATION.dev_type };
+				u8 OTA_END[2] = { FOTA_PACKET_END, G_INFORMATION.dev_type };
+
+				if (plog_IndexOf(packet.payload,OTA_BEGIN,SIZEU8(OTA_BEGIN),SIZEU8(OTA_BEGIN)) != -1) {
+					//			pack_type = FOTA_PACKET_BEGIN;
+					flag_begin++;
+					rtt = fl_rtc_get();
+				} else if (plog_IndexOf(packet.payload,OTA_END,SIZEU8(OTA_END),SIZEU8(OTA_END)) != -1) {
+					//			pack_type = FOTA_PACKET_END;
+					flag_end++;
+					P_INFO("========================\r\n");
+					P_INFO("** Begin: %d\r\n",flag_begin);
+					P_INFO("** FW   : %d\r\n",fw_size);
+					P_INFO("** End  : %d\r\n",flag_end);
+					P_INFO("** RTT  : %d s\r\n",(u32 )(fl_rtc_get() - rtt));
+					P_INFO("========================\r\n");
+					flag_end = 0;
+					flag_begin = 0;
+					fw_size = 0;
+				} else {
+					//			pack_type = FOTA_PACKET_DATA;
+					fw_size++;
+				}
+				/*END DEBUG*/
 			}
-			/*END DEBUG*/
 		}
 	}
 	return -1;
