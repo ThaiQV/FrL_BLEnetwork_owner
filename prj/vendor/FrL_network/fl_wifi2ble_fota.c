@@ -262,23 +262,6 @@ s16 fl_wifi2ble_fota_fwpush(fl_pack_t *fw_pack, fl_fota_pack_type_e _pack_type) 
 //	memcpy(&G_FW_QUEUE_SENDING.data[indx_4full].data_arr[FOTA_MAC_INCOM_POSITION],&fw_pack->data_arr[FOTA_MAC_INCOM_POSITION],6);
 	return indx_4full;
 }
-//
-//s16 fl_wifi2ble_fota_find(fl_pack_t *_pack_rec) {
-//	s16 rslt = -1;
-//	if (G_FW_QUEUE_SENDING.count > 0) {
-//		for(u16 i = 0;i<G_FW_QUEUE_SENDING.mask+1;i++) {
-//			if (G_FW_QUEUE_SENDING.data[i].length > FOTA_PACK_SIZE_MIN
-//			//&& memcmp(_pack_rec.data_arr,G_FW_QUEUE_SENDING.data[head].data_arr,G_FW_QUEUE_SENDING.data[head].length - 2) == 0
-//					&& -1!= plog_IndexOf(G_FW_QUEUE_SENDING.data[i].data_arr,&_pack_rec->data_arr[FOTA_FW_DATA_POSITION],FOTA_PACK_FW_SIZE,
-//									G_FW_QUEUE_SENDING.data[i].length)) {
-//				rslt = G_FW_QUEUE_SENDING.count;
-//				break;
-//			}
-//			//P_INFO("head(cnt:%d):%d/%d\r\n",G_FW_QUEUE_SENDING.count,head,tail);
-//		}
-//	}
-//	return rslt;
-//}
 
 #endif
 
