@@ -300,7 +300,7 @@ void fl_wifi2ble_fota_init(void){
 	fl_wifi2ble_fota_ContainerClear();
 	DFU_OTA_INIT();
 	//change version
-	DFU_OTA_VERISON_SET(17);
+	DFU_OTA_VERISON_SET(22);
 }
 
 s16 fl_wifi2ble_fota_recECHO(fl_pack_t _pack_rec,u8* _mac_incom){
@@ -315,7 +315,7 @@ s16 fl_wifi2ble_fota_recECHO(fl_pack_t _pack_rec,u8* _mac_incom){
 			if (G_FW_QUEUE_SENDING.data[head].length > FOTA_PACK_SIZE_MIN
 				&& G_FW_QUEUE_SENDING.data[head].data_arr[FOTA_RETRY_POSITION] > 0 //sent yet
 				&& plog_IndexOf(G_FW_QUEUE_SENDING.data[head].data_arr,&_pack_rec.data_arr[FOTA_FW_DATA_POSITION],FOTA_PACK_FW_SIZE,G_FW_QUEUE_SENDING.data[head].length) != -1
-				/*&& plog_IndexOf(G_FW_QUEUE_SENDING.data[head].data_arr,_mac_incom,6,G_FW_QUEUE_SENDING.data[head].length) == -1*/)
+				&& plog_IndexOf(G_FW_QUEUE_SENDING.data[head].data_arr,_mac_incom,6,G_FW_QUEUE_SENDING.data[head].length) == -1)
 			{
 #ifdef MASTER_CORE
 //				P_INFO_HEX(_mac_incom,6,"ECHO MAC:");
