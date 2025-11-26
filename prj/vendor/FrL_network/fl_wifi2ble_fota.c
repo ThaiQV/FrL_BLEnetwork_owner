@@ -44,13 +44,12 @@ fl_pack_t g_fw_sending_array[FOTA_SIZE];
 fl_data_container_t G_FW_QUEUE_SENDING = { .data = g_fw_sending_array, .head_index = 0, .tail_index = 0, .mask = FOTA_SIZE - 1, .count = 0 };
 
 #define FOTA_FW_QUEUE_SIZE			(G_FW_QUEUE_SENDING.mask + 1)
-#define FOTA_PACK_SIZE_MIN 			16
-#define FOTA_PACK_FW_SIZE			22
-#define FOTA_RETRY_POSITION			(SIZEU8(G_FW_QUEUE_SENDING.data[0].data_arr)-1)
-#define FOTA_TYPEPACK_POSITION		(FOTA_RETRY_POSITION-1)
-#define FOTA_MILSTEP_POSITION		5
-#define FOTA_FW_DATA_POSITION		(1+4+1+1) //hdr+timestamp[4]+milltamp+slaveID
-
+//#define FOTA_PACK_SIZE_MIN 			16
+//#define FOTA_PACK_FW_SIZE			22
+//#define FOTA_RETRY_POSITION			(SIZEU8(G_FW_QUEUE_SENDING.data[0].data_arr)-1)
+//#define FOTA_TYPEPACK_POSITION		(FOTA_RETRY_POSITION-1)
+//#define FOTA_MILSTEP_POSITION		5
+//#define FOTA_FW_DATA_POSITION		(1+4+1+1) //hdr+timestamp[4]+milltamp+slaveID
 #define FOTA_RETRY_MAX				(4)
 
 u8 F_EXTITFOTA_TIME = 60;//s
@@ -173,6 +172,7 @@ s16 fl_wifi2ble_fota_fwpush(u8 *_fw, u8 _len,fl_fota_pack_type_e _pack_type) {
 				G_FW_QUEUE_SENDING.data[head] = fw_pack;
 				G_FW_QUEUE_SENDING.data[head].data_arr[FOTA_TYPEPACK_POSITION] = _pack_type;
 				G_FW_QUEUE_SENDING.data[head].data_arr[FOTA_RETRY_POSITION] = 0;
+				memset(&G_FW_QUEUE_SENDING.data[head].data_arr[FOTA_MAC_INCOM_POSITION],0xFF,6);
 				if (G_FW_QUEUE_SENDING.count < FOTA_FW_QUEUE_SIZE)
 					G_FW_QUEUE_SENDING.count++;
 				return head;
@@ -206,7 +206,6 @@ int fl_wifi2ble_fota_system_begin(u8 *_payload_start,u8 _len){
 	G_FOTA.runtime.push_return = -1;
 	fl_wifi2ble_fota_ContainerClear();
 	int rslt = fl_wifi2ble_fota_fwpush(_payload_start,_len,FOTA_PACKET_BEGIN);
-
 	//todo: get rsp of the slave if wifi need
 	return rslt;
 }
@@ -228,10 +227,11 @@ int fl_wifi2ble_fota_system_data(u8 *_payload,u8 _len){
  ***************************************************/
 s16 fl_wifi2ble_fota_fwpush(fl_pack_t *fw_pack, fl_fota_pack_type_e _pack_type) {
 	s16 indx_4full= -1;
-	u16 head = G_FW_QUEUE_SENDING.head_index;
 	if(_pack_type==FOTA_PACKET_BEGIN){
 		fl_wifi2ble_fota_ContainerClear();
+//		fl_slave_fota_RECclear();
 	}
+	u16 head = G_FW_QUEUE_SENDING.head_index;
 	do{
 		if (G_FW_QUEUE_SENDING.data[head].length == 0) {
 			G_FW_QUEUE_SENDING.data[head].length = fw_pack->length - 1;
@@ -239,20 +239,27 @@ s16 fl_wifi2ble_fota_fwpush(fl_pack_t *fw_pack, fl_fota_pack_type_e _pack_type) 
 			memcpy(G_FW_QUEUE_SENDING.data[head].data_arr,fw_pack->data_arr,G_FW_QUEUE_SENDING.data[head].length);
 			G_FW_QUEUE_SENDING.data[head].data_arr[FOTA_TYPEPACK_POSITION] = _pack_type;
 			G_FW_QUEUE_SENDING.data[head].data_arr[FOTA_RETRY_POSITION] = 0;
+			//Add mac_incomming
+			memcpy(&G_FW_QUEUE_SENDING.data[head].data_arr[FOTA_MAC_INCOM_POSITION],&fw_pack->data_arr[FOTA_MAC_INCOM_POSITION],6);
+//			P_INFO_HEX(G_FW_QUEUE_SENDING.data[head].data_arr,SIZEU8(G_FW_QUEUE_SENDING.data[head].data_arr),"FOTA-GET(%d):",G_FW_QUEUE_SENDING.data[head].length);
 			if (G_FW_QUEUE_SENDING.count < FOTA_FW_QUEUE_SIZE)
 				G_FW_QUEUE_SENDING.count++;
 			return head;
-		} else {
-			if (indx_4full == -1)
-				indx_4full = head;
 		}
+//		else {
+//			if (indx_4full == -1)
+//				indx_4full = (head + 1) & G_FW_QUEUE_SENDING.mask;
+//		}
 	} while ((head=((head + 1) & G_FW_QUEUE_SENDING.mask)) != G_FW_QUEUE_SENDING.head_index);
 	//FULL -> add to mostRetry index
-	G_FW_QUEUE_SENDING.data[indx_4full].length = fw_pack->length - 1;
-	memset(G_FW_QUEUE_SENDING.data[indx_4full].data_arr,0,SIZEU8(G_FW_QUEUE_SENDING.data[indx_4full].data_arr));
-	memcpy(G_FW_QUEUE_SENDING.data[indx_4full].data_arr,fw_pack->data_arr,G_FW_QUEUE_SENDING.data[indx_4full].length);
-	G_FW_QUEUE_SENDING.data[indx_4full].data_arr[FOTA_TYPEPACK_POSITION] = _pack_type;
-	G_FW_QUEUE_SENDING.data[indx_4full].data_arr[FOTA_RETRY_POSITION] = 0;
+//	indx_4full = (head + 1) & G_FW_QUEUE_SENDING.mask;
+//	G_FW_QUEUE_SENDING.data[indx_4full].length = fw_pack->length - 1;
+//	memset(G_FW_QUEUE_SENDING.data[indx_4full].data_arr,0,SIZEU8(G_FW_QUEUE_SENDING.data[indx_4full].data_arr));
+//	memcpy(G_FW_QUEUE_SENDING.data[indx_4full].data_arr,fw_pack->data_arr,G_FW_QUEUE_SENDING.data[indx_4full].length);
+//	G_FW_QUEUE_SENDING.data[indx_4full].data_arr[FOTA_TYPEPACK_POSITION] = _pack_type;
+//	G_FW_QUEUE_SENDING.data[indx_4full].data_arr[FOTA_RETRY_POSITION] = 0;
+//	//Add mac_incomming
+//	memcpy(&G_FW_QUEUE_SENDING.data[indx_4full].data_arr[FOTA_MAC_INCOM_POSITION],&fw_pack->data_arr[FOTA_MAC_INCOM_POSITION],6);
 	return indx_4full;
 }
 //
@@ -293,22 +300,26 @@ void fl_wifi2ble_fota_init(void){
 	fl_wifi2ble_fota_ContainerClear();
 	DFU_OTA_INIT();
 	//change version
-	DFU_OTA_VERISON_SET(11);
+	DFU_OTA_VERISON_SET(22);
 }
 
-s16 fl_wifi2ble_fota_recECHO(fl_pack_t _pack_rec){
+s16 fl_wifi2ble_fota_recECHO(fl_pack_t _pack_rec,u8* _mac_incom){
 	s16 rslt =-1;
 #ifdef MASTER_CORE
-	IsFOTA_Run();
+//	IsFOTA_Run();
 	if (G_FW_QUEUE_SENDING.count > 0 )
 #endif
 	{
+//		P_INFO_HEX(_pack_rec.data_arr,SIZEU8(_pack_rec.data_arr),"ECHO:");
 		for (s16 head = 0; head < G_FW_QUEUE_SENDING.mask + 1; head++) {
 			if (G_FW_QUEUE_SENDING.data[head].length > FOTA_PACK_SIZE_MIN
 				&& G_FW_QUEUE_SENDING.data[head].data_arr[FOTA_RETRY_POSITION] > 0 //sent yet
-				&& plog_IndexOf(G_FW_QUEUE_SENDING.data[head].data_arr,&_pack_rec.data_arr[FOTA_FW_DATA_POSITION],FOTA_PACK_FW_SIZE,G_FW_QUEUE_SENDING.data[head].length) != -1)
+				&& plog_IndexOf(G_FW_QUEUE_SENDING.data[head].data_arr,&_pack_rec.data_arr[FOTA_FW_DATA_POSITION],FOTA_PACK_FW_SIZE,G_FW_QUEUE_SENDING.data[head].length) != -1
+				&& plog_IndexOf(G_FW_QUEUE_SENDING.data[head].data_arr,_mac_incom,6,G_FW_QUEUE_SENDING.data[head].length) == -1)
 			{
 #ifdef MASTER_CORE
+//				P_INFO_HEX(_mac_incom,6,"ECHO MAC:");
+//				P_INFO_HEX(G_FW_QUEUE_SENDING.data[head].data_arr,SIZEU8(G_FW_QUEUE_SENDING.data[head].data_arr),"ECHO:");
 				fl_fota_pack_type_e type_pack = G_FW_QUEUE_SENDING.data[head].data_arr[FOTA_TYPEPACK_POSITION];
 #endif
 				G_FW_QUEUE_SENDING.data[head].length = 0;
@@ -323,6 +334,11 @@ s16 fl_wifi2ble_fota_recECHO(fl_pack_t _pack_rec){
 					G_FOTA.runtime.push_return = FOTA_EXIT_VALUE;
 					break;
 				}
+#else
+//				if (type_packtype_pack == FOTA_PACKET_END) {
+//					fl_wifi2ble_fota_ContainerClear();
+//					fl_slave_fota_RECclear();
+//				}
 #endif
 				rslt = head;
 			}
@@ -371,25 +387,24 @@ s16 fl_wifi2ble_fota_run(void) {
 	extern volatile u8 F_SENDING_STATE;
 	fl_pack_t his_data_in_queue;
 	if (!F_SENDING_STATE) {
-#ifndef MASTER_CORE
-
-		for (u16 sample_scan = 0; sample_scan < FOTA_FW_QUEUE_SIZE && G_FW_QUEUE_SENDING.count>0; sample_scan++) {
+#ifndef MASTER_CORE//slave
+		for (u16 sample_scan = 0; sample_scan < FOTA_FW_QUEUE_SIZE && G_FW_QUEUE_SENDING.count>0 && !F_SENDING_STATE; sample_scan++) {
 			his_data_in_queue = G_FW_QUEUE_SENDING.data[G_FW_QUEUE_SENDING.head_index];
 			if (his_data_in_queue.length > FOTA_PACK_SIZE_MIN) { //minimun size of the fota
 				//FOR SLAVE
 				if (his_data_in_queue.data_arr[FOTA_RETRY_POSITION] % FOTA_RETRY_MAX == 0)
 				{
+//					P_INFO_HEX(his_data_in_queue.data_arr,SIZEU8(his_data_in_queue.data_arr),"FOTA-SEND(%d):",his_data_in_queue.length);
 					fl_adv_send(his_data_in_queue.data_arr,his_data_in_queue.length,G_ADV_SETTINGS.adv_duration);
-//					G_FW_QUEUE_SENDING.data[G_FW_QUEUE_SENDING.head_index].data_arr[FOTA_MILSTEP_POSITION] += RAND_INT(-50,50);
-					G_FW_QUEUE_SENDING.data[G_FW_QUEUE_SENDING.head_index].data_arr[FOTA_RETRY_POSITION]++;
-					G_FW_QUEUE_SENDING.head_index = (G_FW_QUEUE_SENDING.head_index + 1) & G_FW_QUEUE_SENDING.mask;
-					break;
 				}
 				G_FW_QUEUE_SENDING.data[G_FW_QUEUE_SENDING.head_index].data_arr[FOTA_RETRY_POSITION]++;
-//				// Clear if overload
-				if(G_FW_QUEUE_SENDING.data[G_FW_QUEUE_SENDING.head_index].data_arr[FOTA_RETRY_POSITION] > FOTA_RETRY_MAX*2){
-					if(G_FW_QUEUE_SENDING.count>0)G_FW_QUEUE_SENDING.count--;
-					G_FW_QUEUE_SENDING.data[G_FW_QUEUE_SENDING.head_index].length=0;
+//				// Clear if over-timeout
+				if (G_FW_QUEUE_SENDING.data[G_FW_QUEUE_SENDING.head_index].data_arr[FOTA_RETRY_POSITION] > FOTA_RETRY_MAX) {
+					G_FW_QUEUE_SENDING.data[G_FW_QUEUE_SENDING.head_index].length = 0;
+					memset(G_FW_QUEUE_SENDING.data[G_FW_QUEUE_SENDING.head_index].data_arr,0,SIZEU8(G_FW_QUEUE_SENDING.data[G_FW_QUEUE_SENDING.head_index].data_arr));
+					if (G_FW_QUEUE_SENDING.count > 0) {
+						G_FW_QUEUE_SENDING.count--;
+					}
 				}
 			}
 			G_FW_QUEUE_SENDING.head_index = (G_FW_QUEUE_SENDING.head_index + 1) & G_FW_QUEUE_SENDING.mask;
@@ -398,10 +413,10 @@ s16 fl_wifi2ble_fota_run(void) {
 		IsFOTA_Run();
 		his_data_in_queue = G_FW_QUEUE_SENDING.data[G_FW_QUEUE_SENDING.head_index];
 		if (G_FW_QUEUE_SENDING.count > 0 && his_data_in_queue.length > FOTA_PACK_SIZE_MIN) {
-			if (his_data_in_queue.data_arr[FOTA_RETRY_POSITION]% FOTA_RETRY_MAX == 0)
+			//if (his_data_in_queue.data_arr[FOTA_RETRY_POSITION]% FOTA_RETRY_MAX == 0)
 			{
-				P_PRINTFHEX_A(BLE,his_data_in_queue.data_arr,his_data_in_queue.length,"[%d-%d/%d]FOTA(retry:%d):",G_FW_QUEUE_SENDING.head_index,
-						G_FW_QUEUE_SENDING.tail_index,G_FW_QUEUE_SENDING.count,his_data_in_queue.data_arr[FOTA_RETRY_POSITION]);
+//				P_INFO_HEX(his_data_in_queue.data_arr,his_data_in_queue.length,"[%d-%d/%d]FOTA(retry:%d):",G_FW_QUEUE_SENDING.head_index,
+//						G_FW_QUEUE_SENDING.tail_index,G_FW_QUEUE_SENDING.count,his_data_in_queue.data_arr[FOTA_RETRY_POSITION]);
 				fl_adv_send(his_data_in_queue.data_arr,his_data_in_queue.length,G_ADV_SETTINGS.adv_duration);
 			}
 			//update num of retry

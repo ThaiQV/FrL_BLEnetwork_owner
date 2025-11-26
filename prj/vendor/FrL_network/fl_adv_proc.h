@@ -20,7 +20,8 @@
 #ifdef MASTER_CORE
 #define FOTA_SIZE 						16
 #else
-#define FOTA_SIZE 						256
+#define FOTA_REC_SIZE					512
+#define FOTA_SIZE 						64
 #endif
 
 #define QUEUE_SENDING_SIZE 				64 	//=> main container sending packed

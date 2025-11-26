@@ -31,7 +31,15 @@
 #define DFU_OTA_VERISON_GET(...)		(0)
 #endif
 
+#define FOTA_PACK_SIZE_MIN 				16
+#define FOTA_PACK_FW_SIZE				22
+#define FOTA_RETRY_POSITION				(40-1)//SIZEU8(G_FW_QUEUE_SENDING.data[0].data_arr)
+#define FOTA_TYPEPACK_POSITION			(FOTA_RETRY_POSITION-1)
+#define FOTA_MAC_INCOM_POSITION			(FOTA_TYPEPACK_POSITION-6) //mac size is 6 bytes
+#define FOTA_MILSTEP_POSITION			5
+#define FOTA_FW_DATA_POSITION			(1+4+1+1) //hdr+timestamp[4]+milltamp+slaveID
 #define FOTA_EXIT_VALUE					0x7FFF
+
 typedef enum{
 	FOTA_DEV_COUNTER = 0,
 	FOTA_DEV_PWMETER,
@@ -50,7 +58,7 @@ void fl_wifi2ble_fota_ContainerClear(void);
 void fl_wifi2ble_fota_init(void);
 s16 fl_wifi2ble_fota_run(void);
 s16 fl_wifi2ble_fota_proc(void);
-s16 fl_wifi2ble_fota_recECHO(fl_pack_t _pack_rec);
+s16 fl_wifi2ble_fota_recECHO(fl_pack_t _pack_rec,u8* _mac_incom);
 
 #ifdef MASTER_CORE
 int fl_wifi2ble_fota_system_end(u8 *_payload_end,u8 _len);

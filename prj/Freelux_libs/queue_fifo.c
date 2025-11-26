@@ -89,10 +89,10 @@ s16 FL_QUEUE_ADD(fl_data_container_t *pCont, fl_pack_t *pdata) {
  * @param data A pointer to the location at which the data should be placed.
  * @return 1 if data was returned; 0 otherwise.
  */
-u16 FL_QUEUE_GET(fl_data_container_t *pCont, fl_pack_t *pdata) {
+s16 FL_QUEUE_GET(fl_data_container_t *pCont, fl_pack_t *pdata) {
 	if (FL_QUEUE_ISEMPTY(pCont)) {
 		/* No items */
-		return 0;
+		return -1;
 	}
 	*pdata = pCont->data[pCont->head_index];
 //	memcpy(pdata,pCont->data[pCont->head_index].data_arr,sizeof(fl_pack_t)/sizeof(u8));
@@ -118,9 +118,9 @@ s16 FL_QUEUE_GET_not_NEXTHEAD(fl_data_container_t *pCont, fl_pack_t *pdata) {
 //	u16 numofcount = pCont->count;
 	return pCont->head_index;
 }
-u16 FL_QUEUE_NEXTHEAD(fl_data_container_t *pCont, fl_pack_t *pdata) {
-	return FL_QUEUE_GET(pCont,pdata);
-}
+//s16 FL_QUEUE_NEXTHEAD(fl_data_container_t *pCont, fl_pack_t *pdata) {
+//	return FL_QUEUE_GET(pCont,pdata);
+//}
 /**
  * Returns the pack in a queue container.(FIFO)
  * @param buffer The buffer from which the data should be returned.
@@ -171,9 +171,30 @@ s16 FL_QUEUE_FIND(fl_data_container_t *pCont, fl_pack_t *pdata ,u8 _len){
 //		/* No items */
 //		return -1;
 //	}
-	if(_len < 2) return 0;
+	if(_len < 5) return 0;
 	for(u16 indx = 0; indx < pCont->mask + 1; indx++) {
+		if(pCont->data[indx].length < 5) continue;
 		if(memcmp(pCont->data[indx].data_arr,pdata->data_arr,_len) == 0){
+			return indx;
+		}
+	}
+	return -1;
+}
+/**
+ * Returns the pack in a queue container.(FIFO)
+ * @param pack in queue that find.
+ * @param
+ * @return index of queue if have; -1 otherwise.
+ */
+s16 FL_QUEUE_DATA_FIND(fl_data_container_t *pCont, u8 *pdata,u8 _start_position ,u8 _len){
+//	if (FL_QUEUE_ISEMPTY(pCont)) {
+//		/* No items */
+//		return -1;
+//	}
+	if(_len < 5) return 0; //skip add
+	for(u16 indx = 0; indx < pCont->mask + 1; indx++) {
+		if(pCont->data[indx].length < 5) continue;
+		if(memcmp(&pCont->data[indx].data_arr[_start_position],pdata,_len) == 0){
 			return indx;
 		}
 	}

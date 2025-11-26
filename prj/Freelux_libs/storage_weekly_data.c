@@ -235,8 +235,10 @@ storage_ret_t storage_put_data(uint8_t *pdata,uint32_t pdata_len)
 	storage_map_check(pdata_index,len);
 	// Write to flash
 	address = EX_FLASH_DEVICE_STORAGE_ADDRESS + pdata_index*len;
+
 	W25XXX_WR_Block(write,address,len);
 	W25XXX_Read(read,address,len);
+
 	if(memcmp(read,write,len) == 0) // check write successfully
 	{
 		return STORAGE_RET_OK;

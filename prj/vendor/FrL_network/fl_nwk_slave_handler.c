@@ -78,6 +78,11 @@ fl_data_container_t G_HANDLE_CONTAINER = { .data = g_handle_array, .head_index =
 /*---------------- Priority Sending --------------------------*/
 fl_pack_t g_priority_sending_array[8];
 fl_data_container_t G_PRIORITY_QUEUE_SENDING = { .data = g_priority_sending_array, .head_index = 0, .tail_index = 0, .mask = 8 - 1, .count = 0 };
+
+/*---------------- FW ADV REC QUEUE --------------------------*/
+fl_pack_t g_fw_receiving_array[FOTA_REC_SIZE];
+fl_data_container_t G_FW_QUEUE_REC = { .data = g_fw_receiving_array, .head_index = 0, .tail_index = 0, .mask = FOTA_REC_SIZE - 1, .count = 0 };
+
 //My information
 fl_nodeinnetwork_t G_INFORMATION ={.active=false};
 #ifndef MASTER_CORE
@@ -793,61 +798,149 @@ fl_pack_t fl_slave_fota_rsp_packet_build(u8* _data, u8 _len,fl_data_frame_u _REQ
 	P_PRINTFHEX_A(INF_FILE,rslt.data_arr,rslt.length,"RSP %X:",rsp_pack.frame.hdr);
 	return rslt;
 }
-
-void fl_slave_fota_proc(fl_pack_t *_fota_pack){
+void fl_slave_fota_RECclear(void){
+	FL_QUEUE_CLEAR(&G_FW_QUEUE_REC,G_FW_QUEUE_REC.mask+1);
+}
+s16 fl_slave_fota_rec(fl_pack_t *_fw_pack, u8* _mac_source) {
+	if (FL_QUEUE_DATA_FIND(&G_FW_QUEUE_REC,&_fw_pack->data_arr[FOTA_FW_DATA_POSITION],FOTA_FW_DATA_POSITION,22) == -1)
+	//if(FL_QUEUE_FIND(&G_FW_QUEUE_REC,_fw_pack,_fw_pack->length-1)==-1)
+	{
+		if (FL_QUEUE_ADD(&G_FW_QUEUE_REC,_fw_pack) < 0) {
+			ERR(BLE,"Err <G_FW_QUEUE_REC ADD>!!\r\n");
+			return -1;
+		} else {
+			//Add mac incomming
+			u16 current_slot = (G_FW_QUEUE_REC.tail_index - 1) & (G_FW_QUEUE_REC.mask);
+			memcpy(&G_FW_QUEUE_REC.data[current_slot].data_arr[ FOTA_MAC_INCOM_POSITION],_mac_source,6);
+//			P_INFO_HEX(G_FW_QUEUE_REC.data[current_slot].data_arr,SIZEU8(G_FW_QUEUE_REC.data[current_slot].data_arr),"FOTA-ADD(%d):",G_FW_QUEUE_REC.data[current_slot].length);
+			return current_slot;
+		}
+	}
+	return 0;
+}
+s16 fl_slave_fota_proc(void) {
 	extern u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
 	fl_dataframe_format_t packet;
-	if(!fl_packet_parse(*_fota_pack,&packet)){
-		ERR(INF,"Packet parse fail!!!\r\n");
-		return;
-	}
-
-	if (packet.hdr == NWK_HDR_FOTA) {
-		/*DEBUG*/
-		static u8 flag_begin = 0;
-		static u8 flag_end = 0;
-		static u32 rtt = 0;
-		static u32 fw_size = 0;
-//		fl_fota_pack_type_e pack_type = FOTA_PACKET_BEGIN;
-		u8 OTA_BEGIN[2] = { FOTA_PACKET_BEGIN, G_INFORMATION.dev_type };
-//		u8 OTA_DATA[2] = { FOTA_PACKET_DATA, G_INFORMATION.dev_type };
-		u8 OTA_END[2] = { FOTA_PACKET_END, G_INFORMATION.dev_type };
-
-		if (plog_IndexOf(packet.payload,OTA_BEGIN,SIZEU8(OTA_BEGIN),SIZEU8(OTA_BEGIN)) != -1) {
-//			pack_type = FOTA_PACKET_BEGIN;
-			flag_begin++;
-			rtt = fl_rtc_get();
-		} else if (plog_IndexOf(packet.payload,OTA_END,SIZEU8(OTA_END),SIZEU8(OTA_END)) != -1) {
-//			pack_type = FOTA_PACKET_END;
-			flag_end++;
-			P_INFO("========================\r\n");
-			P_INFO("** Begin: %d\r\n",flag_begin);
-			P_INFO("** FW   : %d\r\n",fw_size);
-			P_INFO("** End  : %d\r\n",flag_end);
-			P_INFO("** RTT  : %d s\r\n",(u32 )(fl_rtc_get() - rtt));
-			P_INFO("========================\r\n");
-			flag_end = 0;
-			flag_begin = 0;
-			fw_size = 0;
-		} else {
-//			pack_type = FOTA_PACKET_DATA;
-			fw_size++;
+	fl_pack_t fota_pack;
+	u16 curr_head = G_FW_QUEUE_REC.head_index;
+	//For debuging log
+	static u16 head_err =0;
+	while (FL_QUEUE_GET(&G_FW_QUEUE_REC,&fota_pack) > -1) {
+		if (!fl_packet_parse(fota_pack,&packet)) {
+			ERR(INF,"Packet parse fail!!!\r\n");
+			P_INFO_HEX(fota_pack.data_arr,SIZEU8(fota_pack.data_arr),"FOTA-GET(%d):",fota_pack.length);
+			return -1;
 		}
-		/*END DEBUG*/
+		if (packet.hdr == NWK_HDR_FOTA) {
+			fl_nwk_LedSignal_run();
+			/*todo: load fw into the dfu*/
+			if (packet.payload[1] == G_INFORMATION.dev_type && (packet.payload[0] <= FOTA_PACKET_END)) {
+				if (OTA_RET_OK != DFU_OTA_FW_PUT(packet.payload,fl_crc8(packet.payload,SIZEU8(packet.payload)))) {
+					ERR(APP,"FOTA DFU Err <RET ERR>\r\n");
+				}
+			}
+			//add send repeat and check echo
+			if (fl_wifi2ble_fota_fwpush(&fota_pack,packet.payload[0]) == -1) {
+				//re-send this slot
+//				G_FW_QUEUE_REC.head_index = curr_head;
+//				G_FW_QUEUE_REC.count++;
+				if (head_err ==0) {
+					head_err=1;
+					ERR(APP,"FOTA ECHO Err <Full>\r\n");
+				}
+				return -1;
+			} else {
+				head_err = 0;
+				curr_head = G_FW_QUEUE_REC.head_index;
+				/*DEBUG*/
+				static u8 flag_begin = 0;
+				static u8 flag_end = 0;
+				static u32 rtt = 0;
+				static u32 fw_size = 0;
+				//		fl_fota_pack_type_e pack_type = FOTA_PACKET_BEGIN;
+				u8 OTA_BEGIN[2] = { FOTA_PACKET_BEGIN, G_INFORMATION.dev_type };
+				//		u8 OTA_DATA[2] = { FOTA_PACKET_DATA, G_INFORMATION.dev_type };
+				u8 OTA_END[2] = { FOTA_PACKET_END, G_INFORMATION.dev_type };
 
-		fl_nwk_LedSignal_run();
-		/*todo: load fw into the dfu*/
-		if (packet.payload[1] == G_INFORMATION.dev_type && (packet.payload[0] <= FOTA_PACKET_END)) {
-			if (OTA_RET_OK != DFU_OTA_FW_PUT(packet.payload,fl_crc8(packet.payload,SIZEU8(packet.payload)))) {
-				ERR(APP,"FOTA DFU Err <RET ERR>\r\n");
+				if (plog_IndexOf(packet.payload,OTA_BEGIN,SIZEU8(OTA_BEGIN),SIZEU8(OTA_BEGIN)) != -1) {
+					//			pack_type = FOTA_PACKET_BEGIN;
+					flag_begin++;
+					rtt = fl_rtc_get();
+				} else if (plog_IndexOf(packet.payload,OTA_END,SIZEU8(OTA_END),SIZEU8(OTA_END)) != -1) {
+					//			pack_type = FOTA_PACKET_END;
+					flag_end++;
+					P_INFO("========================\r\n");
+					P_INFO("** Begin: %d\r\n",flag_begin);
+					P_INFO("** FW   : %d\r\n",fw_size);
+					P_INFO("** End  : %d\r\n",flag_end);
+					P_INFO("** RTT  : %d s\r\n",(u32 )(fl_rtc_get() - rtt));
+					P_INFO("========================\r\n");
+					flag_end = 0;
+					flag_begin = 0;
+					fw_size = 0;
+				} else {
+					//			pack_type = FOTA_PACKET_DATA;
+					fw_size++;
+				}
+				/*END DEBUG*/
 			}
 		}
-		//add send repeat and check echo
-		if (fl_wifi2ble_fota_fwpush(_fota_pack,packet.payload[0]) == -1) {
-			ERR(APP,"FOTA ECHO Err <Full>\r\n");
-		}
 	}
+	return -1;
 }
+//void fl_slave_fota_proc(fl_pack_t *_fota_pack){
+//	extern u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
+//	fl_dataframe_format_t packet;
+//	if(!fl_packet_parse(*_fota_pack,&packet)){
+//		ERR(INF,"Packet parse fail!!!\r\n");
+//		return;
+//	}
+//	if (packet.hdr == NWK_HDR_FOTA) {
+//		/*DEBUG*/
+//		static u8 flag_begin = 0;
+//		static u8 flag_end = 0;
+//		static u32 rtt = 0;
+//		static u32 fw_size = 0;
+////		fl_fota_pack_type_e pack_type = FOTA_PACKET_BEGIN;
+//		u8 OTA_BEGIN[2] = { FOTA_PACKET_BEGIN, G_INFORMATION.dev_type };
+////		u8 OTA_DATA[2] = { FOTA_PACKET_DATA, G_INFORMATION.dev_type };
+//		u8 OTA_END[2] = { FOTA_PACKET_END, G_INFORMATION.dev_type };
+//
+//		if (plog_IndexOf(packet.payload,OTA_BEGIN,SIZEU8(OTA_BEGIN),SIZEU8(OTA_BEGIN)) != -1) {
+////			pack_type = FOTA_PACKET_BEGIN;
+//			flag_begin++;
+//			rtt = fl_rtc_get();
+//		} else if (plog_IndexOf(packet.payload,OTA_END,SIZEU8(OTA_END),SIZEU8(OTA_END)) != -1) {
+////			pack_type = FOTA_PACKET_END;
+//			flag_end++;
+//			P_INFO("========================\r\n");
+//			P_INFO("** Begin: %d\r\n",flag_begin);
+//			P_INFO("** FW   : %d\r\n",fw_size);
+//			P_INFO("** End  : %d\r\n",flag_end);
+//			P_INFO("** RTT  : %d s\r\n",(u32 )(fl_rtc_get() - rtt));
+//			P_INFO("========================\r\n");
+//			flag_end = 0;
+//			flag_begin = 0;
+//			fw_size = 0;
+//		} else {
+////			pack_type = FOTA_PACKET_DATA;
+//			fw_size++;
+//		}
+//		/*END DEBUG*/
+//
+//		fl_nwk_LedSignal_run();
+//		/*todo: load fw into the dfu*/
+//		if (packet.payload[1] == G_INFORMATION.dev_type && (packet.payload[0] <= FOTA_PACKET_END)) {
+//			if (OTA_RET_OK != DFU_OTA_FW_PUT(packet.payload,fl_crc8(packet.payload,SIZEU8(packet.payload)))) {
+//				ERR(APP,"FOTA DFU Err <RET ERR>\r\n");
+//			}
+//		}
+//		//add send repeat and check echo
+//		if (fl_wifi2ble_fota_fwpush(_fota_pack,packet.payload[0]) == -1) {
+//			ERR(APP,"FOTA ECHO Err <Full>\r\n");
+//		}
+//	}
+//}
 
 /***************************************************
  * @brief 		:soft-timer callback for the processing response
@@ -859,7 +952,7 @@ void fl_slave_fota_proc(fl_pack_t *_fota_pack){
  ***************************************************/
 int fl_slave_ProccesRSP_cbk(void) {
 	fl_pack_t data_in_queue;
-	if (FL_QUEUE_GET(&G_HANDLE_CONTAINER,&data_in_queue)) {
+	if (FL_QUEUE_GET(&G_HANDLE_CONTAINER,&data_in_queue)>-1) {
 		//Scan req call rsp
 		if(-1!=fl_queue_REQcRSP_ScanRec(data_in_queue,&G_INFORMATION))
 		{
@@ -1047,7 +1140,7 @@ u8 fl_adv_sendFIFO_PriorityADV_run(void) {
 	extern volatile u8 F_SENDING_STATE;
 	fl_pack_t data_in_queue;
 	if (!F_SENDING_STATE) {
-		if (FL_QUEUE_GET(&G_PRIORITY_QUEUE_SENDING,&data_in_queue)) {
+		if (FL_QUEUE_GET(&G_PRIORITY_QUEUE_SENDING,&data_in_queue)>-1) {
 			fl_adv_send(data_in_queue.data_arr,data_in_queue.length,G_ADV_SETTINGS.adv_duration);
 			P_INFO_HEX(data_in_queue.data_arr,data_in_queue.length,"[%d-%d/%d]PRIORITY(%d):",G_PRIORITY_QUEUE_SENDING.head_index,
 					G_PRIORITY_QUEUE_SENDING.tail_index,G_PRIORITY_QUEUE_SENDING.count,data_in_queue.length);

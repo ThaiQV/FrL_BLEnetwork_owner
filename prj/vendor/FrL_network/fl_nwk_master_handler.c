@@ -773,8 +773,8 @@ static void _master_updateDB_for_Node(u8 node_indx ,fl_data_frame_u *packet)  {
 
 int fl_master_ProccesRSP_cbk(void) {
 	fl_pack_t data_in_queue;
-	u16 numofrsp = 0;
-	if ((numofrsp=FL_QUEUE_GET(&G_HANDLE_MASTER_CONTAINER,&data_in_queue))) {
+	s16 numofrsp = 0;
+	if ((numofrsp=FL_QUEUE_GET(&G_HANDLE_MASTER_CONTAINER,&data_in_queue))>-1) {
 
 		fl_data_frame_u packet;
 		extern u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);

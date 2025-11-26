@@ -84,8 +84,6 @@ tbs_device_counter_t G_COUNTER_DEV = {  .timetamp = 0,
 												}
 									};
 
-#define G_TBS_DEVICE		G_COUNTER_DEV
-
 u8 G_COUNTER_LCD[COUNTER_LCD_MESS_MAX][LCD_MESSAGE_SIZE];
 #define G_TBS_DEVICE		G_COUNTER_DEV
 #endif
@@ -196,22 +194,22 @@ void TEST_rsp_callback(void *_data,void* _data2){
 }
 
 int TEST_Counter_Event(void){
-	extern u8 GETINFO_FLAG_EVENTTEST; // for testing
+//	extern u8 GETINFO_FLAG_EVENTTEST; // for testing
 	u32 period = RAND(1,60);
-	if (IsOnline() && GETINFO_FLAG_EVENTTEST ==1) {
-		if (TEST_EVENT.req_num == 0) {
-			G_COUNTER_DEV.data.pre_err_product = G_COUNTER_DEV.data.index;
-		}
-		//
-		G_COUNTER_DEV.data.bt_call = RAND(0,1);
-		G_COUNTER_DEV.data.bt_endcall = G_COUNTER_DEV.data.bt_call ? 0 : 1;
-		G_COUNTER_DEV.data.bt_rst = 0;
-		fl_api_slave_req(NWK_HDR_55,(u8*)&G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data),&TEST_rsp_callback,0,1);
-		TEST_EVENT.rtt = clock_time();
-		TEST_EVENT.req_num++;
-		G_COUNTER_DEV.data.pass_product = TEST_EVENT.req_num;
-		P_INFO("TEST EVNET after:%d s\r\n",period);
-	}
+//	if (IsOnline() && GETINFO_FLAG_EVENTTEST ==1) {
+//		if (TEST_EVENT.req_num == 0) {
+//			G_COUNTER_DEV.data.pre_err_product = G_COUNTER_DEV.data.index;
+//		}
+//		//
+//		G_COUNTER_DEV.data.bt_call = RAND(0,1);
+//		G_COUNTER_DEV.data.bt_endcall = G_COUNTER_DEV.data.bt_call ? 0 : 1;
+//		G_COUNTER_DEV.data.bt_rst = 0;
+//		fl_api_slave_req(NWK_HDR_55,(u8*)&G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data),&TEST_rsp_callback,0,1);
+//		TEST_EVENT.rtt = clock_time();
+//		TEST_EVENT.req_num++;
+//		G_COUNTER_DEV.data.pass_product = TEST_EVENT.req_num;
+//		P_INFO("TEST EVNET after:%d s\r\n",period);
+//	}
 	return period*1000*1000;
 }
 /* END TEST*/
@@ -238,7 +236,6 @@ void TBS_Counter_init(void){
 	//TEst
 	TEST_EVENT.lifetime = fl_rtc_get();
 	blt_soft_timer_add(&TEST_Counter_Event,5000*1000);
-
 }
 
 void TBS_Counter_Run(void){

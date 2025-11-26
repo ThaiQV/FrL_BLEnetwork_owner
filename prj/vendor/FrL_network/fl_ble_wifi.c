@@ -619,7 +619,7 @@ void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 				}
 				else if (data_fw[0] == FOTA_PACKET_DATA) {
 					rslt = fl_wifi2ble_fota_system_data(data_fw,SIZEU8(data_fw));
-					if (rslt != -1 && rslt == FOTA_EXIT_VALUE) {
+					if (rslt != -1 ) {
 						FOTA_INFO.version=data_fw[2];
 						FOTA_INFO.fw_type=data_fw[1];
 						FOTA_INFO.body++;

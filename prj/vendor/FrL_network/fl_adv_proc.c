@@ -221,19 +221,28 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 				}
 #ifdef MASTER_CORE
 				//skip process from  master and check rspECHO
+				if(incomming_data.data_arr[0] == NWK_HDR_FOTA) {
+					//						P_INFO_HEX(pa->mac,6,"ECHO MAC:");
+//					P_INFO_HEX(incomming_data.data_arr,incomming_data.length,"ECHO:");
+					fl_wifi2ble_fota_recECHO(incomming_data,pa->mac);
+					return 0;
+				}
 				if (fl_adv_IsFromMaster(incomming_data)) {
-					if(incomming_data.data_arr[0] == NWK_HDR_FOTA) fl_wifi2ble_fota_recECHO(incomming_data);
 					return 0;
 				}
 #else
 				if (!fl_nwk_slave_checkHDR(incomming_data.data_arr[0])) {
 					return 0;
 				}
-				//incomming packet is echo pack
-				if (-1 == plog_IndexOf(pa->mac,master_mac,4,6)) {
-					if (incomming_data.data_arr[0] == NWK_HDR_FOTA && fl_wifi2ble_fota_recECHO(incomming_data) != -1) {
-						return 0;
+				//Store FOTA pack
+				if (incomming_data.data_arr[0] == NWK_HDR_FOTA && incomming_data.length > 20) {
+					//incomming packet is echo pack
+					if (-1 == plog_IndexOf(pa->mac,master_mac,4,6)) {
+						fl_wifi2ble_fota_recECHO(incomming_data,pa->mac);
 					}
+					if (fl_slave_fota_rec(&incomming_data,pa->mac) ==-1) {
+					}
+					return 0;
 				}
 #endif
 				if (FL_QUEUE_FIND(&G_DATA_CONTAINER,&incomming_data,incomming_data.length - 1/*skip rssi*/) == -1) {
@@ -330,17 +339,8 @@ u16 FL_NWK_HISTORY_IsReady(void){
 u8 fl_adv_sendFIFO_History_run(void) {
 	fl_pack_t his_data_in_queue;
 	if (!F_SENDING_STATE) {
-		if(FL_QUEUE_GET(&G_QUEUE_HISTORY_SENDING,&his_data_in_queue))
-//		if(FL_QUEUE_GET_LOOP(&G_QUEUE_HISTORY_SENDING,&his_data_in_queue))
-		{
-//			if(his_data_in_queue.length<5){
-//				return 1;
-//			}
-//			P_INFO("SEND ECHO(cnt:%d)%d/%d\r\n",G_QUEUE_HISTORY_SENDING.count,G_QUEUE_HISTORY_SENDING.head_index,G_QUEUE_HISTORY_SENDING.tail_index);
+		if (FL_QUEUE_GET(&G_QUEUE_HISTORY_SENDING,&his_data_in_queue)>-1) {
 			fl_adv_send(his_data_in_queue.data_arr,his_data_in_queue.length,G_ADV_SETTINGS.adv_duration);
-//			P_INFO_HEX(his_data_in_queue.data_arr,his_data_in_queue.length,"[%d-%d/%d]HIS(%d):",
-//					G_QUEUE_HISTORY_SENDING.head_index,G_QUEUE_HISTORY_SENDING.tail_index,G_QUEUE_HISTORY_SENDING.count,
-//					his_data_in_queue.length);
 		}
 	}
 	return 1;
@@ -762,9 +762,8 @@ bool fl_adv_MasterToMe(fl_pack_t data_in_queue) {
 	fl_dataframe_format_t data_parsed;
 	if (fl_packet_parse(data_in_queue,&data_parsed)) {
 		if((data_parsed.endpoint.master == FL_FROM_MASTER|| data_parsed.endpoint.master == FL_FROM_MASTER_ACK)
-				&& (
-						(data_parsed.slaveID == G_INFORMATION.slaveID && G_INFORMATION.slaveID != 0xFF)
-						|| (data_parsed.slaveID == 0xFF ||  G_INFORMATION.slaveID == 0xFF)
+				&& ((data_parsed.slaveID == G_INFORMATION.slaveID && G_INFORMATION.slaveID != 0xFF)
+					|| (data_parsed.slaveID == 0xFF ||  G_INFORMATION.slaveID == 0xFF)
 					)
 			){
 			return true;
@@ -786,26 +785,21 @@ void fl_adv_run(void) {
 	//todo: process adv ....
 	fl_pack_t data_in_queue;
 	u8 multiple_pack = 0;
-	while (FL_QUEUE_GET(&G_DATA_CONTAINER,&data_in_queue)) {
+	while (FL_QUEUE_GET(&G_DATA_CONTAINER,&data_in_queue)>-1) {
 //		LOGA(APP,"QUEUE GET : (%d)%d-%d\r\n",G_DATA_CONTAINER.count,G_DATA_CONTAINER.head_index,G_DATA_CONTAINER.tail_index);
 		fl_dataframe_format_t data_parsed;
 		if (fl_packet_parse(data_in_queue,&data_parsed)) {
 #ifdef MASTER_CORE
 			fl_nwk_master_run(&data_in_queue); //process reponse from the slaves
 #else //SLAVE
-			//Todo: FOTA process
-			if (data_parsed.hdr == NWK_HDR_FOTA) {
-				fl_slave_fota_proc(&data_in_queue);
-			} else {
-				//Todo: Repeat process
-				if (fl_adv_IsFromMe(data_in_queue) == false && data_parsed.endpoint.repeat_cnt > 0) {
-					//check repeat_mode
-					fl_repeat_run(&data_in_queue);
-				}
-				//Todo: Handle FROM MASTER REQ
-				if (fl_adv_MasterToMe(data_in_queue)) {
-					fl_nwk_slave_run(&data_in_queue);
-				}
+			//Todo: Repeat process
+			if (fl_adv_IsFromMe(data_in_queue) == false && data_parsed.endpoint.repeat_cnt > 0) {
+				//check repeat_mode
+				fl_repeat_run(&data_in_queue);
+			}
+			//Todo: Handle FROM MASTER REQ
+			if (fl_adv_MasterToMe(data_in_queue)) {
+				fl_nwk_slave_run(&data_in_queue);
 			}
 #endif
 			//process multiple packet on the circle
@@ -827,6 +821,8 @@ void fl_adv_run(void) {
 	fl_nwk_master_process();
 	fl_wifi2ble_fota_proc();
 #else
+	//Todo: Slave FOTA process
+	fl_slave_fota_proc();
 	//Features processor
 	fl_nwk_slave_process();
 	//SEND PRIORITY ADV
