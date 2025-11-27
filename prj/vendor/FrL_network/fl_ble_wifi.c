@@ -570,16 +570,6 @@ void RSTFACTORY_RESPONSE(u8* _pdata){}
 /******************************************************************************/
 /******************************************************************************/
 u8 data_fw[22];
-//for debuging
-typedef struct {
-	u32 fw_size;
-	u32 body;
-//	u32 rtt;
-	u8 version;
-	u8 fw_type;
-	u8 begin;
-	u8 end;
-} fl_ble2wif_fota_info_t;
 fl_ble2wif_fota_info_t FOTA_INFO;
 void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 	extern fl_slaves_list_t G_NODE_LIST;
@@ -624,7 +614,7 @@ void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 						FOTA_INFO.fw_type=data_fw[1];
 						FOTA_INFO.body++;
 						P_INFO("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
-						P_INFO("[T%d,v%d]Downloading:%d/%d",FOTA_INFO.fw_type,FOTA_INFO.version,FOTA_INFO.body*OTA_PACKET_LENGTH,FOTA_INFO.fw_size);
+						P_INFO("[T%d,v%d]Downloading:%d/%d (%d)",FOTA_INFO.fw_type,FOTA_INFO.version,FOTA_INFO.body*OTA_PACKET_LENGTH,FOTA_INFO.fw_size,FL_NWK_FOTA_IsReady());
 					}
 				}
 				else if(data_fw[0] == FOTA_PACKET_END){

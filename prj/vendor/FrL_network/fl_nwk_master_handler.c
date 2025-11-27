@@ -47,7 +47,8 @@ fl_master_config_t G_MASTER_INFO = { .nwk = { .chn = { 37, 39, 39 }, .collect_ch
 
 volatile u8 MASTER_INSTALL_STATE = 0;
 //Period of the heartbeat
-u16 PERIOD_HEARTBEAT = (PACK_HANDLE_MASTER_SIZE)*101; // slots sending and 100ms interval adv
+u16 PERIOD_HEARTBEAT = (PACK_HANDLE_MASTER_SIZE*101); // slots sending and 100ms interval adv
+
 //flag debug of the network
 volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into endpoint byte (dbg :1bit)
 volatile u8 NWK_REPEAT_MODE = 0; // 1: level | 0 : non-level

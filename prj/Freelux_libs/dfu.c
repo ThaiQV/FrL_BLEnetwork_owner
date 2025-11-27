@@ -1,7 +1,7 @@
 #include "dfu.h"
 
 /* Definition */
-#define DFU_DEBUG	1
+//#define DFU_DEBUG	1
 #ifdef DFU_DEBUG
 #define DFU_PRINTF(...)	LOGA(APP,__VA_ARGS__);
 #else
@@ -551,11 +551,11 @@ ota_ret_t ota_fw_put(uint8_t *pdata, uint8_t crc)
 				memcpy(ota_header.crc128,(uint8_t*)packet_header.signature,OTA_PACKET_LENGTH);
 
 				DFU_PRINTF("Signature: ");
-				for(i = 0; i < CRC128_LENGTH; i++)
-				{
-					printf("%x ",ota_header.crc128[i]);
-				}
-				printf("\n");
+//				for(i = 0; i < CRC128_LENGTH; i++)
+//				{
+//					printf("%x ",ota_header.crc128[i]);
+//				}
+//				printf("\n");
 
 				// Erase OTA Header sector before write
 				FLASH_Erase_Sector(OTA_FW_HEADER);

@@ -802,8 +802,7 @@ void fl_slave_fota_RECclear(void){
 	FL_QUEUE_CLEAR(&G_FW_QUEUE_REC,G_FW_QUEUE_REC.mask+1);
 }
 s16 fl_slave_fota_rec(fl_pack_t *_fw_pack, u8* _mac_source) {
-	if (FL_QUEUE_DATA_FIND(&G_FW_QUEUE_REC,&_fw_pack->data_arr[FOTA_FW_DATA_POSITION],FOTA_FW_DATA_POSITION,22) == -1)
-	//if(FL_QUEUE_FIND(&G_FW_QUEUE_REC,_fw_pack,_fw_pack->length-1)==-1)
+	if (FL_QUEUE_DATA_FIND(&G_FW_QUEUE_REC,&_fw_pack->data_arr[FOTA_FW_DATA_POSITION],FOTA_FW_DATA_POSITION,FOTA_PACK_FW_SIZE) == -1)
 	{
 		if (FL_QUEUE_ADD(&G_FW_QUEUE_REC,_fw_pack) < 0) {
 			ERR(BLE,"Err <G_FW_QUEUE_REC ADD>!!\r\n");
@@ -811,136 +810,115 @@ s16 fl_slave_fota_rec(fl_pack_t *_fw_pack, u8* _mac_source) {
 		} else {
 			//Add mac incomming
 			u16 current_slot = (G_FW_QUEUE_REC.tail_index - 1) & (G_FW_QUEUE_REC.mask);
-			memcpy(&G_FW_QUEUE_REC.data[current_slot].data_arr[ FOTA_MAC_INCOM_POSITION],_mac_source,6);
+			memcpy(&G_FW_QUEUE_REC.data[current_slot].data_arr[FOTA_MAC_INCOM_POSITION],_mac_source,FOTA_MAC_INCOM_SIZE);
 //			P_INFO_HEX(G_FW_QUEUE_REC.data[current_slot].data_arr,SIZEU8(G_FW_QUEUE_REC.data[current_slot].data_arr),"FOTA-ADD(%d):",G_FW_QUEUE_REC.data[current_slot].length);
 			return current_slot;
 		}
 	}
 	return 0;
 }
+//DEBUG
+fl_ble2wif_fota_info_t FOTA_SLAVE_INFO;
+
 s16 fl_slave_fota_proc(void) {
 	extern u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
 	fl_dataframe_format_t packet;
 	fl_pack_t fota_pack;
-	u16 curr_head = G_FW_QUEUE_REC.head_index;
+//	u16 curr_head = G_FW_QUEUE_REC.head_index;
 	//For debuging log
-	static u16 head_err =0;
+//	static u16 head_err =0;
 	while (FL_QUEUE_GET(&G_FW_QUEUE_REC,&fota_pack) > -1) {
+		//
+		blt_soft_timer_restart(&_isOnline_check,RECHECKING_NETWOK_TIME * 1000);
+
 		if (!fl_packet_parse(fota_pack,&packet)) {
 			ERR(INF,"Packet parse fail!!!\r\n");
-			P_INFO_HEX(fota_pack.data_arr,SIZEU8(fota_pack.data_arr),"FOTA-GET(%d):",fota_pack.length);
+			P_INFO_HEX(fota_pack.data_arr,SIZEU8(fota_pack.data_arr),"FOTA-ERR(%d):",fota_pack.length);
 			return -1;
 		}
 		if (packet.hdr == NWK_HDR_FOTA) {
 			fl_nwk_LedSignal_run();
+			//Move END_PACK to the last position
+			if (packet.payload[0] == FOTA_PACKET_END && G_FW_QUEUE_REC.count > 0) {
+				FL_QUEUE_ADD(&G_FW_QUEUE_REC,&fota_pack);
+				continue;
+			}
 			/*todo: load fw into the dfu*/
-			if (packet.payload[1] == G_INFORMATION.dev_type && (packet.payload[0] <= FOTA_PACKET_END)) {
-				if (OTA_RET_OK != DFU_OTA_FW_PUT(packet.payload,fl_crc8(packet.payload,SIZEU8(packet.payload)))) {
-					ERR(APP,"FOTA DFU Err <RET ERR>\r\n");
-				}
-			}
-			//add send repeat and check echo
-			if (fl_wifi2ble_fota_fwpush(&fota_pack,packet.payload[0]) == -1) {
-				//re-send this slot
-//				G_FW_QUEUE_REC.head_index = curr_head;
-//				G_FW_QUEUE_REC.count++;
-				if (head_err ==0) {
-					head_err=1;
-					ERR(APP,"FOTA ECHO Err <Full>\r\n");
-				}
-				return -1;
-			} else {
-				head_err = 0;
-				curr_head = G_FW_QUEUE_REC.head_index;
-				/*DEBUG*/
-				static u8 flag_begin = 0;
-				static u8 flag_end = 0;
-				static u32 rtt = 0;
-				static u32 fw_size = 0;
-				//		fl_fota_pack_type_e pack_type = FOTA_PACKET_BEGIN;
-				u8 OTA_BEGIN[2] = { FOTA_PACKET_BEGIN, G_INFORMATION.dev_type };
-				//		u8 OTA_DATA[2] = { FOTA_PACKET_DATA, G_INFORMATION.dev_type };
-				u8 OTA_END[2] = { FOTA_PACKET_END, G_INFORMATION.dev_type };
+			ota_ret_t rslt_ota = OTA_RET_ERROR;
+			if ((packet.payload[0] <= FOTA_PACKET_END)) {
+				if (packet.payload[1] == G_INFORMATION.dev_type) {
+					rslt_ota = DFU_OTA_FW_PUT(packet.payload,fl_crc8(packet.payload,SIZEU8(packet.payload)));
+					if (OTA_RET_OK != rslt_ota) {
+						ERR(APP,"FOTA DFU Err <RET ERR>\r\n");
+					}
+					/*DEBUG*/
+					FOTA_SLAVE_INFO.version = packet.payload[2];
+					FOTA_SLAVE_INFO.fw_type = packet.payload[1];
+					FOTA_SLAVE_INFO.pack_type = packet.payload[0];
+					if (FOTA_SLAVE_INFO.pack_type == FOTA_PACKET_BEGIN) {
+						FOTA_SLAVE_INFO.begin++;
+						FOTA_SLAVE_INFO.fw_size = MAKE_U32(0,packet.payload[5],packet.payload[4],packet.payload[3]);
+						FOTA_SLAVE_INFO.rtt = fl_rtc_get();
+						FOTA_SLAVE_INFO.body = 0;
+						FOTA_SLAVE_INFO.end = 0;
+					}
+					if (FOTA_SLAVE_INFO.pack_type == FOTA_PACKET_DATA) {
+						FOTA_SLAVE_INFO.body++;
+						P_INFO("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
+						P_INFO("[T%d,v%d]Downloading:%d/%d (%d/%d)",FOTA_SLAVE_INFO.fw_type,FOTA_SLAVE_INFO.version,
+								FOTA_SLAVE_INFO.body*OTA_PACKET_LENGTH,FOTA_SLAVE_INFO.fw_size,FL_NWK_FOTA_IsReady(),G_FW_QUEUE_REC.count);
+					}
+					if (FOTA_SLAVE_INFO.pack_type == FOTA_PACKET_END) {
+						FOTA_SLAVE_INFO.end++;
+						FOTA_SLAVE_INFO.rtt = fl_rtc_get() - FOTA_SLAVE_INFO.rtt;
+						P_INFO("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
+						P_INFO("[T%d,v%d]Begin:%d,Body:%d,End:%d,RTT:%d s\r\n",FOTA_SLAVE_INFO.fw_type,FOTA_SLAVE_INFO.version,FOTA_SLAVE_INFO.begin,
+								FOTA_SLAVE_INFO.body,FOTA_SLAVE_INFO.end,FOTA_SLAVE_INFO.rtt);
+						FOTA_SLAVE_INFO.rtt = fl_rtc_get();
+						FOTA_SLAVE_INFO.begin = 0;
+					}
+					/*END DEBUG*/
+//					else {
+					//add send repeat and check echo
+					if (fl_wifi2ble_fota_fwpush(&fota_pack,packet.payload[0]) == -1) {
+						//re-send this slot
+						//				G_FW_QUEUE_REC.head_index = curr_head;
+						//				G_FW_QUEUE_REC.count++;
+						//				FL_QUEUE_ADD(&G_FW_QUEUE_REC,&fota_pack);
 
-				if (plog_IndexOf(packet.payload,OTA_BEGIN,SIZEU8(OTA_BEGIN),SIZEU8(OTA_BEGIN)) != -1) {
-					//			pack_type = FOTA_PACKET_BEGIN;
-					flag_begin++;
-					rtt = fl_rtc_get();
-				} else if (plog_IndexOf(packet.payload,OTA_END,SIZEU8(OTA_END),SIZEU8(OTA_END)) != -1) {
-					//			pack_type = FOTA_PACKET_END;
-					flag_end++;
-					P_INFO("========================\r\n");
-					P_INFO("** Begin: %d\r\n",flag_begin);
-					P_INFO("** FW   : %d\r\n",fw_size);
-					P_INFO("** End  : %d\r\n",flag_end);
-					P_INFO("** RTT  : %d s\r\n",(u32 )(fl_rtc_get() - rtt));
-					P_INFO("========================\r\n");
-					flag_end = 0;
-					flag_begin = 0;
-					fw_size = 0;
-				} else {
-					//			pack_type = FOTA_PACKET_DATA;
-					fw_size++;
+						P_INFO("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
+						P_INFO("[T%d,v%d]Downloading:%d/%d (%d/%d)",FOTA_SLAVE_INFO.fw_type,FOTA_SLAVE_INFO.version,
+								FOTA_SLAVE_INFO.body*OTA_PACKET_LENGTH,FOTA_SLAVE_INFO.fw_size,FL_NWK_FOTA_IsReady(),G_FW_QUEUE_REC.count);
+						//				if (head_err ==0) {
+						//					head_err=1;
+						//					ERR(APP,"FOTA ECHO Err <Full>\r\n");
+						//				}
+						//				return -1;
+						break;
+					}
+//						else {
+					//				head_err = 0;
+					//				curr_head = G_FW_QUEUE_REC.head_index;
+//						}
+//					}
 				}
-				/*END DEBUG*/
 			}
+		}
+	}
+	//ECHO
+	if (FOTA_SLAVE_INFO.end > 0) {
+		if (FL_NWK_FOTA_IsReady() == G_FW_QUEUE_REC.count && G_FW_QUEUE_REC.count == 0) {
+			FOTA_SLAVE_INFO.rtt = fl_rtc_get() - FOTA_SLAVE_INFO.rtt;
+			P_INFO("\r\n[T%d,v%d]====> FOTA Done (%d s)\r\n",FOTA_SLAVE_INFO.fw_type,FOTA_SLAVE_INFO.version,FOTA_SLAVE_INFO.rtt);
+			FOTA_SLAVE_INFO.end = 0;
+//			fl_slave_fota_RECclear();
+		} else {
+			P_INFO("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
+			P_INFO("[T%d,v%d]Echo:%d/%d",FOTA_SLAVE_INFO.fw_type,FOTA_SLAVE_INFO.version,FL_NWK_FOTA_IsReady(),G_FW_QUEUE_REC.count);
 		}
 	}
 	return -1;
 }
-//void fl_slave_fota_proc(fl_pack_t *_fota_pack){
-//	extern u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
-//	fl_dataframe_format_t packet;
-//	if(!fl_packet_parse(*_fota_pack,&packet)){
-//		ERR(INF,"Packet parse fail!!!\r\n");
-//		return;
-//	}
-//	if (packet.hdr == NWK_HDR_FOTA) {
-//		/*DEBUG*/
-//		static u8 flag_begin = 0;
-//		static u8 flag_end = 0;
-//		static u32 rtt = 0;
-//		static u32 fw_size = 0;
-////		fl_fota_pack_type_e pack_type = FOTA_PACKET_BEGIN;
-//		u8 OTA_BEGIN[2] = { FOTA_PACKET_BEGIN, G_INFORMATION.dev_type };
-////		u8 OTA_DATA[2] = { FOTA_PACKET_DATA, G_INFORMATION.dev_type };
-//		u8 OTA_END[2] = { FOTA_PACKET_END, G_INFORMATION.dev_type };
-//
-//		if (plog_IndexOf(packet.payload,OTA_BEGIN,SIZEU8(OTA_BEGIN),SIZEU8(OTA_BEGIN)) != -1) {
-////			pack_type = FOTA_PACKET_BEGIN;
-//			flag_begin++;
-//			rtt = fl_rtc_get();
-//		} else if (plog_IndexOf(packet.payload,OTA_END,SIZEU8(OTA_END),SIZEU8(OTA_END)) != -1) {
-////			pack_type = FOTA_PACKET_END;
-//			flag_end++;
-//			P_INFO("========================\r\n");
-//			P_INFO("** Begin: %d\r\n",flag_begin);
-//			P_INFO("** FW   : %d\r\n",fw_size);
-//			P_INFO("** End  : %d\r\n",flag_end);
-//			P_INFO("** RTT  : %d s\r\n",(u32 )(fl_rtc_get() - rtt));
-//			P_INFO("========================\r\n");
-//			flag_end = 0;
-//			flag_begin = 0;
-//			fw_size = 0;
-//		} else {
-////			pack_type = FOTA_PACKET_DATA;
-//			fw_size++;
-//		}
-//		/*END DEBUG*/
-//
-//		fl_nwk_LedSignal_run();
-//		/*todo: load fw into the dfu*/
-//		if (packet.payload[1] == G_INFORMATION.dev_type && (packet.payload[0] <= FOTA_PACKET_END)) {
-//			if (OTA_RET_OK != DFU_OTA_FW_PUT(packet.payload,fl_crc8(packet.payload,SIZEU8(packet.payload)))) {
-//				ERR(APP,"FOTA DFU Err <RET ERR>\r\n");
-//			}
-//		}
-//		//add send repeat and check echo
-//		if (fl_wifi2ble_fota_fwpush(_fota_pack,packet.payload[0]) == -1) {
-//			ERR(APP,"FOTA ECHO Err <Full>\r\n");
-//		}
-//	}
-//}
 
 /***************************************************
  * @brief 		:soft-timer callback for the processing response

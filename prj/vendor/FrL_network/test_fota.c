@@ -72,7 +72,7 @@ int _send_fw(void){
 		VIRTUAL_FW_INDX++;
 
 		P_INFO("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
-		P_INFO("Downloading:%d/%d",VIRTUAL_FW_INDX*OTA_PACKET_LENGTH,VIRTUAL_FW_SIZE);
+		P_INFO("Downloading:%d/%d (%d)",VIRTUAL_FW_INDX*OTA_PACKET_LENGTH,VIRTUAL_FW_SIZE,FL_NWK_FOTA_IsReady());
 //		P_INFO("\rDownloading: %6d / %6d\r", VIRTUAL_FW_INDX * OTA_PACKET_LENGTH, VIRTUAL_FW_SIZE);
 		return 0;
 	}
