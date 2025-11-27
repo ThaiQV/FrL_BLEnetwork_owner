@@ -176,7 +176,12 @@ static int rx_from_uart_cb(void) //UART data send to Master,we will handler the 
 static int tx_to_uart_cb(void) {
 	u8 *p = my_fifo_get(&fl_tx_fifo);
 	if (p && !FLAG_uart_dma_send) {
+		memset(FL_TXDATA.data,0,sizeof(FL_TXDATA.data));
 		FL_TXDATA.len = (unsigned int) p[0];
+		if(FL_TXDATA.len>=sizeof(FL_TXDATA.data)){
+			ERR(MCU,"UART SEND OVERLOAD (%d)!!!\r\n",FL_TXDATA.len);
+			FL_TXDATA.len = 5;
+		}
 		memcpy(&FL_TXDATA.data,&p[1],FL_TXDATA.len);
 		if (uart_send_dma(G_INPUT_EXT.serial.uart_num,(u8 *) (&FL_TXDATA.data),FL_TXDATA.len)) {
 			my_fifo_pop(&fl_tx_fifo);
@@ -217,6 +222,7 @@ void fl_input_serial_rec(void) {
 		u8* cur_addr = fl_rx_fifo.p + (fl_rx_fifo.wptr & (fl_rx_fifo.num - 1)) * fl_rx_fifo.size;
 		uart_receive_dma(G_INPUT_EXT.serial.uart_num,(unsigned char *)cur_addr,(unsigned int) fl_rx_fifo.size);
 		uart_clr_irq_status(G_INPUT_EXT.serial.uart_num,UART_CLR_RX);
+
 		return;
 	}
 	u8* w = fl_rx_fifo.p + (fl_rx_fifo.wptr & (fl_rx_fifo.num - 1)) * fl_rx_fifo.size;
