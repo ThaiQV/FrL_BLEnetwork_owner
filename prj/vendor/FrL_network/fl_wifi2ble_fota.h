@@ -32,10 +32,11 @@
 #endif
 
 #define FOTA_PACK_SIZE_MIN 				16
-#define FOTA_PACK_FW_SIZE				22
+#define FOTA_PACK_FW_SIZE				21
 #define FOTA_RETRY_POSITION				(40-1)//SIZEU8(G_FW_QUEUE_SENDING.data[0].data_arr)
 #define FOTA_TYPEPACK_POSITION			(FOTA_RETRY_POSITION-1)
-#define FOTA_MAC_INCOM_POSITION			(FOTA_TYPEPACK_POSITION-6) //mac size is 6 bytes
+#define FOTA_MAC_INCOM_SIZE				4
+#define FOTA_MAC_INCOM_POSITION			(FOTA_TYPEPACK_POSITION-FOTA_MAC_INCOM_SIZE) //mac size is 4 bytes
 #define FOTA_MILSTEP_POSITION			5
 #define FOTA_FW_DATA_POSITION			(1+4+1+1) //hdr+timestamp[4]+milltamp+slaveID
 #define FOTA_EXIT_VALUE					0x7FFF
@@ -51,6 +52,18 @@ typedef enum {
 	FOTA_PACKET_DATA = 1,
 	FOTA_PACKET_END = 2,
 } fl_fota_pack_type_e;
+
+//for debuging
+typedef struct {
+	u32 fw_size;
+	u32 body;
+	u32 rtt;
+	u8 version;
+	u8 pack_type;
+	u8 fw_type;
+	u8 begin;
+	u8 end;
+} fl_ble2wif_fota_info_t;
 
 u16 FL_NWK_FOTA_IsReady(void);
 s16 fl_wifi2ble_fota_find(fl_pack_t *_pack_rec);

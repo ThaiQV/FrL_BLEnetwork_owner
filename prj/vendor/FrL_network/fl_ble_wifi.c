@@ -28,6 +28,8 @@ volatile fl_timetamp_withstep_t WIFI_ORIGINAL_GETALL;
 
 #define BLE_WIFI_MAXLEN					(FL_TXFIFO_SIZE-3)
 
+u8 BLE_WIFI_HDR[3]={'#','F','L'};
+
 typedef struct {
 	u8 len_data;
 	u8 cmd;
@@ -570,16 +572,6 @@ void RSTFACTORY_RESPONSE(u8* _pdata){}
 /******************************************************************************/
 /******************************************************************************/
 u8 data_fw[22];
-//for debuging
-typedef struct {
-	u32 fw_size;
-	u32 body;
-//	u32 rtt;
-	u8 version;
-	u8 fw_type;
-	u8 begin;
-	u8 end;
-} fl_ble2wif_fota_info_t;
 fl_ble2wif_fota_info_t FOTA_INFO;
 void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 	extern fl_slaves_list_t G_NODE_LIST;
@@ -623,8 +615,8 @@ void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 						FOTA_INFO.version=data_fw[2];
 						FOTA_INFO.fw_type=data_fw[1];
 						FOTA_INFO.body++;
-						P_INFO("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
-						P_INFO("[T%d,v%d]Downloading:%d/%d",FOTA_INFO.fw_type,FOTA_INFO.version,FOTA_INFO.body*OTA_PACKET_LENGTH,FOTA_INFO.fw_size);
+						P_INFO("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
+						P_INFO("[T%d,v%d]Downloading:%d/%d (%d)",FOTA_INFO.fw_type,FOTA_INFO.version,FOTA_INFO.body*OTA_PACKET_LENGTH,FOTA_INFO.fw_size,FL_NWK_FOTA_IsReady());
 					}
 				}
 				else if(data_fw[0] == FOTA_PACKET_END){
@@ -678,20 +670,39 @@ void FOTA_RESPONSE(u8* _pdata){
 /***                            Functions callback                           **/
 /******************************************************************************/
 /******************************************************************************/
+
 void fl_ble_wifi_proc(u8* _pdata) {
-	u8 len_cmd = 0;
-	u8 cmd_in_data = 1;
-	for (; cmd_in_data < _pdata[0]; cmd_in_data += len_cmd) {
-		fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[cmd_in_data];
-		LOGA(DRV,"WIFI|cmd_in_data:%d,len_cmd:%d\r\n",cmd_in_data,len_cmd);
+//	u8 len_cmd = 0;
+//	u8 cmd_in_data = 1;
+//	for (; cmd_in_data < _pdata[0]; cmd_in_data += len_cmd) {
+//		fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[cmd_in_data];
+//		LOGA(DRV,"WIFI|cmd_in_data:%d,len_cmd:%d\r\n",cmd_in_data,len_cmd);
+//		for (u8 i = 0; i < GWIFI_SIZE; i++) {
+//			if (data->cmd == G_WIFI_CON[i].req.cmd) {
+//				G_WIFI_CON[i].req.ReqFunc(&_pdata[cmd_in_data - 1],G_WIFI_CON[i].rsp.Rspfnc);
+//				LOGA(DRV,"WIFI|CMDID:%d,CON_cmdid:%d\r\n",data->cmd,(u8 )G_WIFI_CON[i].req.cmd);
+//				break;
+//			}
+//		}
+//		len_cmd = data->len_data + SIZEU8(data->cmd) + SIZEU8(data->crc8) + SIZEU8(data->len_data);
+//	}
+	u8 wifi_cmd_buffer[SIZEU8(fl_datawifi2ble_t)];
+	u8 len_cmd = _pdata[0]+1;
+	//P_INFO_HEX(_pdata,len_cmd,"WIFI(len:%d)->",len_cmd);
+	s8 indx_start = plog_IndexOf(_pdata,BLE_WIFI_HDR,SIZEU8(BLE_WIFI_HDR),len_cmd);
+	while (indx_start > 0 && indx_start < len_cmd) {
+		memset(wifi_cmd_buffer,0,SIZEU8(wifi_cmd_buffer));
+		memcpy(&wifi_cmd_buffer[1],&_pdata[indx_start + SIZEU8(BLE_WIFI_HDR)],_pdata[indx_start + SIZEU8(BLE_WIFI_HDR)]+3);
+		wifi_cmd_buffer[0]=len_cmd;
+		//fl_datawifi2ble_t data ;//= (fl_datawifi2ble_t*) &wifi_cmd_buffer[indx_start + SIZEU8(BLE_WIFI_HDR)];
+//		P_INFO_HEX(wifi_cmd_buffer,wifi_cmd_buffer[1]+3,"WIFI(idx:%d)->",indx_start);
 		for (u8 i = 0; i < GWIFI_SIZE; i++) {
-			if (data->cmd == G_WIFI_CON[i].req.cmd) {
-				G_WIFI_CON[i].req.ReqFunc(&_pdata[cmd_in_data - 1],G_WIFI_CON[i].rsp.Rspfnc);
-				LOGA(DRV,"WIFI|CMDID:%d,CON_cmdid:%d\r\n",data->cmd,(u8 )G_WIFI_CON[i].req.cmd);
+			if (wifi_cmd_buffer[2] == G_WIFI_CON[i].req.cmd) {
+				G_WIFI_CON[i].req.ReqFunc(wifi_cmd_buffer,G_WIFI_CON[i].rsp.Rspfnc);
 				break;
 			}
 		}
-		len_cmd = data->len_data + SIZEU8(data->cmd) + SIZEU8(data->crc8) + SIZEU8(data->len_data);
+		indx_start = indx_start + SIZEU8(BLE_WIFI_HDR) + wifi_cmd_buffer[1]+3;//len + cmdid+ crc
 	}
 }
 

@@ -410,11 +410,13 @@ typedef struct {
 	u8 patch;
 } fl_version_t;
 
-inline s8 plog_IndexOf(u8 *data, u8 *pfind, u8 find_size,u8 data_size) {
-	u8 data_len = data_size;
-	if (!data || !pfind || find_size == 0 || data_len < find_size)
+inline s8 plog_IndexOf(u8 *data, u8 *pfind, u8 find_size, u8 data_size) {
+//	u8 data_len = data_size;
+//	if (!data || !pfind || find_size == 0 || data_len < find_size)
+//		return -1;
+	if (find_size == 0 || data_size < find_size)
 		return -1;
-	for (u8 i = 0; i <= data_len - find_size; i++) {
+	for (s8 i = 0; i <= data_size - find_size; i++) {
 		if (memcmp(&data[i],pfind,find_size) == 0) {
 			return i;
 		}
