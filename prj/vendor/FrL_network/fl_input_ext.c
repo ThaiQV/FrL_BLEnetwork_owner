@@ -134,6 +134,12 @@ s8 RegisterPOLLING(fl_exIO_t _io) {
 /******************************************************************************/
 #ifdef MASTER_CORE
 /////////////////////////////////////blc_register_hci_handler for spp////////////////////////////
+
+void fl_serial_buffer_ClearAll(void){
+	memset(fl_tx_fifo_b,0,sizeof(fl_tx_fifo_b));
+	memset(fl_tx_fifo_b,0,sizeof(fl_tx_fifo_b));
+}
+
 static void fl_serial_AddLenIn1st(u8 *parr, u8 _size) {
 	u8 arr_bkp[UART_DATA_LEN];
 	if (_size > UART_DATA_LEN) {
@@ -222,7 +228,7 @@ void fl_input_serial_rec(void) {
 		u8* cur_addr = fl_rx_fifo.p + (fl_rx_fifo.wptr & (fl_rx_fifo.num - 1)) * fl_rx_fifo.size;
 		uart_receive_dma(G_INPUT_EXT.serial.uart_num,(unsigned char *)cur_addr,(unsigned int) fl_rx_fifo.size);
 		uart_clr_irq_status(G_INPUT_EXT.serial.uart_num,UART_CLR_RX);
-
+		fl_serial_buffer_ClearAll();
 		return;
 	}
 	u8* w = fl_rx_fifo.p + (fl_rx_fifo.wptr & (fl_rx_fifo.num - 1)) * fl_rx_fifo.size;

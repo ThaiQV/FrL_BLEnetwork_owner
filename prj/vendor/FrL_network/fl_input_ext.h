@@ -47,7 +47,7 @@ void fl_input_collection_node_handle(blt_timer_callback_t _fnc, u16 _timeout_ms)
 int fl_serial_send(u8* _data, u8 _len);
 void fl_input_serial_init(uart_num_e uart_num, uart_tx_pin_e tx_pin, uart_rx_pin_e rx_pin, u32 baudrate);
 void fl_input_serial_rec(void);
-
+void fl_serial_buffer_ClearAll(void);
 #endif
 
 #endif /* VENDOR_FRL_NETWORK_FL_INPUT_EXT_H_ */

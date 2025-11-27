@@ -82,6 +82,7 @@ void uart1_recieve_irq(void) {
 		ERR(APP,"UART FAIL !!\r\n");
 		uart_clr_irq_status(UART1,UART_CLR_RX);
 		FLAG_uart_dma_send = 0;
+		fl_serial_buffer_ClearAll();
 	}
 #endif
 }
