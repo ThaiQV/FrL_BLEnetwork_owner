@@ -269,6 +269,7 @@ static subapp_result_t data_app_deinit(subapp_t* self)
 
 static void data_app_event_handler(const event_t* event, void* user_data)
 {
+	u8 tbs_profile[1] = {0} ;
 	if(data_ctx.mode == APP_MODE_SELEC)
 	{
 		if(event->type == EVENT_BUTTON_PPD_HOLD_3S)
@@ -312,6 +313,9 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 			
 			g_app_data.count->pass_product = 0;
 			g_app_data.count->err_product = 0;
+			g_app_data.is_call = false;
+			tbs_profile[0] = 0 ;
+			fl_db_tbsprofile_save(tbs_profile,SIZEU8(tbs_profile));
 			update_cont();
 			data_ctx.mode = APP_MODE_SELEC;
 
@@ -425,10 +429,11 @@ static void data_app_event_handler(const event_t* event, void* user_data)
             ULOGA("Handle EVENT_BUTTON_RST_PED_HOLD_5S\n");
 			ULOGA("PAIR\n");
 			g_app_data.is_call = false;
-			u8 tbs_profile[1] = {0} ;
+			tbs_profile[0] = 0 ;
 			fl_db_tbsprofile_save(tbs_profile,SIZEU8(tbs_profile));
 			EVENT_PUBLISH_SIMPLE(EVENT_LED_CALL_OFF, EVENT_PRIORITY_HIGH);
 			EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_PAIRING, EVENT_PRIORITY_HIGH);
+			EVENT_PUBLISH_SIMPLE(EVENT_DISABLE_COUNTER_BT, EVENT_PRIORITY_HIGH);
 
             break;
         case EVENT_BUTTON_RST_PEU_HOLD_5S:
@@ -442,6 +447,7 @@ static void data_app_event_handler(const event_t* event, void* user_data)
             ULOGA("Handle EVENT_BUTTON_CALL_HOLD_3S\n");
 			ULOGA("remove network\n");
 			EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_REMOVE_GW, EVENT_PRIORITY_HIGH);
+			EVENT_PUBLISH_SIMPLE(EVENT_DISABLE_COUNTER_BT, EVENT_PRIORITY_HIGH);
 
 			break;
 
@@ -461,6 +467,12 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 			{
 				EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_PAIRING, EVENT_PRIORITY_HIGH);
 			}
+
+			if (IsJoinedNetwork())
+			{
+				EVENT_PUBLISH_SIMPLE(EVENT_ENABLE_COUNTER_BT, EVENT_PRIORITY_HIGH);
+			}
+			
 			break;
 
         default:

@@ -152,7 +152,7 @@ void my_timeout_callback(uint8_t row) {
 	{
 		case LCD_PRINT_STARTUP:
 			lcd_ctx.startup = 0;
-			lcd_ctx.print_type = LCD_PRINT_NONE;
+			lcd_ctx.print_type = LCD_PRINT_OFF;
 			EVENT_PUBLISH_SIMPLE(EVENT_DATA_START_DONE, EVENT_PRIORITY_HIGH);
 			continue;
 
@@ -204,6 +204,7 @@ void my_timeout_callback(uint8_t row) {
 			{
 				lcd_ctx.print_type = LCD_PRINT_OFF;
 				lcd_app_clear_all(&app_handle);
+				EVENT_PUBLISH_SIMPLE(EVENT_ENABLE_COUNTER_BT, EVENT_PRIORITY_HIGH);
 				continue;
 			}
 			else
@@ -405,8 +406,18 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 
 					if (lcd_ctx.row0_mess_num == COUNTER_LCD_MESS_MAX)
 					{
-						lcd_app_set_message(&app_handle, 0, "               ", 1);
-						lcd_app_set_message(&app_handle, 1, "               ", 1);
+						if (get_data.is_mode_actic())
+						{
+							lcd_app_set_message(&app_handle, 0, "   Trong Ca     ", 15000); // 0, timeout 10s
+						}
+						else
+						{
+							lcd_app_set_message(&app_handle, 0, "   Chay Thu     ", 15000); // 0, timeout 10s
+						}
+
+						lcd_app_clear_row(&app_handle, 1);
+						lcd_ctx.print_mode = 1;
+						lcd_ctx.row0_mess_num = find_next_mess(COUNTER_LCD_MESS_MAX);
 						break;
 					}
 
@@ -440,7 +451,14 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 		case EVENT_DATA_PASS_PRODUCT_UP:
 			if(lcd_ctx.print_type != LCD_PRINT_ERR)
 			{
-				break;
+				if (lcd_ctx.print_type == LCD_PRINT_MESS && lcd_ctx.print_mode == 2)
+				{
+					
+				}
+				else
+				{
+					break;
+				}
 			}
 		case EVENT_DATA_ERR_PRODUCT_CHANGE:
 		case EVENT_DATA_PASS_PRODUCT_DOWN:
