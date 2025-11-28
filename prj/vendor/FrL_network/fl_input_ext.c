@@ -136,6 +136,7 @@ s8 RegisterPOLLING(fl_exIO_t _io) {
 /////////////////////////////////////blc_register_hci_handler for spp////////////////////////////
 
 void fl_serial_buffer_ClearAll(void){
+	ERR(APP,"UART <ERR> => Clear ALL\r\n");
 	memset(fl_tx_fifo_b,0,sizeof(fl_tx_fifo_b));
 	memset(fl_tx_fifo_b,0,sizeof(fl_tx_fifo_b));
 }

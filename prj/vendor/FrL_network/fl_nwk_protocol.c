@@ -608,7 +608,7 @@ int ping_process(void){
 }
 
 void CMD_PING(u8* _data) {
-	char mac_str[12]; //
+	char mac_str[13]; //
 	uint8_t mac[6];
 	u16 value=0 ;//
 	////p set ping 803948775fd8 3
