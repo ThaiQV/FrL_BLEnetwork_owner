@@ -22,7 +22,9 @@
 
 /* Definition */
 	/* For bootloader */
+	#define DFU_VERSION   					1
 	#define FLASH_R_BASE_ADDR   			0x20000000
+	#define DFU_HEADER						0xE000
 	#define APP_IMAGE_HEADER				0xF000
 	#define APP_IMAGE_ADDR					0x10000
 	#define APP_IMAGE_SIZE_MAX				0x30000
@@ -117,7 +119,8 @@
 	ota_ret_t ota_fw_put(uint8_t *pdata, uint8_t crc);
 	ota_ret_t ota_packet_header_set(ota_fw_header_t *header);
 	ota_ret_t ota_packet_header_get(ota_fw_header_t *header);
-	uint8_t set_current_fw_version(uint8_t fw_patch);
-	uint8_t get_current_fw_version(void);
-	void test_ota(void);
+	uint8_t set_current_fw_version(fw_header_t *fw_header);
+	void get_current_fw_version(fw_header_t *fw_header);
+	uint8_t set_dfu_version(void);
+	uint8_t get_dfu_version(void);
 #endif //__DFU_H__

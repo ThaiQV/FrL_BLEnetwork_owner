@@ -1,10 +1,10 @@
 drivers/B91/ext_driver/software_pa.d drivers/B91/ext_driver/software_pa.o: \
  ../drivers/B91/ext_driver/software_pa.c ../common/compiler.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/common/config/user_config.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/vendor/common/user_config.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/vendor/B91_dfu/app_config.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/vendor/common/default_config.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/config.h \
+ /cygdrive/E/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/common/config/user_config.h \
+ /cygdrive/E/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/vendor/common/user_config.h \
+ /cygdrive/E/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/vendor/B91_dfu/app_config.h \
+ /cygdrive/E/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/vendor/common/default_config.h \
+ /cygdrive/E/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/config.h \
  ../drivers/B91/ext_driver/software_pa.h \
  ../drivers/B91/ext_driver/../gpio.h \
  ../drivers/B91/ext_driver/../lib/include/plic.h \
@@ -37,15 +37,15 @@ drivers/B91/ext_driver/software_pa.d drivers/B91/ext_driver/software_pa.o: \
 
 ../common/compiler.h:
 
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/common/config/user_config.h:
+/cygdrive/E/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/common/config/user_config.h:
 
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/vendor/common/user_config.h:
+/cygdrive/E/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/vendor/common/user_config.h:
 
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/vendor/B91_dfu/app_config.h:
+/cygdrive/E/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/vendor/B91_dfu/app_config.h:
 
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/vendor/common/default_config.h:
+/cygdrive/E/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/vendor/common/default_config.h:
 
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/config.h:
+/cygdrive/E/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/config.h:
 
 ../drivers/B91/ext_driver/software_pa.h:
 

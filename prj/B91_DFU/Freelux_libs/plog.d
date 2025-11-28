@@ -25,11 +25,11 @@ Freelux_libs/plog.d Freelux_libs/plog.o: ../Freelux_libs/plog.c \
  ../drivers/B91/reg_include/swire_reg.h ../drivers/B91/core.h \
  ../drivers/B91/lib/include/sys.h ../drivers/B91/reg_include/stimer_reg.h \
  ../common/compiler.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/common/config/user_config.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/vendor/common/user_config.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/vendor/B91_dfu/app_config.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/vendor/common/default_config.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/config.h \
+ /cygdrive/E/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/common/config/user_config.h \
+ /cygdrive/E/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/vendor/common/user_config.h \
+ /cygdrive/E/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/vendor/B91_dfu/app_config.h \
+ /cygdrive/E/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/vendor/common/default_config.h \
+ /cygdrive/E/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/config.h \
  ../drivers/B91/analog.h ../drivers/B91/dma.h \
  ../drivers/B91/reg_include/gpio_reg.h
 
@@ -99,15 +99,15 @@ Freelux_libs/plog.d Freelux_libs/plog.o: ../Freelux_libs/plog.c \
 
 ../common/compiler.h:
 
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/common/config/user_config.h:
+/cygdrive/E/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/common/config/user_config.h:
 
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/vendor/common/user_config.h:
+/cygdrive/E/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/vendor/common/user_config.h:
 
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/vendor/B91_dfu/app_config.h:
+/cygdrive/E/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/vendor/B91_dfu/app_config.h:
 
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/vendor/common/default_config.h:
+/cygdrive/E/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/vendor/common/default_config.h:
 
-/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/config.h:
+/cygdrive/E/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/config.h:
 
 ../drivers/B91/analog.h:
 

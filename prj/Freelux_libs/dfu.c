@@ -341,6 +341,7 @@ void firmware_check(void)
 
 	// Init ex-flash
 	FLASH_Port_Init();
+	set_dfu_version();
 
 //	ex_flash_region_erase(ORIGINAL_FW_ADDRESS);
 //	ex_flash_region_erase(OTA_FW_ADDRESS);
@@ -637,16 +638,60 @@ ota_ret_t ota_packet_header_get(ota_fw_header_t *header)
 	}
 	return OTA_RET_ERROR;
 }
+
+///**
+//* @brief: set current FW version
+//* @param: see below
+//*/
+//uint8_t set_current_fw_version(uint8_t fw_patch)
+//{
+//	fw_header_t header_current_fw;
+//	flash_read_page(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER, sizeof(fw_header_t), (uint8_t *)&header_current_fw);
+//	// Only set version if it is not set
+//	if((header_current_fw.major == 0xFF) && (header_current_fw.minor == 0xFF) && (header_current_fw.patch == 0xFF))
+//	{
+//		// Erase header page before write new header
+//		flash_read_mid();
+//		flash_unlock_mid146085();
+//		flash_erase_sector(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER);
+//
+//		// Write Application current FW header
+//		header_current_fw.major = 0; // Set default = 1 due to only use 1 byte version
+//		header_current_fw.minor = 0; // Set default = 1 due to only use 1 byte version
+//		header_current_fw.patch = fw_patch;
+//		header_current_fw.size  = 0x40000; // Set default = 0x40000
+//		flash_write_page(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER, sizeof(header_current_fw), (uint8_t *)&header_current_fw);
+//		return 1;
+//	}
+//	return 0;
+//}
+//
+///**
+//* @brief: Get current FW version, due to OTA only send 1 byte version so return only "patch" of version
+//* @param: see below
+//*/
+//uint8_t get_current_fw_version(void)
+//{
+//	fw_header_t header_current_fw;
+//
+//	// Read header of current FW in internal-flash
+//	flash_read_page(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER, sizeof(fw_header_t), (uint8_t *)&header_current_fw);
+//	DFU_PRINTF("Current FW ver: %x.%x.%x\n",header_current_fw.major,header_current_fw.minor,header_current_fw.patch);
+//	DFU_PRINTF("Size: %x\n",header_current_fw.size);
+//	return header_current_fw.patch;
+//}
+
 /**
-* @brief: set current FW verison
+* @brief: set current FW version
 * @param: see below
 */
-uint8_t set_current_fw_version(uint8_t fw_patch)
+uint8_t set_current_fw_version(fw_header_t *fw_header)
 {
 	fw_header_t header_current_fw;
 	flash_read_page(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER, sizeof(fw_header_t), (uint8_t *)&header_current_fw);
 	// Only set version if it is not set
-	if((header_current_fw.major == 0xFF) && (header_current_fw.minor == 0xFF) && (header_current_fw.patch == 0xFF))
+//	if((header_current_fw.major == 0xFF) && (header_current_fw.minor == 0xFF) && (header_current_fw.patch == 0xFF))
+	if((header_current_fw.major != fw_header->major) || (header_current_fw.minor != fw_header->minor) || (header_current_fw.patch != fw_header->patch))
 	{
 		// Erase header page before write new header
 		flash_read_mid();
@@ -654,11 +699,11 @@ uint8_t set_current_fw_version(uint8_t fw_patch)
 		flash_erase_sector(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER);
 
 		// Write Application current FW header
-		header_current_fw.major = 0; // Set default = 1 due to only use 1 byte version
-		header_current_fw.minor = 0; // Set default = 1 due to only use 1 byte version
-		header_current_fw.patch = fw_patch;
-		header_current_fw.size  = 0x40000; // Set default = 0x40000
+		header_current_fw.major = fw_header->major; // Set default = 1 due to only use 1 byte version
+		header_current_fw.minor = fw_header->minor; // Set default = 1 due to only use 1 byte version
+		header_current_fw.patch = fw_header->patch;
 		flash_write_page(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER, sizeof(header_current_fw), (uint8_t *)&header_current_fw);
+		return 1;
 	}
 	return 0;
 }
@@ -667,13 +712,52 @@ uint8_t set_current_fw_version(uint8_t fw_patch)
 * @brief: Get current FW version, due to OTA only send 1 byte version so return only "patch" of version
 * @param: see below
 */
-uint8_t get_current_fw_version(void)
+void get_current_fw_version(fw_header_t *fw_header)
 {
-	fw_header_t header_current_fw;
-
 	// Read header of current FW in internal-flash
-	flash_read_page(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER, sizeof(fw_header_t), (uint8_t *)&header_current_fw);
-	DFU_PRINTF("Current FW ver: %x.%x.%x\n",header_current_fw.major,header_current_fw.minor,header_current_fw.patch);
-	DFU_PRINTF("Size: %x\n",header_current_fw.size);
-	return header_current_fw.patch;
+	flash_read_page(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER, sizeof(fw_header_t), (uint8_t *)fw_header);
+	DFU_PRINTF("Current FW ver: %x.%x.%x\n",fw_header->major,fw_header->minor,fw_header->patch);
+	DFU_PRINTF("Size: %x\n",fw_header->size);
+}
+
+/**
+* @brief: set DFU version
+* @param: see below
+*/
+uint8_t set_dfu_version(void)
+{
+	fw_header_t header_dfu;
+	flash_read_page(FLASH_R_BASE_ADDR + DFU_HEADER, sizeof(fw_header_t), (uint8_t *)&header_dfu);
+	// Only set version if it is not set
+	if(header_dfu.patch != DFU_VERSION)
+	{
+		// Erase header page before write new header
+		flash_read_mid();
+		flash_unlock_mid146085();
+		flash_erase_sector(FLASH_R_BASE_ADDR + DFU_HEADER);
+
+		// Write Application current FW header
+		header_dfu.major = 0; 				// Set default = 1 due to only use 1 byte version
+		header_dfu.minor = 0; 				// Set default = 1 due to only use 1 byte version
+		header_dfu.patch = DFU_VERSION;
+		header_dfu.size  = 0xE000; 			// Set default = 0xE000
+		flash_write_page(FLASH_R_BASE_ADDR + DFU_HEADER, sizeof(header_dfu), (uint8_t *)&header_dfu);
+		return 1;
+	}
+	return 0;
+}
+
+/**
+* @brief: Get DFU version
+* @param: see below
+*/
+uint8_t get_dfu_version(void)
+{
+	fw_header_t header_dfu;
+
+	// Read header of DFU in internal-flash
+	flash_read_page(FLASH_R_BASE_ADDR + DFU_HEADER, sizeof(fw_header_t), (uint8_t *)&header_dfu);
+	DFU_PRINTF("Current FW ver: %x.%x.%x\n",header_dfu.major,header_dfu.minor,header_dfu.patch);
+	DFU_PRINTF("Size: %x\n",header_dfu.size);
+	return header_dfu.patch;
 }

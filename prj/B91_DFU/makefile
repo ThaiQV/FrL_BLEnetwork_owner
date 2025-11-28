@@ -88,7 +88,7 @@ all: B91_DFU.elf secondary-outputs
 B91_DFU.elf: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: Andes C Linker'
-	$(CROSS_COMPILE)gcc -O2 -nostartfiles -static -L"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/proj_lib" -mcmodel=medium -flto -g3 -mcpu=d25f -ffunction-sections -fdata-sections -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -T"/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/boot.link" -Wl,--gc-sections -o "B91_DFU.elf" $(OBJS) $(USER_OBJS) $(LIBS)
+	$(CROSS_COMPILE)gcc -O2 -nostartfiles -static -L"/cygdrive/E/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/proj_lib" -mcmodel=medium -flto -g3 -mcpu=d25f -ffunction-sections -fdata-sections -fmessage-length=0 -fno-builtin -fomit-frame-pointer -fno-strict-aliasing -fshort-wchar -fuse-ld=bfd -fpack-struct -T"/cygdrive/E/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/boot.link" -Wl,--gc-sections -o "B91_DFU.elf" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 	$(MAKE) --no-print-directory post-build
@@ -133,7 +133,7 @@ clean:
 	-@echo ' '
 
 post-build:
-	-"D:\Job\Freelux\Working\TBS_Monitoring\FrL_BLEnetwork_owner\prj/tl_check_fw.bat"   B91_DFU
+	-"E:\All_projects\TELINK\TBS\FrL_BLEnetwork_owner\prj/tl_check_fw.bat"   B91_DFU
 	-@echo ' '
 
 secondary-outputs: $(SYMBOL_OUTPUTS) $(READELF_OUTPUTS) $(OBJDUMP_OUTPUTS) $(SIZE_OUTPUTS)
