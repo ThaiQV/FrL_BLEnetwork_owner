@@ -40,8 +40,8 @@ u8 GETINFO_FLAG_EVENTTEST = 0;
 #define RECHECKING_NETWOK_TIME 		14*1021 		    //ms
 #define RECONNECT_TIME				62*1000*1020		//s
 #define INFORM_MASTER				9*1001*1004
-fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_FOTA,NWK_HDR_A5_HIS,NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
-fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_FOTA,NWK_HDR_A5_HIS,NWK_HDR_55,NWK_HDR_11_REACTIVE,NWK_HDR_22_PING}; // register cmdid REQ
+fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_MASTER_CMD,NWK_HDR_FOTA,NWK_HDR_A5_HIS,NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
+fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_MASTER_CMD,NWK_HDR_FOTA,NWK_HDR_A5_HIS,NWK_HDR_55,NWK_HDR_11_REACTIVE,NWK_HDR_22_PING}; // register cmdid REQ
 
 #define NWK_HDR_SIZE (sizeof(G_NWK_HDR_LIST)/sizeof(G_NWK_HDR_LIST[0]))
 #define NWK_HDR_REQ_SIZE (sizeof(G_NWK_HDR_REQLIST)/sizeof(G_NWK_HDR_REQLIST[0]))
@@ -282,6 +282,7 @@ void fl_nwk_slave_init(void) {
 	TBS_Device_Init();
 	//test random send req
 //	TEST_slave_sendREQ();
+
 }
 /***************************************************
  * @brief 		:synchronization status from packet
@@ -685,6 +686,33 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 						//add repeat_cnt
 						packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
 					} else {
+						//Non-rsp
+						packet_built.length = 0;
+						return packet_built;
+					}
+				}
+			}
+		}
+		break;
+		case NWK_HDR_MASTER_CMD: {
+			if (IsJoinedNetwork()) {
+				//check packet_slaveid
+				if (packet.frame.slaveID == 0xFF || packet.frame.slaveID == G_INFORMATION.slaveID) {
+					if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
+						u8 ok[2] = { 'o', 'k' };
+						memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
+						packet.frame.payload[0]= DFU_OTA_VERISON_GET();//test version
+						memcpy(packet.frame.payload+1,ok,SIZEU8(ok));
+						//change endpoint to node source
+						packet.frame.endpoint.master = FL_FROM_SLAVE;
+						//add repeat_cnt
+						packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
+					} else {
+						u8 master_cmd_settings[22];
+						memcpy(master_cmd_settings,packet.frame.payload,SIZEU8(packet.frame.payload));
+						//Excute cmd
+						P_INFO("CMD:%s\r\n",master_cmd_settings);
+						PLOG_Parser_Cmd(master_cmd_settings);//p log
 						//Non-rsp
 						packet_built.length = 0;
 						return packet_built;

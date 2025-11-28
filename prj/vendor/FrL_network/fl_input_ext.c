@@ -284,7 +284,7 @@ void fl_input_serial_init(uart_num_e uart_num, uart_tx_pin_e tx_pin, uart_rx_pin
 	blc_register_hci_handler(rx_from_uart_cb,tx_to_uart_cb);//customized uart handler
 
 //passing excution function
-	PLOG_RegisterCbk(_Passing_CmdLine);
+//	PLOG_RegisterCbk(_Passing_CmdLine);
 
 }
 

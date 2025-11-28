@@ -54,7 +54,7 @@ volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into endpoint byte (dbg :1
 volatile u8 NWK_REPEAT_MODE = 0; // 1: level | 0 : non-level
 volatile u8 NWK_REPEAT_LEVEL = 3;
 
-fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_FOTA,NWK_HDR_A5_HIS, NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_22_PING}; // register cmdid REQ
+fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_MASTER_CMD,NWK_HDR_FOTA,NWK_HDR_A5_HIS, NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_22_PING}; // register cmdid REQ
 
 #define NWK_HDR_REQ_SIZE (sizeof(G_NWK_HDR_REQLIST)/sizeof(G_NWK_HDR_REQLIST[0]))
 
@@ -550,10 +550,16 @@ u64 fl_req_master_packet_createNsend(u8* _slave_mac,u8 _cmdid,u8* _data, u8 _len
 		ERR(API,"REQ CMD ID hasn't been registered!!\r\n");
 		return 0;
 	}
-	s8 slaveID = fl_master_Node_find(_slave_mac);
-	if(slaveID == -1){
-		ERR(API,"SlaveID NOT FOUND!!\r\n");
-		return 0;
+	//Broadcast SlaveID = 0xFF
+	s8 slaveID = -1;
+	if (IS_MAC_INVALID(_slave_mac,0xFF) == 1) {
+		slaveID = 0xFF;
+	} else {
+		slaveID = fl_master_Node_find(_slave_mac);
+		if (slaveID == -1) {
+			ERR(API,"SlaveID NOT FOUND!!\r\n");
+			return 0;
+		}
 	}
 	fl_send_heartbeat();
 	delay_ms(5);
@@ -613,6 +619,9 @@ u64 fl_req_master_packet_createNsend(u8* _slave_mac,u8 _cmdid,u8* _data, u8 _len
 			req_pack.frame.endpoint.master = FL_FROM_MASTER_ACK;
 		}
 		break;
+		case NWK_HDR_MASTER_CMD:{
+			req_pack.frame.endpoint.master = FL_FROM_MASTER;
+		}break;
 		default:
 			return 0;
 		break;

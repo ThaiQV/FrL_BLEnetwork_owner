@@ -160,6 +160,7 @@ void PLOG_Parser_Cmd(u8 *_arr) {//, uint8_t _arr_sz
 		if (plog_IndexOf( _arr,(u8*)plog_cmd[i].cmd_txt,strlen(plog_cmd[i].cmd_txt),20)!= -1) {
 //			plog_cmd[i].Cbk_fnc(bool_dbg_fnc(&_arr[strlen(plog_cmd[i].cmd_txt)+1]),plog_cmd[i].type);
 			plog_cmd[i].Cbk_fnc(plog_cmd[i].type,&_arr[strlen(plog_cmd[i].cmd_txt) + 1]);
+			break;
 		}
 		i++;
 	};

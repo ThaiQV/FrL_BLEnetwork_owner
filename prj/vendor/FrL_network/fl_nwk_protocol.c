@@ -95,6 +95,7 @@ void CMD_CLEARDB(u8* _data);
 void CMD_CHANNELCONFIG(u8* _data);
 void CMD_PING(u8* _data);
 void CMD_TEST(u8* _data);
+void CMD_SETTING_SLAVE(u8* _data);
 /********************* Functions GET CMD declare ********************/
 void CMD_GETSLALIST(u8* _data);
 void CMD_GETINFOSLAVE(u8* _data);
@@ -112,6 +113,7 @@ fl_cmdlines_t G_CMDSET[] = { { { 'u', 't', 'c' }, 3, CMD_SETUTC }, 			// p set u
 		{ { 'c', 'h', 'n' }, 3, CMD_CHANNELCONFIG },						// p set chn <chn1> <chn2> <chn3>
 		{ { 'p', 'i', 'n','g' }, 4, CMD_PING },								// p set ping <mac> <times>
 		{ { 't','e','s','t'  }, 4, CMD_TEST },								// p set test <type> <parameter1> <parameter2> ...
+		{ { 'c','m','d'  }, 3, CMD_SETTING_SLAVE },							// p set cmd <type> <parameter1> <parameter2> ...
 		};
 
 fl_cmdlines_t G_CMDGET[] = { { { 's', 'l', 'a', 'l', 'i', 's', 't' }, 7, CMD_GETSLALIST },	// p get list
@@ -129,6 +131,30 @@ fl_cmdlines_t G_CMDGET[] = { { { 's', 'l', 'a', 'l', 'i', 's', 't' }, 7, CMD_GET
 /***                            Functions callback                           **/
 /******************************************************************************/
 /******************************************************************************/
+void _str2mac(char* _mac_str, u8* mac_arr) {
+	for (int i = 0; i < 12; ++i) {
+		if (!isxdigit(_mac_str[i])) {
+			return;
+		}
+	}
+	for (int i = 0; i < 6; ++i) {
+		char byte_str[3] = { _mac_str[i * 2], _mac_str[i * 2 + 1], '\0' };
+		uint8_t byte = 0;
+		for (int j = 0; j < 2; ++j) {
+			char c = byte_str[j];
+			byte <<= 4;
+			if (c >= '0' && c <= '9')
+				byte += c - '0';
+			else if (c >= 'A' && c <= 'F')
+				byte += c - 'A' + 10;
+			else if (c >= 'a' && c <= 'f')
+				byte += c - 'a' + 10;
+			else
+				return;
+		}
+		mac_arr[i] = byte;
+	}
+}
 #ifdef MASTER_CORE
 
 /***************************************************
@@ -391,6 +417,7 @@ void CMD_TEST(u8* _data) {
 	extern u8 GETINFO_FLAG_EVENTTEST;
 	u8 slave_event[5] = {'e','v','e','n','t'};
 	u8 fota_test[4] = {'f','o','t','a'};
+
 	char cmd[10];
 	int para[3];
 	u8 mqtt_rp[200];
@@ -415,6 +442,20 @@ void CMD_TEST(u8* _data) {
 				TEST_virtual_fw(para[0]);
 			}
 		}
+	}
+}
+void CMD_SETTING_SLAVE(u8* _data) {
+	char mac_str[13];
+	char cmd[22];
+	u8 mqtt_rp[200];
+	memset(mqtt_rp,0,SIZEU8(mqtt_rp));
+	int rslt = sscanf((char*) _data,"cmd %12s %[^\n]",mac_str,cmd);
+	if (rslt > 1) {
+		u8 mac[6];
+		_str2mac(mac_str,mac);
+		fl_api_master_req(mac,NWK_HDR_MASTER_CMD,(u8*)cmd,SIZEU8(cmd),0,0,0);
+		sprintf((char*) mqtt_rp,"Set 0x%s:%s",mac_str,cmd);
+		fl_ble2wifi_DEBUG2MQTT(mqtt_rp,strlen((char*) mqtt_rp));
 	}
 }
 
@@ -565,8 +606,9 @@ int ping_process(void){
 	}
 	return -1;
 }
+
 void CMD_PING(u8* _data) {
-	char mac_str[13]; //
+	char mac_str[12]; //
 	uint8_t mac[6];
 	u16 value=0 ;//
 	////p set ping 803948775fd8 3
@@ -574,28 +616,29 @@ void CMD_PING(u8* _data) {
 	if (rslt < 1) {
 		return;
 	}
-	for (int i = 0; i < 12; ++i) {
-		if (!isxdigit(mac_str[i])) {
-			return;
-		}
-	}
-	for (int i = 0; i < 6; ++i) {
-		char byte_str[3] = { mac_str[i * 2], mac_str[i * 2 + 1], '\0' };
-		uint8_t byte = 0;
-		for (int j = 0; j < 2; ++j) {
-			char c = byte_str[j];
-			byte <<= 4;
-			if (c >= '0' && c <= '9')
-				byte += c - '0';
-			else if (c >= 'A' && c <= 'F')
-				byte += c - 'A' + 10;
-			else if (c >= 'a' && c <= 'f')
-				byte += c - 'a' + 10;
-			else
-				return;
-		}
-		mac[i] = byte;
-	}
+	_str2mac(mac_str,mac);
+//	for (int i = 0; i < 12; ++i) {
+//		if (!isxdigit(mac_str[i])) {
+//			return;
+//		}
+//	}
+//	for (int i = 0; i < 6; ++i) {
+//		char byte_str[3] = { mac_str[i * 2], mac_str[i * 2 + 1], '\0' };
+//		uint8_t byte = 0;
+//		for (int j = 0; j < 2; ++j) {
+//			char c = byte_str[j];
+//			byte <<= 4;
+//			if (c >= '0' && c <= '9')
+//				byte += c - '0';
+//			else if (c >= 'A' && c <= 'F')
+//				byte += c - 'A' + 10;
+//			else if (c >= 'a' && c <= 'f')
+//				byte += c - 'a' + 10;
+//			else
+//				return;
+//		}
+//		mac[i] = byte;
+//	}
 
 	G_NWK_PING.times = (value==0?4:value);
 	G_NWK_PING.rslt.sent = 0;
@@ -864,6 +907,25 @@ void CMD_GETINFOSLAVE(u8* _data) {
 /***                      Processing functions 					             **/
 /******************************************************************************/
 /******************************************************************************/
+#ifndef MASTER_CORE
+void _Passing_CmdLine(type_debug_t _type, u8 *_data) {
+	LOGA(DRV,"CMD(%d):%s\r\n",_type,_data);
+	if (_type == SETCMD) {
+//		CMD_EXCUTE_FUNC(G_CMDSET,sizeof(G_CMDSET) / sizeof(fl_cmdlines_t),_data);
+	} else if (_type == GETCMD) {
+//		CMD_EXCUTE_FUNC(G_CMDGET,sizeof(G_CMDGET) / sizeof(fl_cmdlines_t),_data);
+	} else if (_type == RSTCMD) {
+		ERR(APP,"Device will reset after 1s !!!!\r\n");
+		blt_soft_timer_add(&REBOOT_DEV,1 * 1000 * 1000);
+	}else if (_type == FACTORYCMD) {
+		ERR(APP,"Clear and reset factory.....\r\n");
+		fl_db_clearAll();
+		delay_ms(1000);
+		sys_reboot();
+	}
+}
+
+#endif
 #ifdef MASTER_CORE
 void _Passing_CmdLine(type_debug_t _type, u8 *_data) {
 	LOGA(DRV,"CMD(%d):%s\r\n",_type,_data);
@@ -900,15 +962,10 @@ int nwk_run(void) {
 	}
 	return 0;
 }
-
+#endif
 void fl_nwk_protocol_InitnRun(void){
-//	extern fl_adv_settings_t G_ADV_SETTINGS ;
-//	char cmd_fmt[50];
-//	memset((u8*)cmd_fmt,0,SIZEU8(cmd_fmt));
-//	sprintf(cmd_fmt,"p get info %d %d %d %d %d %d",255,0,8,G_NODE_LIST.slot_inused,G_ADV_SETTINGS.time_wait_rsp,G_ADV_SETTINGS.retry_times);
-//	_Passing_CmdLine(GETCMD,(u8*)cmd_fmt);
-//	FIRST_PROTOCOL_START =1; //don't change
-//	blt_soft_timer_add(&nwk_run,3*1019*1010); //5s
+	//passing excution function
+	PLOG_RegisterCbk(_Passing_CmdLine);
 }
 
-#endif
+

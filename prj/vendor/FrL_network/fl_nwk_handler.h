@@ -43,6 +43,7 @@ typedef enum {
 	NWK_HDR_55 = 0x55, 							// REQ from slave
 	NWK_HDR_A5_HIS=0xA5, 						//history
 	// master -> req -> slave -> rsp
+	NWK_HDR_MASTER_CMD = 0xF1,					//Master send cmd for settings
 	NWK_HDR_F5_INFO = 0xF5, 					//get data information real-time
 	NWK_HDR_F6_SENDMESS = 0xF6, 				//send mess to slave
 	NWK_HDR_F7_RSTPWMETER = 0xF7, 				//Send req to rst pwmeter
@@ -50,6 +51,7 @@ typedef enum {
 	NWK_HDR_ASSIGN = 0xFC,						//Use to assign SlaveID to slave
 	NWK_HDR_HEARTBEAT = 0xFD,
 	NWK_HDR_COLLECT = 0xFE, 					//Use to collect slave (master and slaves)
+
 	// FOTA
 	NWK_HDR_FOTA = 0xFA 						//===> Upload FW via the BLE
 }__attribute__((packed)) fl_hdr_nwk_type_e;
