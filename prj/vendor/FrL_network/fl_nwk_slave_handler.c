@@ -280,7 +280,7 @@ void fl_nwk_slave_init(void) {
 	G_INFORMATION.active = false;
 	//todo: TBS Device initialization
 	TBS_Device_Init();
-	//test random send req
+	//test random send req slave
 //	TEST_slave_sendREQ();
 
 }
