@@ -182,6 +182,7 @@ static int rx_from_uart_cb(void) //UART data send to Master,we will handler the 
  */
 static int tx_to_uart_cb(void) {
 	u8 *p = my_fifo_get(&fl_tx_fifo);
+	FLAG_uart_dma_send=0;
 	if (p && !FLAG_uart_dma_send) {
 		memset(FL_TXDATA.data,0,sizeof(FL_TXDATA.data));
 		FL_TXDATA.len = (unsigned int) p[0];
