@@ -873,11 +873,14 @@ s16 fl_slave_fota_proc(void) {
 			}
 			/*todo: load fw into the dfu*/
 			ota_ret_t rslt_ota = OTA_RET_ERROR;
+			u8 crc =0;
 			if ((packet.payload[0] <= FOTA_PACKET_END)) {
 				if (packet.payload[1] == G_INFORMATION.dev_type) {
-					rslt_ota = DFU_OTA_FW_PUT(packet.payload,fl_crc8(packet.payload,SIZEU8(packet.payload)));
+					crc = fl_crc8(packet.payload,SIZEU8(packet.payload));
+					rslt_ota = DFU_OTA_FW_PUT(packet.payload,crc);
 					if (OTA_RET_OK != rslt_ota) {
 						ERR(APP,"FOTA DFU Err <RET ERR>\r\n");
+						P_INFO_HEX(packet.payload,SIZEU8(packet.payload),"FW(crc:%02X):",crc);
 					}
 					/*DEBUG*/
 					FOTA_SLAVE_INFO.version = packet.payload[2];

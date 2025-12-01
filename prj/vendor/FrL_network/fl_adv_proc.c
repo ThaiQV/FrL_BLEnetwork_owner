@@ -224,7 +224,7 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 				if(incomming_data.data_arr[0] == NWK_HDR_FOTA) {
 					//						P_INFO_HEX(pa->mac,6,"ECHO MAC:");
 //					P_INFO_HEX(incomming_data.data_arr,incomming_data.length,"ECHO:");
-					fl_wifi2ble_fota_recECHO(incomming_data,pa->mac);
+//					fl_wifi2ble_fota_recECHO(incomming_data,pa->mac);
 					return 0;
 				}
 				if (fl_adv_IsFromMaster(incomming_data)) {
