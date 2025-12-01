@@ -261,13 +261,13 @@ void fl_nwk_slave_init(void) {
 	P_INFO("** RstFac :%d\r\n",G_INFORMATION.profile.run_stt.rst_factory);
 	P_INFO("** MAC GW :%02X%02X%02X%02X\r\n",U32_BYTE0( G_INFORMATION.profile.nwk.mac_parent),U32_BYTE1( G_INFORMATION.profile.nwk.mac_parent),
 			U32_BYTE2( G_INFORMATION.profile.nwk.mac_parent),U32_BYTE3( G_INFORMATION.profile.nwk.mac_parent));
-#ifdef HW_SAMPLE_TEST
+//#ifdef HW_SAMPLE_TEST
 	if(G_INFORMATION.slaveID == G_INFORMATION.profile.slaveid && G_INFORMATION.slaveID == 0xFF){
 		ERR(APP,"Turn on install mode\r\n");
 		G_INFORMATION.profile.run_stt.join_nwk = 1;
 		G_INFORMATION.profile.run_stt.rst_factory  = 1 ; //has reset factory device
 	}
-#endif
+//#endif
 
 	blt_soft_timer_add(_nwk_slave_backup,2*1020*999);
 	//Interval checking network
@@ -624,7 +624,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 			if (IsJoinedNetwork()) {
 #ifdef POWER_METER_DEVICE
 				//check packet_slaveid
-				if (packet.frame.slaveID.id_u8 == G_INFORMATION.slaveID.id_u8) {
+				if (packet.frame.slaveID == G_INFORMATION.slaveID) {
 					TBS_PowerMeter_RESETbyMaster(packet.frame.payload[0],packet.frame.payload[1],packet.frame.payload[2]);
 					if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
 						u8 ok[2] = { 'o', 'k' };
@@ -648,7 +648,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 			if (IsJoinedNetwork()) {
 #ifdef POWER_METER_DEVICE
 				//check packet_slaveid
-				if (packet.frame.slaveID.id_u8 == G_INFORMATION.slaveID.id_u8) {
+				if (packet.frame.slaveID == G_INFORMATION.slaveID) {
 					u16 chn1 = MAKE_U16(packet.frame.payload[1],packet.frame.payload[0]);
 					u16 chn2= MAKE_U16(packet.frame.payload[3],packet.frame.payload[2]);
 					u16 chn3= MAKE_U16(packet.frame.payload[5],packet.frame.payload[4]);
