@@ -17,6 +17,7 @@
 #define TBS_DEVICE_STORE_INTERVAL 		2*1010*1001 //5s
 #define TBS_PACKET_INDEX_MAX			12288
 #include "TBS_dev_app/user_lib.h"
+#include "TBS_power_meter_app/power_meter_app.h"
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -267,6 +268,9 @@ void TBS_PowerMeter_init(void){
 	G_POWER_METER.timetamp= fl_rtc_get();
 	test_powermeter();
 	//todo:Init Butt,lcd,7segs,.....
+
+	power_meter_app_init();
+
 }
 void TBS_PowerMeter_Run(void){
 	G_POWER_METER.timetamp = fl_rtc_get();
@@ -282,6 +286,7 @@ void TBS_PowerMeter_Run(void){
 //	G_POWER_METER.data.energy1 = RAND(0,16777216);
 //	G_POWER_METER.data.energy2 = RAND(0,16777216);
 //	G_POWER_METER.data.energy3 = RAND(0,16777216);
+	power_meter_app_loop();
 }
 #endif
 /******************************************************************************/
@@ -400,6 +405,7 @@ void TBS_Device_Init(void){
 	TBS_History_Init();
 #endif
 	blt_soft_timer_add(TBS_Device_Store_run,TBS_DEVICE_STORE_INTERVAL);
+
 }
 
 void TBS_Device_Run(void){
