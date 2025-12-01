@@ -275,7 +275,11 @@ void fl_wifi2ble_fota_init(void){
 	fl_wifi2ble_fota_ContainerClear();
 	DFU_OTA_INIT();
 	//change version
-	DFU_OTA_VERISON_SET(36);
+	DFU_OTA_VERISON_SET(43);
+#ifdef MASTER_CORE
+	//set interval
+	fl_wifi2ble_Fota_Interval_set(60);
+#endif
 }
 
 s16 fl_wifi2ble_fota_recECHO(fl_pack_t _pack_rec,u8* _mac_incom){
@@ -288,7 +292,11 @@ s16 fl_wifi2ble_fota_recECHO(fl_pack_t _pack_rec,u8* _mac_incom){
 //		P_INFO_HEX(_pack_rec.data_arr,SIZEU8(_pack_rec.data_arr),"ECHO:");
 		for (s16 head = 0; head < G_FW_QUEUE_SENDING.mask + 1; head++) {
 			if (G_FW_QUEUE_SENDING.data[head].length > FOTA_PACK_SIZE_MIN
+#ifdef MASTER_CORE
+				&& G_FW_QUEUE_SENDING.data[head].data_arr[FOTA_RETRY_POSITION] > FOTA_RETRY_MAX-1 //sent yet
+#else
 				&& G_FW_QUEUE_SENDING.data[head].data_arr[FOTA_RETRY_POSITION] > 0 //sent yet
+#endif
 				&& plog_IndexOf(G_FW_QUEUE_SENDING.data[head].data_arr,&_pack_rec.data_arr[FOTA_FW_DATA_POSITION],FOTA_PACK_FW_SIZE,G_FW_QUEUE_SENDING.data[head].length) != -1
 				&& plog_IndexOf(G_FW_QUEUE_SENDING.data[head].data_arr,_mac_incom,FOTA_MAC_INCOM_SIZE,SIZEU8(G_FW_QUEUE_SENDING.data[head].data_arr)) == -1)
 			{
@@ -363,14 +371,16 @@ s16 fl_wifi2ble_fota_run(void) {
 	extern volatile u8 F_SENDING_STATE;
 	fl_pack_t his_data_in_queue;
 	if (!F_SENDING_STATE) {
-#ifndef MASTER_CORE//slave
+#ifdef MASTER_CORE
+		IsFOTA_Run();
+#endif
 		u16 head = G_FW_QUEUE_SENDING.head_index;
 		//for (u16 sample_scan = 0; sample_scan < FOTA_FW_QUEUE_SIZE && G_FW_QUEUE_SENDING.count>0 && !F_SENDING_STATE; sample_scan++)
 		while(!F_SENDING_STATE && G_FW_QUEUE_SENDING.count>0){
 			his_data_in_queue = G_FW_QUEUE_SENDING.data[G_FW_QUEUE_SENDING.head_index];
 			if (his_data_in_queue.length > FOTA_PACK_SIZE_MIN) { //minimun size of the fota
 				//FOR SLAVE
-				if (his_data_in_queue.data_arr[FOTA_RETRY_POSITION] % 2 == 0)
+//				if (his_data_in_queue.data_arr[FOTA_RETRY_POSITION] % 2 == 0)
 				{
 //					P_INFO_HEX(his_data_in_queue.data_arr,SIZEU8(his_data_in_queue.data_arr),"FOTA-SEND(%d):",his_data_in_queue.length);
 					fl_adv_send(his_data_in_queue.data_arr,his_data_in_queue.length,G_ADV_SETTINGS.adv_duration);
@@ -383,31 +393,43 @@ s16 fl_wifi2ble_fota_run(void) {
 					if (G_FW_QUEUE_SENDING.count > 0) {
 						G_FW_QUEUE_SENDING.count--;
 					}
+#ifdef MASTER_CORE
+					if (G_FW_QUEUE_SENDING.count == 0 && G_FW_QUEUE_SENDING.data[G_FW_QUEUE_SENDING.head_index].data_arr[FOTA_TYPEPACK_POSITION] == FOTA_PACKET_END) {
+						blt_soft_timer_delete(_fota_timeout_expired);
+						P_INFO("FOTA Done!!!\r\n");
+						fl_wifi2ble_fota_ContainerClear();
+						G_FOTA.runtime.push_return = FOTA_EXIT_VALUE;
+					}
+#endif
 				}
 			}
 			G_FW_QUEUE_SENDING.head_index = (G_FW_QUEUE_SENDING.head_index + 1) & G_FW_QUEUE_SENDING.mask;
 			if(head == G_FW_QUEUE_SENDING.head_index) break;
 		}
-#else
-		IsFOTA_Run();
-		his_data_in_queue = G_FW_QUEUE_SENDING.data[G_FW_QUEUE_SENDING.head_index];
-		if (G_FW_QUEUE_SENDING.count > 0 && his_data_in_queue.length > FOTA_PACK_SIZE_MIN) {
-			//if (his_data_in_queue.data_arr[FOTA_RETRY_POSITION]% FOTA_RETRY_MAX == 0)
-			{
-//				P_INFO_HEX(his_data_in_queue.data_arr,his_data_in_queue.length,"[%d-%d/%d]FOTA(retry:%d):",G_FW_QUEUE_SENDING.head_index,
-//						G_FW_QUEUE_SENDING.tail_index,G_FW_QUEUE_SENDING.count,his_data_in_queue.data_arr[FOTA_RETRY_POSITION]);
-				fl_adv_send(his_data_in_queue.data_arr,his_data_in_queue.length,G_ADV_SETTINGS.adv_duration);
-			}
-			//update num of retry
-			G_FW_QUEUE_SENDING.data[G_FW_QUEUE_SENDING.head_index].data_arr[FOTA_RETRY_POSITION]++;
-			// retry processor
-//			if (G_FW_QUEUE_SENDING.data[indx].data_arr[FOTA_RETRY_POSITION] > FOTA_RETRY_MAX) {
-//				G_FW_QUEUE_SENDING.data[indx].data_arr[FOTA_MILSTEP_POSITION] += RAND_INT(-50,50);
-//				G_FW_QUEUE_SENDING.data[indx].data_arr[FOTA_RETRY_POSITION] = 0;
+//#else
+//		IsFOTA_Run();
+//		his_data_in_queue = G_FW_QUEUE_SENDING.data[G_FW_QUEUE_SENDING.head_index];
+//		if (G_FW_QUEUE_SENDING.count > 0 && his_data_in_queue.length > FOTA_PACK_SIZE_MIN) {
+//			//if (his_data_in_queue.data_arr[FOTA_RETRY_POSITION]% FOTA_RETRY_MAX == 0)
+//			{
+//				P_INFO_HEX(his_data_in_queue.data_arr,his_data_in_queue.length,"[%d/%d]FOTA(retry:%d):",G_FW_QUEUE_SENDING.head_index,G_FW_QUEUE_SENDING.count,his_data_in_queue.data_arr[FOTA_RETRY_POSITION]);
+//				fl_adv_send(his_data_in_queue.data_arr,his_data_in_queue.length,G_ADV_SETTINGS.adv_duration);
 //			}
-		}
-		G_FW_QUEUE_SENDING.head_index = (G_FW_QUEUE_SENDING.head_index + 1) & G_FW_QUEUE_SENDING.mask;
-#endif
+//			//update num of retry
+//			G_FW_QUEUE_SENDING.data[G_FW_QUEUE_SENDING.head_index].data_arr[FOTA_RETRY_POSITION]++;
+//			// retry processor
+//			if (G_FW_QUEUE_SENDING.data[G_FW_QUEUE_SENDING.head_index].data_arr[FOTA_RETRY_POSITION] > FOTA_RETRY_MAX) {
+////				G_FW_QUEUE_SENDING.data[indx].data_arr[FOTA_MILSTEP_POSITION] += RAND_INT(-50,50);
+//				memset(G_FW_QUEUE_SENDING.data[G_FW_QUEUE_SENDING.head_index].data_arr,0,
+//						SIZEU8(G_FW_QUEUE_SENDING.data[G_FW_QUEUE_SENDING.head_index].data_arr));
+//				G_FW_QUEUE_SENDING.data[G_FW_QUEUE_SENDING.head_index].length=0;
+//				if (G_FW_QUEUE_SENDING.count > 0) {
+//					G_FW_QUEUE_SENDING.count--;
+//				}
+//			}
+//		}
+//		G_FW_QUEUE_SENDING.head_index = (G_FW_QUEUE_SENDING.head_index + 1) & G_FW_QUEUE_SENDING.mask;
+//#endif
 	}
 	return 0;
 }

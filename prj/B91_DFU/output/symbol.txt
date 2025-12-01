@@ -267,13 +267,13 @@
 20005f6c T __riscv_restore_1	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:485
 20005f6c T __riscv_restore_2	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:485
 20005f6c T __riscv_restore_3	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:485
-20005f88 r __FUNCTION__.10062
-20005f9c r __FUNCTION__.10337
-20005fb4 r __FUNCTION__.10419
-20005fc4 r __FUNCTION__.10671
-20005fdc r __FUNCTION__.13003
-20005ff4 r __FUNCTION__.13161
+20005f88 r __FUNCTION__.10061
+20005f9c r __FUNCTION__.10336
+20005fb4 r __FUNCTION__.10418
+20005fc4 r __FUNCTION__.10667
+20005fdc r __FUNCTION__.13002
+20005ff4 r __FUNCTION__.13160
 20006490 R __digits
-200064a8 r __FUNCTION__.10118
-200064b0 r __FUNCTION__.13198
+200064a8 r __FUNCTION__.10117
+200064b0 r __FUNCTION__.13197
 200065b8 A _DATA_LMA_START
