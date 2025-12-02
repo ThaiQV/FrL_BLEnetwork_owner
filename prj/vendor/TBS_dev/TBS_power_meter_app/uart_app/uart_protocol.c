@@ -256,46 +256,45 @@ static void process_rx_frame(protocol_context_t *protocol) {
     
     // Check if this frame belongs to this protocol
     if (frame_protocol_id != protocol->protocol_id) {
+        printf("err_id\n");
         return; // Not for this protocol, ignore
     }
+    // // Extract length
+    // uint16_t payload_len = protocol->rx_frame[2] | (protocol->rx_frame[3] << 8);
     
-    // Extract length
-    uint16_t payload_len = protocol->rx_frame[2] | (protocol->rx_frame[3] << 8);
+    // // Verify length
+    // uint16_t expected_len = PROTOCOL_FRAME_OVERHEAD + payload_len;
+    // if (protocol->rx_frame_idx != expected_len) {
+    //     protocol->rx_frame_error_count++;
+    //     send_nack(protocol);
+    //     PROTOCOL_DEBUG("Frame length mismatch");
+    //     return;
+    // }
     
-    // Verify length
-    uint16_t expected_len = PROTOCOL_FRAME_OVERHEAD + payload_len;
-    if (protocol->rx_frame_idx != expected_len) {
-        protocol->rx_frame_error_count++;
-        send_nack(protocol);
-        PROTOCOL_DEBUG("Frame length mismatch");
-        return;
-    }
+    // // Extract CRC
+    // uint16_t frame_crc = protocol->rx_frame[protocol->rx_frame_idx - 3] | 
+    //                      (protocol->rx_frame[protocol->rx_frame_idx - 2] << 8);
     
-    // Extract CRC
-    uint16_t frame_crc = protocol->rx_frame[protocol->rx_frame_idx - 3] | 
-                         (protocol->rx_frame[protocol->rx_frame_idx - 2] << 8);
+    // // Calculate CRC
+    // uint16_t calc_crc = crc16_calculate(&protocol->rx_frame[1], payload_len + 3);
     
-    // Calculate CRC
-    uint16_t calc_crc = crc16_calculate(&protocol->rx_frame[1], payload_len + 3);
-    
-    if (frame_crc != calc_crc) {
-        protocol->rx_crc_error_count++;
-        send_nack(protocol);
-        PROTOCOL_DEBUG("CRC error %d: %d %d",payload_len + 3, frame_crc, calc_crc );
-        return;
-    }
+    // if (frame_crc != calc_crc) {
+    //     protocol->rx_crc_error_count++;
+    //     send_nack(protocol);
+    //     PROTOCOL_DEBUG("CRC error %d: %d %d",payload_len + 3, frame_crc, calc_crc );
+    //     return;
+    // }
     
     // CRC OK - send ACK
-    send_ack(protocol);
+    // send_ack(protocol);
     protocol->rx_success_count++;
-    
     // Call user callback
     if (protocol->data_callback) {
         const uint8_t *payload = &protocol->rx_frame[4];
-        protocol->data_callback(protocol->protocol_id, payload, payload_len);
+        protocol->data_callback(protocol->protocol_id, payload, protocol->rx_frame_idx - 5);
     }
     
-    PROTOCOL_DEBUG("Frame processed");
+    // PROTOCOL_DEBUG("Frame processed");
 }
 
 /*============================================================================
@@ -349,7 +348,7 @@ static void protocol_uart_rx_callback(protocol_handler_t *handler, const uint8_t
 
             case RX_WAIT_ID:
                 protocol->rx_frame[protocol->rx_frame_idx++] = byte;
-                protocol->rx_state = RX_WAIT_LEN1;
+                protocol->rx_state = 10;
                 break;
 
             case RX_WAIT_LEN1:
@@ -398,7 +397,12 @@ static void protocol_uart_rx_callback(protocol_handler_t *handler, const uint8_t
                 break;
 
             default:
-                protocol->rx_state = RX_WAIT_PRE1;
+                protocol->rx_frame[protocol->rx_frame_idx++] = byte;
+                if (byte == PROTOCOL_ETX) {
+                    process_rx_frame(protocol);
+                    protocol->rx_state = RX_WAIT_PRE1;
+                }
+                
                 break;
         }
     }

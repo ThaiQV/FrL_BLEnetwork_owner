@@ -210,7 +210,7 @@ void uart_driver_get_stats(
 #define PROTOCOL_HEADER1                'S'
 #define PROTOCOL_HEADER2                'T'
 #define PROTOCOL_STX                    'A'
-#define PROTOCOL_ETX                    't'
+#define PROTOCOL_ETX                    '#'
 #define PROTOCOL_ACK                    'R'
 #define PROTOCOL_NACK                   'r'
 
@@ -393,7 +393,12 @@ void protocol_reset_stats(protocol_context_t *protocol);
         print_uart("\n");\
     } while(0)
 #else
-#define PROTOCOL_DEBUG(...)
+#define PROTOCOL_DEBUG(...) \
+    do { \
+        printf("PROTOCOL_DEBUG: ");\
+        printf(__VA_ARGS__);\
+        printf("\n");\
+    } while(0)
 #endif
 /**
  * Macro to create protocol handler

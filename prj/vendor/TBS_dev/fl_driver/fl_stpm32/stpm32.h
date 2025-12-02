@@ -85,7 +85,7 @@ bool stpm_check_gain(stpm_handle_t *handle, uint8_t channel, uint8_t *buffer);
 void stpm_auto_latch(stpm_handle_t *handle, bool enabled);
 void stpm_crc(stpm_handle_t *handle, bool enabled);
 void stpm_set_reference_frequency(stpm_handle_t *handle, STPM3x_Ref_Freq_t freq);
-
+float stpm_read_period(stpm_handle_t *handle, uint8_t channel);
 // Energy functions
 void stpm_update_energy(stpm_handle_t *handle, uint8_t channel);
 void stpm_reset_energies(stpm_handle_t *handle);

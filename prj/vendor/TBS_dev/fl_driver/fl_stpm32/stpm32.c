@@ -344,6 +344,22 @@ bool stpm_check_gain(stpm_handle_t *handle, uint8_t channel, uint8_t *buffer) {
     return true;
 }
 
+float stpm_read_period(stpm_handle_t *handle, uint8_t channel)
+{
+    if (!handle || (channel != 1 && channel != 2)) return;
+    if (!handle->auto_latch) latch(handle);
+
+    uint8_t address = DSP_REG1_Address;
+    read_frame(handle, address, handle->read_buffer);
+    float frequency;
+    if (channel == 1)
+    {
+       frequency = buffer_0to11(handle->read_buffer);
+    }
+
+    return frequency = 1000000.0 / ( frequency * 8.0);
+}
+
 void stpm_update_energy(stpm_handle_t *handle, uint8_t channel) {
     if (!handle || channel > 2) return;
     if (!handle->auto_latch) latch(handle);
@@ -515,12 +531,8 @@ double stpm_read_active_power(stpm_handle_t *handle, uint8_t channel) {
     uint8_t address = (channel == 1) ? PH1_Active_Power_Address : PH2_Active_Power_Address;
     read_frame(handle, address, handle->read_buffer);
     int32_t value = buffer_0to28(handle->read_buffer);
-    // if(value >= 0xffff)
-    {
-        // print_uart("%08x\n", value);
-        // value = 0;
-    }
-    return (double) ((value) * handle->calibration[channel][2]);
+
+    return (double) ((value) / handle->calibration[channel][2]);
 }
 
 float stpm_read_fundamental_power(stpm_handle_t *handle, uint8_t channel) {
@@ -781,8 +793,8 @@ void stpm_read_rms_voltage_and_current(stpm_handle_t *handle, uint8_t channel,
     uint8_t address = (channel == 1) ? DSP_REG14_Address : DSP_REG15_Address;
     read_frame(handle, address, handle->read_buffer);
 
-    *voltage = (float) ((buffer_0to14(handle->read_buffer)) *handle->calibration[channel][0]);
-    *current = (float) ((buffer_15to32(handle->read_buffer)) * handle->calibration[channel][1]);
+    *voltage = (float) ((buffer_0to14(handle->read_buffer)) /handle->calibration[channel][0]);
+    *current = (float) ((buffer_15to32(handle->read_buffer)) /handle->calibration[channel][1]);
 }
 
 float stpm_read_rms_voltage(stpm_handle_t *handle, uint8_t channel) {

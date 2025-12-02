@@ -43,4 +43,11 @@ typedef struct
 void power_meter_app_init(void);
 void power_meter_app_loop(void);
 
+void pmt_setcalib(uint8_t ch, int32_t calib_U, int32_t calib_I, int32_t calib_P);
+void pmt_getcalib(uint8_t ch, int32_t *calib_U, int32_t *calib_I, int32_t *calib_P);
+float pmt_read_U(uint8_t ch);
+float pmt_read_I(uint8_t ch);
+float pmt_read_P(uint8_t ch);
+void pmt_print_info(uint8_t ch);
+
 #endif /* VENDOR_TBS_DEV_TBS_POWER_METER_APP_POWER_METER_APP_H_ */

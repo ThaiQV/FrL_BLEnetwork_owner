@@ -30,17 +30,11 @@
 #define UART_RCV_DMA_LEN_FIX()		do{	\
 										u32 rcvDataLen = uart_get_dma_rev_data_len(UART_IDX, UART_DMA_CHANNEL_RX);		\
 										if(rxBuf_uart){																	\
-											printf("rxBuf_uart: %x\n", rxBuf_uart);\
 											rxBuf_uart[0] = (u8)(rcvDataLen);											\
 											rxBuf_uart[1] = (u8)(rcvDataLen >> 8);										\
 											rxBuf_uart[2] = (u8)(rcvDataLen >> 16);										\
 											rxBuf_uart[3] = (u8)(rcvDataLen >> 24);										\
-											printf("rxBuf_uart[0]: %d\n", rxBuf_uart[0]);\
-											printf("rxBuf_uart[1]: %d\n", rxBuf_uart[1]);\
-											printf("rxBuf_uart[2]: %d\n", rxBuf_uart[2]);\
-											printf("rxBuf_uart[3]: %d\n", rxBuf_uart[3]);\
 										}																				\
-										printf("rcvDataLen: %d\n", rcvDataLen);											\
 									}while(0)
 
 

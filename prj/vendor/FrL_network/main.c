@@ -135,7 +135,6 @@ void uart1_irq_handler(void) {
 		drv_uart_tx_irq_handler();
 	}
 	if(uart_get_irq_status(UART1, UART_RXDONE)){
-		printf("drv_uart_rx_irq_handler\n");
 		drv_uart_rx_irq_handler();
 	}
 }
