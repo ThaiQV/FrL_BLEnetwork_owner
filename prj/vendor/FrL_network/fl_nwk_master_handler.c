@@ -155,8 +155,11 @@ fl_pack_t fl_master_packet_nodelist_table_build(u8* _payload, u8 _size) {
 //	packet.frame.milltamp = timetampStep.milstep;
 //	packet.frame.slaveID = 0xFF; // all grps + all members
 
-	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
-	memcpy(packet.frame.payload,_payload,_size);
+//	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
+//	memcpy(packet.frame.payload,_payload,_size);
+
+	memset(&packet.bytes[1],0xFF,SIZEU8(packet.bytes)-1 -1 -1);//1B HDR + 1B CRC + 1B EP
+	memcpy(&packet.bytes[1],_payload,_size);
 	//crc
 	packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
 
@@ -1142,7 +1145,7 @@ int _interval_heartbeat(void) {
 	}
 	//Synchronization nodelist table
 	static u32 sys_tick_nodelist_table =0;
-	if(clock_time_exceed(sys_tick_nodelist_table,2001*999)){
+	if(clock_time_exceed(sys_tick_nodelist_table,3001*999)){
 		fl_nwk_generate_table_pack();
 		sys_tick_nodelist_table = clock_time();
 	}

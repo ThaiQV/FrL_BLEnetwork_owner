@@ -14,6 +14,8 @@
 #include "fl_nwk_database.h"
 #include "../TBS_dev/TBS_dev_config.h"
 
+#define MAX_NODES 	150
+
 /**
  * @brief	callback function for rsp
  */
@@ -290,7 +292,6 @@ typedef struct {
 }__attribute__((packed)) fl_rsp_container_t;
 
 #ifdef MASTER_CORE
-#define MAX_NODES 	150
 typedef struct {
 	u8 slot_inused;
 	fl_nodeinnetwork_t sla_info[MAX_NODES];
@@ -353,9 +354,7 @@ s8 fl_master_SlaveMAC_get(u8 _slaveid,u8* mac);
 void fl_nwk_master_nodelist_load(void);
 s8 fl_queue_REQcRSP_ScanRec(fl_pack_t _pack);
 s8 fl_api_master_req(u8* _mac_slave,u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry);
-s16 FL_NWK_NODELIST_TABLE_IsReady(void);
 void fl_nwk_generate_table_pack(void) ;
-void fl_nwk_nodelist_table_run(void) ;
 #else
 extern volatile u8 NWK_DEBUG_STT; // it will be assigned into end-point byte (dbg :1bit);
 bool IsPairing(void);
@@ -377,7 +376,10 @@ u64 fl_req_slave_packet_createNsend(u8 _cmdid, u8* _data, u8 _len,u32 *_timequeu
 s8 fl_queue_REQcRSP_ScanRec(fl_pack_t _pack,void *_id);
 void fl_nwk_slave_reconnectNstoragedata(void);
 s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry);
+void fl_nwk_slave_nodelist_repeat(fl_pack_t *_pack) ;
 #endif
+s16 FL_NWK_NODELIST_TABLE_IsReady(void);
+void fl_nwk_nodelist_table_run(void) ;
 s8 fl_nwk_MemberInNodeTable_find(u8* _mac);
 u32 fl_adv_timetampInPack(fl_pack_t _pack);
 fl_timetamp_withstep_t fl_adv_timetampStepInPack(fl_pack_t _pack);

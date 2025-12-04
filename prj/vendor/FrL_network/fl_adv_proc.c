@@ -247,6 +247,11 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 				if (!fl_nwk_slave_checkHDR(incomming_data.data_arr[0])) {
 					return 0;
 				}
+				//Repeat Nodelist table
+				if(incomming_data.data_arr[0] == NWK_HDR_NODETALBE_UPDATE && incomming_data.length > 20){
+					fl_nwk_slave_nodelist_repeat(&incomming_data);
+					return 0;
+				}
 				//Store FOTA pack
 				if (incomming_data.data_arr[0] == NWK_HDR_FOTA && incomming_data.length > 20) {
 					//incomming packet is echo pack
@@ -506,7 +511,7 @@ u8 fl_adv_sendFIFO_run(void) {
 			if (check_heartbeat.frame.hdr == NWK_HDR_HEARTBEAT) {
 //				fl_nwk_slave_SYNC_ORIGIN_MASTER(timetamp_inpack.timetamp,timetamp_inpack.milstep);
 //				ERR(INF,"ORIGINAL MASTER-TIME:%d\r\n",ORIGINAL_MASTER_TIME.milstep);
-				if (inused_slot == 1 && (FL_NWK_HISTORY_IsReady() > 0 || FL_NWK_FOTA_IsReady() > 0)) { // only have HB packet=> send it one times
+				if (inused_slot == 1 && (FL_NWK_HISTORY_IsReady() > 0 || FL_NWK_FOTA_IsReady() > 0 || FL_NWK_NODELIST_TABLE_IsReady()>0)) { // only have HB packet=> send it one times
 				//CLEAR
 					G_QUEUE_SENDING.data[indx_head_cur].length = 0;
 				}
@@ -842,8 +847,9 @@ void fl_adv_run(void) {
 #endif
 	/* SEND ADV */
 	if(fl_adv_sendFIFO_run()==0){
-#ifdef MASTER_CORE
 		fl_nwk_nodelist_table_run();
+#ifdef MASTER_CORE
+
 		fl_wifi2ble_fota_run();
 #else
 		fl_adv_sendFIFO_History_run();

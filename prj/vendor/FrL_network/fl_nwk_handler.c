@@ -22,6 +22,11 @@
 fl_node_data_t G_NODELIST_TABLE[MAX_NODES];
 #define NODELIST_TABLE_SIZE  (sizeof(G_NODELIST_TABLE)/sizeof(G_NODELIST_TABLE[0]))
 
+fl_pack_t g_nodelist_array[NODELIST_SENDING_SIZE];
+fl_data_container_t NODELIST_TABLE_SENDING =
+		{ .data = g_nodelist_array, .head_index = 0, .tail_index = 0, .mask = NODELIST_SENDING_SIZE - 1, .count = 0 };
+
+
 volatile fl_timetamp_withstep_t WIFI_ORIGINAL_GETALL;
 
 void fl_queue_REQnRSP_TimeoutInit(void);
@@ -211,6 +216,8 @@ void fl_queue_REQnRSP_TimeoutInit(void) {
 		blt_soft_timer_add(&fl_queue_REQnRSP_TimeoutStart,QUEUQ_REQcRSP_INTERVAL);
 		fl_queueREQcRSP_clear(G_QUEUE_REQ_CALL_RSP);
 	}
+	//clear buffer nodelist table
+	FL_QUEUE_CLEAR(&NODELIST_TABLE_SENDING,NODELIST_TABLE_SENDING.mask+1);
 }
 /***************************************************
  * @brief 		:scan pack rec from master
@@ -337,15 +344,12 @@ s8 fl_nwk_MemberInNodeTable_find(u8* _mac){
 /*
  * Update NODELIST TABLE
  * */
-#ifdef MASTER_CORE
-fl_pack_t g_nodelist_array[NODELIST_SENDING_SIZE];
-fl_data_container_t NODELIST_TABLE_SENDING =
-		{ .data = g_nodelist_array, .head_index = 0, .tail_index = 0, .mask = NODELIST_SENDING_SIZE - 1, .count = 0 };
+
 
 s16 FL_NWK_NODELIST_TABLE_IsReady(void){
 	return NODELIST_TABLE_SENDING.count;
 }
-
+#ifdef MASTER_CORE
 void fl_nwk_generate_table_pack(void) {
 	fl_pack_t pack;
 	u8 payload_create[28]; // full size adv can be sent
@@ -376,7 +380,36 @@ void fl_nwk_generate_table_pack(void) {
 		FL_QUEUE_ADD(&NODELIST_TABLE_SENDING,&pack);
 	}
 }
-
+#else
+void _nodelist_table_printf(void) {
+	static u32 crc32 = 0;
+	u32 crc32_cur = fl_db_crc32((u8*) G_NODELIST_TABLE,NODELIST_TABLE_SIZE * sizeof(fl_node_data_t));
+	if (crc32_cur != crc32) {
+		for (u8 var = 0; var < NODELIST_TABLE_SIZE; var++) {
+			if (G_NODELIST_TABLE[var].slaveid != 0xFF && !IS_MAC_INVALID(G_NODELIST_TABLE[var].mac,0)) {
+				P_INFO("[%3d]0x%02X%02X%02X%02X%02X%02X\r\n",G_NODELIST_TABLE[var].slaveid,G_NODELIST_TABLE[var].mac[0],G_NODELIST_TABLE[var].mac[1],
+						G_NODELIST_TABLE[var].mac[2],G_NODELIST_TABLE[var].mac[3],G_NODELIST_TABLE[var].mac[4],G_NODELIST_TABLE[var].mac[5]);
+			}
+		}
+		crc32 = crc32_cur;
+	}
+}
+void fl_nwk_slave_nodelist_repeat(fl_pack_t *_pack) {
+	if (FL_QUEUE_FIND(&NODELIST_TABLE_SENDING,_pack,_pack->length - 2) == -1) {
+		FL_QUEUE_ADD(&NODELIST_TABLE_SENDING,_pack);
+	}
+	//Update my table
+	u8 table_arr[28];
+	memcpy(table_arr,&_pack->data_arr[1],SIZEU8(table_arr));
+	for (u8 var = 0; var < SIZEU8(table_arr); var=var+7) {
+		if(table_arr[var] != 0xFF){
+			G_NODELIST_TABLE[table_arr[var]].slaveid  = table_arr[var];
+			memcpy(G_NODELIST_TABLE[table_arr[var]].mac,&table_arr[var + 1],6);
+		}
+	}
+	_nodelist_table_printf();
+}
+#endif
 void fl_nwk_nodelist_table_run(void) {
 	extern void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms);
 	extern fl_adv_settings_t G_ADV_SETTINGS ;
@@ -390,7 +423,6 @@ void fl_nwk_nodelist_table_run(void) {
 		}
 	}
 }
-#endif
 
 /******************************************************************************/
 /******************************************************************************/
