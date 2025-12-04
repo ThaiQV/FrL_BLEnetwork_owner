@@ -377,6 +377,7 @@ s8 fl_queue_REQcRSP_ScanRec(fl_pack_t _pack,void *_id);
 void fl_nwk_slave_reconnectNstoragedata(void);
 s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry);
 void fl_nwk_slave_nodelist_repeat(fl_pack_t *_pack) ;
+void G_NODELIST_TABLE_Clear(void);
 #endif
 s16 FL_NWK_NODELIST_TABLE_IsReady(void);
 void fl_nwk_nodelist_table_run(void) ;

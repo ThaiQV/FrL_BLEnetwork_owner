@@ -216,8 +216,10 @@ void fl_queue_REQnRSP_TimeoutInit(void) {
 		blt_soft_timer_add(&fl_queue_REQnRSP_TimeoutStart,QUEUQ_REQcRSP_INTERVAL);
 		fl_queueREQcRSP_clear(G_QUEUE_REQ_CALL_RSP);
 	}
+#ifndef MASTER_CORE
 	//clear buffer nodelist table
-	FL_QUEUE_CLEAR(&NODELIST_TABLE_SENDING,NODELIST_TABLE_SENDING.mask+1);
+	G_NODELIST_TABLE_Clear();
+#endif
 }
 /***************************************************
  * @brief 		:scan pack rec from master
@@ -381,12 +383,18 @@ void fl_nwk_generate_table_pack(void) {
 	}
 }
 #else
+void G_NODELIST_TABLE_Clear(void){
+	for (u8 var = 0; var < sizeof(G_NODELIST_TABLE)/sizeof(G_NODELIST_TABLE[0]); ++var) {
+		G_NODELIST_TABLE[var].slaveid=0xFF;
+		memset(G_NODELIST_TABLE[var].mac,0xFF,SIZEU8(G_NODELIST_TABLE[var].mac));
+	}
+}
 void _nodelist_table_printf(void) {
 	static u32 crc32 = 0;
 	u32 crc32_cur = fl_db_crc32((u8*) G_NODELIST_TABLE,NODELIST_TABLE_SIZE * sizeof(fl_node_data_t));
 	if (crc32_cur != crc32) {
 		for (u8 var = 0; var < NODELIST_TABLE_SIZE; var++) {
-			if (G_NODELIST_TABLE[var].slaveid != 0xFF && !IS_MAC_INVALID(G_NODELIST_TABLE[var].mac,0)) {
+			if (G_NODELIST_TABLE[var].slaveid != 0xFF && !IS_MAC_INVALID(G_NODELIST_TABLE[var].mac,0xFF)) {
 				P_INFO("[%3d]0x%02X%02X%02X%02X%02X%02X\r\n",G_NODELIST_TABLE[var].slaveid,G_NODELIST_TABLE[var].mac[0],G_NODELIST_TABLE[var].mac[1],
 						G_NODELIST_TABLE[var].mac[2],G_NODELIST_TABLE[var].mac[3],G_NODELIST_TABLE[var].mac[4],G_NODELIST_TABLE[var].mac[5]);
 			}
