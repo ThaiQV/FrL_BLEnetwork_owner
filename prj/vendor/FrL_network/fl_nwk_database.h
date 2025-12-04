@@ -58,6 +58,7 @@ typedef struct {
 	uint8_t mac[6];
 	uint8_t dev_type;
 }__attribute__((packed)) fl_node_data_t;
+
 typedef struct {
 	u8 num_slave;
 	fl_node_data_t slave[NODELIST_SLAVE_MAX];

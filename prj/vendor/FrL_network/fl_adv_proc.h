@@ -19,6 +19,7 @@
 /* SENDING QUEUE */
 #ifdef MASTER_CORE
 #define FOTA_SIZE 						16
+#define NODELIST_SENDING_SIZE			64 // min_size = max_node /4
 #else
 #define FOTA_REC_SIZE					512
 #define FOTA_SIZE 						64

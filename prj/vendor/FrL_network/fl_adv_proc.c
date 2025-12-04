@@ -66,7 +66,7 @@ fl_pack_t g_history_sending_array[QUEUE_HISTORY_SENDING_SIZE];
 fl_data_container_t G_QUEUE_HISTORY_SENDING = { .data = g_history_sending_array, .head_index = 0, .tail_index = 0, .mask = QUEUE_HISTORY_SENDING_SIZE - 1, .count = 0 };
 /*-----------------------------------------------------------*/
 
-fl_hdr_nwk_type_e FL_NWK_HDR[]={NWK_HDR_MASTER_CMD,NWK_HDR_FOTA,NWK_HDR_11_REACTIVE,NWK_HDR_22_PING,NWK_HDR_A5_HIS,NWK_HDR_55,NWK_HDR_F5_INFO,NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_ASSIGN,NWK_HDR_HEARTBEAT,NWK_HDR_COLLECT};
+fl_hdr_nwk_type_e FL_NWK_HDR[]={NWK_HDR_NODETALBE_UPDATE,NWK_HDR_REMOVE,NWK_HDR_MASTER_CMD,NWK_HDR_FOTA,NWK_HDR_11_REACTIVE,NWK_HDR_22_PING,NWK_HDR_A5_HIS,NWK_HDR_55,NWK_HDR_F5_INFO,NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_ASSIGN,NWK_HDR_HEARTBEAT,NWK_HDR_COLLECT};
 #define FL_NWK_HDR_SIZE	(sizeof(FL_NWK_HDR)/sizeof(FL_NWK_HDR[0]))
 
 /******************************************************************************/
@@ -124,11 +124,12 @@ static bool fl_nwk_decrypt16(unsigned char * key,u8* _data,u8 _size, u8* decrypt
 	fl_data_frame_u packet_frame;
 	memcpy(packet_frame.bytes,decrypted,SIZEU8(packet_frame.bytes));
 	u8 pack_crc = fl_crc8(packet_frame.frame.payload,SIZEU8(packet_frame.frame.payload));
-	u32 timetamp_hdr = MAKE_U32(packet_frame.frame.timetamp[3],packet_frame.frame.timetamp[2],packet_frame.frame.timetamp[1],packet_frame.frame.timetamp[0]);
+//	u32 timetamp_hdr = MAKE_U32(packet_frame.frame.timetamp[3],packet_frame.frame.timetamp[2],packet_frame.frame.timetamp[1],packet_frame.frame.timetamp[0]);
 //	if(timetamp_hdr<ORIGINAL_TIME_TRUST){
 //		ERR(BLE,"Decrypt(hdr:0x%02X):%d|%d\r\n",packet_frame.frame.hdr,timetamp_hdr,ORIGINAL_TIME_TRUST);
 //	}
-	return (timetamp_hdr>=ORIGINAL_TIME_TRUST && IsNWKHDR(decrypted[0])!=0xFF && pack_crc == packet_frame.frame.crc8);
+	//timetamp_hdr>=ORIGINAL_TIME_TRUST &&
+	return (IsNWKHDR(decrypted[0])!=0xFF && pack_crc == packet_frame.frame.crc8);
 #undef BLOCK_SIZE
 }
 /***************************************************
@@ -213,6 +214,18 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 				}
 #endif
 #endif
+				//Scan mac in nodetable when transaction mode, skip when in collection mode
+#ifndef MASTER_CORE
+				if(-1 == plog_IndexOf(pa->mac,master_mac,SIZEU8(master_mac),6))
+#endif
+				{
+					if (*FL_NWK_COLLECTION_MODE == 0) {
+						if (fl_nwk_MemberInNodeTable_find(pa->mac) == -1) {
+							return 0;				//skip process
+						}
+					}
+				}
+
 				//Add decrypt
 				NWK_MYKEY();
 				if(!fl_nwk_decrypt16(FL_NWK_USE_KEY,pa->data,incomming_data.length,incomming_data.data_arr)){
@@ -510,8 +523,8 @@ u8 fl_adv_sendFIFO_run(void) {
 				//TODO: IMPORTANT SYNCHRONIZATION TIMESTAMP
 				fl_master_SYNC_ORIGINAL_TIMETAMP(timetamp_inpack);
 				// CLEAR HB => only send 1 times IF have a new FW need to update for slaves
-				if (inused_slot == 1 && FL_NWK_FOTA_IsReady() > 0) {
-					LOGA(INF_FILE,"FOTA Ready:%d\r\n",FL_NWK_FOTA_IsReady());
+				if (inused_slot == 1 && (FL_NWK_FOTA_IsReady() > 0 || FL_NWK_NODELIST_TABLE_IsReady()>0)) {
+					LOGA(INF_FILE,"EX_QUEUEs Ready:%d/%d\r\n",FL_NWK_FOTA_IsReady(),FL_NWK_NODELIST_TABLE_IsReady());
 					G_QUEUE_SENDING.data[indx_head_cur].length = 0;
 				}
 			}
@@ -788,6 +801,7 @@ void fl_adv_run(void) {
 		fl_dataframe_format_t data_parsed;
 		if (fl_packet_parse(data_in_queue,&data_parsed)) {
 #ifdef MASTER_CORE
+			//scan slaveid avaible
 			fl_nwk_master_run(&data_in_queue); //process reponse from the slaves
 #else //SLAVE
 			//Todo: Repeat process
@@ -829,6 +843,7 @@ void fl_adv_run(void) {
 	/* SEND ADV */
 	if(fl_adv_sendFIFO_run()==0){
 #ifdef MASTER_CORE
+		fl_nwk_nodelist_table_run();
 		fl_wifi2ble_fota_run();
 #else
 		fl_adv_sendFIFO_History_run();

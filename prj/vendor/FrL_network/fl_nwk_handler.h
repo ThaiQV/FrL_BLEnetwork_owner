@@ -48,22 +48,18 @@ typedef enum {
 	NWK_HDR_F6_SENDMESS = 0xF6, 				//send mess to slave
 	NWK_HDR_F7_RSTPWMETER = 0xF7, 				//Send req to rst pwmeter
 	NWK_HDR_F8_PWMETER_SET = 0xF8, 				//Send req to set parameter's pwmeter
+	//Update nodelist table
+	NWK_HDR_NODETALBE_UPDATE = 0xF9,			//UPdate nodelist table for network
+	// FOTA
+	NWK_HDR_FOTA = 0xFA, 						//===> Upload FW via the BLE
+	//Access network
+	NWK_HDR_REMOVE = 0xFB,
 	NWK_HDR_ASSIGN = 0xFC,						//Use to assign SlaveID to slave
 	NWK_HDR_HEARTBEAT = 0xFD,
 	NWK_HDR_COLLECT = 0xFE, 					//Use to collect slave (master and slaves)
 
-	// FOTA
-	NWK_HDR_FOTA = 0xFA 						//===> Upload FW via the BLE
-}__attribute__((packed)) fl_hdr_nwk_type_e;
 
-//
-//typedef union {
-//	u8 id_u8;
-//	struct {
-//		u8 memID :3; //3 bits : 0-8 => total 8*32 = 256 slaves
-//		u8 grpID :5; //5bits : 0-32
-//	};
-//} fl_slaveID_u;
+}__attribute__((packed)) fl_hdr_nwk_type_e;
 
 typedef struct {
 	u8 hdr;
@@ -343,6 +339,7 @@ void fl_nwk_master_init(void);
 void fl_nwk_master_run(fl_pack_t *_pack_handle);
 void fl_nwk_master_process(void);
 fl_pack_t fl_master_packet_heartbeat_build(void);
+fl_pack_t fl_master_packet_nodelist_table_build(u8* _payload, u8 _size);
 int fl_send_heartbeat(void);
 void fl_nwk_master_StatusNodesRefesh(void);
 void fl_nwk_master_heartbeat_run(void);
@@ -356,6 +353,9 @@ s8 fl_master_SlaveMAC_get(u8 _slaveid,u8* mac);
 void fl_nwk_master_nodelist_load(void);
 s8 fl_queue_REQcRSP_ScanRec(fl_pack_t _pack);
 s8 fl_api_master_req(u8* _mac_slave,u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry);
+s16 FL_NWK_NODELIST_TABLE_IsReady(void);
+void fl_nwk_generate_table_pack(void) ;
+void fl_nwk_nodelist_table_run(void) ;
 #else
 extern volatile u8 NWK_DEBUG_STT; // it will be assigned into end-point byte (dbg :1bit);
 bool IsPairing(void);
@@ -378,6 +378,7 @@ s8 fl_queue_REQcRSP_ScanRec(fl_pack_t _pack,void *_id);
 void fl_nwk_slave_reconnectNstoragedata(void);
 s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry);
 #endif
+s8 fl_nwk_MemberInNodeTable_find(u8* _mac);
 u32 fl_adv_timetampInPack(fl_pack_t _pack);
 fl_timetamp_withstep_t fl_adv_timetampStepInPack(fl_pack_t _pack);
 void fl_queue_REQnRSP_OriginTime_set(u64 _timestamp_set);

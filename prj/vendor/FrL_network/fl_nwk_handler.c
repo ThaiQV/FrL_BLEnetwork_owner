@@ -11,12 +11,17 @@
 #include "tl_common.h"
 #include "fl_nwk_handler.h"
 #include "fl_nwk_protocol.h"
+#include "fl_adv_proc.h"
 
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
 /******************************************************************************/
 /******************************************************************************/
+
+fl_node_data_t G_NODELIST_TABLE[MAX_NODES];
+#define NODELIST_TABLE_SIZE  (sizeof(G_NODELIST_TABLE)/sizeof(G_NODELIST_TABLE[0]))
+
 volatile fl_timetamp_withstep_t WIFI_ORIGINAL_GETALL;
 
 void fl_queue_REQnRSP_TimeoutInit(void);
@@ -295,8 +300,9 @@ s8 fl_queue_REQcRSP_ScanRec(fl_pack_t _pack,void *_id)
 /******************************************************************************/
 /******************************************************************************/
 fl_hdr_nwk_type_e G_NWK_HDR[] = {
-		NWK_HDR_MASTER_CMD,NWK_HDR_FOTA,NWK_HDR_A5_HIS, NWK_HDR_F6_SENDMESS, NWK_HDR_F7_RSTPWMETER,
-		NWK_HDR_F8_PWMETER_SET, NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,
+		NWK_HDR_NODETALBE_UPDATE,
+		NWK_HDR_REMOVE,NWK_HDR_MASTER_CMD,NWK_HDR_FOTA,NWK_HDR_A5_HIS, NWK_HDR_F6_SENDMESS,
+		NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET, NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,
 		NWK_HDR_ASSIGN, NWK_HDR_55, NWK_HDR_11_REACTIVE, NWK_HDR_22_PING };// register cmdid RSP
 #define NWK_HDR_SIZE (sizeof(G_NWK_HDR)/sizeof(G_NWK_HDR[0]))
 /******************************************************************************/
@@ -320,7 +326,71 @@ static inline u8 IsNWKHDR(fl_hdr_nwk_type_e cmdid) {
 /******************************************************************************/
 /******************************************************************************/
 
+s8 fl_nwk_MemberInNodeTable_find(u8* _mac){
+	for (u8 var = 0; var < NODELIST_TABLE_SIZE; ++var) {
+		if(0 == memcmp(_mac,G_NODELIST_TABLE[var].mac,SIZEU8(G_NODELIST_TABLE[var].mac))){
+			return G_NODELIST_TABLE[var].slaveid;
+		}
+	}
+	return -1;
+}
+/*
+ * Update NODELIST TABLE
+ * */
+#ifdef MASTER_CORE
+fl_pack_t g_nodelist_array[NODELIST_SENDING_SIZE];
+fl_data_container_t NODELIST_TABLE_SENDING =
+		{ .data = g_nodelist_array, .head_index = 0, .tail_index = 0, .mask = NODELIST_SENDING_SIZE - 1, .count = 0 };
 
+s16 FL_NWK_NODELIST_TABLE_IsReady(void){
+	return NODELIST_TABLE_SENDING.count;
+}
+
+void fl_nwk_generate_table_pack(void) {
+	fl_pack_t pack;
+	u8 payload_create[28]; // full size adv can be sent
+	memset(payload_create,0xFF,SIZEU8(payload_create));
+	u8 ptr = 0;
+	if(FL_NWK_NODELIST_TABLE_IsReady()>0) return;
+
+	FL_QUEUE_CLEAR(&NODELIST_TABLE_SENDING,NODELIST_TABLE_SENDING.mask+1);
+	for (u8 var = 0; var < NODELIST_TABLE_SIZE; ++var) {
+		if (G_NODELIST_TABLE[var].slaveid != 0xFF) {
+			payload_create[ptr] = G_NODELIST_TABLE[var].slaveid;
+			memcpy(&payload_create[++ptr],G_NODELIST_TABLE[var].mac,SIZEU8(G_NODELIST_TABLE[var].mac));
+			ptr +=SIZEU8(G_NODELIST_TABLE[var].mac);
+			if (ptr >= SIZEU8(payload_create)) {
+//				P_INFO_HEX(payload_create,SIZEU8(payload_create),"PACK NODELIST(%d/%d):",var,NODELIST_TABLE_SIZE);
+				pack = fl_master_packet_nodelist_table_build(payload_create,SIZEU8(payload_create));
+				FL_QUEUE_ADD(&NODELIST_TABLE_SENDING,&pack);
+				memset(payload_create,0xFF,SIZEU8(payload_create));
+				ptr=0;
+			}
+			//else ptr += 1; //
+		}
+	}
+	//Last pack
+	if(ptr>0){
+//		P_INFO_HEX(payload_create,SIZEU8(payload_create),"PACK NODELIST(LSB):");
+		pack = fl_master_packet_nodelist_table_build(payload_create,SIZEU8(payload_create));
+		FL_QUEUE_ADD(&NODELIST_TABLE_SENDING,&pack);
+	}
+}
+
+void fl_nwk_nodelist_table_run(void) {
+	extern void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms);
+	extern fl_adv_settings_t G_ADV_SETTINGS ;
+	fl_pack_t pack_in_queue;
+	extern volatile u8 F_SENDING_STATE;
+	if (!F_SENDING_STATE) {
+//		P_INFO("PACK NODELIST:%d\r\n",FL_NWK_NODELIST_TABLE_IsReady());
+		if (FL_QUEUE_GET(&NODELIST_TABLE_SENDING,&pack_in_queue) != -1) {
+			P_INFO_HEX(pack_in_queue.data_arr,pack_in_queue.length,"PACK NODELIST(%d):",FL_NWK_NODELIST_TABLE_IsReady());
+			fl_adv_send(pack_in_queue.data_arr,pack_in_queue.length,G_ADV_SETTINGS.adv_duration);
+		}
+	}
+}
+#endif
 
 /******************************************************************************/
 /******************************************************************************/

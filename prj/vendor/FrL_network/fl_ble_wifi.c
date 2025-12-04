@@ -55,6 +55,8 @@ typedef enum {
 	GF_CMD_PAIRING_RESPONSE = 0x05,
 	GF_CMD_SENDMESS_REQUEST = 0x06,
 	GF_CMD_SENDMESS_RESPONSE = 0x06,
+	GF_CMD_REMOVE_REQUEST = 0x07,
+	GF_CMD_REMOVE_RESPONSE = 0x07,
 	GF_CMD_TIMESTAMP_REQUEST = 0x08,
 	GF_CMD_TIMESTAMP_RESPONSE = 0x08,
 	GF_CMD_DEBUG_RESPONSE =0x09,
@@ -116,6 +118,9 @@ void RSTPWMETER_REQUEST(u8* _pdata, RspFunc rspfnc);
 void RSTPWMETER_RESPONSE(u8* _pdata);
 void PWMETER_RUNNING_SET_REQUEST(u8* _pdata, RspFunc rspfnc);
 void PWMETER_RUNNING_SET_RESPONSE(u8* _pdata){};
+//Remove
+void REMOVE_REQ(u8* _pdata, RspFunc rspfnc);
+void REMOVE_RSP(u8* _pdata){};
 //FOTA
 void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc);
 void FOTA_RESPONSE(u8* _pdata);
@@ -126,6 +131,7 @@ fl_wifiprotocol_proc_t G_WIFI_CON[] = {
 			{ { GF_CMD_GET_LIST_REQUEST, GETLIST_REQUEST },{GF_CMD_GET_LIST_RESPONSE, GETLIST_RESPONSE } },
 			{ { GF_CMD_PAIRING_REQUEST, PAIRING_REQUEST }, {GF_CMD_PAIRING_RESPONSE, PAIRING_RESPONSE } },
 			{ { GF_CMD_SENDMESS_REQUEST, SENDMESS_REQUEST }, {GF_CMD_SENDMESS_RESPONSE, SENDMESS_RESPONSE } },
+			{ { GF_CMD_REMOVE_REQUEST, REMOVE_REQ }, {GF_CMD_REMOVE_RESPONSE, REMOVE_RSP } },
 			{ { GF_CMD_TIMESTAMP_REQUEST, TIMETAMP_REQUEST }, {GF_CMD_TIMESTAMP_RESPONSE, TIMETAMP_RESPONSE } },
 			{ { GF_CMD_RSTFACTORY_REQUEST, RSTFACTORY_REQUEST }, {GF_CMD_RSTFACTORY_RESPONSE, RSTFACTORY_RESPONSE } },
 			{ { GF_CMD_RSTPWMETER_REQUEST, RSTPWMETER_REQUEST }, {GF_CMD_RSTPWMETER_RESPONSE, RSTPWMETER_RESPONSE } },
@@ -428,6 +434,56 @@ void SENDMESS_REQUEST(u8* _pdata, RspFunc rspfnc){
 }
 
 void SENDMESS_RESPONSE(u8* _pdata){
+}
+
+void _REMOVE_slave_rsp_callback(void *_data, void* _data2) {
+	fl_rsp_container_t *data = (fl_rsp_container_t*) _data;
+	u8 status = 0;
+	//rsp data
+	if (data->timeout > 0) {
+		LOGA(API,"RTT:%d ms\r\n",(data->timeout_set - data->timeout) / 1000);
+		fl_pack_t *packet = (fl_pack_t *) _data2;
+		P_PRINTFHEX_A(API,packet->data_arr,packet->length,"RSP: ");
+		status= 1;
+	} else {
+		LOGA(API,"RTT: TIMEOUT (%d ms)\r\n",(data->timeout_set) / 1000);
+		status=0;
+	}
+	LOGA(API,"cmdID  :%02X\r\n",data->rsp_check.hdr_cmdid);
+	LOGA(API,"SlaveID:%d\r\n",data->rsp_check.slaveID);
+	LOGA(API,"SeqTT  :%lld\r\n",data->rsp_check.seqTimetamp);
+	//Rsp to WIFI
+	u8 mac[6];
+	if (fl_master_SlaveMAC_get(data->rsp_check.slaveID,mac) != -1 && status==1) {
+		fl_datawifi2ble_t wfdata;
+		wfdata.cmd = GF_CMD_REMOVE_RESPONSE;
+		memset(wfdata.data,0,SIZEU8(wfdata.data));
+		memcpy(wfdata.data,mac,SIZEU8(mac));
+		wfdata.len_data = SIZEU8(mac);
+		wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
+		u8 payload_len = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
+		fl_ble_send_wifi((u8*) &wfdata,payload_len);
+		//Remove device from db
+
+	}
+}
+void REMOVE_REQ(u8* _pdata, RspFunc rspfnc) {
+	fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[1];
+	LOGA(MCU,"LEN:0x%02X\r\n",data->len_data);
+	LOGA(MCU,"cmdID:0x%02X\r\n",data->cmd);
+	LOGA(MCU,"CRC8:0x%02X\r\n",data->crc8);
+	P_PRINTFHEX_A(MCU,data->data,data->len_data,"Data:");
+	u8 crc8_cal = fl_crc8(data->data,data->len_data);
+	if (crc8_cal != data->crc8) {
+		ERR(MCU,"ERR >> CRC8:0x%02X | 0x%02X\r\n",data->crc8,crc8_cal);
+		return;
+	}
+	u8 mac[6];
+	memcpy(mac,data->data,SIZEU8(mac));
+	fl_api_master_req(mac,NWK_HDR_REMOVE,mac,SIZEU8(mac),_REMOVE_slave_rsp_callback,0,1);
+	if (rspfnc != 0) {
+		//don't reponse in here => wait slave rsp or timeout
+	}
 }
 
 void _PING_slave_rsp_callback(void *_data, void* _data2) {
