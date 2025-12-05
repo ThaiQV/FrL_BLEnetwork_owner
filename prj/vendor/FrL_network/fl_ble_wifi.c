@@ -645,6 +645,10 @@ void RSTFACTORY_RESPONSE(u8* _pdata){}
 /******************************************************************************/
 u8 data_fw[22];
 fl_ble2wif_fota_info_t FOTA_INFO;
+
+u8 Is_FOTA_RUNNING(void){
+	return FOTA_INFO.begin;
+}
 void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 	extern fl_slaves_list_t G_NODE_LIST;
 	fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[1];

@@ -17,7 +17,7 @@ typedef enum{
 	//todo something
 
 }fl_wifi2ble_exc_e;
-
+u8 Is_FOTA_RUNNING(void);
 void fl_ble_wifi_proc(u8* _pdata) ;
 void fl_ble2wifi_HISTORY_SEND(u8* mac,u8* timetamp,u8* _data);
 void fl_ble2wifi_EVENT_SEND(u8* _slave_mac);

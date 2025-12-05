@@ -1172,6 +1172,7 @@ int _interval_heartbeat(void) {
 	//Synchronization nodelist table
 	static u32 sys_tick_nodelist_table =0;
 	if(clock_time_exceed(sys_tick_nodelist_table,3001*999)){
+//		if(Is_FOTA_RUNNING()==0)
 		fl_nwk_generate_table_pack();
 		sys_tick_nodelist_table = clock_time();
 	}

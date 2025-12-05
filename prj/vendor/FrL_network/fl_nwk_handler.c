@@ -360,6 +360,25 @@ s16 FL_NWK_NODELIST_TABLE_IsReady(void){
 	return NODELIST_TABLE_SENDING.count;
 }
 #ifdef MASTER_CORE
+#define FIELD_SIZE 7
+#define TOTAL_SIZE 28
+#define NUM_FIELDS (TOTAL_SIZE / FIELD_SIZE)
+void _swap_blocks(u8 *arr, int a, int b) {
+    for (int i = 0; i < FIELD_SIZE; i++) {
+        int tmp = arr[a * FIELD_SIZE + i];
+        arr[a * FIELD_SIZE + i] = arr[b * FIELD_SIZE + i];
+        arr[b * FIELD_SIZE + i] = tmp;
+    }
+}
+void shuffle_fields_inplace(u8 *arr) {
+    for (int i = NUM_FIELDS - 1; i > 0; i--) {
+        int j = rand() % (i + 1);
+        if (i != j) {
+           _swap_blocks(arr, i, j);
+        }
+    }
+}
+
 void fl_nwk_generate_table_pack(void) {
 	fl_pack_t pack;
 	u8 payload_create[28]; // full size adv can be sent
@@ -374,7 +393,9 @@ void fl_nwk_generate_table_pack(void) {
 			memcpy(&payload_create[++ptr],G_NODELIST_TABLE[var].mac,SIZEU8(G_NODELIST_TABLE[var].mac));
 			ptr +=SIZEU8(G_NODELIST_TABLE[var].mac);
 			if (ptr >= SIZEU8(payload_create)) {
-//				P_INFO_HEX(payload_create,SIZEU8(payload_create),"PACK NODELIST(%d/%d):",var,NODELIST_TABLE_SIZE);
+				//shuffer data
+				shuffle_fields_inplace(payload_create);
+				//P_INFO_HEX(payload_create,SIZEU8(payload_create),"PACK NODELIST(%d/%d):",var,NODELIST_TABLE_SIZE);
 				pack = fl_master_packet_nodelist_table_build(payload_create,SIZEU8(payload_create));
 				FL_QUEUE_ADD(&NODELIST_TABLE_SENDING,&pack);
 				memset(payload_create,0xFF,SIZEU8(payload_create));
@@ -385,7 +406,8 @@ void fl_nwk_generate_table_pack(void) {
 	}
 	//Last pack
 	if(ptr>0){
-//		P_INFO_HEX(payload_create,SIZEU8(payload_create),"PACK NODELIST(LSB):");
+		shuffle_fields_inplace(payload_create);
+		//P_INFO_HEX(payload_create,SIZEU8(payload_create),"PACK NODELIST(LSB):");
 		pack = fl_master_packet_nodelist_table_build(payload_create,SIZEU8(payload_create));
 		FL_QUEUE_ADD(&NODELIST_TABLE_SENDING,&pack);
 	}
