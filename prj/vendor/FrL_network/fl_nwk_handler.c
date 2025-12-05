@@ -347,6 +347,14 @@ s8 fl_nwk_MemberInNodeTable_find(u8* _mac){
  * Update NODELIST TABLE
  * */
 
+bool FL_NODELIST_TABLE_Updated(void) {
+	for (u8 var = 0; var < sizeof(G_NODELIST_TABLE) / sizeof(G_NODELIST_TABLE[0]); ++var) {
+		if(G_NODELIST_TABLE[var].slaveid!=0xFF && !IS_MAC_INVALID(G_NODELIST_TABLE[var].mac,0xFF)){
+			return true;
+		}
+	}
+	return false;
+}
 
 s16 FL_NWK_NODELIST_TABLE_IsReady(void){
 	return NODELIST_TABLE_SENDING.count;
@@ -414,6 +422,15 @@ void fl_nwk_slave_nodelist_repeat(fl_pack_t *_pack) {
 			G_NODELIST_TABLE[table_arr[var]].slaveid  = table_arr[var];
 			memcpy(G_NODELIST_TABLE[table_arr[var]].mac,&table_arr[var + 1],6);
 		}
+		//Check myID match myMAC
+		if(table_arr[var] == fl_nwk_mySlaveID()){
+			//Match SlaveID but incorrect mac => has been removed yet
+			if(memcmp(G_NODELIST_TABLE[table_arr[var]].mac,fl_nwk_mySlaveMac(),SIZEU8(G_NODELIST_TABLE[table_arr[var]].mac))){
+				ERR(APP,"Removed.....!!!\r\n");
+				fl_nwk_slave_nwkclear();
+				G_NODELIST_TABLE_Clear();
+			}
+		}
 	}
 	_nodelist_table_printf();
 }
@@ -426,7 +443,7 @@ void fl_nwk_nodelist_table_run(void) {
 	if (!F_SENDING_STATE) {
 //		P_INFO("PACK NODELIST:%d\r\n",FL_NWK_NODELIST_TABLE_IsReady());
 		if (FL_QUEUE_GET(&NODELIST_TABLE_SENDING,&pack_in_queue) != -1) {
-			P_INFO_HEX(pack_in_queue.data_arr,pack_in_queue.length,"PACK NODELIST(%d):",FL_NWK_NODELIST_TABLE_IsReady());
+//			P_INFO_HEX(pack_in_queue.data_arr,pack_in_queue.length,"PACK NODELIST(%d):",FL_NWK_NODELIST_TABLE_IsReady());
 			fl_adv_send(pack_in_queue.data_arr,pack_in_queue.length,G_ADV_SETTINGS.adv_duration);
 		}
 	}

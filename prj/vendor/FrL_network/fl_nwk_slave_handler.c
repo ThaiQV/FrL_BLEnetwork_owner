@@ -133,6 +133,10 @@ void fl_nwk_LedSignal_run(void){
 u8 fl_nwk_mySlaveID(void){
 	return G_INFORMATION.slaveID;
 }
+u8* fl_nwk_mySlaveMac(void){
+	return G_INFORMATION.mac;
+}
+
 bool IsPairing(void)	{
 	return(G_INFORMATION.profile.run_stt.join_nwk);
 }
@@ -207,7 +211,7 @@ int _nwk_slave_backup(void){
 	return 0;
 }
 
-void fl_nwk_slave_nwkclear(void){
+int fl_nwk_slave_nwkclear(void){
 	fl_db_Pairing_Clear();
 	fl_slave_profiles_t my_profile =fl_db_slaveprofile_init();
 	G_INFORMATION.slaveID = my_profile.slaveid;
@@ -215,6 +219,7 @@ void fl_nwk_slave_nwkclear(void){
 	G_INFORMATION.profile.run_stt.join_nwk =1;
 	fl_db_slaveprofile_save(G_INFORMATION.profile);
 	blt_soft_timer_restart(_interval_report,100*100);
+	return -1;
 }
 
 void fl_nwk_slave_init(void) {
@@ -722,6 +727,31 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 		}
 		break;
 		/*============================================================================================*/
+		case NWK_HDR_REMOVE: {
+			if (IsJoinedNetwork() && packet.frame.slaveID == G_INFORMATION.slaveID) {
+				if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
+					//get master's mac
+					u32 mac_parent = MAKE_U32(packet.frame.payload[3],packet.frame.payload[2],packet.frame.payload[1],packet.frame.payload[0]);
+					memcpy(G_INFORMATION.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_INFORMATION.mac));
+					if (mac_parent == G_INFORMATION.profile.nwk.mac_parent && -1!=plog_IndexOf(packet.frame.payload,G_INFORMATION.mac,6,SIZEU8(packet.frame.payload))) {
+						ERR(APP,"Network leaving.....(%d )s\r\n",1);
+						blt_soft_timer_add(fl_nwk_slave_nwkclear,1201*998);
+						//Process rsp
+						memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
+						memcpy(packet.frame.payload,G_INFORMATION.mac,SIZEU8(G_INFORMATION.mac));
+						packet.frame.payload[SIZEU8(G_INFORMATION.mac)] = G_INFORMATION.dev_type;
+						//change endpoint to node source
+						packet.frame.endpoint.master = FL_FROM_SLAVE;
+						//add repeat_cnt
+						packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
+						break;
+					}
+				}
+			}
+			packet_built.length = 0;
+			return packet_built;
+		}
+		break;
 		case NWK_HDR_COLLECT: {
 //			_nwk_slave_syncFromPack(&packet.frame);
 			fl_nwk_LedSignal_run();

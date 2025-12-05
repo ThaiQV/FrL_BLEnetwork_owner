@@ -355,6 +355,7 @@ void fl_nwk_master_nodelist_load(void);
 s8 fl_queue_REQcRSP_ScanRec(fl_pack_t _pack);
 s8 fl_api_master_req(u8* _mac_slave,u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry);
 void fl_nwk_generate_table_pack(void) ;
+void fl_master_nodelist_member_remove(u8* _mac) ;
 #else
 extern volatile u8 NWK_DEBUG_STT; // it will be assigned into end-point byte (dbg :1bit);
 bool IsPairing(void);
@@ -362,8 +363,9 @@ bool IsJoinedNetwork(void);
 bool IsOnline(void);
 s16 fl_nwk_slave_PriorityADV_Add(fl_pack_t _pack);
 u8 fl_nwk_mySlaveID(void);
+u8* fl_nwk_mySlaveMac(void);
 void fl_nwk_slave_init(void);
-void fl_nwk_slave_nwkclear(void);
+int fl_nwk_slave_nwkclear(void);
 void fl_nwk_slave_run(fl_pack_t *_pack_handle);
 u8 fl_adv_sendFIFO_PriorityADV_run(void) ;
 void fl_nwk_slave_process(void);
@@ -379,6 +381,7 @@ s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 
 void fl_nwk_slave_nodelist_repeat(fl_pack_t *_pack) ;
 void G_NODELIST_TABLE_Clear(void);
 #endif
+bool FL_NODELIST_TABLE_Updated(void) ;
 s16 FL_NWK_NODELIST_TABLE_IsReady(void);
 void fl_nwk_nodelist_table_run(void) ;
 s8 fl_nwk_MemberInNodeTable_find(u8* _mac);

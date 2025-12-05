@@ -216,7 +216,7 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 #endif
 				//Scan mac in nodetable when transaction mode, skip when in collection mode
 #ifndef MASTER_CORE
-				if(-1 == plog_IndexOf(pa->mac,master_mac,SIZEU8(master_mac),6))
+				if(-1 == plog_IndexOf(pa->mac,master_mac,SIZEU8(master_mac),6) && FL_NODELIST_TABLE_Updated())
 #endif
 				{
 					if (*FL_NWK_COLLECTION_MODE == 0) {
@@ -270,7 +270,9 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 					} else {
 //						LOGA(APP,"QUEUE ADD (len:%d|RSSI:%d): (%d)%d-%d\r\n",pa->len,rssi,G_DATA_CONTAINER.count,G_DATA_CONTAINER.head_index,
 //								G_DATA_CONTAINER.tail_index);
-						P_PRINTFHEX_A(BLE,incomming_data.data_arr,incomming_data.length,"%s(%d):","PACK",incomming_data.length);
+						P_PRINTFHEX_A(BLE,incomming_data.data_arr,incomming_data.length,
+								"[0x%02X%02X%02X%02X%02X%02X]PACK(%d):",pa->mac[0],pa->mac[1],pa->mac[2],pa->mac[3],
+								pa->mac[4],pa->mac[5],incomming_data.length);
 					}
 				} else {
 //					ERR(BLE,"Err <QUEUE ALREADY>!!\r\n");

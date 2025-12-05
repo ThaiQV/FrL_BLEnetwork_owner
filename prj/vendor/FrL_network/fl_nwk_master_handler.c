@@ -83,7 +83,7 @@ void fl_nwk_master_heartbeat_init(void);
 
 void _master_nodelist_printf(fl_slaves_list_t *_node, u8 _size) {
 	if (_size < 0xFF && _size > 0) {
-		P_INFO("******** NODELIST MATER *********\r\n");
+		P_INFO("******** NODELIST MATER (%d)*********\r\n",_size);
 		for (u8 var = 0; var < _size; ++var) {
 			P_INFO("[%3d]0x%02X%02X%02X%02X%02X%02X(%d):%d\r\n",_node->sla_info[var].slaveID,_node->sla_info[var].mac[0],
 					_node->sla_info[var].mac[1],_node->sla_info[var].mac[2],_node->sla_info[var].mac[3],_node->sla_info[var].mac[4],
@@ -99,12 +99,31 @@ void _master_nodelist_printf(fl_slaves_list_t *_node, u8 _size) {
 		P_INFO("******** END *************\r\n");
 	}
 }
+void fl_master_nodelist_member_remove(u8* _mac) {
+	s16 indx = -1;
+	if ((indx=fl_master_Node_find(_mac))!= -1) {
+		//G_NODE_LIST.sla_info[indx].slaveID=0xFF;
+		memset(G_NODE_LIST.sla_info[indx].mac,0,SIZEU8(G_NODE_LIST.sla_info[indx].mac));
+		G_NODE_LIST.sla_info[indx].dev_type=0xFF;
+		G_NODE_LIST.sla_info[indx].active=false;
+		G_NODE_LIST.sla_info[indx].timelife=0;
+		fl_nwk_master_nodelist_store();
+	}
+}
 
 void fl_master_nodelist_AddRefesh(fl_nodeinnetwork_t _node) {
+	u8 slot_ins = 0xFF;
+	G_NODE_LIST.slot_inused = 0;
 	for (u8 var = 0; var < MAX_NODES; ++var) {
-		if (IS_MAC_INVALID(G_NODE_LIST.sla_info[var].mac,0) != 1) {
-			G_NODE_LIST.slot_inused = var + 1;
+		if (IS_MAC_INVALID(G_NODE_LIST.sla_info[var].mac,0xFF) != 1) {
+			if (slot_ins == 0xFF && IS_MAC_INVALID(G_NODE_LIST.sla_info[var].mac,0) && G_NODE_LIST.sla_info[var].dev_type == 0xFF) {
+				slot_ins = var;
+			} else{
+				G_NODE_LIST.slot_inused = var + 1;
+			}
 		} else {
+			if (slot_ins == 0xFF)
+				slot_ins = var;
 			//debug
 			u8 inused = 0xFF; //Empty
 			u8 grp_inused = 0xFF;
@@ -120,13 +139,18 @@ void fl_master_nodelist_AddRefesh(fl_nodeinnetwork_t _node) {
 	}
 	if (IS_MAC_INVALID(_node.mac,0) != 1) {
 		//update
-		u8 slot_ins = G_NODE_LIST.slot_inused++;
+		//u8 slot_ins = G_NODE_LIST.slot_inused++;
 		G_NODE_LIST.sla_info[slot_ins] = _node;
 		G_NODE_LIST.sla_info[slot_ins].slaveID = slot_ins;
 		//Clear data in the first joinning
 		memset(G_NODE_LIST.sla_info[slot_ins].data,0,SIZEU8(G_NODE_LIST.sla_info[slot_ins].data));
-		LOGA(FLA,"Update Node [%d]slaveID:%d\r\n",slot_ins,G_NODE_LIST.sla_info[slot_ins].slaveID);
+		G_NODE_LIST.slot_inused++;
+		LOGA(FLA,"Update Node [%d/%d]slaveID:%d\r\n",slot_ins,G_NODE_LIST.slot_inused,G_NODE_LIST.sla_info[slot_ins].slaveID);
 		fl_nwk_master_nodelist_store();
+	}else{
+		if(G_NODE_LIST.slot_inused ==0){
+			G_NODE_LIST.slot_inused =0xFF;
+		}
 	}
 }
 
@@ -772,7 +796,9 @@ int _nwk_master_backup(void) {
 /******************************************************************************/
 void fl_nwk_master_StatusNodesRefesh(void) {
 	for (u8 i = 0; i < G_NODE_LIST.slot_inused && G_NODE_LIST.slot_inused != 0xFF; i++) {
-		G_NODE_LIST.sla_info[i].active = (fl_rtc_get() - G_NODE_LIST.sla_info[i].timelife <= 40) ? 1 : 0;
+		if(G_NODE_LIST.sla_info[i].dev_type != 0xFF && IS_MAC_INVALID(G_NODE_LIST.sla_info[i].mac,0)&&IS_MAC_INVALID(G_NODE_LIST.sla_info[i].mac,0xFF)){
+			G_NODE_LIST.sla_info[i].active = (fl_rtc_get() - G_NODE_LIST.sla_info[i].timelife <= 40) ? 1 : 0;
+		}
 	}
 }
 
@@ -1033,9 +1059,9 @@ void fl_nwk_master_nodelist_init(void) {
 		G_NODE_LIST.sla_info[i].active = false;
 		G_NODE_LIST.sla_info[i].slaveID = 0xFF;
 		G_NODE_LIST.sla_info[i].timelife = 0;
-		MAC_ZERO_CLEAR(G_NODE_LIST.sla_info[i].mac,0);
+		MAC_ZERO_CLEAR(G_NODE_LIST.sla_info[i].mac,0xFF);
 		//Init NODELIST_TBALE
-		MAC_ZERO_CLEAR(G_NODELIST_TABLE[i].mac,0);
+		MAC_ZERO_CLEAR(G_NODELIST_TABLE[i].mac,0xFF);
 		G_NODELIST_TABLE[i].dev_type = 0xFF;
 		G_NODELIST_TABLE[i].slaveid = 0xFF;
 	}
