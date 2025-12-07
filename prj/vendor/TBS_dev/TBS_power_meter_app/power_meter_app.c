@@ -308,7 +308,7 @@ void power_meter_app_loop(void)
     uart_app_loop();
     pmt_protocol_loop();
     static uint64_t appTimeTick = 0;
-    if(get_system_time_us() - appTimeTick > 1000){
+    if(get_system_time_us() - appTimeTick > 10000){
         appTimeTick = get_system_time_us()  ; //1ms
     }
     else{
@@ -318,7 +318,7 @@ void power_meter_app_loop(void)
     stpm_monitoring_loop(pmt_handle);
 
 }
-uint32_t volmax = 0;
+uint32_t time_max = 0;
 void read_stpm_data(stpm_handle_t *handle) {
     if (handle == NULL) return;
     pmt_data_context_t *ctx = handle->context;
@@ -329,11 +329,20 @@ void read_stpm_data(stpm_handle_t *handle) {
     stpm_read_rms_voltage_and_current(handle, 1, &voltage, &current );
     active = stpm_read_active_power(handle, 1);
     
-    ctx->accumulator.voltage_sum += voltage;
-    ctx->accumulator.current_sum += current;
-    ctx->accumulator.active_power_sum += active;
-    ctx->measurement.active_energy += (active * ctx->measurement.time) /3600000;
-    ctx->accumulator.sample_count++;
+    if( ctx->measurement.time > 10 )
+    {
+        ctx->accumulator.sample_count++;
+    }
+
+    if( ctx->measurement.time > time_max )
+	{
+    	time_max = ctx->measurement.time;
+	}
+
+    ctx->measurement.voltage += 3*0.1*(voltage - ctx->measurement.voltage );
+	ctx->measurement.current += 3*0.1*(current - ctx->measurement.current );
+	ctx->measurement.active_power += 3*0.1*(active - ctx->measurement.active_power );
+    ctx->measurement.active_energy += (ctx->measurement.active_power * ctx->measurement.time) /3600000;
 }
 
 void update_energy(stpm_handle_t *handle) {
@@ -349,56 +358,8 @@ void update_energy(stpm_handle_t *handle) {
 void update_display(stpm_handle_t *handle, uint32_t current_time) {
     if (handle == NULL) return;
     pmt_data_context_t *ctx = handle->context;
-
-   if (ctx->accumulator.sample_count > 0) {
-       ctx->measurement.voltage = ctx->accumulator.voltage_sum / ctx->accumulator.sample_count;
-       ctx->measurement.current = ctx->accumulator.current_sum / ctx->accumulator.sample_count;
-       ctx->measurement.active_power = ctx->accumulator.active_power_sum / ctx->accumulator.sample_count;
-   }
-
 //    update_energy(handle);
-    int index = 0;
-    switch (handle->cs_pin)
-    {
-    case PIN_CS1:
-        index = 1;
-        break;
 
-    case PIN_CS2:
-        index = 2;
-        break;
-
-    case PIN_CS3:
-        index = 3;
-        break;
-
-    default:
-        break;
-    }
-
-    uint32_t elapsed_seconds = (current_time - ctx->start_time) / 1000;
-    uint32_t hours = elapsed_seconds / 3600;
-    uint32_t minutes = (elapsed_seconds % 3600) / 60;
-    uint32_t seconds = elapsed_seconds % 60;
-    uint8_t buff[5];
-    uint32_t fre_ch1, fre_ch2;
-    // stpm_read_periods(handle, & fre_ch1, fre_ch2);
-    // stpm32_read_frame(handle, PH1_Active_Power_Address, buff);
-	// printf("%02x%02x%02x%02x\n", buff[0], buff[1], buff[2], buff[3] );
-    // printf("%10.3f\n", stpm_read_active_power(handle, 1));
-    // printf("========================================\n");
-    // printf("STPM32 ID: %d - Measurement Data\n", index);
-    // printf("freqecen: %10.3f \n", stpm_read_period(handle, 1));
-    // // printf("========================================\n");
-    // printf("timetamp: %02u:%02u:%02u\n", hours, minutes, seconds);
-    // printf("number of reasd: %u\n", ctx->accumulator.sample_count);
-    // printf("voltaget rsm (V):   %10.3f V\n", ctx->measurement.voltage);
-    // printf("current  rsm (A):   %10.3f A\n", ctx->measurement.current);
-    // printf("active_power:       %10.3f W\n", ctx->measurement.active_power);
-    // printf("active_energy:      %10.3f Wh\n", ctx->measurement.active_energy);
-    // printf("========================================\n");
-
-    memset(&ctx->accumulator, 0, sizeof(accumulator_t));
     G_POWER_METER.data.voltage = ctx->measurement.voltage;
     G_POWER_METER.data.frequency = (int)stpm_read_period(handle, 1);
     switch (ctx->id) {
@@ -448,7 +409,7 @@ void stpm_monitoring_loop(stpm_handle_t **handle) {
 
 }
 
-void pmt_setcalib(uint8_t ch, int32_t calib_U, int32_t calib_I, int32_t calib_P)
+void pmt_setcalib(uint8_t ch, float calib_U, float calib_I, float calib_P)
 {
     pmt_handle[ch - 1]->calibration[1][0] = calib_U;
     pmt_handle[ch - 1]->calibration[1][1] = calib_I;
@@ -456,11 +417,43 @@ void pmt_setcalib(uint8_t ch, int32_t calib_U, int32_t calib_I, int32_t calib_P)
     save_calib();
 }
 
-void pmt_getcalib(uint8_t ch, int32_t *calib_U, int32_t *calib_I, int32_t *calib_P)
+void pmt_getcalib(uint8_t ch, float *calib_U, float *calib_I, float *calib_P)
 {
+    read_calib();
     *calib_U = pmt_handle[ch - 1]->calibration[1][0];
     *calib_I = pmt_handle[ch - 1]->calibration[1][1];
     *calib_P = pmt_handle[ch - 1]->calibration[1][2];
+}
+
+void pmt_setcalibr(uint8_t ch, uint16_t calib_U, uint16_t calib_I, uint16_t calib_P)
+{
+    stpm_handle_t *handle = pmt_handle[ch -1 ];
+    stpm_update_calib(handle, 1, calib_U, calib_I);
+}
+
+void pmt_getcalibr(uint8_t ch, float *calib_U, float *calib_I, float *calib_P)
+{
+    stpm_handle_t *handle = pmt_handle[ch -1 ];
+    DSP_CR5_bits_t dsp_cr5;
+    DSP_CR6_bits_t dsp_cr6;
+
+    stpm32_read_frame(handle, DSP_CR5_Address, handle->read_buffer);
+    dsp_cr5.LSW.LSB = handle->read_buffer[0];
+    dsp_cr5.LSW.MSB = handle->read_buffer[1];
+    dsp_cr5.MSW.LSB = handle->read_buffer[2];
+    dsp_cr5.MSW.MSB = handle->read_buffer[3];
+    printf("dsp_cr5: %08x\n", dsp_cr5);
+
+    stpm32_read_frame(handle, DSP_CR6_Address, handle->read_buffer);
+    dsp_cr6.LSW.LSB = handle->read_buffer[0];
+    dsp_cr6.LSW.MSB = handle->read_buffer[1];
+    dsp_cr6.MSW.LSB = handle->read_buffer[2];
+    dsp_cr6.MSW.MSB = handle->read_buffer[3];
+    printf("dsp_cr6: %08x\n", dsp_cr6);
+
+    *calib_U = dsp_cr5.CHV1;
+    *calib_I = dsp_cr6.CHC1;
+    *calib_P = 0;
 }
 
 float pmt_read_U(uint8_t ch)
@@ -503,36 +496,38 @@ void pmt_print_info(uint8_t ch)
     printf("freqecen: %10.3f \n", stpm_read_period(handle, 1));
     // printf("========================================\n");
     printf("timetamp: %02u:%02u:%02u\n", hours, minutes, seconds);
-    printf("number of reasd: %u\n", ctx->accumulator.sample_count);
+    printf("number of reasd: %d\n", ctx->accumulator.sample_count);
+    printf("deta time max: %u\n", time_max);
     printf("voltaget rsm (V):   %10.3f V\n", ctx->measurement.voltage);
     printf("current  rsm (A):   %10.3f A\n", ctx->measurement.current);
     printf("active_power:       %10.3f W\n", ctx->measurement.active_power);
     printf("active_energy:      %10.3f Wh\n", ctx->measurement.active_energy);
     printf("========================================\n");
+
+    time_max = 0;
 }
 
 static void save_calib()
 {
-    u8 tbs_profile[36] = {0} ;
-    for(int i = 0 ; i < NUMBER_CHANNEL_POWERMETTER; i++)
-    {
-        for(int j = 0 ; j < 3; j++)
-        {
-            tbs_profile[0 + j * 4 + i * 12] = (pmt_handle[i]->calibration[1][j]) >> 24;
-            tbs_profile[1 + j * 4 + i * 12] = (pmt_handle[i]->calibration[1][j]) >> 16;
-            tbs_profile[2 + j * 4 + i * 12] = (pmt_handle[i]->calibration[1][j]) >> 8;
-            tbs_profile[3 + j * 4 + i * 12] = (pmt_handle[i]->calibration[1][j]) >> 0;
-        }
-        
-    }
-    
-	fl_db_tbsprofile_save((u8*)tbs_profile,SIZEU8(tbs_profile));
-}
+    u8 tbs_profile[36] = {0};
 
+    for (int i = 0; i < NUMBER_CHANNEL_POWERMETTER; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            float f = pmt_handle[i]->calibration[1][j];
+            int base = j * 4 + i * 12;
+
+            memcpy(&tbs_profile[base], &f, sizeof(float));
+        }
+    }
+
+    fl_db_tbsprofile_save((u8*)tbs_profile, sizeof(tbs_profile));
+}
 
 static void read_calib()
 {
-    fl_tbs_data_t tbs_load = fl_db_tbsprofile_load(); // tbs_load.data[] = 36 bytes
+    fl_tbs_data_t tbs_load = fl_db_tbsprofile_load(); // 36 bytes
 
     for (int i = 0; i < NUMBER_CHANNEL_POWERMETTER; i++)
     {
@@ -540,13 +535,11 @@ static void read_calib()
         {
             int base = j * 4 + i * 12;
 
-            int32_t val =
-                (tbs_load.data[base + 0] << 24) |
-                (tbs_load.data[base + 1] << 16) |
-                (tbs_load.data[base + 2] << 8)  |
-                (tbs_load.data[base + 3] << 0);
+            float f;
+            memcpy(&f, &tbs_load.data[base], sizeof(float));
 
-            pmt_handle[i]->calibration[1][j] = val;
+            pmt_handle[i]->calibration[1][j] = f;
         }
     }
 }
+

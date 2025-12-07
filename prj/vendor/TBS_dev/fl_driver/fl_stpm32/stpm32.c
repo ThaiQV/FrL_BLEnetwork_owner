@@ -4,7 +4,7 @@
  
  Corrected to use stpm3x_define.h definitions.
 
- Benjamin Völker, voelkerb@me.com
+ Benjamin VÃ¶lker, voelkerb@me.com
  Embedded Systems
  University of Freiburg, Institute of Informatik
  
@@ -793,8 +793,8 @@ void stpm_read_rms_voltage_and_current(stpm_handle_t *handle, uint8_t channel,
     uint8_t address = (channel == 1) ? DSP_REG14_Address : DSP_REG15_Address;
     read_frame(handle, address, handle->read_buffer);
 
-    *voltage = (float) ((buffer_0to14(handle->read_buffer)) /handle->calibration[channel][0]);
-    *current = (float) ((buffer_15to32(handle->read_buffer)) /handle->calibration[channel][1]);
+    *voltage = (float) (((float)buffer_0to14(handle->read_buffer)) / (float)handle->calibration[channel][0]);
+    *current = (float) (((float)buffer_15to32(handle->read_buffer)) /(float)handle->calibration[channel][1]);
 }
 
 float stpm_read_rms_voltage(stpm_handle_t *handle, uint8_t channel) {
@@ -1064,16 +1064,16 @@ static inline int32_t buffer_0to32(uint8_t *buffer) {
 }
 
 static inline int32_t buffer_0to28(uint8_t *buffer) {
-    // Đọc 4 bytes thành 32-bit
+    // Ä�á»�c 4 bytes thÃ nh 32-bit
     int32_t value = (int32_t)(((uint32_t)buffer[3] << 24) | 
                               ((uint32_t)buffer[2] << 16) | 
                               ((uint32_t)buffer[1] << 8) | 
                               (uint32_t)buffer[0]);
     
-    // Mask để lấy 28-bit
+    // Mask Ä‘á»ƒ láº¥y 28-bit
     value &= 0x0FFFFFFF;
     
-    // Sign extension: nếu bit 27 = 1, mở rộng thành số âm 32-bit
+    // Sign extension: náº¿u bit 27 = 1, má»Ÿ rá»™ng thÃ nh sá»‘ Ã¢m 32-bit
     if (value & 0x08000000) {
         value |= 0xF0000000;
     }
@@ -1146,4 +1146,63 @@ void stpm32_send_frame(stpm_handle_t *handle, uint8_t read_add, uint8_t write_ad
     handle->spi_end_transaction();
 
     handle->delay_us(4);
+}
+
+void stpm_update_calib(stpm_handle_t *handle, uint8_t channel, uint16_t calib_V, uint16_t calib_C)
+{
+    if (!handle) return;
+
+    DSP_CR5_bits_t dsp_cr5;
+    DSP_CR6_bits_t dsp_cr6;
+
+    if(channel == 1)
+    {
+        read_frame(handle, DSP_CR5_Address, handle->read_buffer);
+        dsp_cr5.LSW.LSB = handle->read_buffer[0];
+        dsp_cr5.LSW.MSB = handle->read_buffer[1];
+        dsp_cr5.MSW.LSB = handle->read_buffer[2];
+        dsp_cr5.MSW.MSB = handle->read_buffer[3];
+        printf("dsp_cr5: %08x\n", dsp_cr5);
+
+        read_frame(handle, DSP_CR6_Address, handle->read_buffer);
+        dsp_cr6.LSW.LSB = handle->read_buffer[0];
+        dsp_cr6.LSW.MSB = handle->read_buffer[1];
+        dsp_cr6.MSW.LSB = handle->read_buffer[2];
+        dsp_cr6.MSW.MSB = handle->read_buffer[3];
+        printf("dsp_cr6: %08x\n", dsp_cr6);
+
+        dsp_cr5.CHV1 = calib_V;
+        dsp_cr6.CHC1 = calib_C;
+
+        if (handle->crc_enabled) {
+            send_frame_crc(handle, DSP_CR5_Address, DSP_CR5_Address, dsp_cr5.LSW.LSB, dsp_cr5.LSW.MSB);
+            send_frame_crc(handle, DSP_CR6_Address, DSP_CR6_Address, dsp_cr6.LSW.LSB, dsp_cr6.LSW.MSB);
+        } else {
+            send_frame(handle, DSP_CR5_Address, DSP_CR5_Address, dsp_cr5.LSW.LSB, dsp_cr5.LSW.MSB);
+            send_frame(handle, DSP_CR6_Address, DSP_CR6_Address, dsp_cr6.LSW.LSB, dsp_cr6.LSW.MSB);
+        }
+
+        read_frame(handle, DSP_CR5_Address, handle->read_buffer);
+        dsp_cr5.LSW.LSB = handle->read_buffer[0];
+        dsp_cr5.LSW.MSB = handle->read_buffer[1];
+        dsp_cr5.MSW.LSB = handle->read_buffer[2];
+        dsp_cr5.MSW.MSB = handle->read_buffer[3];
+        printf("dsp_cr5: %08x\n", dsp_cr5);
+
+        read_frame(handle, DSP_CR6_Address, handle->read_buffer);
+        dsp_cr6.LSW.LSB = handle->read_buffer[0];
+        dsp_cr6.LSW.MSB = handle->read_buffer[1];
+        dsp_cr6.MSW.LSB = handle->read_buffer[2];
+        dsp_cr6.MSW.MSB = handle->read_buffer[3];
+        printf("dsp_cr6: %08x\n", dsp_cr6);
+
+    }
+    else if(channel == 2)
+    {
+
+    }
+    else
+    {
+
+    }
 }

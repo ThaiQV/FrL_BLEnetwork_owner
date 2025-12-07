@@ -39,7 +39,7 @@ typedef struct {
     int syn_pin;
     int net_freq;
 
-    int32_t calibration[3][3];
+    float calibration[3][3];
     uint8_t crc_checksum;
     uint8_t address;
     bool auto_latch;
@@ -139,4 +139,5 @@ void stpm32_read_frame(stpm_handle_t *handle, uint8_t address, uint8_t *buffer);
 void stpm32_send_frame(stpm_handle_t *handle, uint8_t read_add, uint8_t write_add,
                        uint8_t data_lsb, uint8_t data_msb);
 
+void stpm_update_calib(stpm_handle_t *handle, uint8_t channel, uint16_t calib_V, uint16_t calib_C);
 #endif // STPM3X_H

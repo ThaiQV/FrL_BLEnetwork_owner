@@ -184,11 +184,62 @@ static int split_buffer(uint8_t *buffer, uint16_t len,
     return token_index;  // số token
 }
 
+static float parse_float(const char *s)
+{
+    char buf[32];
+    int j = 0;
+
+    // Copy chuỗi vào buffer và thay ',' thành '.'
+    for (int i = 0; s[i] != '\0' && j < sizeof(buf) - 1; i++)
+    {
+        if (s[i] == ',')
+            buf[j++] = '.';
+        else
+            buf[j++] = s[i];
+    }
+    buf[j] = '\0';
+
+    // parse thủ công (chính xác như atof)
+    float sign = 1.0f;
+
+    int idx = 0;
+    if (buf[idx] == '-') { sign = -1.0f; idx++; }
+    else if (buf[idx] == '+') { idx++; }
+
+    float result = 0.0f;
+
+    // Phần nguyên
+    while (buf[idx] >= '0' && buf[idx] <= '9')
+    {
+        result = result * 10.0f + (buf[idx] - '0');
+        idx++;
+    }
+
+    // Phần thập phân
+    if (buf[idx] == '.')
+    {
+        idx++;
+        float frac = 0.0f;
+        float base = 0.1f;
+
+        while (buf[idx] >= '0' && buf[idx] <= '9')
+        {
+            frac += (buf[idx] - '0') * base;
+            base *= 0.1f;
+            idx++;
+        }
+
+        result += frac;
+    }
+
+    return result * sign;
+}
+
 static void process_data(const uint8_t *data, uint16_t len)
 {
     char tokens[MAX_TOKENS][MAX_TOKEN_LEN];
     int count = split_buffer(data, len, tokens);
-    int32_t calib_U, calib_I, calib_P;
+    float calib_U, calib_I, calib_P;
     float U, I, P;
 
     // printf("str %d:\n", count);
@@ -207,62 +258,108 @@ static void process_data(const uint8_t *data, uint16_t len)
         }
         else if (strcmp(tokens[1], "ch1") == 0) {
             printf("ch1\n");
-            printf("ch1: U: %10.3f I: %10.3f P: %10.3f\n", pmt_read_U(1), pmt_read_I(1), pmt_read_P(1));
+            printf("ch1: U: %5.3f (V)  -I: %5.3f (A)  -P: %5.3f (W)\n", pmt_read_U(1), pmt_read_I(1), pmt_read_P(1));
         }
         else if (strcmp(tokens[1], "ch2") == 0) {
             printf("ch2\n");
-            printf("ch2: U: %10.3f I: %10.3f P: %10.3f\n", pmt_read_U(2), pmt_read_I(2), pmt_read_P(2));
+            printf("ch2: U: %5.3f (V)  -I: %5.3f (A)  -P: %5.3f (W)\n", pmt_read_U(2), pmt_read_I(2), pmt_read_P(2));
         }
         else if (strcmp(tokens[1], "ch3") == 0) {
             printf("ch3\n");
-            printf("ch3: U: %10.3f I: %10.3f P: %10.3f\n", pmt_read_U(3), pmt_read_I(3), pmt_read_P(3));
+            printf("ch3: U: %5.3f (V)  -I: %5.3f (A)  -P: %5.3f (W)\n", pmt_read_U(3), pmt_read_I(3), pmt_read_P(3));
         }
         else if (strcmp(tokens[1], "calib") == 0) {
-            printf("set: ");
+            printf("calib: ");
 
             if (strcmp(tokens[2], "ch1") == 0) {
                 printf("ch1\n");
                 pmt_getcalib(1, &calib_U, &calib_I, &calib_P);
-                printf("get calib: calibU: %d calibI: %d calibP: %d\n", calib_U, calib_I, calib_P);
+                printf("get calib: calibU: %5.3f calibI: %5.3f calibP: %5.3f\n", calib_U, calib_I, calib_P);
 
             }
             else if (strcmp(tokens[2], "ch2") == 0) {
                 printf("ch2\n");
                 pmt_getcalib(2, &calib_U, &calib_I, &calib_P);
-                printf("get calib: calibU: %d calibI: %d calibP: %d\n", calib_U, calib_I, calib_P);
+                printf("get calib: calibU: %5.3f calibI: %5.3f calibP: %5.3f\n", calib_U, calib_I, calib_P);
             }
             else if (strcmp(tokens[2], "ch3") == 0) {
                 printf("ch3\n");
                 pmt_getcalib(3, &calib_U, &calib_I, &calib_P);
-                printf("get calib: calibU: %d calibI: %d calibP: %d\n", calib_U, calib_I, calib_P);
+                printf("get calib: calibU: %5.3f calibI: %5.3f calibP: %5.3f\n", calib_U, calib_I, calib_P);
+            }
+        }
+        else if (strcmp(tokens[1], "calibr") == 0) {
+            printf("calibr: ");
+
+            if (strcmp(tokens[2], "ch1") == 0) {
+                printf("ch1\n");
+                pmt_getcalibr(1, &calib_U, &calib_I, &calib_P);
+                printf("get calib: calibU: %5.3f calibI: %5.3f calibP: %5.3f\n", calib_U, calib_I, calib_P);
+
+            }
+            else if (strcmp(tokens[2], "ch2") == 0) {
+                printf("ch2\n");
+                pmt_getcalibr(2, &calib_U, &calib_I, &calib_P);
+                printf("get calib: calibU: %5.3f calibI: %5.3f calibP: %5.3f\n", calib_U, calib_I, calib_P);
+            }
+            else if (strcmp(tokens[2], "ch3") == 0) {
+                printf("ch3\n");
+                pmt_getcalibr(3, &calib_U, &calib_I, &calib_P);
+                printf("get calib: calibU: %5.3f calibI: %5.3f calibP: %5.3f\n", calib_U, calib_I, calib_P);
             }
         }
 
     }
-    else if (strcmp(tokens[0], "set") == 0) {
-        printf("set: ");
-        calib_U = atoi(tokens[2]);
-        calib_I = atoi(tokens[3]);
-        calib_P = atoi(tokens[4]);
+    else if (strcmp(tokens[0], "setr") == 0) {
+        
+        calib_U = parse_float(tokens[2]);
+        calib_I = parse_float(tokens[3]);
+        calib_P = parse_float(tokens[4]);
+        printf("setr: ");
+        if (strcmp(tokens[1], "ch1") == 0) {
+            printf("ch1\n");
+            pmt_setcalibr(1, (uint16_t)calib_U, (uint16_t)calib_I, (uint16_t)calib_P);
+            pmt_getcalibr(1, &calib_U, &calib_I, &calib_P);
+            printf("get calib: calibU: %5.3f calibI: %5.3f calibP: %5.3f\n", calib_U, calib_I, calib_P);
 
+        }
+        else if (strcmp(tokens[1], "ch2") == 0) {
+            printf("ch2\n");
+            pmt_setcalibr(2, (uint16_t)calib_U, (uint16_t)calib_I, (uint16_t)calib_P);
+            pmt_getcalibr(2, &calib_U, &calib_I, &calib_P);
+            printf("get calib: calibU: %5.3f calibI: %5.3f calibP: %5.3f\n", calib_U, calib_I, calib_P);
+        }
+        else if (strcmp(tokens[1], "ch3") == 0) {
+            printf("ch3\n");
+            pmt_setcalibr(3, (uint16_t)calib_U, (uint16_t)calib_I, (uint16_t)calib_P);
+            pmt_getcalibr(3, &calib_U, &calib_I, &calib_P);
+            printf("get calib: calibU: %5.3f calibI: %5.3f calibP: %5.3f\n", calib_U, calib_I, calib_P);
+        }
+    }
+    else if (strcmp(tokens[0], "set") == 0) {
+        
+        calib_U = parse_float(tokens[2]);
+        calib_I = parse_float(tokens[3]);
+        calib_P = parse_float(tokens[4]);
+        printf("set: ");
         if (strcmp(tokens[1], "ch1") == 0) {
             printf("ch1\n");
             pmt_setcalib(1, calib_U, calib_I, calib_P);
             pmt_getcalib(1, &calib_U, &calib_I, &calib_P);
-            printf("get calib: calibU: %d calibI: %d calibP: %d\n", calib_U, calib_I, calib_P);
+            printf("get calib: calibU: %5.3f calibI: %5.3f calibP: %5.3f\n", calib_U, calib_I, calib_P);
 
         }
         else if (strcmp(tokens[1], "ch2") == 0) {
             printf("ch2\n");
             pmt_setcalib(2, calib_U, calib_I, calib_P);
             pmt_getcalib(2, &calib_U, &calib_I, &calib_P);
-            printf("get calib: calibU: %d calibI: %d calibP: %d\n", calib_U, calib_I, calib_P);
+            printf("get calib: calibU: %5.3f calibI: %5.3f calibP: %5.3f\n", calib_U, calib_I, calib_P);
         }
         else if (strcmp(tokens[1], "ch3") == 0) {
             printf("ch3\n");
             pmt_setcalib(3, calib_U, calib_I, calib_P);
             pmt_getcalib(3, &calib_U, &calib_I, &calib_P);
-            printf("get calib: calibU: %d calibI: %d calibP: %d\n", calib_U, calib_I, calib_P);
+            printf("get calib: calibU: %5.3f calibI: %5.3f calibP: %5.3f\n", calib_U, calib_I, calib_P);
         }
     }
     else if (strcmp(tokens[0], "info") == 0) {
@@ -274,11 +371,11 @@ static void process_data(const uint8_t *data, uint16_t len)
         }
         else if (strcmp(tokens[1], "ch2") == 0) {
             printf("ch2\n");
-            pmt_print_info(1);
+            pmt_print_info(2);
         }
         else if (strcmp(tokens[1], "ch3") == 0) {
             printf("ch3\n");
-            pmt_print_info(1);
+            pmt_print_info(3);
         }
     }
 }
