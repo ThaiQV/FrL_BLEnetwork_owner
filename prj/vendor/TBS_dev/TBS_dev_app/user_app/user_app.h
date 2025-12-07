@@ -57,6 +57,8 @@ typedef struct {
 void user_app_init(void);
 void user_app_loop(void);
 void user_app_run(void);
+void ct_remove_nwwk(void);
+void ct_add_bt_print(char * mess);
 
 #define get_data_event()   {\
     EVENT_BUTTON_NONE,\

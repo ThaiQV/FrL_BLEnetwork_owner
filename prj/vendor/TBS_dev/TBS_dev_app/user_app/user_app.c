@@ -34,6 +34,7 @@ extern subapp_t led_app;
 extern subapp_t lcd_app;
 extern subapp_t button_app;
 extern subapp_t data_storage_app;
+extern char print_extern[32];
 
 const char mess[10][24] = {
     "0 chao buoi sang",
@@ -480,6 +481,16 @@ static void data_app_event_handler(const event_t* event, void* user_data)
             break;
     }
 
+}
+
+void ct_remove_nwwk(void)
+{
+	EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_REMOVE_GW, EVENT_PRIORITY_HIGH);
+}
+
+void ct_add_bt_print(char * mess)
+{
+	memcpy(print_extern, mess, strlen(mess));
 }
 
 static void read_count(void)
