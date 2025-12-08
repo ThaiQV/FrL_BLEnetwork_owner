@@ -433,7 +433,8 @@ void _nodelist_table_printf(void) {
 	}
 }
 void fl_nwk_slave_nodelist_repeat(fl_pack_t *_pack) {
-	if (FL_QUEUE_FIND(&NODELIST_TABLE_SENDING,_pack,_pack->length - 2) == -1) {
+//	if (FL_QUEUE_FIND(&NODELIST_TABLE_SENDING,_pack,_pack->length - 2) == -1)
+	{
 		FL_QUEUE_ADD(&NODELIST_TABLE_SENDING,_pack);
 	}
 	//Update my table

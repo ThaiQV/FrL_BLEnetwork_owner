@@ -164,6 +164,15 @@ static inline void NWK_MYKEY(void){
 /***                            Functions callback                           **/
 /******************************************************************************/
 /******************************************************************************/
+//TESET BLOCK  MAC-MASTER_BLOCK_MAC_SLAVE
+#ifdef MASTER_BLOCK_MAC_SLAVE
+u8 blacklist_mac[3][6]={
+		{0xe2,0xdb,0x21,0x77,0x5f,0xd8},
+		{0x7e,0x8a,0xf2,0x77,0x5f,0xd8},
+		{0x97,0xe4,0xa7,0x77,0x5f,0xd8}};
+#define SIZE_BLACKLIST (sizeof(blacklist_mac) / sizeof(blacklist_mac[0]))
+#endif
+/*------------------*/
 static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 
 	if (h & HCI_FLAG_EVENT_BT_STD)		//ble controller hci event
@@ -213,6 +222,14 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 					return 0;
 				}
 #endif
+#endif
+				//TEST BLOCK BLACKLIST
+#ifdef MASTER_BLOCK_MAC_SLAVE
+				for (u8 var = 0; var < SIZE_BLACKLIST; ++var) {
+					if(memcmp(pa->mac,blacklist_mac[var],6)==0){
+						return 0;
+					}
+				}
 #endif
 				//Scan mac in nodetable when transaction mode, skip when in collection mode
 #ifndef MASTER_CORE

@@ -27,6 +27,8 @@ typedef enum{
 void TBS_PowerMeter_RESETbyMaster(u8 _ch1,u8 _ch2,u8 _ch3);
 void TBS_PwMeter_SetThreshod(u16 _chn1,u16 _chn2,u16 _chn3);
 #endif
+#else
+#define MASTER_BLOCK_MAC_SLAVE
 #endif
 void tbs_counter_printf(type_debug_t _plog_type,void* _p);
 void tbs_power_meter_printf(type_debug_t _plog_type,void* _p);

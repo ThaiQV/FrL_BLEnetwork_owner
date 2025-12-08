@@ -796,7 +796,7 @@ int _nwk_master_backup(void) {
 /******************************************************************************/
 void fl_nwk_master_StatusNodesRefesh(void) {
 	for (u8 i = 0; i < G_NODE_LIST.slot_inused && G_NODE_LIST.slot_inused != 0xFF; i++) {
-		if(G_NODE_LIST.sla_info[i].dev_type != 0xFF && IS_MAC_INVALID(G_NODE_LIST.sla_info[i].mac,0)&&IS_MAC_INVALID(G_NODE_LIST.sla_info[i].mac,0xFF)){
+		if(G_NODE_LIST.sla_info[i].dev_type != 0xFF && !IS_MAC_INVALID(G_NODE_LIST.sla_info[i].mac,0)&&!IS_MAC_INVALID(G_NODE_LIST.sla_info[i].mac,0xFF)){
 			G_NODE_LIST.sla_info[i].active = (fl_rtc_get() - G_NODE_LIST.sla_info[i].timelife <= 40) ? 1 : 0;
 		}
 	}

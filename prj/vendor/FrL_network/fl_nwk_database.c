@@ -279,6 +279,7 @@ void fl_db_masterprofile_save(fl_db_master_profile_t entry) {
 //	flash_page_program(ADDR_MASTER_PROFILE_START,MASTER_PROFILE_ENTRY_SIZE,(uint8_t*) &entry);
 	fl_db_masterprofile_save(entry);
 }
+
 fl_db_master_profile_t fl_db_masterprofile_init(void) {
 	fl_db_master_profile_t profile = { .magic = 0xFFFFFFFF };
 	profile = fl_db_masterprofile_load();
