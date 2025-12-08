@@ -13,7 +13,7 @@
 
 #include "fl_nwk_database.h"
 #include "../TBS_dev/TBS_dev_config.h"
-
+#define NWK_LEAVE_TIME_DISPLAY 				2*1001*1000
 //#define MAX_NODES 	100
 
 /**
@@ -367,6 +367,7 @@ u8 fl_nwk_mySlaveID(void);
 u8* fl_nwk_mySlaveMac(void);
 void fl_nwk_slave_init(void);
 int fl_nwk_slave_nwkclear(void);
+int fl_nwk_slave_nwkRemove(void);
 void fl_nwk_slave_run(fl_pack_t *_pack_handle);
 u8 fl_adv_sendFIFO_PriorityADV_run(void) ;
 void fl_nwk_slave_process(void);

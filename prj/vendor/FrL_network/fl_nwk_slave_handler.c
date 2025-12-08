@@ -222,6 +222,19 @@ int fl_nwk_slave_nwkclear(void){
 	return -1;
 }
 
+int fl_nwk_slave_nwkRemove(void){
+	extern int REBOOT_DEV(void) ;
+	fl_db_Pairing_Clear();
+	fl_slave_profiles_t my_profile =fl_db_slaveprofile_init();
+	G_INFORMATION.slaveID = my_profile.slaveid;
+	G_INFORMATION.profile = my_profile;
+	G_INFORMATION.profile.run_stt.join_nwk =0;
+	fl_db_slaveprofile_save(G_INFORMATION.profile);
+	REBOOT_DEV();
+//	blt_soft_timer_restart(_interval_report,100*100);
+	return -1;
+}
+
 void fl_nwk_slave_init(void) {
 //	PLOG_Start(APP);
 //	PLOG_Start(FLA);
@@ -735,7 +748,8 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 					memcpy(G_INFORMATION.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_INFORMATION.mac));
 					if (mac_parent == G_INFORMATION.profile.nwk.mac_parent && -1!=plog_IndexOf(packet.frame.payload,G_INFORMATION.mac,6,SIZEU8(packet.frame.payload))) {
 						ERR(APP,"Network leaving.....(%d )s\r\n",1);
-						blt_soft_timer_add(fl_nwk_slave_nwkclear,1201*998);
+						Counter_LCD_RemoveDisplay();
+						blt_soft_timer_add(fl_nwk_slave_nwkRemove,NWK_LEAVE_TIME_DISPLAY);
 						//Process rsp
 						memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
 						memcpy(packet.frame.payload,G_INFORMATION.mac,SIZEU8(G_INFORMATION.mac));

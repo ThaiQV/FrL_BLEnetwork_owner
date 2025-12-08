@@ -453,8 +453,10 @@ void fl_nwk_slave_nodelist_repeat(fl_pack_t *_pack) {
 			//Match SlaveID but incorrect mac => has been removed yet
 			if(memcmp(G_NODELIST_TABLE[table_arr[var]].mac,fl_nwk_mySlaveMac(),SIZEU8(G_NODELIST_TABLE[table_arr[var]].mac))){
 				ERR(APP,"Removed.....!!!\r\n");
-				fl_nwk_slave_nwkclear();
-				G_NODELIST_TABLE_Clear();
+				Counter_LCD_RemoveDisplay();
+				blt_soft_timer_add(fl_nwk_slave_nwkRemove,NWK_LEAVE_TIME_DISPLAY);
+//				fl_nwk_slave_nwkclear();
+//				G_NODELIST_TABLE_Clear();
 			}
 		}
 	}

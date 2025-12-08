@@ -17,6 +17,8 @@
 #define TBS_DEVICE_STORE_INTERVAL 		2*1010*1001 //5s
 #define TBS_PACKET_INDEX_MAX			12288
 #include "TBS_dev_app/user_lib.h"
+
+#define COUNTER_LCD_REMOVE_DISPLAY		ct_remove_nwwk
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -132,6 +134,9 @@ void test_powermeter(void) {
 /******************************************************************************/
 /******************************************************************************/
 #ifdef COUNTER_DEVICE
+void Counter_LCD_RemoveDisplay(void){
+	COUNTER_LCD_REMOVE_DISPLAY();
+}
 void Counter_LCD_MessageStore(void){
 	static u32 crc32 = 0;
 	u32 crc32_curr = fl_db_crc32((u8*)G_COUNTER_LCD,SIZEU8(G_COUNTER_LCD[0])*COUNTER_LCD_MESS_MAX);
