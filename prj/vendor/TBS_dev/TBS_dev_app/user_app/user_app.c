@@ -236,7 +236,7 @@ static subapp_result_t data_app_init(subapp_t* self)
 		snprintf(name, sizeof(name), "app_data_evt_table[%d]", i);
 		event_bus_subscribe(app_data_evt_table[i], data_app_event_handler, NULL, name);
 	}
-	
+
 	return SUBAPP_OK;
 }
 
@@ -486,6 +486,9 @@ static void data_app_event_handler(const event_t* event, void* user_data)
 void ct_remove_nwwk(void)
 {
 	EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_REMOVE_GW, EVENT_PRIORITY_HIGH);
+	g_app_data.is_call = false;
+	u8 tbs_profile[1] = {0} ;
+	fl_db_tbsprofile_save(tbs_profile,SIZEU8(tbs_profile));
 }
 
 void ct_add_bt_print(char * mess)
