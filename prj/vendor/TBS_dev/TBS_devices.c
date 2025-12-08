@@ -138,8 +138,18 @@ void test_powermeter(void) {
 void Counter_LCD_RemoveDisplay(void){
 	COUNTER_LCD_REMOVE_DISPLAY();
 }
-void Counter_LCD_PEUDisplay(char* _mess){
-	COUNTER_LCD_PEU_DISPLAY(_mess);
+void Counter_LCD_PEU_Display(char* _mess){
+	COUNTER_LCD_PEU_DISPLAY(_mess,BT_PEU_ID);
+}
+void Counter_LCD_PED_Display(char* _mess){
+	COUNTER_LCD_PEU_DISPLAY(_mess,BT_PED_ID);
+}
+void Counter_LCD_PPD_Display(char* _mess){
+	COUNTER_LCD_PEU_DISPLAY(_mess,BT_PPD_ID);
+
+}
+void Counter_LCD_ENDCALL_Display(char* _mess){
+	COUNTER_LCD_PEU_DISPLAY(_mess,BT_ENDCALL_ID);
 }
 void Counter_LCD_MessageStore(void){
 	static u32 crc32 = 0;
@@ -242,11 +252,14 @@ void TBS_Counter_init(void){
 	//todo:Init Butt,lcd,7segs,.....
 	user_app_init();
 	//display version
-//	extern fl_version_t _fw;
-//	char version_c[10];
-//	sprintf(version_c,"%d.%d.%d",_fw.minor, _fw.patch, _fw.major);
-//	P_INFO(version_c);
-//	Counter_LCD_PEUDisplay(version_c);
+	extern fl_version_t _fw;
+	char version_c[10];
+	sprintf(version_c,"%d.%d.%d", _fw.major,_fw.patch,_fw.minor );
+	P_INFO(version_c);
+	Counter_LCD_PEU_Display(version_c);
+	Counter_LCD_PED_Display(version_c);
+	Counter_LCD_PPD_Display(version_c);
+	Counter_LCD_ENDCALL_Display(version_c);
 #endif
 	//TEst
 	TEST_EVENT.lifetime = fl_rtc_get();
