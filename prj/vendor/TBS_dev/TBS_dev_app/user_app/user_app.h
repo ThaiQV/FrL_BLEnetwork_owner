@@ -66,7 +66,7 @@ void user_app_init(void);
 void user_app_loop(void);
 void user_app_run(void);
 void ct_remove_nwwk(void);
-void ct_add_bt_print(char * mess, e_bt_id_t bt_id);
+void ct_add_bt_print(char * mess,uint8_t row, e_bt_id_t bt_id);
 
 #define get_data_event()   {\
     EVENT_BUTTON_NONE,\

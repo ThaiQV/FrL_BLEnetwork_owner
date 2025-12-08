@@ -54,7 +54,7 @@ typedef struct {
 // Static context instance
 static lcd_context_t lcd_ctx = {0};
 static uint8_t mess_zero[22] = {0};
-char print_extern[BT_MAX_ID][32] = {'\0'};
+char print_extern[BT_MAX_ID * 2][32] = {'\0'};
 // Forward declarations
 static subapp_result_t lcd_app_init(subapp_t* self);
 static subapp_result_t lcd_app_loop(subapp_t* self);
@@ -309,8 +309,8 @@ void lcd_print_extern(uint8_t bt_id)
 
 	lcd_ctx.enable = 1;
 	lcd_ctx.print_type = LCD_PRINT_EXTERN;
-	lcd_app_set_message(&app_handle, 0, print_extern[bt_id], 30000); //  0, timeout 10s
-	lcd_app_set_message(&app_handle, 1, "                ", 15000); //  0, timeout 10s	
+	lcd_app_set_message(&app_handle, 0, print_extern[bt_id * 2], 30000); //  0, timeout 10s
+	lcd_app_set_message(&app_handle, 1, print_extern[bt_id * 2 + 1], 15000); //  0, timeout 10s	
 }
 
 static subapp_result_t lcd_app_init(subapp_t* self)
