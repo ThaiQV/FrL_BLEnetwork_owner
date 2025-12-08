@@ -69,6 +69,8 @@ typedef enum {
 	///FOTA cmd
 	GF_CMD_FOTA_REQUEST = 0xA0,
 	GF_CMD_FOTA_RESPONSE = 0xA0,
+	GF_CMD_FOTA_INTERVAL_REQUEST = 0xA2,
+	GF_CMD_FOTA_INTERVAL_RESPONSE = 0xA2,
 }fl_wifi_cmd_e;
 
 typedef void (*RspFunc)(u8*);
@@ -124,6 +126,8 @@ void REMOVE_RSP(u8* _pdata){};
 //FOTA
 void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc);
 void FOTA_RESPONSE(u8* _pdata);
+void FOTA_INTERVAL_REQUEST(u8* _pdata, RspFunc rspfnc){};
+void FOTA_INTERVAL_RESPONSE(u8* _pdata){};
 
 fl_wifiprotocol_proc_t G_WIFI_CON[] = {
 			{ { GF_CMD_PING_REQUEST, PING_REQ }, { GF_CMD_PAIRING_RESPONSE, PING_RSP } }, //ping
@@ -138,6 +142,7 @@ fl_wifiprotocol_proc_t G_WIFI_CON[] = {
 			{ { GF_CMD_PWMETER_RUNNING_SET_REQUEST, PWMETER_RUNNING_SET_REQUEST }, {GF_CMD_PWMETER_RUNNING_SET_RESPONSE, PWMETER_RUNNING_SET_RESPONSE } },
 			//FOTA
 			{ { GF_CMD_FOTA_REQUEST, FOTA_REQUEST }, { GF_CMD_FOTA_RESPONSE, FOTA_RESPONSE } },
+//			{ { GF_CMD_FOTA_INTERVAL_REQUEST, FOTA_INTERVAL_REQUEST }, { GF_CMD_FOTA_INTERVAL_RESPONSE, FOTA_INTERVAL_RESPONSE } },
 };
 
 #define GWIFI_SIZE 				(sizeof(G_WIFI_CON)/sizeof(G_WIFI_CON[0]))
@@ -659,6 +664,7 @@ void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 	u8 crc8_cal = fl_crc8(data->data,data->len_data);
 	if (crc8_cal != data->crc8) {
 		ERR(MCU,"ERR >> CRC8:0x%02X | 0x%02X\r\n",data->crc8,crc8_cal);
+		P_INFO_HEX(data->data,data->len_data,"ERR >>");
 		return;
 	}
 	//callback fnc rsp
@@ -691,8 +697,8 @@ void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 						FOTA_INFO.version=data_fw[2];
 						FOTA_INFO.fw_type=data_fw[1];
 						FOTA_INFO.body++;
-						P_INFO("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
-						P_INFO("[T%d,v%d]Downloading:%d/%d (%d)",FOTA_INFO.fw_type,FOTA_INFO.version,FOTA_INFO.body*OTA_PACKET_LENGTH,FOTA_INFO.fw_size,FL_NWK_FOTA_IsReady());
+						P_INFO("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
+						P_INFO("[T%d,v%d]Downloading:%d/%d (%d)(%d)",FOTA_INFO.fw_type,FOTA_INFO.version,FOTA_INFO.body*OTA_PACKET_LENGTH,FOTA_INFO.fw_size,FOTA_INFO.body,FL_NWK_FOTA_IsReady());
 					}
 				}
 				else if(data_fw[0] == FOTA_PACKET_END){
@@ -714,6 +720,7 @@ void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 					wfdata.data[0] = 0xFF;
 				} else {
 					wfdata.data[0] = 0;
+//					P_INFO_HEX(data->data,data->len_data,"FW:");
 				}
 			}
 		} else {
@@ -859,7 +866,19 @@ void fl_wifi2ble_Sync_RTC(void){
 	P_INFO("RTC Sync......\r\n");
 	fl_ble_send_wifi((u8*)&wfdata,wfdata.len_data+3);//len_data + id_cmd + crc
 }
-
+void fl_wifi2ble_Fota_Interval_set(u32 _ms){
+	fl_datawifi2ble_t wfdata;
+	wfdata.cmd = GF_CMD_FOTA_INTERVAL_REQUEST;
+	wfdata.len_data = SIZEU8(_ms);
+	memset(wfdata.data,0,wfdata.len_data);
+	wfdata.data[0] = U32_BYTE0(_ms);
+	wfdata.data[1] = U32_BYTE1(_ms);
+	wfdata.data[2] = U32_BYTE2(_ms);
+	wfdata.data[3] = U32_BYTE3(_ms);
+	wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
+	P_INFO("SET FOTA Interval:%d ms\r\n",_ms);
+	fl_ble_send_wifi((u8*)&wfdata,wfdata.len_data+3);//len_data + id_cmd + crc
+}
 void fl_wifi2ble_Excute(fl_wifi2ble_exc_e cmd) {
 	extern fl_slaves_list_t G_NODE_LIST;
 //	extern fl_adv_settings_t G_ADV_SETTINGS;

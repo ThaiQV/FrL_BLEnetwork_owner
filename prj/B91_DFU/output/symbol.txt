@@ -199,6 +199,7 @@
 20000190 A _RETENTION_RESET_LMA_START
 200002e8 A _RETENTION_DATA_LMA_START
 20000538 A _RAMCODE_LMA_START
+<<<<<<< HEAD
 20003240 t flash_read_status	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/flash.c:438
 20003270 t flash_read_mid	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/flash.c:573
 2000329c t flash_page_program	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/flash.c:392
@@ -271,3 +272,83 @@
 2000567c R __digits
 20005694 r __FUNCTION__.13198
 20005798 A _DATA_LMA_START
+=======
+20003340 t flash_read_status	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/flash.c:438
+20003370 t flash_read_mid	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/flash.c:573
+2000339c t flash_page_program	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/flash.c:392
+200033f8 t flash_dread	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/flash.c:314
+20003424 t flash_erase_sector	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/flash.c:265
+20003458 t cpu_sleep_wakeup_32k_rc	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/lib/src/pm_32k_rc.c:374
+20003474 t pwm_kick_32k_pad.constprop.2	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/ext_driver/ext_pm.c:134
+200034dc t blc_readFlashSize_autoConfigCustomFlashSector	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../vendor/common/blt_common.c:40
+20003544 t writeSPIByte	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/SPI_FLASH.c:26
+200035dc t W25XXX_Read	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/SPI_FLASH.c:336
+20003648 t FLASH_ReadStatusReg	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/SPI_FLASH.c:251
+20003684 t W25XXX_WR_Page	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/SPI_FLASH.c:352
+20003734 t W25XXX_WR_Block	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/SPI_FLASH.c:385
+2000384c t FLASH_Erase_Sector	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/SPI_FLASH.c:268
+200038cc t analog_read_reg32.constprop.7	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/core.h:101
+20003910 t pwm_kick_32k_pad_times.constprop.1	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/ext_driver/ext_pm.c:165
+20003994 t cpu_wakeup_no_deepretn_back_init	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/ext_driver/ext_pm.c:252
+20003b3c t gpio_set_up_down_res	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/gpio.c:372
+20003bd4 t hspi_set_pin_mux.part.0
+20003dc8 t jump_to_application	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:26
+20003e60 t main_loop	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../vendor/B91_dfu/app.c:165
+20004088 t flash_unlock_mid146085	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/flash/flash_mid146085.c:101
+200040e4 t fw_copy	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:121
+20004894 t firmware_check	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:335
+20005168 T _write	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../application/print/printf.c:98
+200051b4 T memcmp
+20005204 T memcpy
+200052fe T memset
+200053a8 T printf
+200053c6 T strrchr
+200053f2 t __vprintf_help
+2000542a T vprintf
+20005474 T __print_integral
+200054c0 T __printf_impl
+2000593a T __int_to_poly
+2000595a T __print_integral_poly
+200059ea T __printf_float_impl
+20005dec T strchr
+20005e20 T strcpy
+20005e9e T strnlen
+20005eb8 T __lshrdi3	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/libgcc2.c:404
+20005ee8 T __ashldi3	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/libgcc2.c:432
+20005f18 T __riscv_save_12	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:336
+20005f20 T __riscv_save_10	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:348
+20005f20 T __riscv_save_11	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:348
+20005f20 T __riscv_save_8	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:348
+20005f20 T __riscv_save_9	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:348
+20005f2e T __riscv_save_4	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:371
+20005f2e T __riscv_save_5	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:371
+20005f2e T __riscv_save_6	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:371
+20005f2e T __riscv_save_7	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:371
+20005f48 T __riscv_save_0	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:404
+20005f48 T __riscv_save_1	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:404
+20005f48 T __riscv_save_2	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:404
+20005f48 T __riscv_save_3	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:404
+20005f54 T __riscv_restore_12	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:432
+20005f58 T __riscv_restore_10	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:442
+20005f58 T __riscv_restore_11	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:442
+20005f58 T __riscv_restore_8	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:442
+20005f58 T __riscv_restore_9	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:442
+20005f62 T __riscv_restore_4	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:462
+20005f62 T __riscv_restore_5	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:462
+20005f62 T __riscv_restore_6	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:462
+20005f62 T __riscv_restore_7	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:462
+20005f6c T __riscv_restore_0	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:485
+20005f6c T __riscv_restore_1	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:485
+20005f6c T __riscv_restore_2	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:485
+20005f6c T __riscv_restore_3	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:485
+20005f88 r __FUNCTION__.10061
+20005f9c r __FUNCTION__.10336
+20005fb4 r __FUNCTION__.10418
+20005fc4 r __FUNCTION__.10667
+20005fdc r __FUNCTION__.13002
+20005ff4 r __FUNCTION__.13160
+20006490 R __digits
+200064a8 r __FUNCTION__.10117
+200064b0 r __FUNCTION__.13197
+200065b8 A _DATA_LMA_START
+>>>>>>> 867d73a200fc783b564a194f47aa01eae5ecc63a

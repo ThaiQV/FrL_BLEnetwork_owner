@@ -25,4 +25,5 @@ void fl_wifi2ble_Excute(fl_wifi2ble_exc_e cmd);
 void fl_ble2wifi_DEBUG2MQTT(u8* _payload,u8 _size);
 void fl_ble2wifi_send_FOTA_BROADCAST_RSP(u8 *_rsl,u8 _size);
 void fl_wifi2ble_Sync_RTC(void);
+void fl_wifi2ble_Fota_Interval_set(u32 _ms);
 #endif /* VENDOR_FRL_NETWORK_FL_BLE_WIFI_H_ */

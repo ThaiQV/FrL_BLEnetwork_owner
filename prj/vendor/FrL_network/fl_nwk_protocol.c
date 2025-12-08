@@ -417,12 +417,13 @@ void CMD_TEST(u8* _data) {
 	extern u8 GETINFO_FLAG_EVENTTEST;
 	u8 slave_event[5] = {'e','v','e','n','t'};
 	u8 fota_test[4] = {'f','o','t','a'};
+	u8 fota_interval_set[12] = {'f','o','t','a','i','n','t','e','r','v','a','l'};
 
 	char cmd[10];
 	int para[3];
 	u8 mqtt_rp[200];
 	memset(mqtt_rp,0,SIZEU8(mqtt_rp));
-	int rslt = sscanf((char*) _data,"test %10s %d %d %d",cmd,&para[0],&para[1],&para[2]);
+	int rslt = sscanf((char*) _data,"test %12s %d %d %d",cmd,&para[0],&para[1],&para[2]);
 	if (rslt >= 1) {
 		//AUTOMATIC create event - p set test even 1
 		if(plog_IndexOf((u8*)cmd,slave_event,SIZEU8(slave_event),SIZEU8(cmd)) != -1){
@@ -433,13 +434,23 @@ void CMD_TEST(u8* _data) {
 				P_INFO("%s\r\n",mqtt_rp);
 			}
 		}
-		//FOTA - p set test fota <size_fw>
-		if (plog_IndexOf((u8*) cmd,fota_test,SIZEU8(fota_test),SIZEU8(cmd)) != -1) {
+		//FOTA INTERVAL- p set test fotainterval <ms period>
+		if (plog_IndexOf((u8*) cmd,fota_interval_set,SIZEU8(fota_interval_set),SIZEU8(fota_interval_set)) != -1) {
 			if (rslt == 2) {
-				sprintf((char*) mqtt_rp,"FOTA size:%d bytes",para[0]);
+				sprintf((char*) mqtt_rp,"FOTA Interval:%d ms",para[0]);
 				fl_ble2wifi_DEBUG2MQTT(mqtt_rp,strlen((char*) mqtt_rp));
 				P_INFO("%s\r\n",mqtt_rp);
-				TEST_virtual_fw(para[0]);
+				fl_wifi2ble_Fota_Interval_set(para[0]);
+			}
+		} else {
+			//FOTA - p set test fota <size_fw>
+			if (plog_IndexOf((u8*) cmd,fota_test,SIZEU8(fota_test),SIZEU8(fota_test)) != -1) {
+				if (rslt == 2) {
+					sprintf((char*) mqtt_rp,"FOTA size:%d bytes",para[0]);
+					fl_ble2wifi_DEBUG2MQTT(mqtt_rp,strlen((char*) mqtt_rp));
+					P_INFO("%s\r\n",mqtt_rp);
+					TEST_virtual_fw(para[0]);
+				}
 			}
 		}
 	}
