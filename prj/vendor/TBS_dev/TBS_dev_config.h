@@ -31,6 +31,7 @@ void TBS_PwMeter_SetThreshod(u16 _chn1,u16 _chn2,u16 _chn3);
 //#define MASTER_BLOCK_MAC_SLAVE
 #endif
 void Counter_LCD_RemoveDisplay(void);
+void Counter_LCD_PEUDisplay(char* _mess);
 void tbs_counter_printf(type_debug_t _plog_type,void* _p);
 void tbs_power_meter_printf(type_debug_t _plog_type,void* _p);
 void TBS_Device_Init(void);

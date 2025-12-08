@@ -560,7 +560,7 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 
 			lcd_ctx.enable = 1;
 			lcd_ctx.print_type = LCD_PRINT_REMOVE_GW;
-			lcd_app_set_message(&app_handle, 0, "  Leave networ  ", 30000); //  0, timeout 10s
+			lcd_app_set_message(&app_handle, 0, "Leave network...", 30000); //  0, timeout 10s
 			lcd_app_set_message(&app_handle, 1, "                ", 3000); //  0, timeout 10s		
 
 			break;

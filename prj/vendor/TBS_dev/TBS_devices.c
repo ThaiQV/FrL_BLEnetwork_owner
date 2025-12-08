@@ -19,6 +19,7 @@
 #include "TBS_dev_app/user_lib.h"
 
 #define COUNTER_LCD_REMOVE_DISPLAY		ct_remove_nwwk
+#define COUNTER_LCD_PEU_DISPLAY			ct_add_bt_print
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -137,6 +138,9 @@ void test_powermeter(void) {
 void Counter_LCD_RemoveDisplay(void){
 	COUNTER_LCD_REMOVE_DISPLAY();
 }
+void Counter_LCD_PEUDisplay(char* _mess){
+	COUNTER_LCD_PEU_DISPLAY(_mess);
+}
 void Counter_LCD_MessageStore(void){
 	static u32 crc32 = 0;
 	u32 crc32_curr = fl_db_crc32((u8*)G_COUNTER_LCD,SIZEU8(G_COUNTER_LCD[0])*COUNTER_LCD_MESS_MAX);
@@ -237,6 +241,12 @@ void TBS_Counter_init(void){
 #ifndef HW_SAMPLE_TEST
 	//todo:Init Butt,lcd,7segs,.....
 	user_app_init();
+	//display version
+//	extern fl_version_t _fw;
+//	char version_c[10];
+//	sprintf(version_c,"%d.%d.%d",_fw.minor, _fw.patch, _fw.major);
+//	P_INFO(version_c);
+//	Counter_LCD_PEUDisplay(version_c);
 #endif
 	//TEst
 	TEST_EVENT.lifetime = fl_rtc_get();
