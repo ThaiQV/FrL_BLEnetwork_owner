@@ -66,6 +66,7 @@ void lcd_off(void);
     EVENT_LCD_PRINT_CALL__,\
     EVENT_LCD_PRINT_MESS_NEW,\
     EVENT_LCD_PRINT_REMOVE_GW,\
+    EVENT_LCD_PRINT_EXTERN,\
 }
 
 #endif /* COUNTER_DEVICE*/

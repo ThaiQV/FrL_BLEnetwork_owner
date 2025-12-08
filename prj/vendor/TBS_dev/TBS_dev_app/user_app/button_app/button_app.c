@@ -343,7 +343,7 @@ static void button_on_click(uint8_t button_id)
 			break;
 		
 		case BUTTON_ID_ENDCALL:
-
+			EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_EXTERN, EVENT_PRIORITY_HIGH);
 			break;
 
 		case BUTTON_ID_PEU:

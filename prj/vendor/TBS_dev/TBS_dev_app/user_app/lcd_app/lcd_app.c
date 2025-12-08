@@ -638,6 +638,7 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 
 			if(print_extern[0] == '\0')
 			{
+				ULOGA("Handler EVENT_LCD_PRINT_EXTERN\n");
 				break;
 			}
 
