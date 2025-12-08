@@ -46,6 +46,7 @@ typedef struct {
 
 void lcd_on(void);
 void lcd_off(void);
+void lcd_print_extern(uint8_t bt_id);
 
 #define get_lcd_event() {\
 	EVENT_LCD_PRINT_MESS,\

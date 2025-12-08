@@ -54,7 +54,7 @@ typedef struct {
 // Static context instance
 static lcd_context_t lcd_ctx = {0};
 static uint8_t mess_zero[22] = {0};
-char print_extern[32] = {'\0'};
+char print_extern[BT_MAX_ID][32] = {'\0'};
 // Forward declarations
 static subapp_result_t lcd_app_init(subapp_t* self);
 static subapp_result_t lcd_app_loop(subapp_t* self);
@@ -300,6 +300,18 @@ void lcd_off(void)
 	gpio_set_level(GPIO_PC0, 0);
 }
 
+void lcd_print_extern(uint8_t bt_id)
+{
+	if(print_extern[bt_id][0] == '\0')
+	{
+		return;
+	}
+
+	lcd_ctx.enable = 1;
+	lcd_ctx.print_type = LCD_PRINT_EXTERN;
+	lcd_app_set_message(&app_handle, 0, print_extern[bt_id], 30000); //  0, timeout 10s
+	lcd_app_set_message(&app_handle, 1, "                ", 15000); //  0, timeout 10s	
+}
 
 static subapp_result_t lcd_app_init(subapp_t* self)
 {
@@ -635,17 +647,6 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 
 		case EVENT_LCD_PRINT_EXTERN:
 			ULOGA("Handler EVENT_LCD_PRINT_EXTERN\n");
-
-			if(print_extern[0] == '\0')
-			{
-				ULOGA("Handler EVENT_LCD_PRINT_EXTERN\n");
-				break;
-			}
-
-			lcd_ctx.enable = 1;
-			lcd_ctx.print_type = LCD_PRINT_EXTERN;
-			lcd_app_set_message(&app_handle, 0, print_extern, 30000); //  0, timeout 10s
-			lcd_app_set_message(&app_handle, 1, "                ", 5000); //  0, timeout 10s	
 
 			break;
 

@@ -34,7 +34,7 @@ extern subapp_t led_app;
 extern subapp_t lcd_app;
 extern subapp_t button_app;
 extern subapp_t data_storage_app;
-extern char print_extern[32];
+extern char print_extern[BT_MAX_ID][32];
 
 const char mess[10][24] = {
     "0 chao buoi sang",
@@ -236,6 +236,11 @@ static subapp_result_t data_app_init(subapp_t* self)
 		snprintf(name, sizeof(name), "app_data_evt_table[%d]", i);
 		event_bus_subscribe(app_data_evt_table[i], data_app_event_handler, NULL, name);
 	}
+
+	// ct_add_bt_print("bt BT_ENDCALL_ID", BT_ENDCALL_ID);
+	// ct_add_bt_print("bt BT_PED_ID", BT_PED_ID);
+	// ct_add_bt_print("bt BT_PEU_ID", BT_PEU_ID);
+	// ct_add_bt_print("bt BT_PPD_ID", BT_PPD_ID);
 
 	return SUBAPP_OK;
 }
@@ -491,9 +496,9 @@ void ct_remove_nwwk(void)
 	fl_db_tbsprofile_save(tbs_profile,SIZEU8(tbs_profile));
 }
 
-void ct_add_bt_print(char * mess)
+void ct_add_bt_print(char * mess, e_bt_id_t bt_id)
 {
-	memcpy(print_extern, mess, strlen(mess));
+	memcpy(print_extern[bt_id], mess, strlen(mess));
 }
 
 static void read_count(void)
