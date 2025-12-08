@@ -14,7 +14,7 @@
 #include "fl_nwk_database.h"
 #include "../TBS_dev/TBS_dev_config.h"
 
-#define MAX_NODES 	150
+//#define MAX_NODES 	100
 
 /**
  * @brief	callback function for rsp
@@ -346,6 +346,7 @@ void fl_nwk_master_StatusNodesRefesh(void);
 void fl_nwk_master_heartbeat_run(void);
 fl_pack_t fl_master_packet_GetInfo_build(u8 *_slave_mac_arr, u8 _slave_num);
 s8 fl_master_packet_F5_CreateNSend(u8 *_slave_mac_arr, u8 _slave_num);
+u8 fl_master_nodelist_isFull(void);
 void fl_master_nodelist_AddRefesh(fl_nodeinnetwork_t _node);
 s16 fl_master_Node_find(u8 *_mac);
 s16 fl_master_SlaveID_find(u8 _id);
@@ -380,8 +381,8 @@ void fl_nwk_slave_reconnectNstoragedata(void);
 s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry);
 void fl_nwk_slave_nodelist_repeat(fl_pack_t *_pack) ;
 void G_NODELIST_TABLE_Clear(void);
-#endif
 bool FL_NODELIST_TABLE_Updated(void) ;
+#endif
 s16 FL_NWK_NODELIST_TABLE_IsReady(void);
 void fl_nwk_nodelist_table_run(void) ;
 s8 fl_nwk_MemberInNodeTable_find(u8* _mac);

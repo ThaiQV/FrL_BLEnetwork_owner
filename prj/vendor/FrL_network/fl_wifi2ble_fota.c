@@ -275,7 +275,7 @@ void fl_wifi2ble_fota_init(void){
 	fl_wifi2ble_fota_ContainerClear();
 	DFU_OTA_INIT();
 	//change version
-	DFU_OTA_VERISON_SET(48);
+	DFU_OTA_VERISON_SET(49);
 }
 
 s16 fl_wifi2ble_fota_recECHO(fl_pack_t _pack_rec,u8* _mac_incom){
@@ -288,7 +288,11 @@ s16 fl_wifi2ble_fota_recECHO(fl_pack_t _pack_rec,u8* _mac_incom){
 //		P_INFO_HEX(_pack_rec.data_arr,SIZEU8(_pack_rec.data_arr),"ECHO:");
 		for (s16 head = 0; head < G_FW_QUEUE_SENDING.mask + 1; head++) {
 			if (G_FW_QUEUE_SENDING.data[head].length > FOTA_PACK_SIZE_MIN
+#ifdef MASTER_CORE
 				&& G_FW_QUEUE_SENDING.data[head].data_arr[FOTA_RETRY_POSITION] > 0 //sent yet
+#else
+				&& G_FW_QUEUE_SENDING.data[head].data_arr[FOTA_RETRY_POSITION] > 1 //sent yet
+#endif
 				&& plog_IndexOf(G_FW_QUEUE_SENDING.data[head].data_arr,&_pack_rec.data_arr[FOTA_FW_DATA_POSITION],FOTA_PACK_FW_SIZE,G_FW_QUEUE_SENDING.data[head].length) != -1
 				&& plog_IndexOf(G_FW_QUEUE_SENDING.data[head].data_arr,_mac_incom,FOTA_MAC_INCOM_SIZE,SIZEU8(G_FW_QUEUE_SENDING.data[head].data_arr)) == -1)
 			{
@@ -370,7 +374,7 @@ s16 fl_wifi2ble_fota_run(void) {
 			his_data_in_queue = G_FW_QUEUE_SENDING.data[G_FW_QUEUE_SENDING.head_index];
 			if (his_data_in_queue.length > FOTA_PACK_SIZE_MIN) { //minimun size of the fota
 				//FOR SLAVE
-				if (his_data_in_queue.data_arr[FOTA_RETRY_POSITION] % 2 == 0)
+				//if (his_data_in_queue.data_arr[FOTA_RETRY_POSITION] % 2 == 0)
 				{
 //					P_INFO_HEX(his_data_in_queue.data_arr,SIZEU8(his_data_in_queue.data_arr),"FOTA-SEND(%d):",his_data_in_queue.length);
 					fl_adv_send(his_data_in_queue.data_arr,his_data_in_queue.length,G_ADV_SETTINGS.adv_duration);

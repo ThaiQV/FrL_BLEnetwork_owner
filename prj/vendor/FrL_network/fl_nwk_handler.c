@@ -12,6 +12,7 @@
 #include "fl_nwk_handler.h"
 #include "fl_nwk_protocol.h"
 #include "fl_adv_proc.h"
+//#include "fl_nwk_database.h"
 
 /******************************************************************************/
 /******************************************************************************/
@@ -347,15 +348,6 @@ s8 fl_nwk_MemberInNodeTable_find(u8* _mac){
  * Update NODELIST TABLE
  * */
 
-bool FL_NODELIST_TABLE_Updated(void) {
-	for (u8 var = 0; var < sizeof(G_NODELIST_TABLE) / sizeof(G_NODELIST_TABLE[0]); ++var) {
-		if(G_NODELIST_TABLE[var].slaveid!=0xFF && !IS_MAC_INVALID(G_NODELIST_TABLE[var].mac,0xFF)){
-			return true;
-		}
-	}
-	return false;
-}
-
 s16 FL_NWK_NODELIST_TABLE_IsReady(void){
 	return NODELIST_TABLE_SENDING.count;
 }
@@ -413,6 +405,17 @@ void fl_nwk_generate_table_pack(void) {
 	}
 }
 #else
+bool FL_NODELIST_TABLE_Updated(void) {
+	if (IsJoinedNetwork()) {
+		for (u8 var = 0; var < sizeof(G_NODELIST_TABLE) / sizeof(G_NODELIST_TABLE[0]); ++var) {
+			if (G_NODELIST_TABLE[var].slaveid != 0xFF && !IS_MAC_INVALID(G_NODELIST_TABLE[var].mac,0xFF)
+					&& G_NODELIST_TABLE[var].slaveid == fl_nwk_mySlaveID()) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
 void G_NODELIST_TABLE_Clear(void){
 	for (u8 var = 0; var < sizeof(G_NODELIST_TABLE)/sizeof(G_NODELIST_TABLE[0]); ++var) {
 		G_NODELIST_TABLE[var].slaveid=0xFF;

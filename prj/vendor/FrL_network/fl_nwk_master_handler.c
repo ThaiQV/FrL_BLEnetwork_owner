@@ -36,7 +36,7 @@ extern _attribute_data_retention_ volatile fl_timetamp_withstep_t ORIGINAL_MASTE
 /******************************************************************************/
 /******************************************************************************/
 #define TIME_COLLECT_NODE				5*1000 //
-
+#define MAX_NODES_SETTING				12
 #define PACK_HANDLE_MASTER_SIZE 		64
 fl_pack_t g_handle_master_array[PACK_HANDLE_MASTER_SIZE];
 fl_data_container_t G_HANDLE_MASTER_CONTAINER = {.data = g_handle_master_array, .head_index = 0, .tail_index = 0, .mask = PACK_HANDLE_MASTER_SIZE - 1, .count = 0 };
@@ -109,6 +109,15 @@ void fl_master_nodelist_member_remove(u8* _mac) {
 		G_NODE_LIST.sla_info[indx].timelife=0;
 		fl_nwk_master_nodelist_store();
 	}
+}
+
+u8 fl_master_nodelist_isFull(void){
+	for (u8 var = 0; var < MAX_NODES_SETTING; ++var) {
+		if(IS_MAC_INVALID(G_NODE_LIST.sla_info[var].mac,0xFF) || IS_MAC_INVALID(G_NODE_LIST.sla_info[var].mac,0)){
+			return 0;
+		}
+	}
+	return 1;
 }
 
 void fl_master_nodelist_AddRefesh(fl_nodeinnetwork_t _node) {
@@ -992,10 +1001,10 @@ int fl_master_ProccesRSP_cbk(void) {
 				}
 				s16 node_indx = fl_master_Node_find(mac);
 				//Full and node is a new => skip
-//				if (G_NODE_LIST.slot_inused > MAX_NODES -1 && G_NODE_LIST.slot_inused != 0xFF && node_indx == -1) {
-//					ERR(APP,"Network Full!!!\r\n");
-//					break;
-//				}
+				if(node_indx == -1 && fl_master_nodelist_isFull()){
+					ERR(APP,"NODELIST FULL (%d)!!!\r\n",MAX_NODES);
+					break;
+				}
 				if (node_indx == -1) {
 					fl_nodeinnetwork_t new_slave;
 					new_slave.active = true;
