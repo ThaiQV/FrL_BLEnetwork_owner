@@ -33,20 +33,28 @@
  * @param[in]  none
  * @return     none
  */
-void uart1_recieve_irq(void) {
-#ifdef MASTER_CORE
-	extern unsigned char FLAG_uart_dma_send;
-	if (uart_get_irq_status(UART1,UART_TXDONE)) {
-		FLAG_uart_dma_send = 0;
+void uart1_recieve_irq(void)
+{
+	unsigned int irq_flags = uart_get_irq_status(UART1,0xFFFFFFFF);
+
+	if(irq_flags & UART_RXBUF_IRQ_STATUS)
+	{
+		uart_clr_irq_status(UART1, UART_CLR_RX);
+		uart_clr_irq_mask(UART1,UART_RXBUF_IRQ_STATUS);
+	}
+	else if (irq_flags & UART_TXDONE)
+	{
 		uart_clr_tx_done(UART1);
 	}
-	if (uart_get_irq_status(UART1,UART_RXDONE)) //A0-SOC can't use RX-DONE status,so this interrupt can noly used in A1-SOC.
-			{
-		/************************cll rx_irq****************************/
-		fl_input_serial_rec();
+	else if (irq_flags & UART_RXDONE) //A0-SOC can't use RX-DONE status,so this interrupt can noly used in A1-SOC.
+	{
+		dfu_uart_receive();
 		uart_clr_irq_status(UART1,UART_CLR_RX);
 	}
-#endif
+	else if(irq_flags & UART_RX_ERR)
+	{
+		uart_clr_irq_status(UART1,UART_CLR_RX);
+	}
 }
 #ifdef MASTER_CORE
 /**
@@ -172,12 +180,9 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 //		user_init_normal();
 
 		/* Test code */
+		dfu_uart_init();
 		LOG_P(APP,"DFU\n");
-		firmware_check();
-//		storage_init();
-
-//		ota_init();
-//		test_ota();
+//		firmware_check();
 
 		irq_enable();
 		// wdt init
@@ -185,7 +190,8 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 		wd_start();
 		while(1)
 		{
-			main_loop();
+//			main_loop();
+			dfu_uart_process();
 			wd_clear();
 		}
 		return 0;

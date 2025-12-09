@@ -100,6 +100,7 @@ __attribute__((used)) int _write(int fd, const unsigned char *buf, int size) {
 	for (i = 0; i < size; i++) {
 		dr_putchar(buf[i]);
 	}
+//	uart_send(UART1,buf,size);
 	return i;
 }
 

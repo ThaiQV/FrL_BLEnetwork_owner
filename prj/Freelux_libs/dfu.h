@@ -100,6 +100,34 @@
 		uint8_t				signature[OTA_PACKET_LENGTH];
 	}ota_fw_header_t;
 
+	/* For UART DFU */
+	typedef enum
+	{
+		CMD_IDLE = 0,
+		CMD_ENTER_BOOTLOADER,
+		CMD_MCU_RESET,
+		CMD_ERASE,
+		CMD_FULL_ERASE,
+		CMD_SET_ADDRESS,
+		CMD_PROGRAM_DOUBLEWORD,
+		CMD_PROGRAM_WITH_ADDRESS,
+		CMD_PROGRAM_ARRAY,
+		CMD_ACK_OK,
+		CMD_ACK_ERROR,
+		CMD_PING,
+		CMD_JUMP_APPLICATION,
+		CMD_VERIFY,
+		CMD_BOOTLOADER_VERSION,
+		CMD_READ_WORD,
+	}cmt_t;
+
+	typedef struct
+	{
+		cmt_t		cmd;
+		uint8_t		len;
+		uint8_t		*data;
+	}command_t;
+
 /* Prototypes */
 	/* For bootloader t */
 	void jump_to_application(void);
@@ -123,4 +151,11 @@
 	void get_current_fw_version(fw_header_t *fw_header);
 	uint8_t set_dfu_version(void);
 	uint8_t get_dfu_version(void);
+
+	/* For UART DFU */
+	void dfu_uart_init(void);
+	void dfu_uart_receive(void);
+	void dfu_uart_process(void);
+	void cmd_process(void);
+
 #endif //__DFU_H__
