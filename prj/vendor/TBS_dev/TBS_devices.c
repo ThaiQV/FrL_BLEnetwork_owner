@@ -138,18 +138,18 @@ void test_powermeter(void) {
 void Counter_LCD_RemoveDisplay(void){
 	COUNTER_LCD_REMOVE_DISPLAY();
 }
-void Counter_LCD_PEU_Display(char* _mess){
-	COUNTER_LCD_PEU_DISPLAY(_mess,BT_PEU_ID);
+void Counter_LCD_PEU_Display(u8 _row,char* _mess){
+	COUNTER_LCD_PEU_DISPLAY(_mess,_row,BT_PEU_ID);
 }
-void Counter_LCD_PED_Display(char* _mess){
-	COUNTER_LCD_PEU_DISPLAY(_mess,BT_PED_ID);
+void Counter_LCD_PED_Display(u8 _row,char* _mess){
+	COUNTER_LCD_PEU_DISPLAY(_mess,_row,BT_PED_ID);
 }
-void Counter_LCD_PPD_Display(char* _mess){
-	COUNTER_LCD_PEU_DISPLAY(_mess,BT_PPD_ID);
+void Counter_LCD_PPD_Display(u8 _row,char* _mess){
+	COUNTER_LCD_PEU_DISPLAY(_mess,_row,BT_PPD_ID);
 
 }
-void Counter_LCD_ENDCALL_Display(char* _mess){
-	COUNTER_LCD_PEU_DISPLAY(_mess,BT_ENDCALL_ID);
+void Counter_LCD_ENDCALL_Display(u8 _row,char* _mess){
+	COUNTER_LCD_PEU_DISPLAY(_mess,_row,BT_ENDCALL_ID);
 }
 void Counter_LCD_MessageStore(void){
 	static u32 crc32 = 0;
@@ -253,13 +253,12 @@ void TBS_Counter_init(void){
 	user_app_init();
 	//display version
 	extern fl_version_t _fw;
+	extern fl_version_t _hw;
 	char version_c[10];
-	sprintf(version_c,"%d.%d.%d", _fw.major,_fw.patch,_fw.minor );
-	P_INFO(version_c);
-	Counter_LCD_PEU_Display(version_c);
-	Counter_LCD_PED_Display(version_c);
-	Counter_LCD_PPD_Display(version_c);
-	Counter_LCD_ENDCALL_Display(version_c);
+	sprintf(version_c,"FW ver:%d.%d.%d", _fw.major,_fw.patch,_fw.minor );
+	Counter_LCD_ENDCALL_Display(1,version_c);
+	sprintf(version_c,"HW ver:%d.%d.%d", _hw.major,_hw.patch,_hw.minor );
+	Counter_LCD_ENDCALL_Display(0,version_c);
 #endif
 	//TEst
 	TEST_EVENT.lifetime = fl_rtc_get();
@@ -393,9 +392,9 @@ int TBS_Device_Store_run(void) {
 
 void TBS_Device_Index_manage(void) {
 //	ERR(FLA,"0x%02X callback (indx:%d)!!\r\n",_cmdID,G_TBS_DEVICE.data.index);
-#ifndef HW_SAMPLE_TEST
 	u16 CHECK_ERR=0;
 	CHECK_ERR = G_TBS_DEVICE.data.index;
+#ifndef HW_SAMPLE_TEST
 //	P_INFO("Before:%d\r\n",G_TBS_DEVICE.data.index);
 	//todo:store to flash
 	TBS_History_StoreToFlash((u8*) &G_TBS_DEVICE);

@@ -16,10 +16,12 @@ typedef enum{
 	TBS_POWERMETER=0x01,
 }__attribute__((__packed__)) tbs_dev_type_e;
 
-#define OTA_ENABLE
 #ifndef MASTER_CORE
-//#define HW_SAMPLE_TEST
+#define HW_SAMPLE_TEST
 //#define BLOCK_MASTER
+#ifndef HW_SAMPLE_TEST
+#define OTA_ENABLE
+#endif
 #define COUNTER_DEVICE
 #define COUNTER_LCD_MESS_MAX				10
 #ifndef COUNTER_DEVICE
@@ -31,10 +33,10 @@ void TBS_PwMeter_SetThreshod(u16 _chn1,u16 _chn2,u16 _chn3);
 //#define MASTER_BLOCK_MAC_SLAVE
 #endif
 void Counter_LCD_RemoveDisplay(void);
-void Counter_LCD_PEU_Display(char* _mess);
-void Counter_LCD_PED_Display(char* _mess);
-void Counter_LCD_PPD_Display(char* _mess);
-void Counter_LCD_ENDCALL_Display(char* _mess);
+void Counter_LCD_PEU_Display(u8 _row,char* _mess);
+void Counter_LCD_PED_Display(u8 _row,char* _mess);
+void Counter_LCD_PPD_Display(u8 _row,char* _mess);
+void Counter_LCD_ENDCALL_Display(u8 _row,char* _mess);
 void tbs_counter_printf(type_debug_t _plog_type,void* _p);
 void tbs_power_meter_printf(type_debug_t _plog_type,void* _p);
 void TBS_Device_Init(void);

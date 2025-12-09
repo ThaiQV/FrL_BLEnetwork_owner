@@ -276,11 +276,11 @@ void fl_wifi2ble_fota_init(void){
 	DFU_OTA_INIT();
 	//change version
 
-	DFU_OTA_VERISON_SET(51);
+	DFU_OTA_VERISON_SET(52);
 
 #ifdef MASTER_CORE
 	//set interval
-	fl_wifi2ble_Fota_Interval_set(120);
+	fl_wifi2ble_Fota_Interval_set(60);
 #endif
 }
 
@@ -294,11 +294,7 @@ s16 fl_wifi2ble_fota_recECHO(fl_pack_t _pack_rec,u8* _mac_incom){
 //		P_INFO_HEX(_pack_rec.data_arr,SIZEU8(_pack_rec.data_arr),"ECHO:");
 		for (s16 head = 0; head < G_FW_QUEUE_SENDING.mask + 1; head++) {
 			if (G_FW_QUEUE_SENDING.data[head].length > FOTA_PACK_SIZE_MIN
-#ifdef MASTER_CORE
-				&& G_FW_QUEUE_SENDING.data[head].data_arr[FOTA_RETRY_POSITION] > 0 //sent yet
-#else
 				&& G_FW_QUEUE_SENDING.data[head].data_arr[FOTA_RETRY_POSITION] > 1 //sent yet
-#endif
 				&& plog_IndexOf(G_FW_QUEUE_SENDING.data[head].data_arr,&_pack_rec.data_arr[FOTA_FW_DATA_POSITION],FOTA_PACK_FW_SIZE,G_FW_QUEUE_SENDING.data[head].length) != -1
 				&& plog_IndexOf(G_FW_QUEUE_SENDING.data[head].data_arr,_mac_incom,FOTA_MAC_INCOM_SIZE,SIZEU8(G_FW_QUEUE_SENDING.data[head].data_arr)) == -1)
 			{

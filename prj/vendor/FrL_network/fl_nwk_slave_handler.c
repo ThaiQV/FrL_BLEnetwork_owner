@@ -272,13 +272,22 @@ void fl_nwk_slave_init(void) {
 	P_INFO("** MAC     :%02X%02X%02X%02X%02X%02X\r\n",G_INFORMATION.mac[0],G_INFORMATION.mac[1],G_INFORMATION.mac[2],
 			G_INFORMATION.mac[3],G_INFORMATION.mac[4],G_INFORMATION.mac[5]);
 	P_INFO("** DevType:%d\r\n",G_INFORMATION.dev_type);
+	char mess_c1[16];
 	P_INFO("** SlaveID:%d\r\n",G_INFORMATION.slaveID);
+	sprintf(mess_c1,"SlaveID:%d\r\n",G_INFORMATION.slaveID);
 	P_INFO("** grpID  :%d\r\n",FL_SLAVEID_GRPID(G_INFORMATION.slaveID));
 	P_INFO("** memID  :%d\r\n",FL_SLAVEID_MEMID(G_INFORMATION.slaveID));
 	P_INFO("** JoinNWK:%d\r\n",G_INFORMATION.profile.run_stt.join_nwk);
 	P_INFO("** RstFac :%d\r\n",G_INFORMATION.profile.run_stt.rst_factory);
+	char mess_c[16];
+	sprintf(mess_c,"GW:%02X%02X%02X%02X\r\n",U32_BYTE0( G_INFORMATION.profile.nwk.mac_parent),U32_BYTE1( G_INFORMATION.profile.nwk.mac_parent),
+			U32_BYTE2( G_INFORMATION.profile.nwk.mac_parent),U32_BYTE3( G_INFORMATION.profile.nwk.mac_parent));
 	P_INFO("** MAC GW :%02X%02X%02X%02X\r\n",U32_BYTE0( G_INFORMATION.profile.nwk.mac_parent),U32_BYTE1( G_INFORMATION.profile.nwk.mac_parent),
 			U32_BYTE2( G_INFORMATION.profile.nwk.mac_parent),U32_BYTE3( G_INFORMATION.profile.nwk.mac_parent));
+#ifdef COUNTER_DEVICE
+	Counter_LCD_PEU_Display(0,mess_c);
+	Counter_LCD_PEU_Display(1,mess_c1);
+#endif
 #ifdef HW_SAMPLE_TEST
 	if(G_INFORMATION.slaveID == G_INFORMATION.profile.slaveid && G_INFORMATION.slaveID == 0xFF){
 		ERR(APP,"Turn on install mode\r\n");
