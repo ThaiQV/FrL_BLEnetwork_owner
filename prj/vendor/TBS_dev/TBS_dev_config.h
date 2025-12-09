@@ -17,7 +17,7 @@ typedef enum{
 }__attribute__((__packed__)) tbs_dev_type_e;
 
 #ifndef MASTER_CORE
-#define HW_SAMPLE_TEST
+//#define HW_SAMPLE_TEST
 //#define BLOCK_MASTER
 #ifndef HW_SAMPLE_TEST
 #define OTA_ENABLE
@@ -30,7 +30,7 @@ void TBS_PowerMeter_RESETbyMaster(u8 _ch1,u8 _ch2,u8 _ch3);
 void TBS_PwMeter_SetThreshod(u16 _chn1,u16 _chn2,u16 _chn3);
 #endif
 #else
-//#define MASTER_BLOCK_MAC_SLAVE
+#define MASTER_BLOCK_MAC_SLAVE
 #endif
 void Counter_LCD_RemoveDisplay(void);
 void Counter_LCD_PEU_Display(u8 _row,char* _mess);

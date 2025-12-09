@@ -771,7 +771,7 @@ void fl_ble_wifi_proc(u8* _pdata) {
 //	}
 	u8 wifi_cmd_buffer[SIZEU8(fl_datawifi2ble_t)];
 	u8 len_cmd = _pdata[0]+1;
-	//P_INFO_HEX(_pdata,len_cmd,"WIFI(len:%d)->",len_cmd);
+//	P_PRINTFHEX_A(DRV,_pdata,len_cmd,"WIFI(len:%d)->",len_cmd);
 	s8 indx_start = plog_IndexOf(_pdata,BLE_WIFI_HDR,SIZEU8(BLE_WIFI_HDR),len_cmd);
 	while (indx_start > 0 && indx_start < len_cmd) {
 		memset(wifi_cmd_buffer,0,SIZEU8(wifi_cmd_buffer));

@@ -171,7 +171,8 @@ s16 fl_wifi2ble_fota_fwpush(u8 *_fw, u8 _len,fl_fota_pack_type_e _pack_type) {
 					G_FW_QUEUE_SENDING.count++;
 				return head;
 			}
-		} while ((head = ((head + 1) & G_FW_QUEUE_SENDING.mask)) != G_FW_QUEUE_SENDING.head_index);
+			head = (head + 1) & G_FW_QUEUE_SENDING.mask;
+		} while (head!= G_FW_QUEUE_SENDING.head_index);
 	}
 	return G_FOTA.runtime.push_return;
 }
@@ -276,7 +277,7 @@ void fl_wifi2ble_fota_init(void){
 	DFU_OTA_INIT();
 	//change version
 
-	DFU_OTA_VERISON_SET(52);
+	DFU_OTA_VERISON_SET(53);
 
 #ifdef MASTER_CORE
 	//set interval

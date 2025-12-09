@@ -129,6 +129,11 @@ static bool fl_nwk_decrypt16(unsigned char * key,u8* _data,u8 _size, u8* decrypt
 //		ERR(BLE,"Decrypt(hdr:0x%02X):%d|%d\r\n",packet_frame.frame.hdr,timetamp_hdr,ORIGINAL_TIME_TRUST);
 //	}
 	//timetamp_hdr>=ORIGINAL_TIME_TRUST &&
+	//DEBUG
+//	if(decrypted[0]==NWK_HDR_NODETALBE_UPDATE){
+//		P_INFO_HEX(decrypted,_size,"MISS(%d):",_size);
+//		ERR(BLE,"Crc:%02X|Cal_Crc:%02X\r\n", packet_frame.frame.crc8,pack_crc );
+//	}
 	return (IsNWKHDR(decrypted[0])!=0xFF && pack_crc == packet_frame.frame.crc8);
 #undef BLOCK_SIZE
 }
@@ -166,10 +171,13 @@ static inline void NWK_MYKEY(void){
 /******************************************************************************/
 //TESET BLOCK  MAC-MASTER_BLOCK_MAC_SLAVE
 #ifdef MASTER_BLOCK_MAC_SLAVE
-u8 blacklist_mac[3][6]={
-		{0xe2,0xdb,0x21,0x77,0x5f,0xd8},
-		{0x7e,0x8a,0xf2,0x77,0x5f,0xd8},
-		{0x97,0xe4,0xa7,0x77,0x5f,0xd8}};
+u8 blacklist_mac[2][6]={
+//		{0xe2,0xdb,0x21,0x77,0x5f,0xd8},
+//		{0x7e,0x8a,0xf2,0x77,0x5f,0xd8},
+//		{0x97,0xe4,0xa7,0x77,0x5f,0xd8}
+		{0xAF,0x19,0xB9,0x77,0x5F,0xD8},
+		{0xFA,0x59,0x77,0x77,0x5F,0xD8}
+		};
 #define SIZE_BLACKLIST (sizeof(blacklist_mac) / sizeof(blacklist_mac[0]))
 #endif
 /*------------------*/
@@ -220,6 +228,10 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 				/*For TESTING REPEATER*/
 				if (-1 != plog_IndexOf(pa->mac,master_mac,4,6)) {
 					return 0;
+				}else{
+//					P_INFO_HEX(pa->mac,6,   "MAC   :");
+//					P_INFO_HEX(master_mac,4,"MASTER:");
+
 				}
 #endif
 #endif
@@ -231,6 +243,17 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 					}
 				}
 #endif
+
+				//Add decrypt
+				NWK_MYKEY();
+				if(!fl_nwk_decrypt16(FL_NWK_USE_KEY,pa->data,incomming_data.length,incomming_data.data_arr)){
+//					ERR(APP,"ERR Decrypt !!!!\r\n");
+					return 0;
+				}
+//				u8 mac_child[6] = { 0x7E, 0x8A, 0xF2, 0x77, 0x5F, 0xD8 };
+//				if (-1 != plog_IndexOf(pa->mac,mac_child,4,6) ) {
+//					P_INFO_HEX(incomming_data.data_arr,incomming_data.length,"MISS:");
+//				}
 				//Scan mac in nodetable when transaction mode, skip when in collection mode
 #ifndef MASTER_CORE
 				if(-1 == plog_IndexOf(pa->mac,master_mac,SIZEU8(master_mac),6) && FL_NODELIST_TABLE_Updated())
@@ -241,13 +264,6 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 							return 0;				//skip process
 						}
 					}
-				}
-
-				//Add decrypt
-				NWK_MYKEY();
-				if(!fl_nwk_decrypt16(FL_NWK_USE_KEY,pa->data,incomming_data.length,incomming_data.data_arr)){
-//					ERR(APP,"ERR Decrypt !!!!\r\n");
-					return 0;
 				}
 #ifdef MASTER_CORE
 				//skip process from  master and check rspECHO
@@ -269,6 +285,7 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 					fl_nwk_slave_nodelist_repeat(&incomming_data);
 					return 0;
 				}
+
 				//Store FOTA pack
 				if (incomming_data.data_arr[0] == NWK_HDR_FOTA && incomming_data.length > 20) {
 					//incomming packet is echo pack
@@ -568,8 +585,8 @@ u8 fl_adv_sendFIFO_run(void) {
 void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms) {
 //	while (blc_ll_getCurrentState() == BLS_LINK_STATE_SCAN && blc_ll_getCurrentState() == BLS_LINK_STATE_ADV) {
 //	};
-	if (_size >= 5)
-	{
+	if (_size >= 5) {
+		if (_size > 31) _size = 31;
 		bls_ll_setAdvEnable(BLC_ADV_DISABLE);
 		rf_set_power_level_index(MY_RF_POWER_INDEX);
 		u8 mac[6];
@@ -616,6 +633,8 @@ void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms) {
  ***************************************************/
 void fl_adv_init(void) {
 	fl_db_init();
+	//	//fota init
+	fl_wifi2ble_fota_init();
 #ifdef MASTER_CORE
 	extern fl_master_config_t G_MASTER_INFO;
 //	fl_input_external_init();
@@ -650,8 +669,7 @@ void fl_adv_init(void) {
 	fl_adv_scanner_init();
 	//Init protocol network layer
 	fl_nwk_protocol_InitnRun();
-//	//fota init
-	fl_wifi2ble_fota_init();
+
 }
 /***************************************************
  * @brief 		:init collection channel (0,1,2)

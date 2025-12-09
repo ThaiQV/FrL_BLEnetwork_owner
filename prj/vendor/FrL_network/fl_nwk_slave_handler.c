@@ -234,7 +234,36 @@ int fl_nwk_slave_nwkRemove(void){
 //	blt_soft_timer_restart(_interval_report,100*100);
 	return -1;
 }
-
+#ifdef COUNTER_DEVICE
+void fl_nwk_slave_displayLCD_Refesh(void){
+#ifndef HW_SAMPLE_TEST
+	//display version
+	extern fl_version_t _fw;
+	extern fl_version_t _hw;
+	char version_c[16];
+	memset((u8*)version_c,0,SIZEU8(version_c));
+	_fw.patch = DFU_OTA_VERISON_GET();
+	sprintf(version_c,"FW ver:%d.%d.%d", _fw.major,_fw.minor,_fw.patch );
+	Counter_LCD_ENDCALL_Display(1,version_c);
+	memset((u8*)version_c,0,SIZEU8(version_c));
+	sprintf(version_c,"HW ver:%d.%d.%d", _hw.major,_hw.minor,_hw.patch );
+	Counter_LCD_ENDCALL_Display(0,version_c);
+	char mess_c[16];
+	memset((u8*)mess_c,0,SIZEU8(mess_c));
+	sprintf(mess_c,"GW : %02X%02X%02X%02X",U32_BYTE0( G_INFORMATION.profile.nwk.mac_parent),U32_BYTE1( G_INFORMATION.profile.nwk.mac_parent),
+			U32_BYTE2( G_INFORMATION.profile.nwk.mac_parent),U32_BYTE3( G_INFORMATION.profile.nwk.mac_parent));
+	Counter_LCD_PEU_Display(0,mess_c);
+	char mess_c1[16];
+	memset((u8*)mess_c1,0,SIZEU8(mess_c1));
+	sprintf(mess_c1,"ID : %d",G_INFORMATION.slaveID);
+	Counter_LCD_PEU_Display(1,mess_c1);
+	char mess_c2[16];
+	memset((u8*) mess_c2,0,SIZEU8(mess_c2));
+	sprintf(mess_c2,"Chn:%d,%d,%d",G_INFORMATION.profile.nwk.chn[0],G_INFORMATION.profile.nwk.chn[1],G_INFORMATION.profile.nwk.chn[2]);
+	Counter_LCD_PED_Display(0,mess_c2);
+#endif
+}
+#endif
 void fl_nwk_slave_init(void) {
 //	PLOG_Start(APP);
 //	PLOG_Start(FLA);
@@ -272,21 +301,16 @@ void fl_nwk_slave_init(void) {
 	P_INFO("** MAC     :%02X%02X%02X%02X%02X%02X\r\n",G_INFORMATION.mac[0],G_INFORMATION.mac[1],G_INFORMATION.mac[2],
 			G_INFORMATION.mac[3],G_INFORMATION.mac[4],G_INFORMATION.mac[5]);
 	P_INFO("** DevType:%d\r\n",G_INFORMATION.dev_type);
-	char mess_c1[16];
-	P_INFO("** SlaveID:%d\r\n",G_INFORMATION.slaveID);
-	sprintf(mess_c1,"SlaveID:%d\r\n",G_INFORMATION.slaveID);
+	P_INFO("** SlaveID: %d\r\n",G_INFORMATION.slaveID);
 	P_INFO("** grpID  :%d\r\n",FL_SLAVEID_GRPID(G_INFORMATION.slaveID));
 	P_INFO("** memID  :%d\r\n",FL_SLAVEID_MEMID(G_INFORMATION.slaveID));
 	P_INFO("** JoinNWK:%d\r\n",G_INFORMATION.profile.run_stt.join_nwk);
 	P_INFO("** RstFac :%d\r\n",G_INFORMATION.profile.run_stt.rst_factory);
-	char mess_c[16];
-	sprintf(mess_c,"GW:%02X%02X%02X%02X\r\n",U32_BYTE0( G_INFORMATION.profile.nwk.mac_parent),U32_BYTE1( G_INFORMATION.profile.nwk.mac_parent),
-			U32_BYTE2( G_INFORMATION.profile.nwk.mac_parent),U32_BYTE3( G_INFORMATION.profile.nwk.mac_parent));
 	P_INFO("** MAC GW :%02X%02X%02X%02X\r\n",U32_BYTE0( G_INFORMATION.profile.nwk.mac_parent),U32_BYTE1( G_INFORMATION.profile.nwk.mac_parent),
 			U32_BYTE2( G_INFORMATION.profile.nwk.mac_parent),U32_BYTE3( G_INFORMATION.profile.nwk.mac_parent));
+	P_INFO("** Channel:%d,%d,%d\r\n",G_INFORMATION.profile.nwk.chn[0],G_INFORMATION.profile.nwk.chn[1],G_INFORMATION.profile.nwk.chn[2]);
 #ifdef COUNTER_DEVICE
-	Counter_LCD_PEU_Display(0,mess_c);
-	Counter_LCD_PEU_Display(1,mess_c1);
+	fl_nwk_slave_displayLCD_Refesh();
 #endif
 #ifdef HW_SAMPLE_TEST
 	if(G_INFORMATION.slaveID == G_INFORMATION.profile.slaveid && G_INFORMATION.slaveID == 0xFF){
@@ -1087,6 +1111,9 @@ int _slave_reconnect(void){
 }
 
 int _interval_report(void) {
+#ifdef COUNTER_DEVICE
+	fl_nwk_slave_displayLCD_Refesh();
+#endif
 	int offset_spread = (fl_rtc_getWithMilliStep().milstep - WIFI_ORIGINAL_GETALL.milstep)*10;
 #define INTERVAL_REPORT_TIME (55 - FL_SLAVEID_MEMID(G_INFORMATION.slaveID))
 	extern const u32 ORIGINAL_TIME_TRUST;
@@ -1116,11 +1143,6 @@ int _interval_report(void) {
 	}
 #undef INTERVAL_REPORT_TIME
 	return 100 * 1000 + offset_spread;
-}
-
-void fl_nwk_slave_reconnectNstoragedata(void){
-	//Restart timeout reconnect
-//	blt_soft_timer_restart(_slave_reconnect,RECONNECT_TIME);
 }
 
 /******************************************************************************/

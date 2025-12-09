@@ -436,8 +436,10 @@ void _nodelist_table_printf(void) {
 	}
 }
 void fl_nwk_slave_nodelist_repeat(fl_pack_t *_pack) {
-//	if (FL_QUEUE_FIND(&NODELIST_TABLE_SENDING,_pack,_pack->length - 2) == -1)
+//	P_INFO("PACK NODELIST:%d\r\n",FL_NWK_NODELIST_TABLE_IsReady());
+	if (FL_QUEUE_FIND(&NODELIST_TABLE_SENDING,_pack,_pack->length - 2) == -1)
 	{
+		_pack->length=_pack->length-1;
 		FL_QUEUE_ADD(&NODELIST_TABLE_SENDING,_pack);
 	}
 	//Update my table
@@ -471,7 +473,8 @@ void fl_nwk_nodelist_table_run(void) {
 	if (!F_SENDING_STATE) {
 //		P_INFO("PACK NODELIST:%d\r\n",FL_NWK_NODELIST_TABLE_IsReady());
 		if (FL_QUEUE_GET(&NODELIST_TABLE_SENDING,&pack_in_queue) != -1) {
-//			P_INFO_HEX(pack_in_queue.data_arr,pack_in_queue.length,"PACK NODELIST(%d):",FL_NWK_NODELIST_TABLE_IsReady());
+			P_PRINTFHEX_A(BLE,pack_in_queue.data_arr,pack_in_queue.length,"PACK NODELIST(%d):",FL_NWK_NODELIST_TABLE_IsReady());
+//			P_INFO_HEX(pack_in_queue.data_arr,pack_in_queue.length,"PACK NODELIST(%d):",pack_in_queue.length);
 			fl_adv_send(pack_in_queue.data_arr,pack_in_queue.length,G_ADV_SETTINGS.adv_duration);
 		}
 	}

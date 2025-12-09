@@ -19,7 +19,7 @@
 #include "TBS_dev_app/user_lib.h"
 
 #define COUNTER_LCD_REMOVE_DISPLAY		ct_remove_nwwk
-#define COUNTER_LCD_PEU_DISPLAY			ct_add_bt_print
+#define COUNTER_LCD_PRESS_DISPLAY		ct_add_bt_print
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -139,17 +139,17 @@ void Counter_LCD_RemoveDisplay(void){
 	COUNTER_LCD_REMOVE_DISPLAY();
 }
 void Counter_LCD_PEU_Display(u8 _row,char* _mess){
-	COUNTER_LCD_PEU_DISPLAY(_mess,_row,BT_PEU_ID);
+	COUNTER_LCD_PRESS_DISPLAY(_mess,_row,BT_PEU_ID);
 }
 void Counter_LCD_PED_Display(u8 _row,char* _mess){
-	COUNTER_LCD_PEU_DISPLAY(_mess,_row,BT_PED_ID);
+	COUNTER_LCD_PRESS_DISPLAY(_mess,_row,BT_PED_ID);
 }
 void Counter_LCD_PPD_Display(u8 _row,char* _mess){
-	COUNTER_LCD_PEU_DISPLAY(_mess,_row,BT_PPD_ID);
+	COUNTER_LCD_PRESS_DISPLAY(_mess,_row,BT_PPD_ID);
 
 }
 void Counter_LCD_ENDCALL_Display(u8 _row,char* _mess){
-	COUNTER_LCD_PEU_DISPLAY(_mess,_row,BT_ENDCALL_ID);
+	COUNTER_LCD_PRESS_DISPLAY(_mess,_row,BT_ENDCALL_ID);
 }
 void Counter_LCD_MessageStore(void){
 	static u32 crc32 = 0;
@@ -251,14 +251,6 @@ void TBS_Counter_init(void){
 #ifndef HW_SAMPLE_TEST
 	//todo:Init Butt,lcd,7segs,.....
 	user_app_init();
-	//display version
-	extern fl_version_t _fw;
-	extern fl_version_t _hw;
-	char version_c[10];
-	sprintf(version_c,"FW ver:%d.%d.%d", _fw.major,_fw.patch,_fw.minor );
-	Counter_LCD_ENDCALL_Display(1,version_c);
-	sprintf(version_c,"HW ver:%d.%d.%d", _hw.major,_hw.patch,_hw.minor );
-	Counter_LCD_ENDCALL_Display(0,version_c);
 #endif
 	//TEst
 	TEST_EVENT.lifetime = fl_rtc_get();
