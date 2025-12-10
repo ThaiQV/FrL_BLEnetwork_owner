@@ -230,7 +230,7 @@ int fl_nwk_slave_nwkRemove(void){
 	G_INFORMATION.profile = my_profile;
 	G_INFORMATION.profile.run_stt.join_nwk =0;
 	fl_db_slaveprofile_save(G_INFORMATION.profile);
-	REBOOT_DEV();
+//	REBOOT_DEV();
 //	blt_soft_timer_restart(_interval_report,100*100);
 	return -1;
 }
@@ -781,8 +781,11 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 					memcpy(G_INFORMATION.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_INFORMATION.mac));
 					if (mac_parent == G_INFORMATION.profile.nwk.mac_parent && -1!=plog_IndexOf(packet.frame.payload,G_INFORMATION.mac,6,SIZEU8(packet.frame.payload))) {
 						ERR(APP,"Network leaving.....(%d )s\r\n",1);
+//						Counter_LCD_RemoveDisplay();
+//						blt_soft_timer_add(fl_nwk_slave_nwkRemove,NWK_LEAVE_TIME_DISPLAY);
 						Counter_LCD_RemoveDisplay();
-						blt_soft_timer_add(fl_nwk_slave_nwkRemove,NWK_LEAVE_TIME_DISPLAY);
+						fl_nwk_slave_nwkRemove();
+						blt_soft_timer_add(REBOOT_DEV,NWK_LEAVE_TIME_DISPLAY);
 						//Process rsp
 						memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
 						memcpy(packet.frame.payload,G_INFORMATION.mac,SIZEU8(G_INFORMATION.mac));

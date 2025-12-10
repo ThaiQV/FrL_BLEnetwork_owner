@@ -85,7 +85,7 @@ void fl_nwk_master_heartbeat_init(void);
 
 void _master_nodelist_printf(fl_slaves_list_t *_node, u8 _size) {
 	if (_size < 0xFF && _size > 0) {
-		P_INFO("******** NODELIST MATER (%d)*********\r\n",_size);
+		P_INFO("******** NODELIST MATER (%d/%d)*********\r\n",_size,MAX_NODES_SETTING);
 		for (u8 var = 0; var < _size; ++var) {
 			P_INFO("[%3d]0x%02X%02X%02X%02X%02X%02X(%d):%d\r\n",_node->sla_info[var].slaveID,_node->sla_info[var].mac[0],
 					_node->sla_info[var].mac[1],_node->sla_info[var].mac[2],_node->sla_info[var].mac[3],_node->sla_info[var].mac[4],
@@ -812,6 +812,8 @@ void fl_nwk_master_StatusNodesRefesh(void) {
 	for (u8 i = 0; i < G_NODE_LIST.slot_inused && G_NODE_LIST.slot_inused != 0xFF; i++) {
 		if(G_NODE_LIST.sla_info[i].dev_type != 0xFF && !IS_MAC_INVALID(G_NODE_LIST.sla_info[i].mac,0)&&!IS_MAC_INVALID(G_NODE_LIST.sla_info[i].mac,0xFF)){
 			G_NODE_LIST.sla_info[i].active = (fl_rtc_get() - G_NODE_LIST.sla_info[i].timelife <= 40) ? 1 : 0;
+		}else{
+			G_NODE_LIST.sla_info[i].dev_type = 0xFF;
 		}
 	}
 }

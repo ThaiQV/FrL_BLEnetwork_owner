@@ -456,7 +456,8 @@ void fl_nwk_slave_nodelist_repeat(fl_pack_t *_pack) {
 			if(memcmp(G_NODELIST_TABLE[table_arr[var]].mac,fl_nwk_mySlaveMac(),SIZEU8(G_NODELIST_TABLE[table_arr[var]].mac))){
 				ERR(APP,"Removed.....!!!\r\n");
 				Counter_LCD_RemoveDisplay();
-				blt_soft_timer_add(fl_nwk_slave_nwkRemove,NWK_LEAVE_TIME_DISPLAY);
+				fl_nwk_slave_nwkRemove();
+				blt_soft_timer_add(REBOOT_DEV,NWK_LEAVE_TIME_DISPLAY);
 //				fl_nwk_slave_nwkclear();
 //				G_NODELIST_TABLE_Clear();
 			}

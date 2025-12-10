@@ -13,7 +13,7 @@
 
 #include "fl_nwk_database.h"
 #include "../TBS_dev/TBS_dev_config.h"
-#define NWK_LEAVE_TIME_DISPLAY 				2*1001*1000
+#define NWK_LEAVE_TIME_DISPLAY 				5*1001*1000
 //#define MAX_NODES 	100
 
 /**

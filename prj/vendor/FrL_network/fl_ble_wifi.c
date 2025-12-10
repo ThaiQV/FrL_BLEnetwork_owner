@@ -799,7 +799,7 @@ void fl_ble_wifi_proc(u8* _pdata) {
 		memcpy(&wifi_cmd_buffer[1],&_pdata[indx_start + SIZEU8(BLE_WIFI_HDR)],_pdata[indx_start + SIZEU8(BLE_WIFI_HDR)]+3);
 		wifi_cmd_buffer[0]=len_cmd;
 		//fl_datawifi2ble_t data ;//= (fl_datawifi2ble_t*) &wifi_cmd_buffer[indx_start + SIZEU8(BLE_WIFI_HDR)];
-		P_PRINTFHEX_A(MCU,wifi_cmd_buffer,wifi_cmd_buffer[1]+3,"WIFI(idx:%d)->",indx_start);
+		P_PRINTFHEX_A(DRV,wifi_cmd_buffer,wifi_cmd_buffer[1]+3,"WIFI(idx:%d)->",indx_start);
 		for (u8 i = 0; i < GWIFI_SIZE; i++) {
 			if (wifi_cmd_buffer[2] == G_WIFI_CON[i].req.cmd) {
 				G_WIFI_CON[i].req.ReqFunc(wifi_cmd_buffer,G_WIFI_CON[i].rsp.Rspfnc);

@@ -146,7 +146,16 @@ static bool fl_nwk_decrypt16(unsigned char * key,u8* _data,u8 _size, u8* decrypt
  * @return	  	:none
  *
  ***************************************************/
-static inline void NWK_MYKEY(void){
+static inline void NWK_MYKEY(u8 _hdr){
+	//IMPORTANT PACKET HDR
+	u8 COMMOM_HDR[2] ={NWK_HDR_ASSIGN,NWK_HDR_COLLECT};
+	bool hdr_common_check = false;
+	for(u8 indx_hdr = 0;indx_hdr<(sizeof(COMMOM_HDR)/sizeof(COMMOM_HDR[0]));indx_hdr++){
+		if(_hdr==COMMOM_HDR[indx_hdr]){
+			hdr_common_check=true;
+			break;
+		}
+	}
 	const unsigned char KEY_NULL[4] = { 0xFF, 0xFF, 0xFF, 0xFF };
 	u8 key_buffer[NWK_PRIVATE_KEY_SIZE];
 #ifdef MASTER_CORE
@@ -156,7 +165,8 @@ static inline void NWK_MYKEY(void){
 	extern fl_nodeinnetwork_t G_INFORMATION ;
 	memcpy(key_buffer,G_INFORMATION.profile.nwk.private_key,NWK_PRIVATE_KEY_SIZE);
 #endif
-	if (memcmp(key_buffer,KEY_NULL,SIZEU8(KEY_NULL)) == 0 || *FL_NWK_COLLECTION_MODE == 1) {
+	//Generate key
+	if ((memcmp(key_buffer,KEY_NULL,SIZEU8(KEY_NULL)) == 0 || *FL_NWK_COLLECTION_MODE == 1) || hdr_common_check == true) {
 		memcpy(FL_NWK_USE_KEY,FL_NWK_PB_KEY,SIZEU8(FL_NWK_PB_KEY));
 	} else {
 		//build
@@ -245,7 +255,7 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 #endif
 
 				//Add decrypt
-				NWK_MYKEY();
+				NWK_MYKEY(0xFF); //=>decrypt
 				if(!fl_nwk_decrypt16(FL_NWK_USE_KEY,pa->data,incomming_data.length,incomming_data.data_arr)){
 //					ERR(APP,"ERR Decrypt !!!!\r\n");
 					return 0;
@@ -601,7 +611,7 @@ void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms) {
 		/*Encryt data*/
 		u8 encrypted[_size];
 		memset(encrypted,0,SIZEU8(encrypted));
-		NWK_MYKEY();
+		NWK_MYKEY(_data[0]);
 		fl_nwk_encrypt16(FL_NWK_USE_KEY,_data,_size,encrypted);
 		/*todo: IMPORTANT FOR CLEAR ALL NETWORK*/
 		extern u8 MASTER_CLEARNETWORK[18];

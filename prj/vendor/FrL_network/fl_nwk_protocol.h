@@ -40,4 +40,5 @@ typedef struct {
 void fl_nwk_protocol_InitnRun(void);
 void _Passing_CmdLine(type_debug_t _type, u8 *_data);
 void fl_nwk_protcol_ExtCall(type_debug_t _type, u8 *_data); //use to the other layers
+int REBOOT_DEV(void);
 #endif /* VENDOR_FRL_NETWORK_FL_NWK_PROTOCOL_H_ */

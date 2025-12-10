@@ -942,6 +942,7 @@ void _Passing_CmdLine(type_debug_t _type, u8 *_data) {
 	}else if (_type == FACTORYCMD) {
 		ERR(APP,"Clear and reset factory.....\r\n");
 		fl_db_clearAll();
+		TBS_History_ClearAll();
 		delay_ms(1000);
 		sys_reboot();
 	}
