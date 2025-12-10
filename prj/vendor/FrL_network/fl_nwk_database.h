@@ -49,18 +49,20 @@
 
 #define NWK_PRIVATE_KEY_SIZE 			13
 
-#ifdef MASTER_CORE
-/******************** NODE LIST ********************/
-#define NODELIST_SLAVE_MAX				200
-
 typedef struct {
 	uint8_t slaveid;
 	uint8_t mac[6];
 	uint8_t dev_type;
 }__attribute__((packed)) fl_node_data_t;
+
+//#define NODELIST_SLAVE_MAX				200
+#define MAX_NODES							110
+#ifdef MASTER_CORE
+/******************** NODE LIST ********************/
+
 typedef struct {
 	u8 num_slave;
-	fl_node_data_t slave[NODELIST_SLAVE_MAX];
+	fl_node_data_t slave[MAX_NODES];
 }__attribute__((packed)) fl_nodelist_db_t;
 
 typedef struct {

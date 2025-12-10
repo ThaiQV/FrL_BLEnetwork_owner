@@ -195,7 +195,7 @@ static int tx_to_uart_cb(void) {
 			my_fifo_pop(&fl_tx_fifo);
 			FLAG_uart_dma_send = 1;
 //			LOGA(DRV,"lenData:%d\r\n",FL_TXDATA.len);
-//			P_PRINTFHEX_A(DRV,FL_TXDATA.data,FL_TXDATA.len,"%s(%d):","Tx",FL_TXDATA.len);
+			P_PRINTFHEX_A(DRV,FL_TXDATA.data,FL_TXDATA.len,"%s(%d):","Tx",FL_TXDATA.len);
 		}
 	}
 	return 0;

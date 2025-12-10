@@ -40,8 +40,8 @@ u8 GETINFO_FLAG_EVENTTEST = 0;
 #define RECHECKING_NETWOK_TIME 		14*1021 		    //ms
 #define RECONNECT_TIME				62*1000*1020		//s
 #define INFORM_MASTER				9*1001*1004
-fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_MASTER_CMD,NWK_HDR_FOTA,NWK_HDR_A5_HIS,NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
-fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_MASTER_CMD,NWK_HDR_FOTA,NWK_HDR_A5_HIS,NWK_HDR_55,NWK_HDR_11_REACTIVE,NWK_HDR_22_PING}; // register cmdid REQ
+fl_hdr_nwk_type_e G_NWK_HDR_LIST[] = {NWK_HDR_NODETALBE_UPDATE,NWK_HDR_REMOVE,NWK_HDR_MASTER_CMD,NWK_HDR_FOTA,NWK_HDR_A5_HIS,NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,NWK_HDR_ASSIGN }; // register cmdid RSP
+fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_NODETALBE_UPDATE,NWK_HDR_REMOVE,NWK_HDR_MASTER_CMD,NWK_HDR_FOTA,NWK_HDR_A5_HIS,NWK_HDR_55,NWK_HDR_11_REACTIVE,NWK_HDR_22_PING}; // register cmdid REQ
 
 #define NWK_HDR_SIZE (sizeof(G_NWK_HDR_LIST)/sizeof(G_NWK_HDR_LIST[0]))
 #define NWK_HDR_REQ_SIZE (sizeof(G_NWK_HDR_REQLIST)/sizeof(G_NWK_HDR_REQLIST[0]))
@@ -133,6 +133,10 @@ void fl_nwk_LedSignal_run(void){
 u8 fl_nwk_mySlaveID(void){
 	return G_INFORMATION.slaveID;
 }
+u8* fl_nwk_mySlaveMac(void){
+	return G_INFORMATION.mac;
+}
+
 bool IsPairing(void)	{
 	return(G_INFORMATION.profile.run_stt.join_nwk);
 }
@@ -207,7 +211,7 @@ int _nwk_slave_backup(void){
 	return 0;
 }
 
-void fl_nwk_slave_nwkclear(void){
+int fl_nwk_slave_nwkclear(void){
 	fl_db_Pairing_Clear();
 	fl_slave_profiles_t my_profile =fl_db_slaveprofile_init();
 	G_INFORMATION.slaveID = my_profile.slaveid;
@@ -215,8 +219,55 @@ void fl_nwk_slave_nwkclear(void){
 	G_INFORMATION.profile.run_stt.join_nwk =1;
 	fl_db_slaveprofile_save(G_INFORMATION.profile);
 	blt_soft_timer_restart(_interval_report,100*100);
+	return -1;
 }
 
+int fl_nwk_slave_nwkRemove(void){
+	extern int REBOOT_DEV(void) ;
+	fl_db_Pairing_Clear();
+	fl_slave_profiles_t my_profile =fl_db_slaveprofile_init();
+	G_INFORMATION.slaveID = my_profile.slaveid;
+	G_INFORMATION.profile = my_profile;
+	G_INFORMATION.profile.run_stt.join_nwk =0;
+	fl_db_slaveprofile_save(G_INFORMATION.profile);
+//	REBOOT_DEV();
+//	blt_soft_timer_restart(_interval_report,100*100);
+	return -1;
+}
+#ifdef COUNTER_DEVICE
+void fl_nwk_slave_displayLCD_Refesh(void){
+#ifndef HW_SAMPLE_TEST
+	//display version
+	extern fl_version_t _fw;
+	extern fl_version_t _hw;
+	char version_c[16];
+	memset((u8*)version_c,0,SIZEU8(version_c));
+	_fw.patch = DFU_OTA_VERISON_GET();
+	sprintf(version_c,"FW ver:%d.%d.%d", _fw.major,_fw.minor,_fw.patch );
+	Counter_LCD_ENDCALL_Display(1,version_c);
+	memset((u8*)version_c,0,SIZEU8(version_c));
+	sprintf(version_c,"HW ver:%d.%d.%d", _hw.major,_hw.minor,_hw.patch );
+	Counter_LCD_ENDCALL_Display(0,version_c);
+	char mess_c[16];
+	memset((u8*)mess_c,0,SIZEU8(mess_c));
+	sprintf(mess_c,"GW : %02X%02X%02X%02X",U32_BYTE0( G_INFORMATION.profile.nwk.mac_parent),U32_BYTE1( G_INFORMATION.profile.nwk.mac_parent),
+			U32_BYTE2( G_INFORMATION.profile.nwk.mac_parent),U32_BYTE3( G_INFORMATION.profile.nwk.mac_parent));
+	Counter_LCD_PEU_Display(0,mess_c);
+	char mess_c1[16];
+	memset((u8*)mess_c1,0,SIZEU8(mess_c1));
+	sprintf(mess_c1,"ID : %d",G_INFORMATION.slaveID);
+	Counter_LCD_PEU_Display(1,mess_c1);
+	char mess_c2[16];
+	memset((u8*) mess_c2,0,SIZEU8(mess_c2));
+	sprintf(mess_c2,"Chn:%d,%d,%d",G_INFORMATION.profile.nwk.chn[0],G_INFORMATION.profile.nwk.chn[1],G_INFORMATION.profile.nwk.chn[2]);
+	Counter_LCD_PED_Display(0,mess_c2);
+	memset((u8*) mess_c2,0,SIZEU8(mess_c2));
+	sprintf(mess_c2,"Key:***%02X%02X%02X%02X",G_INFORMATION.profile.nwk.private_key[12],G_INFORMATION.profile.nwk.private_key[11],
+			G_INFORMATION.profile.nwk.private_key[10],G_INFORMATION.profile.nwk.private_key[9]);
+	Counter_LCD_PED_Display(1,mess_c2);
+#endif
+}
+#endif
 void fl_nwk_slave_init(void) {
 //	PLOG_Start(APP);
 //	PLOG_Start(FLA);
@@ -254,13 +305,17 @@ void fl_nwk_slave_init(void) {
 	P_INFO("** MAC     :%02X%02X%02X%02X%02X%02X\r\n",G_INFORMATION.mac[0],G_INFORMATION.mac[1],G_INFORMATION.mac[2],
 			G_INFORMATION.mac[3],G_INFORMATION.mac[4],G_INFORMATION.mac[5]);
 	P_INFO("** DevType:%d\r\n",G_INFORMATION.dev_type);
-	P_INFO("** SlaveID:%d\r\n",G_INFORMATION.slaveID);
+	P_INFO("** SlaveID: %d\r\n",G_INFORMATION.slaveID);
 	P_INFO("** grpID  :%d\r\n",FL_SLAVEID_GRPID(G_INFORMATION.slaveID));
 	P_INFO("** memID  :%d\r\n",FL_SLAVEID_MEMID(G_INFORMATION.slaveID));
 	P_INFO("** JoinNWK:%d\r\n",G_INFORMATION.profile.run_stt.join_nwk);
 	P_INFO("** RstFac :%d\r\n",G_INFORMATION.profile.run_stt.rst_factory);
 	P_INFO("** MAC GW :%02X%02X%02X%02X\r\n",U32_BYTE0( G_INFORMATION.profile.nwk.mac_parent),U32_BYTE1( G_INFORMATION.profile.nwk.mac_parent),
 			U32_BYTE2( G_INFORMATION.profile.nwk.mac_parent),U32_BYTE3( G_INFORMATION.profile.nwk.mac_parent));
+	P_INFO("** Channel:%d,%d,%d\r\n",G_INFORMATION.profile.nwk.chn[0],G_INFORMATION.profile.nwk.chn[1],G_INFORMATION.profile.nwk.chn[2]);
+#ifdef COUNTER_DEVICE
+	fl_nwk_slave_displayLCD_Refesh();
+#endif
 #ifdef HW_SAMPLE_TEST
 	if(G_INFORMATION.slaveID == G_INFORMATION.profile.slaveid && G_INFORMATION.slaveID == 0xFF){
 		ERR(APP,"Turn on install mode\r\n");
@@ -722,6 +777,35 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 		}
 		break;
 		/*============================================================================================*/
+		case NWK_HDR_REMOVE: {
+			if (IsJoinedNetwork() && packet.frame.slaveID == G_INFORMATION.slaveID) {
+				if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
+					//get master's mac
+					u32 mac_parent = MAKE_U32(packet.frame.payload[3],packet.frame.payload[2],packet.frame.payload[1],packet.frame.payload[0]);
+					memcpy(G_INFORMATION.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_INFORMATION.mac));
+					if (mac_parent == G_INFORMATION.profile.nwk.mac_parent && -1!=plog_IndexOf(packet.frame.payload,G_INFORMATION.mac,6,SIZEU8(packet.frame.payload))) {
+						ERR(APP,"Network leaving.....(%d )s\r\n",1);
+//						Counter_LCD_RemoveDisplay();
+//						blt_soft_timer_add(fl_nwk_slave_nwkRemove,NWK_LEAVE_TIME_DISPLAY);
+						Counter_LCD_RemoveDisplay();
+						fl_nwk_slave_nwkRemove();
+						blt_soft_timer_add(REBOOT_DEV,NWK_LEAVE_TIME_DISPLAY);
+						//Process rsp
+						memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
+						memcpy(packet.frame.payload,G_INFORMATION.mac,SIZEU8(G_INFORMATION.mac));
+						packet.frame.payload[SIZEU8(G_INFORMATION.mac)] = G_INFORMATION.dev_type;
+						//change endpoint to node source
+						packet.frame.endpoint.master = FL_FROM_SLAVE;
+						//add repeat_cnt
+						packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
+						break;
+					}
+				}
+			}
+			packet_built.length = 0;
+			return packet_built;
+		}
+		break;
 		case NWK_HDR_COLLECT: {
 //			_nwk_slave_syncFromPack(&packet.frame);
 			fl_nwk_LedSignal_run();
@@ -1034,6 +1118,9 @@ int _slave_reconnect(void){
 }
 
 int _interval_report(void) {
+#ifdef COUNTER_DEVICE
+	fl_nwk_slave_displayLCD_Refesh();
+#endif
 	int offset_spread = (fl_rtc_getWithMilliStep().milstep - WIFI_ORIGINAL_GETALL.milstep)*10;
 #define INTERVAL_REPORT_TIME (55 - FL_SLAVEID_MEMID(G_INFORMATION.slaveID))
 	extern const u32 ORIGINAL_TIME_TRUST;
@@ -1063,11 +1150,6 @@ int _interval_report(void) {
 	}
 #undef INTERVAL_REPORT_TIME
 	return 100 * 1000 + offset_spread;
-}
-
-void fl_nwk_slave_reconnectNstoragedata(void){
-	//Restart timeout reconnect
-//	blt_soft_timer_restart(_slave_reconnect,RECONNECT_TIME);
 }
 
 /******************************************************************************/

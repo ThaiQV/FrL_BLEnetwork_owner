@@ -37,6 +37,7 @@ typedef enum {
 // SubApp context structure
 typedef struct {
 	bool start;
+	bool is_count_enable;
 	button_mode_app_t mode;
 } button_context_t;
 
@@ -44,6 +45,7 @@ typedef struct {
 static button_context_t button_ctx = {
 	.start = 0,
 	.mode = BUTTON_MODE_NORMAL,
+	.is_count_enable = false,
 };
 
 // Forward declarations
@@ -224,6 +226,7 @@ static void button_app_event_handler(const event_t* event, void* user_data)
             break;
 		
 		case EVENT_DISABLE_COUNTER_BT:
+			button_ctx.is_count_enable = false;
 			button_remove_click_callback(BUTTON_ID_PED);
 			button_remove_click_callback(BUTTON_ID_PEU);
 			button_remove_click_callback(BUTTON_ID_PPD);
@@ -232,6 +235,7 @@ static void button_app_event_handler(const event_t* event, void* user_data)
 			break;
 
 		case EVENT_ENABLE_COUNTER_BT:
+			button_ctx.is_count_enable = true;
 			button_set_click_callback(BUTTON_ID_PED, button_on_click);
 			button_set_click_callback(BUTTON_ID_PEU, button_on_click);
 			button_set_click_callback(BUTTON_ID_PPD, button_on_click);
@@ -275,6 +279,13 @@ static void button_press(uint8_t button_id)
 
 	case BUTTON_ID_PPU:
 		button_ctx.mode = BUTTON_MODE_HOLD_MASTER_COUNTER;
+		if(button_ctx.is_count_enable == false)
+		{
+			button_set_click_callback(BUTTON_ID_PED, button_on_click);
+			button_set_click_callback(BUTTON_ID_PEU, button_on_click);
+			button_set_click_callback(BUTTON_ID_PPD, button_on_click);
+			button_set_click_callback(BUTTON_ID_PPU, button_on_click);
+		}
 
 		break;
 
@@ -313,6 +324,13 @@ static void button_release(uint8_t button_id, uint32_t actual_hold_time)
 
 	case BUTTON_ID_PPU:
 		button_ctx.mode = BUTTON_MODE_NORMAL;
+		if(button_ctx.is_count_enable == false)
+		{
+			button_remove_click_callback(BUTTON_ID_PED);
+			button_remove_click_callback(BUTTON_ID_PEU);
+			button_remove_click_callback(BUTTON_ID_PPD);
+			button_remove_click_callback(BUTTON_ID_PPU);
+		}
 
 		break;
 
@@ -340,6 +358,26 @@ static void button_on_click(uint8_t button_id)
 		
 		case BUTTON_ID_CALL:
 			EVENT_PUBLISH_SIMPLE(EVENT_BUTTON_PPD_HOLD_3S, EVENT_PRIORITY_HIGH);
+			break;
+		
+		case BUTTON_ID_ENDCALL:
+			lcd_print_extern(BT_ENDCALL_ID);
+			// EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_EXTERN, EVENT_PRIORITY_HIGH);
+			break;
+
+		case BUTTON_ID_PEU:
+			lcd_print_extern(BT_PEU_ID);
+			// EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_EXTERN, EVENT_PRIORITY_HIGH);
+			break;
+
+		case BUTTON_ID_PED:
+			lcd_print_extern(BT_PED_ID);
+			// EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_EXTERN, EVENT_PRIORITY_HIGH);
+			break;
+
+		case BUTTON_ID_PPD:
+			lcd_print_extern(BT_PPD_ID);
+			// EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_EXTERN, EVENT_PRIORITY_HIGH);
 			break;
 
 		default:

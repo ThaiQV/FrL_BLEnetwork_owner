@@ -55,6 +55,8 @@ typedef enum {
 	GF_CMD_PAIRING_RESPONSE = 0x05,
 	GF_CMD_SENDMESS_REQUEST = 0x06,
 	GF_CMD_SENDMESS_RESPONSE = 0x06,
+	GF_CMD_REMOVE_REQUEST = 0x07,
+	GF_CMD_REMOVE_RESPONSE = 0x07,
 	GF_CMD_TIMESTAMP_REQUEST = 0x08,
 	GF_CMD_TIMESTAMP_RESPONSE = 0x08,
 	GF_CMD_DEBUG_RESPONSE =0x09,
@@ -118,6 +120,9 @@ void RSTPWMETER_REQUEST(u8* _pdata, RspFunc rspfnc);
 void RSTPWMETER_RESPONSE(u8* _pdata);
 void PWMETER_RUNNING_SET_REQUEST(u8* _pdata, RspFunc rspfnc);
 void PWMETER_RUNNING_SET_RESPONSE(u8* _pdata){};
+//Remove
+void REMOVE_REQ(u8* _pdata, RspFunc rspfnc);
+void REMOVE_RSP(u8* _pdata){};
 //FOTA
 void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc);
 void FOTA_RESPONSE(u8* _pdata);
@@ -130,6 +135,7 @@ fl_wifiprotocol_proc_t G_WIFI_CON[] = {
 			{ { GF_CMD_GET_LIST_REQUEST, GETLIST_REQUEST },{GF_CMD_GET_LIST_RESPONSE, GETLIST_RESPONSE } },
 			{ { GF_CMD_PAIRING_REQUEST, PAIRING_REQUEST }, {GF_CMD_PAIRING_RESPONSE, PAIRING_RESPONSE } },
 			{ { GF_CMD_SENDMESS_REQUEST, SENDMESS_REQUEST }, {GF_CMD_SENDMESS_RESPONSE, SENDMESS_RESPONSE } },
+			{ { GF_CMD_REMOVE_REQUEST, REMOVE_REQ }, {GF_CMD_REMOVE_RESPONSE, REMOVE_RSP } },
 			{ { GF_CMD_TIMESTAMP_REQUEST, TIMETAMP_REQUEST }, {GF_CMD_TIMESTAMP_RESPONSE, TIMETAMP_RESPONSE } },
 			{ { GF_CMD_RSTFACTORY_REQUEST, RSTFACTORY_REQUEST }, {GF_CMD_RSTFACTORY_RESPONSE, RSTFACTORY_RESPONSE } },
 			{ { GF_CMD_RSTPWMETER_REQUEST, RSTPWMETER_REQUEST }, {GF_CMD_RSTPWMETER_RESPONSE, RSTPWMETER_RESPONSE } },
@@ -248,7 +254,8 @@ void REPORT_RESPONSE(u8* _pdata) {
 		for (u8 var = 0; var < G_NODE_LIST.slot_inused && G_NODE_LIST.slot_inused != 0xFF; ++var) {
 //			LOGA(MCU,"Devtype:%d\r\n",G_NODE_LIST.sla_info[var].dev_type);
 			//addnew: only send offline nodes bcs the online nodes has automatically sent yet
-			if (G_NODE_LIST.sla_info[var].active == false) {
+			if (G_NODE_LIST.sla_info[var].active == false && G_NODE_LIST.sla_info[var].dev_type != 0xFF
+					&& !IS_MAC_INVALID(G_NODE_LIST.sla_info[var].mac,0)&& !IS_MAC_INVALID(G_NODE_LIST.sla_info[var].mac,0xFF)) {
 //				P_INFO_HEX(G_NODE_LIST.sla_info[var].mac,6,"[%d]Mac:",G_NODE_LIST.sla_info[var].slaveID);
 				_getnsend_data_report(var,G_WIFI_CON[_wf_CMD_find(data->cmd)].rsp.cmd);
 			}
@@ -267,7 +274,7 @@ void REPORT_RESPONSE(u8* _pdata) {
 		if (slave_idx != 0xFF)
 		{
 			if(-1==fl_api_master_req(report_fmt.frame.mac,NWK_HDR_A5_HIS,report_fmt.bytes,SIZEU8(report_fmt.bytes),0,0,0)){
-				ERR(MCU,"REQ API !!!!\r\n");
+				ERR(MCU,"REQ API <HISTORY> !!!!\r\n");
 			}
 		}
 	}
@@ -296,8 +303,21 @@ void GETLIST_RESPONSE(u8* _pdata) {
 	//memset(payload,0xFF,SIZEU8(payload));
 //	fl_nwk_master_StatusNodesRefesh();
 	u8 payload_len = 0;
+	u8 numofslave = 0;
 	for (u8 var = 0; var < G_NODE_LIST.slot_inused && G_NODE_LIST.slot_inused != 0xFF; ++var) {
-		wfdata.data[payload_len] = G_NODE_LIST.slot_inused ;
+		if (G_NODE_LIST.sla_info[var].dev_type != 0xFF
+				&& !IS_MAC_INVALID(G_NODE_LIST.sla_info[var].mac,0)&& !IS_MAC_INVALID(G_NODE_LIST.sla_info[var].mac,0xFF)) {
+			numofslave++;
+		}else{
+//			G_NODE_LIST.sla_info[var].dev_type = 0xFF;
+		}
+	}
+
+	for (u8 var = 0; var < G_NODE_LIST.slot_inused && G_NODE_LIST.slot_inused != 0xFF; ++var) {
+		if(G_NODE_LIST.sla_info[var].dev_type == 0xFF || IS_MAC_INVALID(G_NODE_LIST.sla_info[var].mac,0) || IS_MAC_INVALID(G_NODE_LIST.sla_info[var].mac,0xFF)){
+			continue;
+		}
+		wfdata.data[payload_len] = numofslave;
 		memcpy(&wfdata.data[++payload_len],G_NODE_LIST.sla_info[var].mac,SIZEU8(G_NODE_LIST.sla_info[var].mac));
 		payload_len+=SIZEU8(G_NODE_LIST.sla_info[var].mac);
 		wfdata.data[payload_len] =  G_NODE_LIST.sla_info[var].dev_type;
@@ -313,6 +333,8 @@ void GETLIST_RESPONSE(u8* _pdata) {
 		//memset(payload,0xFF,SIZEU8(payload));
 		payload_len = 0;
 	}
+//	extern void CMD_GETSLALIST(u8* _data);
+//	CMD_GETSLALIST(0);
 	return;
 }
 void PAIRING_REQUEST(u8* _pdata, RspFunc rspfnc) {
@@ -433,6 +455,77 @@ void SENDMESS_REQUEST(u8* _pdata, RspFunc rspfnc){
 }
 
 void SENDMESS_RESPONSE(u8* _pdata){
+}
+
+void _REMOVE_slave_rsp_callback(void *_data, void* _data2) {
+	fl_rsp_container_t *data = (fl_rsp_container_t*) _data;
+//	u8 status = 0;
+	//rsp data
+	if (data->timeout > 0) {
+		LOGA(API,"RTT:%d ms\r\n",(data->timeout_set - data->timeout) / 1000);
+		fl_pack_t *packet = (fl_pack_t *) _data2;
+		P_PRINTFHEX_A(API,packet->data_arr,packet->length,"RSP: ");
+//		status= 1;
+	} else {
+		LOGA(API,"RTT: TIMEOUT (%d ms)\r\n",(data->timeout_set) / 1000);
+//		status=0;
+	}
+	LOGA(API,"cmdID  :%02X\r\n",data->rsp_check.hdr_cmdid);
+	LOGA(API,"SlaveID:%d\r\n",data->rsp_check.slaveID);
+	LOGA(API,"SeqTT  :%lld\r\n",data->rsp_check.seqTimetamp);
+//	//Rsp to WIFI
+//	u8 mac[6];
+//	if (fl_master_SlaveMAC_get(data->rsp_check.slaveID,mac) != -1)
+//	{
+//		fl_datawifi2ble_t wfdata;
+//		wfdata.cmd = GF_CMD_REMOVE_RESPONSE;
+//		memset(wfdata.data,0,SIZEU8(wfdata.data));
+//		memcpy(wfdata.data,mac,SIZEU8(mac));
+//		wfdata.len_data = SIZEU8(mac);
+//		wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
+//		u8 payload_len = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
+//		fl_ble_send_wifi((u8*) &wfdata,payload_len);
+//		//Remove device from db
+//		fl_master_nodelist_member_remove(mac);
+//	}
+}
+void REMOVE_REQ(u8* _pdata, RspFunc rspfnc) {
+	extern u8* 	blc_ll_get_macAddrPublic(void);
+	fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[1];
+	LOGA(MCU,"LEN:0x%02X\r\n",data->len_data);
+	LOGA(MCU,"cmdID:0x%02X\r\n",data->cmd);
+	LOGA(MCU,"CRC8:0x%02X\r\n",data->crc8);
+	P_PRINTFHEX_A(MCU,data->data,data->len_data,"Data:");
+	u8 crc8_cal = fl_crc8(data->data,data->len_data);
+	if (crc8_cal != data->crc8) {
+		ERR(MCU,"ERR >> CRC8:0x%02X | 0x%02X\r\n",data->crc8,crc8_cal);
+		return;
+	}
+	if(-1==fl_master_Node_find(data->data)){
+		return;
+	}
+	u8 mac_n_macparent[6+6];
+	memcpy(mac_n_macparent,blc_ll_get_macAddrPublic(),6);//gw_mac
+	memcpy(&mac_n_macparent[6],data->data,6);//node mac
+	fl_api_master_req(data->data,NWK_HDR_REMOVE,mac_n_macparent,SIZEU8(mac_n_macparent),0/*_REMOVE_slave_rsp_callback*/,0,1);
+	if (rspfnc != 0) {
+		//Rsp to WIFI
+		u8 mac[6];
+		memcpy(mac,data->data,6);
+		//if (fl_master_SlaveMAC_get(data->rsp_check.slaveID,mac) != -1)
+		{
+			fl_datawifi2ble_t wfdata;
+			wfdata.cmd = GF_CMD_REMOVE_RESPONSE;
+			memset(wfdata.data,0,SIZEU8(wfdata.data));
+			memcpy(wfdata.data,mac,SIZEU8(mac));
+			wfdata.len_data = SIZEU8(mac);
+			wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
+			u8 payload_len = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
+			fl_ble_send_wifi((u8*) &wfdata,payload_len);
+			//Remove device from db
+			fl_master_nodelist_member_remove(mac);
+		}
+	}
 }
 
 void _PING_slave_rsp_callback(void *_data, void* _data2) {
@@ -578,6 +671,10 @@ void RSTFACTORY_RESPONSE(u8* _pdata){}
 /******************************************************************************/
 u8 data_fw[22];
 fl_ble2wif_fota_info_t FOTA_INFO;
+
+u8 Is_FOTA_RUNNING(void){
+	return FOTA_INFO.begin;
+}
 void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 	extern fl_slaves_list_t G_NODE_LIST;
 	fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[1];
@@ -695,14 +792,14 @@ void fl_ble_wifi_proc(u8* _pdata) {
 //	}
 	u8 wifi_cmd_buffer[SIZEU8(fl_datawifi2ble_t)];
 	u8 len_cmd = _pdata[0]+1;
-	//P_INFO_HEX(_pdata,len_cmd,"WIFI(len:%d)->",len_cmd);
+//	P_PRINTFHEX_A(DRV,_pdata,len_cmd,"WIFI(len:%d)->",len_cmd);
 	s8 indx_start = plog_IndexOf(_pdata,BLE_WIFI_HDR,SIZEU8(BLE_WIFI_HDR),len_cmd);
 	while (indx_start > 0 && indx_start < len_cmd) {
 		memset(wifi_cmd_buffer,0,SIZEU8(wifi_cmd_buffer));
 		memcpy(&wifi_cmd_buffer[1],&_pdata[indx_start + SIZEU8(BLE_WIFI_HDR)],_pdata[indx_start + SIZEU8(BLE_WIFI_HDR)]+3);
 		wifi_cmd_buffer[0]=len_cmd;
 		//fl_datawifi2ble_t data ;//= (fl_datawifi2ble_t*) &wifi_cmd_buffer[indx_start + SIZEU8(BLE_WIFI_HDR)];
-		P_PRINTFHEX_A(MCU,wifi_cmd_buffer,wifi_cmd_buffer[1]+3,"WIFI(idx:%d)->",indx_start);
+		P_PRINTFHEX_A(DRV,wifi_cmd_buffer,wifi_cmd_buffer[1]+3,"WIFI(idx:%d)->",indx_start);
 		for (u8 i = 0; i < GWIFI_SIZE; i++) {
 			if (wifi_cmd_buffer[2] == G_WIFI_CON[i].req.cmd) {
 				G_WIFI_CON[i].req.ReqFunc(wifi_cmd_buffer,G_WIFI_CON[i].rsp.Rspfnc);

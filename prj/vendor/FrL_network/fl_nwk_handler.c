@@ -11,12 +11,23 @@
 #include "tl_common.h"
 #include "fl_nwk_handler.h"
 #include "fl_nwk_protocol.h"
+#include "fl_adv_proc.h"
+//#include "fl_nwk_database.h"
 
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
 /******************************************************************************/
 /******************************************************************************/
+
+fl_node_data_t G_NODELIST_TABLE[MAX_NODES];
+#define NODELIST_TABLE_SIZE  (sizeof(G_NODELIST_TABLE)/sizeof(G_NODELIST_TABLE[0]))
+
+fl_pack_t g_nodelist_array[NODELIST_SENDING_SIZE];
+fl_data_container_t NODELIST_TABLE_SENDING =
+		{ .data = g_nodelist_array, .head_index = 0, .tail_index = 0, .mask = NODELIST_SENDING_SIZE - 1, .count = 0 };
+
+
 volatile fl_timetamp_withstep_t WIFI_ORIGINAL_GETALL;
 
 void fl_queue_REQnRSP_TimeoutInit(void);
@@ -206,6 +217,10 @@ void fl_queue_REQnRSP_TimeoutInit(void) {
 		blt_soft_timer_add(&fl_queue_REQnRSP_TimeoutStart,QUEUQ_REQcRSP_INTERVAL);
 		fl_queueREQcRSP_clear(G_QUEUE_REQ_CALL_RSP);
 	}
+#ifndef MASTER_CORE
+	//clear buffer nodelist table
+	G_NODELIST_TABLE_Clear();
+#endif
 }
 /***************************************************
  * @brief 		:scan pack rec from master
@@ -295,8 +310,9 @@ s8 fl_queue_REQcRSP_ScanRec(fl_pack_t _pack,void *_id)
 /******************************************************************************/
 /******************************************************************************/
 fl_hdr_nwk_type_e G_NWK_HDR[] = {
-		NWK_HDR_MASTER_CMD,NWK_HDR_FOTA,NWK_HDR_A5_HIS, NWK_HDR_F6_SENDMESS, NWK_HDR_F7_RSTPWMETER,
-		NWK_HDR_F8_PWMETER_SET, NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,
+		NWK_HDR_NODETALBE_UPDATE,
+		NWK_HDR_REMOVE,NWK_HDR_MASTER_CMD,NWK_HDR_FOTA,NWK_HDR_A5_HIS, NWK_HDR_F6_SENDMESS,
+		NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET, NWK_HDR_F5_INFO, NWK_HDR_COLLECT, NWK_HDR_HEARTBEAT,
 		NWK_HDR_ASSIGN, NWK_HDR_55, NWK_HDR_11_REACTIVE, NWK_HDR_22_PING };// register cmdid RSP
 #define NWK_HDR_SIZE (sizeof(G_NWK_HDR)/sizeof(G_NWK_HDR[0]))
 /******************************************************************************/
@@ -320,7 +336,150 @@ static inline u8 IsNWKHDR(fl_hdr_nwk_type_e cmdid) {
 /******************************************************************************/
 /******************************************************************************/
 
+s8 fl_nwk_MemberInNodeTable_find(u8* _mac){
+	for (u8 var = 0; var < NODELIST_TABLE_SIZE; ++var) {
+		if(0 == memcmp(_mac,G_NODELIST_TABLE[var].mac,SIZEU8(G_NODELIST_TABLE[var].mac))){
+			return G_NODELIST_TABLE[var].slaveid;
+		}
+	}
+	return -1;
+}
+/*
+ * Update NODELIST TABLE
+ * */
 
+s16 FL_NWK_NODELIST_TABLE_IsReady(void){
+	return NODELIST_TABLE_SENDING.count;
+}
+#ifdef MASTER_CORE
+#define FIELD_SIZE 7
+#define TOTAL_SIZE 28
+#define NUM_FIELDS (TOTAL_SIZE / FIELD_SIZE)
+void _swap_blocks(u8 *arr, int a, int b) {
+    for (int i = 0; i < FIELD_SIZE; i++) {
+        int tmp = arr[a * FIELD_SIZE + i];
+        arr[a * FIELD_SIZE + i] = arr[b * FIELD_SIZE + i];
+        arr[b * FIELD_SIZE + i] = tmp;
+    }
+}
+void shuffle_fields_inplace(u8 *arr) {
+    for (int i = NUM_FIELDS - 1; i > 0; i--) {
+        int j = rand() % (i + 1);
+        if (i != j) {
+           _swap_blocks(arr, i, j);
+        }
+    }
+}
+
+void fl_nwk_generate_table_pack(void) {
+	fl_pack_t pack;
+	u8 payload_create[28]; // full size adv can be sent
+	memset(payload_create,0xFF,SIZEU8(payload_create));
+	u8 ptr = 0;
+	if(FL_NWK_NODELIST_TABLE_IsReady()>0) return;
+
+	FL_QUEUE_CLEAR(&NODELIST_TABLE_SENDING,NODELIST_TABLE_SENDING.mask+1);
+	for (u8 var = 0; var < NODELIST_TABLE_SIZE; ++var) {
+		if (G_NODELIST_TABLE[var].slaveid != 0xFF) {
+			payload_create[ptr] = G_NODELIST_TABLE[var].slaveid;
+			memcpy(&payload_create[++ptr],G_NODELIST_TABLE[var].mac,SIZEU8(G_NODELIST_TABLE[var].mac));
+			ptr +=SIZEU8(G_NODELIST_TABLE[var].mac);
+			if (ptr >= SIZEU8(payload_create)) {
+				//shuffer data
+				shuffle_fields_inplace(payload_create);
+				//P_INFO_HEX(payload_create,SIZEU8(payload_create),"PACK NODELIST(%d/%d):",var,NODELIST_TABLE_SIZE);
+				pack = fl_master_packet_nodelist_table_build(payload_create,SIZEU8(payload_create));
+				FL_QUEUE_ADD(&NODELIST_TABLE_SENDING,&pack);
+				memset(payload_create,0xFF,SIZEU8(payload_create));
+				ptr=0;
+			}
+			//else ptr += 1; //
+		}
+	}
+	//Last pack
+	if(ptr>0){
+		shuffle_fields_inplace(payload_create);
+		//P_INFO_HEX(payload_create,SIZEU8(payload_create),"PACK NODELIST(LSB):");
+		pack = fl_master_packet_nodelist_table_build(payload_create,SIZEU8(payload_create));
+		FL_QUEUE_ADD(&NODELIST_TABLE_SENDING,&pack);
+	}
+}
+#else
+bool FL_NODELIST_TABLE_Updated(void) {
+	if (IsJoinedNetwork()) {
+		for (u8 var = 0; var < sizeof(G_NODELIST_TABLE) / sizeof(G_NODELIST_TABLE[0]); ++var) {
+			if (G_NODELIST_TABLE[var].slaveid != 0xFF && !IS_MAC_INVALID(G_NODELIST_TABLE[var].mac,0xFF)
+					&& G_NODELIST_TABLE[var].slaveid == fl_nwk_mySlaveID()) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+void G_NODELIST_TABLE_Clear(void){
+	for (u8 var = 0; var < sizeof(G_NODELIST_TABLE)/sizeof(G_NODELIST_TABLE[0]); ++var) {
+		G_NODELIST_TABLE[var].slaveid=0xFF;
+		memset(G_NODELIST_TABLE[var].mac,0xFF,SIZEU8(G_NODELIST_TABLE[var].mac));
+	}
+}
+void _nodelist_table_printf(void) {
+	static u32 crc32 = 0;
+	u32 crc32_cur = fl_db_crc32((u8*) G_NODELIST_TABLE,NODELIST_TABLE_SIZE * sizeof(fl_node_data_t));
+	if (crc32_cur != crc32) {
+		for (u8 var = 0; var < NODELIST_TABLE_SIZE; var++) {
+			if (G_NODELIST_TABLE[var].slaveid != 0xFF && !IS_MAC_INVALID(G_NODELIST_TABLE[var].mac,0xFF)) {
+				P_INFO("[%3d]0x%02X%02X%02X%02X%02X%02X\r\n",G_NODELIST_TABLE[var].slaveid,G_NODELIST_TABLE[var].mac[0],G_NODELIST_TABLE[var].mac[1],
+						G_NODELIST_TABLE[var].mac[2],G_NODELIST_TABLE[var].mac[3],G_NODELIST_TABLE[var].mac[4],G_NODELIST_TABLE[var].mac[5]);
+			}
+		}
+		crc32 = crc32_cur;
+	}
+}
+void fl_nwk_slave_nodelist_repeat(fl_pack_t *_pack) {
+//	P_INFO("PACK NODELIST:%d\r\n",FL_NWK_NODELIST_TABLE_IsReady());
+	if (FL_QUEUE_FIND(&NODELIST_TABLE_SENDING,_pack,_pack->length - 2) == -1)
+	{
+		_pack->length=_pack->length-1;
+		FL_QUEUE_ADD(&NODELIST_TABLE_SENDING,_pack);
+	}
+	//Update my table
+	u8 table_arr[28];
+	memcpy(table_arr,&_pack->data_arr[1],SIZEU8(table_arr));
+	for (u8 var = 0; var < SIZEU8(table_arr); var=var+7) {
+		if(table_arr[var] != 0xFF){
+			G_NODELIST_TABLE[table_arr[var]].slaveid  = table_arr[var];
+			memcpy(G_NODELIST_TABLE[table_arr[var]].mac,&table_arr[var + 1],6);
+		}
+		//Check myID match myMAC
+		if(table_arr[var] == fl_nwk_mySlaveID()){
+			//Match SlaveID but incorrect mac => has been removed yet
+			if(memcmp(G_NODELIST_TABLE[table_arr[var]].mac,fl_nwk_mySlaveMac(),SIZEU8(G_NODELIST_TABLE[table_arr[var]].mac))){
+				ERR(APP,"Removed.....!!!\r\n");
+				Counter_LCD_RemoveDisplay();
+				fl_nwk_slave_nwkRemove();
+				blt_soft_timer_add(REBOOT_DEV,NWK_LEAVE_TIME_DISPLAY);
+//				fl_nwk_slave_nwkclear();
+//				G_NODELIST_TABLE_Clear();
+			}
+		}
+	}
+	_nodelist_table_printf();
+}
+#endif
+void fl_nwk_nodelist_table_run(void) {
+	extern void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms);
+	extern fl_adv_settings_t G_ADV_SETTINGS ;
+	fl_pack_t pack_in_queue;
+	extern volatile u8 F_SENDING_STATE;
+	if (!F_SENDING_STATE) {
+//		P_INFO("PACK NODELIST:%d\r\n",FL_NWK_NODELIST_TABLE_IsReady());
+		if (FL_QUEUE_GET(&NODELIST_TABLE_SENDING,&pack_in_queue) != -1) {
+			P_PRINTFHEX_A(BLE,pack_in_queue.data_arr,pack_in_queue.length,"PACK NODELIST(%d):",FL_NWK_NODELIST_TABLE_IsReady());
+//			P_INFO_HEX(pack_in_queue.data_arr,pack_in_queue.length,"PACK NODELIST(%d):",pack_in_queue.length);
+			fl_adv_send(pack_in_queue.data_arr,pack_in_queue.length,G_ADV_SETTINGS.adv_duration);
+		}
+	}
+}
 
 /******************************************************************************/
 /******************************************************************************/

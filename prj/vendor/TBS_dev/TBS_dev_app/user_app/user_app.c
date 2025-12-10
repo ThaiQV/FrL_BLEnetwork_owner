@@ -34,6 +34,7 @@ extern subapp_t led_app;
 extern subapp_t lcd_app;
 extern subapp_t button_app;
 extern subapp_t data_storage_app;
+extern char print_extern[BT_MAX_ID * 2][32];
 
 const char mess[10][24] = {
     "0 chao buoi sang",
@@ -235,7 +236,13 @@ static subapp_result_t data_app_init(subapp_t* self)
 		snprintf(name, sizeof(name), "app_data_evt_table[%d]", i);
 		event_bus_subscribe(app_data_evt_table[i], data_app_event_handler, NULL, name);
 	}
-	
+
+//	ct_add_bt_print("row0 BT_ENDCALL_ID",0 ,BT_ENDCALL_ID);
+//	ct_add_bt_print("row1 BT_ENDCALL_ID",1 ,BT_ENDCALL_ID);
+	// ct_add_bt_print("bt BT_PED_ID", 0, BT_PED_ID);
+	// ct_add_bt_print("bt BT_PEU_ID", 0, BT_PEU_ID);
+	// ct_add_bt_print("bt BT_PPD_ID", 0, BT_PPD_ID);
+
 	return SUBAPP_OK;
 }
 
@@ -480,6 +487,20 @@ static void data_app_event_handler(const event_t* event, void* user_data)
             break;
     }
 
+}
+
+void ct_remove_nwwk(void)
+{
+	EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_REMOVE_GW, EVENT_PRIORITY_HIGH);
+	g_app_data.is_call = false;
+	u8 tbs_profile[1] = {0} ;
+	fl_db_tbsprofile_save(tbs_profile,SIZEU8(tbs_profile));
+}
+
+void ct_add_bt_print(char * mess,uint8_t row, e_bt_id_t bt_id)
+{
+	memset(print_extern[bt_id * 2 + row],0,SIZEU8(print_extern[bt_id * 2 + row]));
+	memcpy(print_extern[bt_id * 2 + row], mess, strlen(mess));
 }
 
 static void read_count(void)

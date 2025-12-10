@@ -33,6 +33,7 @@ typedef enum {
 	LCD_PRINT_CALL_FAIL,
 	LCD_PRINT_MESS_NEW,
 	LCD_PRINT_REMOVE_GW,
+	LCD_PRINT_EXTERN,
 } lcd_print_type_t;
 
 // SubApp context structure
@@ -53,6 +54,7 @@ typedef struct {
 // Static context instance
 static lcd_context_t lcd_ctx = {0};
 static uint8_t mess_zero[22] = {0};
+char print_extern[BT_MAX_ID * 2][32] = {'\0'};
 // Forward declarations
 static subapp_result_t lcd_app_init(subapp_t* self);
 static subapp_result_t lcd_app_loop(subapp_t* self);
@@ -229,11 +231,9 @@ void my_timeout_callback(uint8_t row) {
 
 		case LCD_PRINT_REMOVE_GW:
 			lcd_ctx.print_type = LCD_PRINT_OFF;
-			lcd_app_clear_all(&app_handle);
-			lcd_off();
 			
-			sys_reboot();
-			break;
+			// sys_reboot();
+			continue;
 
 		case LCD_PRINT_CALL_FAIL:
 			lcd_ctx.print_type = LCD_PRINT_OFF;
@@ -253,6 +253,10 @@ void my_timeout_callback(uint8_t row) {
 			}
 			EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_MESS_NEW, EVENT_PRIORITY_HIGH);
 			return;
+
+		case LCD_PRINT_EXTERN:
+			lcd_ctx.print_type = LCD_PRINT_OFF;
+			continue;
 
 		default:
 			lcd_ctx.print_mode = 0;
@@ -296,6 +300,18 @@ void lcd_off(void)
 	gpio_set_level(GPIO_PC0, 0);
 }
 
+void lcd_print_extern(uint8_t bt_id)
+{
+	if(print_extern[bt_id][0] == '\0')
+	{
+		return;
+	}
+
+	lcd_ctx.enable = 1;
+	lcd_ctx.print_type = LCD_PRINT_EXTERN;
+	lcd_app_set_message(&app_handle, 0, print_extern[bt_id * 2], 30000); //  0, timeout 10s
+	lcd_app_set_message(&app_handle, 1, print_extern[bt_id * 2 + 1], 15000); //  0, timeout 10s	
+}
 
 static subapp_result_t lcd_app_init(subapp_t* self)
 {
@@ -556,7 +572,7 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 
 			lcd_ctx.enable = 1;
 			lcd_ctx.print_type = LCD_PRINT_REMOVE_GW;
-			lcd_app_set_message(&app_handle, 0, " Remove From GW ", 30000); //  0, timeout 10s
+			lcd_app_set_message(&app_handle, 0, "Leave network...", 30000); //  0, timeout 10s
 			lcd_app_set_message(&app_handle, 1, "                ", 3000); //  0, timeout 10s		
 
 			break;
@@ -627,6 +643,11 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 				lcd_ctx.row0_mess_num = lcd_ctx.row1_mess_num;
 			}
 			
+			break;
+
+		case EVENT_LCD_PRINT_EXTERN:
+			ULOGA("Handler EVENT_LCD_PRINT_EXTERN\n");
+
 			break;
 
         default:

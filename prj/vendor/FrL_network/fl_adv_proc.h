@@ -17,6 +17,7 @@
 #define PACK_HANDLE_SIZE 				64 // bcs : slave need to rec its req and repeater of the neighbors
 
 /* SENDING QUEUE */
+#define NODELIST_SENDING_SIZE			64 // min_size = max_node /4
 #ifdef MASTER_CORE
 #define FOTA_SIZE 						16
 #else

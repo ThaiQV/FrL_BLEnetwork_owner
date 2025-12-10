@@ -99,6 +99,7 @@ typedef enum {
     EVENT_LCD_PRINT_CALL__,
     EVENT_LCD_PRINT_MESS_NEW,
     EVENT_LCD_PRINT_REMOVE_GW,
+    EVENT_LCD_PRINT_EXTERN,
 
 	//OUTPUT EVENT
 	/***************************************/

@@ -27,7 +27,7 @@
 #define DFU_OTA_CRC128_GET(...) 		(0)
 #define DFU_OTA_CRC128_CAL 				(0)
 #define DFU_OTA_FW_PUT(...)     		(0)
-#define DFU_OTA_VERISON_SET				(0)
+#define DFU_OTA_VERISON_SET(...)		((void)0)
 #define DFU_OTA_VERISON_GET(...)		(0)
 #endif
 

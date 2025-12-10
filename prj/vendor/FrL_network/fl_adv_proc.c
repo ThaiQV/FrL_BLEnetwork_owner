@@ -66,7 +66,7 @@ fl_pack_t g_history_sending_array[QUEUE_HISTORY_SENDING_SIZE];
 fl_data_container_t G_QUEUE_HISTORY_SENDING = { .data = g_history_sending_array, .head_index = 0, .tail_index = 0, .mask = QUEUE_HISTORY_SENDING_SIZE - 1, .count = 0 };
 /*-----------------------------------------------------------*/
 
-fl_hdr_nwk_type_e FL_NWK_HDR[]={NWK_HDR_MASTER_CMD,NWK_HDR_FOTA,NWK_HDR_11_REACTIVE,NWK_HDR_22_PING,NWK_HDR_A5_HIS,NWK_HDR_55,NWK_HDR_F5_INFO,NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_ASSIGN,NWK_HDR_HEARTBEAT,NWK_HDR_COLLECT};
+fl_hdr_nwk_type_e FL_NWK_HDR[]={NWK_HDR_NODETALBE_UPDATE,NWK_HDR_REMOVE,NWK_HDR_MASTER_CMD,NWK_HDR_FOTA,NWK_HDR_11_REACTIVE,NWK_HDR_22_PING,NWK_HDR_A5_HIS,NWK_HDR_55,NWK_HDR_F5_INFO,NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_ASSIGN,NWK_HDR_HEARTBEAT,NWK_HDR_COLLECT};
 #define FL_NWK_HDR_SIZE	(sizeof(FL_NWK_HDR)/sizeof(FL_NWK_HDR[0]))
 
 /******************************************************************************/
@@ -124,11 +124,17 @@ static bool fl_nwk_decrypt16(unsigned char * key,u8* _data,u8 _size, u8* decrypt
 	fl_data_frame_u packet_frame;
 	memcpy(packet_frame.bytes,decrypted,SIZEU8(packet_frame.bytes));
 	u8 pack_crc = fl_crc8(packet_frame.frame.payload,SIZEU8(packet_frame.frame.payload));
-	u32 timetamp_hdr = MAKE_U32(packet_frame.frame.timetamp[3],packet_frame.frame.timetamp[2],packet_frame.frame.timetamp[1],packet_frame.frame.timetamp[0]);
+//	u32 timetamp_hdr = MAKE_U32(packet_frame.frame.timetamp[3],packet_frame.frame.timetamp[2],packet_frame.frame.timetamp[1],packet_frame.frame.timetamp[0]);
 //	if(timetamp_hdr<ORIGINAL_TIME_TRUST){
 //		ERR(BLE,"Decrypt(hdr:0x%02X):%d|%d\r\n",packet_frame.frame.hdr,timetamp_hdr,ORIGINAL_TIME_TRUST);
 //	}
-	return (timetamp_hdr>=ORIGINAL_TIME_TRUST && IsNWKHDR(decrypted[0])!=0xFF && pack_crc == packet_frame.frame.crc8);
+	//timetamp_hdr>=ORIGINAL_TIME_TRUST &&
+	//DEBUG
+//	if(decrypted[0]==NWK_HDR_NODETALBE_UPDATE){
+//		P_INFO_HEX(decrypted,_size,"MISS(%d):",_size);
+//		ERR(BLE,"Crc:%02X|Cal_Crc:%02X\r\n", packet_frame.frame.crc8,pack_crc );
+//	}
+	return (IsNWKHDR(decrypted[0])!=0xFF && pack_crc == packet_frame.frame.crc8);
 #undef BLOCK_SIZE
 }
 /***************************************************
@@ -140,7 +146,16 @@ static bool fl_nwk_decrypt16(unsigned char * key,u8* _data,u8 _size, u8* decrypt
  * @return	  	:none
  *
  ***************************************************/
-static inline void NWK_MYKEY(void){
+static inline void NWK_MYKEY(u8 _hdr){
+	//IMPORTANT PACKET HDR
+	u8 COMMOM_HDR[2] ={NWK_HDR_ASSIGN,NWK_HDR_COLLECT};
+	bool hdr_common_check = false;
+	for(u8 indx_hdr = 0;indx_hdr<(sizeof(COMMOM_HDR)/sizeof(COMMOM_HDR[0]));indx_hdr++){
+		if(_hdr==COMMOM_HDR[indx_hdr]){
+			hdr_common_check=true;
+			break;
+		}
+	}
 	const unsigned char KEY_NULL[4] = { 0xFF, 0xFF, 0xFF, 0xFF };
 	u8 key_buffer[NWK_PRIVATE_KEY_SIZE];
 #ifdef MASTER_CORE
@@ -150,7 +165,8 @@ static inline void NWK_MYKEY(void){
 	extern fl_nodeinnetwork_t G_INFORMATION ;
 	memcpy(key_buffer,G_INFORMATION.profile.nwk.private_key,NWK_PRIVATE_KEY_SIZE);
 #endif
-	if (memcmp(key_buffer,KEY_NULL,SIZEU8(KEY_NULL)) == 0 || *FL_NWK_COLLECTION_MODE == 1) {
+	//Generate key
+	if ((memcmp(key_buffer,KEY_NULL,SIZEU8(KEY_NULL)) == 0 || *FL_NWK_COLLECTION_MODE == 1) || hdr_common_check == true) {
 		memcpy(FL_NWK_USE_KEY,FL_NWK_PB_KEY,SIZEU8(FL_NWK_PB_KEY));
 	} else {
 		//build
@@ -163,6 +179,18 @@ static inline void NWK_MYKEY(void){
 /***                            Functions callback                           **/
 /******************************************************************************/
 /******************************************************************************/
+//TESET BLOCK  MAC-MASTER_BLOCK_MAC_SLAVE
+#ifdef MASTER_BLOCK_MAC_SLAVE
+u8 blacklist_mac[2][6]={
+//		{0xe2,0xdb,0x21,0x77,0x5f,0xd8},
+//		{0x7e,0x8a,0xf2,0x77,0x5f,0xd8},
+//		{0x97,0xe4,0xa7,0x77,0x5f,0xd8}
+		{0xAF,0x19,0xB9,0x77,0x5F,0xD8},
+		{0xFA,0x59,0x77,0x77,0x5F,0xD8}
+		};
+#define SIZE_BLACKLIST (sizeof(blacklist_mac) / sizeof(blacklist_mac[0]))
+#endif
+/*------------------*/
 static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 
 	if (h & HCI_FLAG_EVENT_BT_STD)		//ble controller hci event
@@ -210,14 +238,42 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 				/*For TESTING REPEATER*/
 				if (-1 != plog_IndexOf(pa->mac,master_mac,4,6)) {
 					return 0;
+				}else{
+//					P_INFO_HEX(pa->mac,6,   "MAC   :");
+//					P_INFO_HEX(master_mac,4,"MASTER:");
+
 				}
 #endif
 #endif
+				//TEST BLOCK BLACKLIST
+#ifdef MASTER_BLOCK_MAC_SLAVE
+				for (u8 var = 0; var < SIZE_BLACKLIST; ++var) {
+					if(memcmp(pa->mac,blacklist_mac[var],6)==0){
+						return 0;
+					}
+				}
+#endif
+
 				//Add decrypt
-				NWK_MYKEY();
+				NWK_MYKEY(0xFF); //=>decrypt
 				if(!fl_nwk_decrypt16(FL_NWK_USE_KEY,pa->data,incomming_data.length,incomming_data.data_arr)){
 //					ERR(APP,"ERR Decrypt !!!!\r\n");
 					return 0;
+				}
+//				u8 mac_child[6] = { 0x7E, 0x8A, 0xF2, 0x77, 0x5F, 0xD8 };
+//				if (-1 != plog_IndexOf(pa->mac,mac_child,4,6) ) {
+//					P_INFO_HEX(incomming_data.data_arr,incomming_data.length,"MISS:");
+//				}
+				//Scan mac in nodetable when transaction mode, skip when in collection mode
+#ifndef MASTER_CORE
+				if(-1 == plog_IndexOf(pa->mac,master_mac,SIZEU8(master_mac),6) && FL_NODELIST_TABLE_Updated())
+#endif
+				{
+					if (*FL_NWK_COLLECTION_MODE == 0) {
+						if (fl_nwk_MemberInNodeTable_find(pa->mac) == -1) {
+							return 0;				//skip process
+						}
+					}
 				}
 #ifdef MASTER_CORE
 				//skip process from  master and check rspECHO
@@ -234,6 +290,12 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 				if (!fl_nwk_slave_checkHDR(incomming_data.data_arr[0])) {
 					return 0;
 				}
+				//Repeat Nodelist table
+				if(incomming_data.data_arr[0] == NWK_HDR_NODETALBE_UPDATE && incomming_data.length > 20){
+					fl_nwk_slave_nodelist_repeat(&incomming_data);
+					return 0;
+				}
+
 				//Store FOTA pack
 				if (incomming_data.data_arr[0] == NWK_HDR_FOTA && incomming_data.length > 20) {
 					//incomming packet is echo pack
@@ -252,7 +314,9 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 					} else {
 //						LOGA(APP,"QUEUE ADD (len:%d|RSSI:%d): (%d)%d-%d\r\n",pa->len,rssi,G_DATA_CONTAINER.count,G_DATA_CONTAINER.head_index,
 //								G_DATA_CONTAINER.tail_index);
-						P_PRINTFHEX_A(BLE,incomming_data.data_arr,incomming_data.length,"%s(%d):","PACK",incomming_data.length);
+						P_PRINTFHEX_A(BLE,incomming_data.data_arr,incomming_data.length,
+								"[0x%02X%02X%02X%02X%02X%02X]PACK(%d):",pa->mac[0],pa->mac[1],pa->mac[2],pa->mac[3],
+								pa->mac[4],pa->mac[5],incomming_data.length);
 					}
 				} else {
 //					ERR(BLE,"Err <QUEUE ALREADY>!!\r\n");
@@ -493,7 +557,7 @@ u8 fl_adv_sendFIFO_run(void) {
 			if (check_heartbeat.frame.hdr == NWK_HDR_HEARTBEAT) {
 //				fl_nwk_slave_SYNC_ORIGIN_MASTER(timetamp_inpack.timetamp,timetamp_inpack.milstep);
 //				ERR(INF,"ORIGINAL MASTER-TIME:%d\r\n",ORIGINAL_MASTER_TIME.milstep);
-				if (inused_slot == 1 && (FL_NWK_HISTORY_IsReady() > 0 || FL_NWK_FOTA_IsReady() > 0)) { // only have HB packet=> send it one times
+				if (inused_slot == 1 && (FL_NWK_HISTORY_IsReady() > 0 || FL_NWK_FOTA_IsReady() > 0 || FL_NWK_NODELIST_TABLE_IsReady()>0)) { // only have HB packet=> send it one times
 				//CLEAR
 					G_QUEUE_SENDING.data[indx_head_cur].length = 0;
 				}
@@ -510,8 +574,8 @@ u8 fl_adv_sendFIFO_run(void) {
 				//TODO: IMPORTANT SYNCHRONIZATION TIMESTAMP
 				fl_master_SYNC_ORIGINAL_TIMETAMP(timetamp_inpack);
 				// CLEAR HB => only send 1 times IF have a new FW need to update for slaves
-				if (inused_slot == 1 && FL_NWK_FOTA_IsReady() > 0) {
-					LOGA(INF_FILE,"FOTA Ready:%d\r\n",FL_NWK_FOTA_IsReady());
+				if (inused_slot == 1 && (FL_NWK_FOTA_IsReady() > 0 || FL_NWK_NODELIST_TABLE_IsReady()>0)) {
+					LOGA(INF_FILE,"EX_QUEUEs Ready:%d/%d\r\n",FL_NWK_FOTA_IsReady(),FL_NWK_NODELIST_TABLE_IsReady());
 					G_QUEUE_SENDING.data[indx_head_cur].length = 0;
 				}
 			}
@@ -531,8 +595,8 @@ u8 fl_adv_sendFIFO_run(void) {
 void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms) {
 //	while (blc_ll_getCurrentState() == BLS_LINK_STATE_SCAN && blc_ll_getCurrentState() == BLS_LINK_STATE_ADV) {
 //	};
-	if (_size >= 5)
-	{
+	if (_size >= 5) {
+		if (_size > 31) _size = 31;
 		bls_ll_setAdvEnable(BLC_ADV_DISABLE);
 		rf_set_power_level_index(MY_RF_POWER_INDEX);
 		u8 mac[6];
@@ -547,7 +611,7 @@ void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms) {
 		/*Encryt data*/
 		u8 encrypted[_size];
 		memset(encrypted,0,SIZEU8(encrypted));
-		NWK_MYKEY();
+		NWK_MYKEY(_data[0]);
 		fl_nwk_encrypt16(FL_NWK_USE_KEY,_data,_size,encrypted);
 		/*todo: IMPORTANT FOR CLEAR ALL NETWORK*/
 		extern u8 MASTER_CLEARNETWORK[18];
@@ -579,6 +643,8 @@ void fl_adv_send(u8* _data, u8 _size, u16 _timeout_ms) {
  ***************************************************/
 void fl_adv_init(void) {
 	fl_db_init();
+	//	//fota init
+	fl_wifi2ble_fota_init();
 #ifdef MASTER_CORE
 	extern fl_master_config_t G_MASTER_INFO;
 //	fl_input_external_init();
@@ -613,8 +679,7 @@ void fl_adv_init(void) {
 	fl_adv_scanner_init();
 	//Init protocol network layer
 	fl_nwk_protocol_InitnRun();
-//	//fota init
-	fl_wifi2ble_fota_init();
+
 }
 /***************************************************
  * @brief 		:init collection channel (0,1,2)
@@ -788,6 +853,7 @@ void fl_adv_run(void) {
 		fl_dataframe_format_t data_parsed;
 		if (fl_packet_parse(data_in_queue,&data_parsed)) {
 #ifdef MASTER_CORE
+			//scan slaveid avaible
 			fl_nwk_master_run(&data_in_queue); //process reponse from the slaves
 #else //SLAVE
 			//Todo: Repeat process
@@ -828,7 +894,9 @@ void fl_adv_run(void) {
 #endif
 	/* SEND ADV */
 	if(fl_adv_sendFIFO_run()==0){
+		fl_nwk_nodelist_table_run();
 #ifdef MASTER_CORE
+
 		fl_wifi2ble_fota_run();
 #else
 		fl_adv_sendFIFO_History_run();

@@ -44,6 +44,14 @@ typedef struct {
 	app_mode_t mode;
 }app_data_t;
 
+typedef enum{
+    BT_ENDCALL_ID = 0,
+    BT_PEU_ID,
+    BT_PED_ID,
+    BT_PPD_ID,
+    BT_MAX_ID,
+} e_bt_id_t;
+
 typedef struct {
 	uint32_t (*timetamp)(void);
     uint16_t (* pass_product)(void);
@@ -57,6 +65,8 @@ typedef struct {
 void user_app_init(void);
 void user_app_loop(void);
 void user_app_run(void);
+void ct_remove_nwwk(void);
+void ct_add_bt_print(char * mess,uint8_t row, e_bt_id_t bt_id);
 
 #define get_data_event()   {\
     EVENT_BUTTON_NONE,\
