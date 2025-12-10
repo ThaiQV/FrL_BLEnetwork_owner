@@ -302,7 +302,7 @@ void lcd_off(void)
 
 void lcd_print_extern(uint8_t bt_id)
 {
-	if(print_extern[bt_id][0] == '\0')
+	if(print_extern[bt_id * 2][0] == '\0' && print_extern[bt_id * 2 + 1][0] == '\0')
 	{
 		return;
 	}
