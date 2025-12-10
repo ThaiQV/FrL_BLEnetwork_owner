@@ -333,8 +333,8 @@ void GETLIST_RESPONSE(u8* _pdata) {
 		//memset(payload,0xFF,SIZEU8(payload));
 		payload_len = 0;
 	}
-	extern void CMD_GETSLALIST(u8* _data);
-	CMD_GETSLALIST(0);
+//	extern void CMD_GETSLALIST(u8* _data);
+//	CMD_GETSLALIST(0);
 	return;
 }
 void PAIRING_REQUEST(u8* _pdata, RspFunc rspfnc) {

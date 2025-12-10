@@ -261,6 +261,10 @@ void fl_nwk_slave_displayLCD_Refesh(void){
 	memset((u8*) mess_c2,0,SIZEU8(mess_c2));
 	sprintf(mess_c2,"Chn:%d,%d,%d",G_INFORMATION.profile.nwk.chn[0],G_INFORMATION.profile.nwk.chn[1],G_INFORMATION.profile.nwk.chn[2]);
 	Counter_LCD_PED_Display(0,mess_c2);
+	memset((u8*) mess_c2,0,SIZEU8(mess_c2));
+	sprintf(mess_c2,"Key:***%02X%02X%02X%02X",G_INFORMATION.profile.nwk.private_key[12],G_INFORMATION.profile.nwk.private_key[11],
+			G_INFORMATION.profile.nwk.private_key[10],G_INFORMATION.profile.nwk.private_key[9]);
+	Counter_LCD_PED_Display(1,mess_c2);
 #endif
 }
 #endif
