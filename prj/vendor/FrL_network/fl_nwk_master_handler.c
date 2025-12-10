@@ -36,10 +36,12 @@ extern _attribute_data_retention_ volatile fl_timetamp_withstep_t ORIGINAL_MASTE
 /******************************************************************************/
 /******************************************************************************/
 #define TIME_COLLECT_NODE				5*1000 //
-#define MAX_NODES_SETTING				12
+
 #define PACK_HANDLE_MASTER_SIZE 		64
 fl_pack_t g_handle_master_array[PACK_HANDLE_MASTER_SIZE];
 fl_data_container_t G_HANDLE_MASTER_CONTAINER = {.data = g_handle_master_array, .head_index = 0, .tail_index = 0, .mask = PACK_HANDLE_MASTER_SIZE - 1, .count = 0 };
+
+u8 MAX_NODES_SETTING = 100;
 
 extern fl_node_data_t G_NODELIST_TABLE[MAX_NODES];
 fl_slaves_list_t G_NODE_LIST = { .slot_inused = 0xFF };
@@ -123,6 +125,8 @@ u8 fl_master_nodelist_isFull(void){
 void fl_master_nodelist_AddRefesh(fl_nodeinnetwork_t _node) {
 	u8 slot_ins = 0xFF;
 	G_NODE_LIST.slot_inused = 0;
+	//MAX_NODES -> used to define buffer size
+	//MAX_NODE_SETTINGs -> used to setup max slave can be joined network
 	for (u8 var = 0; var < MAX_NODES; ++var) {
 		if (IS_MAC_INVALID(G_NODE_LIST.sla_info[var].mac,0xFF) != 1) {
 			if (slot_ins == 0xFF && IS_MAC_INVALID(G_NODE_LIST.sla_info[var].mac,0) && G_NODE_LIST.sla_info[var].dev_type == 0xFF) {
@@ -131,7 +135,8 @@ void fl_master_nodelist_AddRefesh(fl_nodeinnetwork_t _node) {
 				G_NODE_LIST.slot_inused = var + 1;
 			}
 		} else {
-			if (slot_ins == 0xFF)
+			//if (slot_ins == 0xFF) => insert to removing slot
+			if (var < MAX_NODES_SETTING) //=> insert to last slot of the table
 				slot_ins = var;
 			//debug
 			u8 inused = 0xFF; //Empty

@@ -274,7 +274,7 @@ void REPORT_RESPONSE(u8* _pdata) {
 		if (slave_idx != 0xFF)
 		{
 			if(-1==fl_api_master_req(report_fmt.frame.mac,NWK_HDR_A5_HIS,report_fmt.bytes,SIZEU8(report_fmt.bytes),0,0,0)){
-				ERR(MCU,"REQ API !!!!\r\n");
+				ERR(MCU,"REQ API <HISTORY> !!!!\r\n");
 			}
 		}
 	}
@@ -305,15 +305,16 @@ void GETLIST_RESPONSE(u8* _pdata) {
 	u8 payload_len = 0;
 	u8 numofslave = 0;
 	for (u8 var = 0; var < G_NODE_LIST.slot_inused && G_NODE_LIST.slot_inused != 0xFF; ++var) {
-		if (G_NODE_LIST.sla_info[var].dev_type != 0xFF && !IS_MAC_INVALID(G_NODE_LIST.sla_info[var].mac,0)&& !IS_MAC_INVALID(G_NODE_LIST.sla_info[var].mac,0xFF)) {
+		if (G_NODE_LIST.sla_info[var].dev_type != 0xFF
+				&& !IS_MAC_INVALID(G_NODE_LIST.sla_info[var].mac,0)&& !IS_MAC_INVALID(G_NODE_LIST.sla_info[var].mac,0xFF)) {
 			numofslave++;
 		}else{
-			G_NODE_LIST.sla_info[var].dev_type = 0xFF;
+//			G_NODE_LIST.sla_info[var].dev_type = 0xFF;
 		}
 	}
 
 	for (u8 var = 0; var < G_NODE_LIST.slot_inused && G_NODE_LIST.slot_inused != 0xFF; ++var) {
-		if(G_NODE_LIST.sla_info[var].dev_type == 0xFF ){
+		if(G_NODE_LIST.sla_info[var].dev_type == 0xFF || IS_MAC_INVALID(G_NODE_LIST.sla_info[var].mac,0) || IS_MAC_INVALID(G_NODE_LIST.sla_info[var].mac,0xFF)){
 			continue;
 		}
 		wfdata.data[payload_len] = numofslave;
@@ -332,6 +333,8 @@ void GETLIST_RESPONSE(u8* _pdata) {
 		//memset(payload,0xFF,SIZEU8(payload));
 		payload_len = 0;
 	}
+	extern void CMD_GETSLALIST(u8* _data);
+	CMD_GETSLALIST(0);
 	return;
 }
 void PAIRING_REQUEST(u8* _pdata, RspFunc rspfnc) {
@@ -470,21 +473,21 @@ void _REMOVE_slave_rsp_callback(void *_data, void* _data2) {
 	LOGA(API,"cmdID  :%02X\r\n",data->rsp_check.hdr_cmdid);
 	LOGA(API,"SlaveID:%d\r\n",data->rsp_check.slaveID);
 	LOGA(API,"SeqTT  :%lld\r\n",data->rsp_check.seqTimetamp);
-	//Rsp to WIFI
-	u8 mac[6];
-	if (fl_master_SlaveMAC_get(data->rsp_check.slaveID,mac) != -1)
-	{
-		fl_datawifi2ble_t wfdata;
-		wfdata.cmd = GF_CMD_REMOVE_RESPONSE;
-		memset(wfdata.data,0,SIZEU8(wfdata.data));
-		memcpy(wfdata.data,mac,SIZEU8(mac));
-		wfdata.len_data = SIZEU8(mac);
-		wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
-		u8 payload_len = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
-		fl_ble_send_wifi((u8*) &wfdata,payload_len);
-		//Remove device from db
-		fl_master_nodelist_member_remove(mac);
-	}
+//	//Rsp to WIFI
+//	u8 mac[6];
+//	if (fl_master_SlaveMAC_get(data->rsp_check.slaveID,mac) != -1)
+//	{
+//		fl_datawifi2ble_t wfdata;
+//		wfdata.cmd = GF_CMD_REMOVE_RESPONSE;
+//		memset(wfdata.data,0,SIZEU8(wfdata.data));
+//		memcpy(wfdata.data,mac,SIZEU8(mac));
+//		wfdata.len_data = SIZEU8(mac);
+//		wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
+//		u8 payload_len = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
+//		fl_ble_send_wifi((u8*) &wfdata,payload_len);
+//		//Remove device from db
+//		fl_master_nodelist_member_remove(mac);
+//	}
 }
 void REMOVE_REQ(u8* _pdata, RspFunc rspfnc) {
 	extern u8* 	blc_ll_get_macAddrPublic(void);
@@ -498,12 +501,30 @@ void REMOVE_REQ(u8* _pdata, RspFunc rspfnc) {
 		ERR(MCU,"ERR >> CRC8:0x%02X | 0x%02X\r\n",data->crc8,crc8_cal);
 		return;
 	}
+	if(-1==fl_master_Node_find(data->data)){
+		return;
+	}
 	u8 mac_n_macparent[6+6];
 	memcpy(mac_n_macparent,blc_ll_get_macAddrPublic(),6);//gw_mac
 	memcpy(&mac_n_macparent[6],data->data,6);//node mac
-	fl_api_master_req(data->data,NWK_HDR_REMOVE,mac_n_macparent,SIZEU8(mac_n_macparent),_REMOVE_slave_rsp_callback,0,1);
+	fl_api_master_req(data->data,NWK_HDR_REMOVE,mac_n_macparent,SIZEU8(mac_n_macparent),0/*_REMOVE_slave_rsp_callback*/,0,1);
 	if (rspfnc != 0) {
-		//don't reponse in here => wait slave rsp or timeout
+		//Rsp to WIFI
+		u8 mac[6];
+		memcpy(mac,data->data,6);
+		//if (fl_master_SlaveMAC_get(data->rsp_check.slaveID,mac) != -1)
+		{
+			fl_datawifi2ble_t wfdata;
+			wfdata.cmd = GF_CMD_REMOVE_RESPONSE;
+			memset(wfdata.data,0,SIZEU8(wfdata.data));
+			memcpy(wfdata.data,mac,SIZEU8(mac));
+			wfdata.len_data = SIZEU8(mac);
+			wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
+			u8 payload_len = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
+			fl_ble_send_wifi((u8*) &wfdata,payload_len);
+			//Remove device from db
+			fl_master_nodelist_member_remove(mac);
+		}
 	}
 }
 

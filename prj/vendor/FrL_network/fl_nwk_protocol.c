@@ -418,6 +418,7 @@ void CMD_TEST(u8* _data) {
 	u8 slave_event[5] = {'e','v','e','n','t'};
 	u8 fota_test[4] = {'f','o','t','a'};
 	u8 fota_interval_set[12] = {'f','o','t','a','i','n','t','e','r','v','a','l'};
+	u8 max_node_test[8] = {'n','o','d','e','s','i','z','e'};
 
 	char cmd[10];
 	int para[3];
@@ -451,6 +452,18 @@ void CMD_TEST(u8* _data) {
 					P_INFO("%s\r\n",mqtt_rp);
 					TEST_virtual_fw(para[0]);
 				}
+			}
+		}
+		//MAXNODE SIZE => config size of nodelist table
+		if (plog_IndexOf((u8*) cmd,max_node_test,SIZEU8(max_node_test),SIZEU8(cmd)) != -1) {
+			if (rslt == 2) {
+				extern u8 MAX_NODES_SETTING;
+				if (para[0] > 100)
+					MAX_NODES_SETTING = 100;
+				MAX_NODES_SETTING = para[0];
+				sprintf((char*) mqtt_rp,"Set MAX_NODEs:%d",MAX_NODES_SETTING);
+				fl_ble2wifi_DEBUG2MQTT(mqtt_rp,strlen((char*) mqtt_rp));
+				P_INFO("%s\r\n",mqtt_rp);
 			}
 		}
 	}
