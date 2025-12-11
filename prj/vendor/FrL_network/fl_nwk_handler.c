@@ -393,7 +393,6 @@ void fl_nwk_generate_table_pack(void) {
 				memset(payload_create,0xFF,SIZEU8(payload_create));
 				ptr=0;
 			}
-			//else ptr += 1; //
 		}
 	}
 	//Last pack
