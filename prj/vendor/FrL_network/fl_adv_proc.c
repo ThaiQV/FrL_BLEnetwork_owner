@@ -156,7 +156,7 @@ static inline void NWK_MYKEY(u8 _hdr){
 			break;
 		}
 	}
-	const unsigned char KEY_NULL[4] = { 0xFF, 0xFF, 0xFF, 0xFF };
+//	const unsigned char KEY_NULL[4] = { 0xFF, 0xFF, 0xFF, 0xFF };
 	u8 key_buffer[NWK_PRIVATE_KEY_SIZE];
 #ifdef MASTER_CORE
 	extern fl_master_config_t G_MASTER_INFO;
@@ -166,7 +166,7 @@ static inline void NWK_MYKEY(u8 _hdr){
 	memcpy(key_buffer,G_INFORMATION.profile.nwk.private_key,NWK_PRIVATE_KEY_SIZE);
 #endif
 	//Generate key
-	if ((memcmp(key_buffer,KEY_NULL,SIZEU8(KEY_NULL)) == 0 || *FL_NWK_COLLECTION_MODE == 1) || hdr_common_check == true) {
+	if (/*memcmp(key_buffer,KEY_NULL,SIZEU8(KEY_NULL)) == 0 || */*FL_NWK_COLLECTION_MODE == 1 || hdr_common_check == true) {
 		memcpy(FL_NWK_USE_KEY,FL_NWK_PB_KEY,SIZEU8(FL_NWK_PB_KEY));
 	} else {
 		//build

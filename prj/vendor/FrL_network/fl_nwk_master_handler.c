@@ -1006,6 +1006,10 @@ int fl_master_ProccesRSP_cbk(void) {
 				if (IS_MAC_INVALID(mac,0) || IS_MAC_INVALID(mac,0xFF)) {
 					return -1;
 				}
+				//Confirm myMac
+				if(-1 == plog_IndexOf(packet.frame.payload,blc_ll_get_macAddrPublic(),4,SIZEU8(packet.frame.payload))){
+					return -1;
+				}
 				s16 node_indx = fl_master_Node_find(mac);
 				//Full and node is a new => skip
 				if(node_indx == -1 && fl_master_nodelist_isFull()){

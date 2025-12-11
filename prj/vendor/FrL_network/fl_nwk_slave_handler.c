@@ -812,12 +812,17 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 			if (IsJoinedNetwork() == 0) {
 				if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
 					//get master's mac
+					u8 mac_parent[4];
+					memcpy(mac_parent,packet.frame.payload,SIZEU8(mac_parent));
 					G_INFORMATION.profile.nwk.mac_parent = MAKE_U32(packet.frame.payload[3],packet.frame.payload[2],packet.frame.payload[1],packet.frame.payload[0]);
 					//Process rsp
 					memcpy(G_INFORMATION.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_INFORMATION.mac));
+
 					memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
 					memcpy(packet.frame.payload,G_INFORMATION.mac,SIZEU8(G_INFORMATION.mac));
 					packet.frame.payload[SIZEU8(G_INFORMATION.mac)] = G_INFORMATION.dev_type;
+					//Add MAC PARENT to confirm
+					memcpy(&packet.frame.payload[SIZEU8(G_INFORMATION.mac)+1],mac_parent,SIZEU8(mac_parent));
 					//change endpoint to node source
 					packet.frame.endpoint.master = FL_FROM_SLAVE;
 					//add repeat_cnt
