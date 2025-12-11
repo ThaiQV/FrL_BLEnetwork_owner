@@ -228,10 +228,14 @@ int fl_nwk_slave_nwkRemove(void){
 	fl_slave_profiles_t my_profile =fl_db_slaveprofile_init();
 	G_INFORMATION.slaveID = my_profile.slaveid;
 	G_INFORMATION.profile = my_profile;
+#ifdef HW_SAMPLE_TEST
+	G_INFORMATION.profile.run_stt.join_nwk =1;
+#else
 	G_INFORMATION.profile.run_stt.join_nwk =0;
+#endif
 	fl_db_slaveprofile_save(G_INFORMATION.profile);
 //	REBOOT_DEV();
-//	blt_soft_timer_restart(_interval_report,100*100);
+	blt_soft_timer_restart(_interval_report,100*100);
 	return -1;
 }
 #ifdef COUNTER_DEVICE
@@ -809,6 +813,15 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 		case NWK_HDR_COLLECT: {
 //			_nwk_slave_syncFromPack(&packet.frame);
 			fl_nwk_LedSignal_run();
+			/***/
+			u32 master_timetamp = MAKE_U32(packet.frame.timetamp[3],packet.frame.timetamp[2],packet.frame.timetamp[1],packet.frame.timetamp[0]);
+			SYNC_ORIGIN_MASTER(master_timetamp,packet.frame.milltamp);
+			fl_rtc_sync(master_timetamp);
+			//Synchronize debug log
+			NWK_DEBUG_STT = packet.frame.endpoint.dbg;
+			DEBUG_TURN(NWK_DEBUG_STT);
+			/**/
+			//LOGA(INF,"ORIGINAL MASTER-TIME:%d\r\n",ORIGINAL_MASTER_TIME.milstep);
 			if (IsJoinedNetwork() == 0) {
 				if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
 					//get master's mac

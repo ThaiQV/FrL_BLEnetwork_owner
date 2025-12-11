@@ -304,6 +304,10 @@ void GETLIST_RESPONSE(u8* _pdata) {
 //	fl_nwk_master_StatusNodesRefesh();
 	u8 payload_len = 0;
 	u8 numofslave = 0;
+	fl_nodeinnetwork_t _node;
+	MAC_ZERO_CLEAR(_node.mac,0);
+	fl_master_nodelist_AddRefesh(_node);
+
 	for (u8 var = 0; var < G_NODE_LIST.slot_inused && G_NODE_LIST.slot_inused != 0xFF; ++var) {
 		if (G_NODE_LIST.sla_info[var].dev_type != 0xFF
 				&& !IS_MAC_INVALID(G_NODE_LIST.sla_info[var].mac,0)&& !IS_MAC_INVALID(G_NODE_LIST.sla_info[var].mac,0xFF)) {
