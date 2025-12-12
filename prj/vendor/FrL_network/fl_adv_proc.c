@@ -869,7 +869,7 @@ void fl_adv_run(void) {
 			//process multiple packet on the circle
 			if (G_DATA_CONTAINER.count > 0) {
 				multiple_pack++;
-				if (multiple_pack < 5) {
+				if (multiple_pack < 8) {
 					continue;
 				}
 				else{

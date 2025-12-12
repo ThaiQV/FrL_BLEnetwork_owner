@@ -116,7 +116,8 @@ tbs_device_powermeter_t G_POWER_METER = {
 
 #define G_TBS_DEVICE		G_POWER_METER
 //use to store setting parameter
-u16 G_POWER_METER_PARAMETER[3];
+u16 G_POWER_METER_PARAMETER[4];
+#define PW_SAMPLE_PERIOD			G_POWER_METER_PARAMETER[3]
 
 void test_powermeter(void) {
 	u8 buffer[POWER_METER_BITSIZE];
@@ -269,6 +270,42 @@ void TBS_Counter_Run(void){
 }
 #endif
 #ifdef POWER_METER_DEVICE
+
+
+void TBS_PowerMeter_TimerIRQ_handler(void){
+	gpio_toggle(GPIO_PA6);
+	gpio_toggle(GPIO_PA5);
+	if(timer_get_irq_status(TMR_STA_TMR0)){
+		timer_clr_irq_status(TMR_STA_TMR0);
+		timer_set_cap_tick(TIMER0, timer0_get_tick() + PW_SAMPLE_PERIOD*SYSTEM_TIMER_TICK_1MS);
+	}
+}
+
+void TBS_PowerMeter_TimerIRQ_Init(u8 _period_ms) {
+	if (PW_SAMPLE_PERIOD!= _period_ms) {
+		PW_SAMPLE_PERIOD=_period_ms;
+		P_INFO("Re-SamplePeriod:%d ms\r\n",PW_SAMPLE_PERIOD);
+	}
+	timer_set_mode(TIMER0,TIMER_MODE_SYSCLK);
+	timer_set_init_tick(TIMER0,clock_time());
+	P_INFO("TIMER INIT (%d)\r\n",timer0_get_tick());
+	timer_set_cap_tick(TIMER0, timer0_get_tick() + PW_SAMPLE_PERIOD*SYSTEM_TIMER_TICK_1MS);
+	plic_set_priority(IRQ4_TIMER0, IRQ_PRI_LEV3);
+	plic_interrupt_enable(IRQ4_TIMER0);
+	timer_start(TIMER0);
+	core_interrupt_enable();
+//tesst
+	gpio_function_en(GPIO_PA6);
+	gpio_set_output(GPIO_PA6,1);	//enable output
+	gpio_set_input(GPIO_PA6,0);		//disable input
+	gpio_set_level(GPIO_PA6,1);
+
+	gpio_function_en(GPIO_PA5);
+	gpio_set_output(GPIO_PA5,1);	//enable output
+	gpio_set_input(GPIO_PA5,0);		//disable input
+	gpio_set_level(GPIO_PA5,1);
+}
+
 void TBS_PowerMeter_init(void){
 	//init db settings
 	fl_db_slavesettings_init();
@@ -279,13 +316,14 @@ void TBS_PowerMeter_init(void){
 	G_POWER_METER_PARAMETER[1] = MAKE_U16(settings[3],settings[2]);
 	G_POWER_METER_PARAMETER[2] = MAKE_U16(settings[5],settings[4]);
 
-	LOGA(PERI,"Threshold channel:%d-%d-%d\r\n",G_POWER_METER_PARAMETER[0],	G_POWER_METER_PARAMETER[1],	G_POWER_METER_PARAMETER[2]);
-
+	P_INFO("Threshold channel:%d-%d-%d\r\n",G_POWER_METER_PARAMETER[0],	G_POWER_METER_PARAMETER[1],	G_POWER_METER_PARAMETER[2]);
+	P_INFO("SamplePeriod:%d ms\r\n",PW_SAMPLE_PERIOD);
 //	memcpy(G_POWER_METER.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_POWER_METER.mac));
 	G_POWER_METER.type = TBS_POWERMETER;
 	G_POWER_METER.timetamp= fl_rtc_get();
 	test_powermeter();
 	//todo:Init Butt,lcd,7segs,.....
+	TBS_PowerMeter_TimerIRQ_Init(15);
 }
 void TBS_PowerMeter_Run(void){
 	G_POWER_METER.timetamp = fl_rtc_get();
