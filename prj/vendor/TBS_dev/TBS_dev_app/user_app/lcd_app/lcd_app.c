@@ -309,7 +309,7 @@ void lcd_print_extern(uint8_t bt_id)
 
 	lcd_ctx.enable = 1;
 	lcd_ctx.print_type = LCD_PRINT_EXTERN;
-	lcd_app_set_message(&app_handle, 0, print_extern[bt_id * 2], 30000); //  0, timeout 10s
+	lcd_app_set_message(&app_handle, 0, print_extern[bt_id * 2], 15000); //  0, timeout 10s
 	lcd_app_set_message(&app_handle, 1, print_extern[bt_id * 2 + 1], 15000); //  0, timeout 10s	
 }
 
