@@ -60,7 +60,7 @@ static subapp_result_t lcd_app_init(subapp_t* self);
 static subapp_result_t lcd_app_loop(subapp_t* self);
 static subapp_result_t lcd_app_deinit(subapp_t* self);
 static void lcd_app_event_handler(const event_t* event, void* user_data);
-static void LCD_MessageCheck_FlagNew(void);
+static uint8_t LCD_MessageCheck_FlagNew(void);
 static uint8_t find_next_mess(uint8_t index);
 
 subapp_t lcd_app = {
@@ -240,20 +240,15 @@ void my_timeout_callback(uint8_t row) {
 			continue;
 
 		case LCD_PRINT_MESS_NEW:
-			if (get_data.is_call())
+			lcd_ctx.print_type = LCD_PRINT_OFF;
+			lcd_ctx.print_mode = 0;
+			if(LCD_MessageCheck_FlagNew() != COUNTER_LCD_MESS_MAX)
 			{
-				lcd_ctx.print_type = LCD_PRINT_OFF;
-				continue;
+				return;
 			}
-			if(get_system_time_ms() > lcd_ctx.time_off)
-			{
-				lcd_ctx.print_type = LCD_PRINT_OFF;
-				lcd_ctx.print_mode = 0;
-				continue;
-			}
-			EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_MESS_NEW, EVENT_PRIORITY_HIGH);
-			return;
 
+			continue;
+			
 		case LCD_PRINT_EXTERN:
 			lcd_ctx.print_type = LCD_PRINT_OFF;
 			continue;
@@ -632,16 +627,6 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
 			lcd_ctx.print_type = LCD_PRINT_MESS_NEW;
 			lcd_app_set_message(&app_handle, 0, (char *)G_COUNTER_LCD[lcd_ctx.row0_mess_num], 15000);
 			lcd_app_clear_row(&app_handle, 1);
-			lcd_ctx.row1_mess_num = find_next_mess(lcd_ctx.row0_mess_num);
-
-			if (lcd_ctx.row0_mess_num >= lcd_ctx.row1_mess_num)
-			{
-				lcd_ctx.print_mode = 0;
-			}
-			else
-			{
-				lcd_ctx.row0_mess_num = lcd_ctx.row1_mess_num;
-			}
 			
 			break;
 
@@ -656,7 +641,27 @@ static void lcd_app_event_handler(const event_t* event, void* user_data)
     }
 }
 
-static void LCD_MessageCheck_FlagNew(void){
+static uint8_t LCD_MessageCheck_FlagNew(void){
+	static uint8_t index = COUNTER_LCD_MESS_MAX;
+	if(index != COUNTER_LCD_MESS_MAX && lcd_ctx.print_type == LCD_PRINT_MESS_NEW)
+	{
+		tbs_counter_lcd_t *mess_lcd = (tbs_counter_lcd_t *)&G_COUNTER_LCD[index][0];
+		if(mess_lcd->f_new == 1)
+		{
+			if(memcmp(mess_zero, (uint8_t *)G_COUNTER_LCD[index], 20) != 0)
+			{
+				lcd_ctx.row0_mess_num = index;
+				lcd_ctx.print_type = LCD_PRINT_MESS_NEW;
+				ULOGA("lcd_ctx.row0_mess_num %d\n", lcd_ctx.row1_mess_num);
+				lcd_ctx.time_off = get_system_time_ms() + LCD_TIME_DELAY_PRINT;
+				EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_MESS_NEW, EVENT_PRIORITY_HIGH);
+				mess_lcd->f_new = 0;
+			}
+			
+		}
+		return index;
+	}
+
 	for (u8 var = 0; var < COUNTER_LCD_MESS_MAX; ++var) 
 	{
 		tbs_counter_lcd_t *mess_lcd = (tbs_counter_lcd_t *)&G_COUNTER_LCD[var][0];
@@ -665,15 +670,19 @@ static void LCD_MessageCheck_FlagNew(void){
 			if(memcmp(mess_zero, (uint8_t *)G_COUNTER_LCD[var], 20) != 0)
 			{
 				lcd_ctx.row0_mess_num = var;
+				lcd_ctx.print_type = LCD_PRINT_MESS_NEW;
 				ULOGA("lcd_ctx.row0_mess_num %d\n", lcd_ctx.row1_mess_num);
 				lcd_ctx.time_off = get_system_time_ms() + LCD_TIME_DELAY_PRINT;
 				EVENT_PUBLISH_SIMPLE(EVENT_LCD_PRINT_MESS_NEW, EVENT_PRIORITY_HIGH);
 				mess_lcd->f_new = 0;
-				lcd_ctx.print_mode = 2;
+				index = var;
+				return index;
 			}
 			
 		}
 	}
+	index = COUNTER_LCD_MESS_MAX;
+	return 	index;
 }
 
 static uint8_t find_next_mess(uint8_t index)
