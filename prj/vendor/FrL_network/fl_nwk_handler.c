@@ -377,7 +377,7 @@ void fl_nwk_generate_table_pack(void) {
 	u8 payload_create[28]; // full size adv can be sent
 	memset(payload_create,0xFF,SIZEU8(payload_create));
 	u8 ptr = 0;
-	if(FL_NWK_NODELIST_TABLE_IsReady()>0) return;
+	if(FL_NWK_NODELIST_TABLE_IsReady() > 0 || FL_NWK_FOTA_IsReady() > 0) return;
 
 	FL_QUEUE_CLEAR(&NODELIST_TABLE_SENDING,NODELIST_TABLE_SENDING.mask+1);
 	for (u8 var = 0; var < NODELIST_TABLE_SIZE; ++var) {

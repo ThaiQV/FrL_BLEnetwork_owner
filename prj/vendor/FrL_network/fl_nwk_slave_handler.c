@@ -308,7 +308,7 @@ void fl_nwk_slave_init(void) {
 
 	memcpy(G_INFORMATION.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_INFORMATION.mac));
 	memcpy(&G_INFORMATION.data[0],G_INFORMATION.mac,6);
-	P_INFO("** Freelux network SLAVE init \r\n");
+	P_INFO("** Freelux network SLAVE Init \r\n");
 	P_INFO("** MAC     :%02X%02X%02X%02X%02X%02X\r\n",G_INFORMATION.mac[0],G_INFORMATION.mac[1],G_INFORMATION.mac[2],
 			G_INFORMATION.mac[3],G_INFORMATION.mac[4],G_INFORMATION.mac[5]);
 	P_INFO("** DevType:%d\r\n",G_INFORMATION.dev_type);

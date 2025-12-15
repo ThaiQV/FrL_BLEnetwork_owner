@@ -132,9 +132,11 @@ void uart1_irq_handler(void) {
 	uart1_recieve_irq();
 }
 _attribute_ram_code_
-void timer0_irq_handler(void){
+void timer0_irq_handler(void) {
 #ifndef MASTER_CORE
+#ifndef COUNTER_DEVICE
 	TBS_PowerMeter_TimerIRQ_handler();
+#endif
 #endif
 }
 
@@ -157,7 +159,6 @@ void uart0_irq_handler(void) {
 _attribute_ram_code_
 void stimer_irq_handler(void) {
 	DBG_CHN15_HIGH;
-	gpio_toggle(GPIO_PA5);
 	irq_blt_sdk_handler();
 	DBG_CHN15_LOW;
 }
@@ -185,7 +186,7 @@ void proto_task( void *pvParameters );
  * @return      none
  */
 fl_version_t _bootloader = { 1, 0, 3};
-fl_version_t _fw = { 1, 4,60 };
+fl_version_t _fw = { 1, 4,62 };
 fl_version_t _hw = { 1, 0, 0 };
 
 _attribute_ram_code_ int main(void)   //must on ramcode

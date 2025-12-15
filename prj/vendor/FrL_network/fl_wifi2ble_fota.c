@@ -277,11 +277,11 @@ void fl_wifi2ble_fota_init(void){
 	DFU_OTA_INIT();
 	//change version
 
-	DFU_OTA_VERISON_SET(60);
+	DFU_OTA_VERISON_SET(62);
 
 #ifdef MASTER_CORE
 	//set interval
-	fl_wifi2ble_Fota_Interval_set(60);
+	fl_wifi2ble_Fota_Interval_set(150);
 #endif
 }
 

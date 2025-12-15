@@ -272,12 +272,14 @@ void TBS_Counter_Run(void){
 #ifdef POWER_METER_DEVICE
 
 
-void TBS_PowerMeter_TimerIRQ_handler(void){
+void TBS_PowerMeter_TimerIRQ_handler(void) {
+	//todo
 	gpio_toggle(GPIO_PA6);
 	gpio_toggle(GPIO_PA5);
-	if(timer_get_irq_status(TMR_STA_TMR0)){
+	/*Clear......**/
+	if (timer_get_irq_status(TMR_STA_TMR0)) {
 		timer_clr_irq_status(TMR_STA_TMR0);
-		timer_set_cap_tick(TIMER0, timer0_get_tick() + PW_SAMPLE_PERIOD*SYSTEM_TIMER_TICK_1MS);
+		timer_set_cap_tick(TIMER0,timer0_get_tick() + PW_SAMPLE_PERIOD* SYSTEM_TIMER_TICK_1MS);
 	}
 }
 
