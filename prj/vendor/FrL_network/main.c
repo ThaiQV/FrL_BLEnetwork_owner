@@ -68,7 +68,7 @@ void uart1_recieve_irq(void) {
 		fl_input_serial_rec();
 		uart_clr_irq_status(UART1, UART_CLR_RX);
 		uart_clr_irq_mask(UART1,UART_RXBUF_IRQ_STATUS);
-		FLAG_uart_dma_send = 0;
+//		FLAG_uart_dma_send = 0;
 	}
 	if (uart_get_irq_status(UART1,UART_TXDONE)) {
 		FLAG_uart_dma_send = 0;
@@ -84,6 +84,7 @@ void uart1_recieve_irq(void) {
 	if(uart_get_irq_status(UART1,UART_RX_ERR)){
 		ERR(APP,"UART FAIL !!\r\n");
 		uart_clr_irq_status(UART1,UART_CLR_RX);
+		uart_clr_tx_done(UART1);
 		FLAG_uart_dma_send = 0;
 		fl_serial_buffer_ClearAll();
 	}
@@ -186,7 +187,7 @@ void proto_task( void *pvParameters );
  * @return      none
  */
 fl_version_t _bootloader = { 1, 0, 3};
-fl_version_t _fw = { 1, 4,62 };
+fl_version_t _fw = { 1, 4,64 };
 fl_version_t _hw = { 1, 0, 0 };
 
 _attribute_ram_code_ int main(void)   //must on ramcode
@@ -208,6 +209,7 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 	DEBUG_TX_PIN_INIT()
 	;
 #endif
+
 	PLOG_DEVICE_PROFILE(_bootloader,_fw,_hw);
 #ifdef MASTER_CORE
 //	P_INFO("Startup from FOTA");

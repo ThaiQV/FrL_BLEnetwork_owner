@@ -274,8 +274,8 @@ void TBS_Counter_Run(void){
 
 void TBS_PowerMeter_TimerIRQ_handler(void) {
 	//todo
-	gpio_toggle(GPIO_PA6);
-	gpio_toggle(GPIO_PA5);
+//	gpio_toggle(GPIO_PA6);
+//	gpio_toggle(GPIO_PA5);
 	/*Clear......**/
 	if (timer_get_irq_status(TMR_STA_TMR0)) {
 		timer_clr_irq_status(TMR_STA_TMR0);
@@ -325,7 +325,7 @@ void TBS_PowerMeter_init(void){
 	G_POWER_METER.timetamp= fl_rtc_get();
 	test_powermeter();
 	//todo:Init Butt,lcd,7segs,.....
-	TBS_PowerMeter_TimerIRQ_Init(15);
+//	TBS_PowerMeter_TimerIRQ_Init(15);
 }
 void TBS_PowerMeter_Run(void){
 	G_POWER_METER.timetamp = fl_rtc_get();

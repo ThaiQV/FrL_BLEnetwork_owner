@@ -881,6 +881,9 @@ void fl_adv_run(void) {
 			P_PRINTFHEX_A(APP,data_in_queue.data_arr,data_in_queue.length,"%s(%d):","PACK",data_in_queue.length);
 		}
 	}
+
+	//CHECK
+//	gpio_set_high_level(GPIO_PA5);
 #ifdef  MASTER_CORE
 	fl_nwk_master_process();
 	fl_wifi2ble_fota_proc();
@@ -896,7 +899,6 @@ void fl_adv_run(void) {
 	if(fl_adv_sendFIFO_run()==0){
 		fl_nwk_nodelist_table_run();
 #ifdef MASTER_CORE
-
 		fl_wifi2ble_fota_run();
 #else
 		fl_adv_sendFIFO_History_run();
