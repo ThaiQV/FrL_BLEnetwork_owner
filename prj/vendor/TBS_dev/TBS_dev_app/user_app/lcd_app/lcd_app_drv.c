@@ -242,10 +242,7 @@ lcd_app_error_t lcd_app_update(lcd_app_handle_t *handle)
 
     for (uint8_t row = 0; row < LCD_APP_MAX_ROWS; row++) {
         // Check timeout first
-        result = lcd_app_check_timeout(handle, row);
-        if (result != LCD_APP_OK) {
-            return result;
-        }
+        
 
         // Update scrolling display
         if (handle->rows[row].mode == LCD_APP_MODE_SCROLL &&
@@ -261,12 +258,23 @@ lcd_app_error_t lcd_app_update(lcd_app_handle_t *handle)
                     handle->rows[row].scroll_position++;
                     if (handle->rows[row].scroll_position > handle->rows[row].message_length) {
                         handle->rows[row].scroll_position = 0;
+                        result = lcd_app_check_timeout(handle, row);
+                        if (result != LCD_APP_OK) {
+                            return result;
+                        }
                     }
                 }
             }
 
 
             
+        }
+        else
+        {
+            result = lcd_app_check_timeout(handle, row);
+            if (result != LCD_APP_OK) {
+                return result;
+            }
         }
 
         // Update display if needed
@@ -478,13 +486,13 @@ static lcd_app_error_t lcd_app_update_row_display(lcd_app_handle_t *handle, uint
         // Fill remaining space with spaces or wrap-around text
         for (uint8_t i = chars_to_copy; i < LCD_APP_MAX_DISPLAY_WIDTH; i++) {
             if (start_pos == handle->rows[row].message_length ) {
-                uint8_t wrap_idx = i - chars_to_copy;
-                if (wrap_idx < handle->rows[row].message_length) {
-                    display_buffer[i] = handle->rows[row].message[wrap_idx];
-                } else {
-                    display_buffer[i] = ' ';
-                }
-            } else {
+            //     uint8_t wrap_idx = i - chars_to_copy;
+            //     if (wrap_idx < handle->rows[row].message_length) {
+            //         display_buffer[i] = handle->rows[row].message[wrap_idx];
+            //     } else {
+            //         display_buffer[i] = ' ';
+            //     }
+            // } else {
                 display_buffer[i] = ' ';
             }
         }

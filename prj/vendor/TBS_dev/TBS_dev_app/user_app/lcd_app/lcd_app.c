@@ -283,7 +283,7 @@ lcd_app_config_t app_config = {
     .get_tick = lcd_app_get_tick,
     .default_timeout_ms = 5000,
     .default_scroll_delay_ms = 500,
-	.default_scroll_start_delay_ms = 1500,
+	.default_scroll_start_delay_ms = 2000,
 };
 
 void lcd_on(void)
@@ -326,7 +326,7 @@ static subapp_result_t lcd_app_init(subapp_t* self)
 	lcd_app_init_drv(&app_handle, &lcd_handle, &app_config);
 
 	lcd_app_set_message(&app_handle, 0, "   TBS GROUP   ", 30000); //  0, timeout 10s
-	lcd_app_set_message(&app_handle, 1, "Chung Suc Kien Tao Tuong Lai      ", 15500); //  1, timeout 15s
+	lcd_app_set_message(&app_handle, 1, "Chung Suc Kien Tao Tuong Lai", 15500); //  1, timeout 15s
 
 	uint32_t app_lcd_evt_table[] = get_lcd_event();
 
