@@ -109,6 +109,11 @@ void fl_master_nodelist_member_remove(u8* _mac) {
 		G_NODE_LIST.sla_info[indx].dev_type=0xFF;
 		G_NODE_LIST.sla_info[indx].active=false;
 		G_NODE_LIST.sla_info[indx].timelife=0;
+		//refesh DB
+		fl_nodeinnetwork_t _node;
+		MAC_ZERO_CLEAR(_node.mac,0);
+		fl_master_nodelist_AddRefesh(_node);
+		//store DB
 		fl_nwk_master_nodelist_store();
 	}
 }

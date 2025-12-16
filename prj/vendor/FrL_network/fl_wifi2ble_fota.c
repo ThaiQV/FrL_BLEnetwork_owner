@@ -160,6 +160,14 @@ s16 fl_wifi2ble_fota_fwpush(u8 *_fw, u8 _len,fl_fota_pack_type_e _pack_type) {
 	u8 broadcast_mac[6] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
 	fl_pack_t fw_pack = _fota_fw_packet_build(broadcast_mac,_fw,_len,0);
 	u16 head = G_FW_QUEUE_SENDING.head_index;
+	//add new step -> filter duplicate ble sending
+	for (u8 indx = 0; indx < G_FW_QUEUE_SENDING.mask + 1; indx++) {
+		if (plog_IndexOf(G_FW_QUEUE_SENDING.data[indx].data_arr, _fw,_len,G_FW_QUEUE_SENDING.data[indx].length)!= -1) {
+//			ERR(MCU,"FOTA Duplicate.....\r\n");
+			return -1;
+		}
+	}
+	///===end filter
 	if (G_FW_QUEUE_SENDING.count < FOTA_FW_QUEUE_SIZE) {
 		do {
 			if (G_FW_QUEUE_SENDING.data[head].length == 0) {
@@ -276,12 +284,10 @@ void fl_wifi2ble_fota_init(void){
 	fl_wifi2ble_fota_ContainerClear();
 	DFU_OTA_INIT();
 	//change version
-
-	DFU_OTA_VERISON_SET(56);
-
+	DFU_OTA_VERISON_SET(65);
 #ifdef MASTER_CORE
 	//set interval
-	fl_wifi2ble_Fota_Interval_set(60);
+	fl_wifi2ble_Fota_Interval_set(100);
 #endif
 }
 
@@ -295,7 +301,7 @@ s16 fl_wifi2ble_fota_recECHO(fl_pack_t _pack_rec,u8* _mac_incom){
 //		P_INFO_HEX(_pack_rec.data_arr,SIZEU8(_pack_rec.data_arr),"ECHO:");
 		for (s16 head = 0; head < G_FW_QUEUE_SENDING.mask + 1; head++) {
 			if (G_FW_QUEUE_SENDING.data[head].length > FOTA_PACK_SIZE_MIN
-				&& G_FW_QUEUE_SENDING.data[head].data_arr[FOTA_RETRY_POSITION] > 1 //sent yet
+				&& G_FW_QUEUE_SENDING.data[head].data_arr[FOTA_RETRY_POSITION] > 0 //sent yet
 				&& plog_IndexOf(G_FW_QUEUE_SENDING.data[head].data_arr,&_pack_rec.data_arr[FOTA_FW_DATA_POSITION],FOTA_PACK_FW_SIZE,G_FW_QUEUE_SENDING.data[head].length) != -1
 				&& plog_IndexOf(G_FW_QUEUE_SENDING.data[head].data_arr,_mac_incom,FOTA_MAC_INCOM_SIZE,SIZEU8(G_FW_QUEUE_SENDING.data[head].data_arr)) == -1)
 			{

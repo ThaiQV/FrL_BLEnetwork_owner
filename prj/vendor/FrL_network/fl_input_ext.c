@@ -182,7 +182,7 @@ static int rx_from_uart_cb(void) //UART data send to Master,we will handler the 
  */
 static int tx_to_uart_cb(void) {
 	u8 *p = my_fifo_get(&fl_tx_fifo);
-	FLAG_uart_dma_send=0;
+	//FLAG_uart_dma_send=0;
 	if (p && !FLAG_uart_dma_send) {
 		memset(FL_TXDATA.data,0,sizeof(FL_TXDATA.data));
 		FL_TXDATA.len = (unsigned int) p[0];
@@ -432,6 +432,7 @@ void fl_ExIO_init(i2c_sda_pin_e _sda, i2c_scl_pin_e _scl, gpio_pin_e _irq_pin) {
 /******************************************************************************/
 /******************************************************************************/
 void fl_input_external_init(void) {
+#ifdef COUNTER_DEVICE
 //init POLLING Container
 	InitPOLLING();
 #ifndef MASTER_CORE //use to test
@@ -461,4 +462,5 @@ void fl_input_external_init(void) {
 #endif
 	/* --- Polling read input --- */
 	blt_soft_timer_add(_scan_external_input,FL_IO_SCAN_INTERVAL * 1000); //ms
+#endif
 }

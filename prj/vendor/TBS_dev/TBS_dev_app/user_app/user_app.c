@@ -237,12 +237,6 @@ static subapp_result_t data_app_init(subapp_t* self)
 		event_bus_subscribe(app_data_evt_table[i], data_app_event_handler, NULL, name);
 	}
 
-//	ct_add_bt_print("row0 BT_ENDCALL_ID",0 ,BT_ENDCALL_ID);
-//	ct_add_bt_print("row1 BT_ENDCALL_ID",1 ,BT_ENDCALL_ID);
-	// ct_add_bt_print("bt BT_PED_ID", 0, BT_PED_ID);
-	// ct_add_bt_print("bt BT_PEU_ID", 0, BT_PEU_ID);
-	// ct_add_bt_print("bt BT_PPD_ID", 0, BT_PPD_ID);
-
 	return SUBAPP_OK;
 }
 

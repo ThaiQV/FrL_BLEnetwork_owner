@@ -304,6 +304,10 @@ void GETLIST_RESPONSE(u8* _pdata) {
 //	fl_nwk_master_StatusNodesRefesh();
 	u8 payload_len = 0;
 	u8 numofslave = 0;
+	fl_nodeinnetwork_t _node;
+	MAC_ZERO_CLEAR(_node.mac,0);
+	fl_master_nodelist_AddRefesh(_node);
+
 	for (u8 var = 0; var < G_NODE_LIST.slot_inused && G_NODE_LIST.slot_inused != 0xFF; ++var) {
 		if (G_NODE_LIST.sla_info[var].dev_type != 0xFF
 				&& !IS_MAC_INVALID(G_NODE_LIST.sla_info[var].mac,0)&& !IS_MAC_INVALID(G_NODE_LIST.sla_info[var].mac,0xFF)) {
@@ -317,6 +321,7 @@ void GETLIST_RESPONSE(u8* _pdata) {
 		if(G_NODE_LIST.sla_info[var].dev_type == 0xFF || IS_MAC_INVALID(G_NODE_LIST.sla_info[var].mac,0) || IS_MAC_INVALID(G_NODE_LIST.sla_info[var].mac,0xFF)){
 			continue;
 		}
+		wfdata.cmd = G_WIFI_CON[_wf_CMD_find(data->cmd)].rsp.cmd;
 		wfdata.data[payload_len] = numofslave;
 		memcpy(&wfdata.data[++payload_len],G_NODE_LIST.sla_info[var].mac,SIZEU8(G_NODE_LIST.sla_info[var].mac));
 		payload_len+=SIZEU8(G_NODE_LIST.sla_info[var].mac);
@@ -330,7 +335,7 @@ void GETLIST_RESPONSE(u8* _pdata) {
 		//memcpy(payload,wfdata,payload_len);
 		//P_PRINTFHEX_A(MCU,(u8*)&wfdata,payload_len,"List(%d):",payload_len);
 		fl_ble_send_wifi((u8*)&wfdata,payload_len);
-		//memset(payload,0xFF,SIZEU8(payload));
+		memset(wfdata.data,0,SIZEU8(wfdata.data));
 		payload_len = 0;
 	}
 //	extern void CMD_GETSLALIST(u8* _data);
@@ -748,7 +753,8 @@ void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 			ERR(MCU,"FOTA ERR >> Format packet\r\n");
 			return;
 		}
-		wfdata.len_data = 1; //<OK/ERR> 1 byte
+		wfdata.len_data = 7; //<OK/ERR> 1 byte + 1B packet type + 1B device type + 1B version+3Bs size/address
+		memcpy(&wfdata.data[1],&data_fw[0],6);
 		wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
 		u8 payload_len = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
 //		P_INFO_HEX(data_fw,SIZEU8(data_fw),"WIFI2BLE[%d](%d):",data_fw[0],wfdata.data[0]);

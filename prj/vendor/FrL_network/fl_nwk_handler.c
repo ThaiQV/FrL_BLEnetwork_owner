@@ -372,11 +372,12 @@ void shuffle_fields_inplace(u8 *arr) {
 }
 
 void fl_nwk_generate_table_pack(void) {
+	extern u16 FL_NWK_FOTA_IsReady(void);
 	fl_pack_t pack;
 	u8 payload_create[28]; // full size adv can be sent
 	memset(payload_create,0xFF,SIZEU8(payload_create));
 	u8 ptr = 0;
-	if(FL_NWK_NODELIST_TABLE_IsReady()>0) return;
+	if(FL_NWK_NODELIST_TABLE_IsReady() > 0 || FL_NWK_FOTA_IsReady() > 0) return;
 
 	FL_QUEUE_CLEAR(&NODELIST_TABLE_SENDING,NODELIST_TABLE_SENDING.mask+1);
 	for (u8 var = 0; var < NODELIST_TABLE_SIZE; ++var) {
@@ -438,8 +439,10 @@ void fl_nwk_slave_nodelist_repeat(fl_pack_t *_pack) {
 //	P_INFO("PACK NODELIST:%d\r\n",FL_NWK_NODELIST_TABLE_IsReady());
 	if (FL_QUEUE_FIND(&NODELIST_TABLE_SENDING,_pack,_pack->length - 2) == -1)
 	{
-		_pack->length=_pack->length-1;
-		FL_QUEUE_ADD(&NODELIST_TABLE_SENDING,_pack);
+		_pack->length = _pack->length - 1;
+		if (-1 != FL_QUEUE_ADD(&NODELIST_TABLE_SENDING,_pack)) {
+			fl_slave_network_checkSTT();
+		}
 	}
 	//Update my table
 	u8 table_arr[28];
@@ -454,7 +457,9 @@ void fl_nwk_slave_nodelist_repeat(fl_pack_t *_pack) {
 			//Match SlaveID but incorrect mac => has been removed yet
 			if(memcmp(G_NODELIST_TABLE[table_arr[var]].mac,fl_nwk_mySlaveMac(),SIZEU8(G_NODELIST_TABLE[table_arr[var]].mac))){
 				ERR(APP,"Removed.....!!!\r\n");
+#ifdef COUNTER_DEVICE
 				Counter_LCD_RemoveDisplay();
+#endif
 				fl_nwk_slave_nwkRemove();
 				blt_soft_timer_add(REBOOT_DEV,NWK_LEAVE_TIME_DISPLAY);
 //				fl_nwk_slave_nwkclear();

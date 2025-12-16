@@ -210,7 +210,10 @@ int _nwk_slave_backup(void){
 	}
 	return 0;
 }
-
+void fl_slave_network_checkSTT(void){
+	G_INFORMATION.active = true;
+	blt_soft_timer_restart(&_isOnline_check,RECHECKING_NETWOK_TIME * 1000);
+}
 int fl_nwk_slave_nwkclear(void){
 	fl_db_Pairing_Clear();
 	fl_slave_profiles_t my_profile =fl_db_slaveprofile_init();
@@ -228,10 +231,14 @@ int fl_nwk_slave_nwkRemove(void){
 	fl_slave_profiles_t my_profile =fl_db_slaveprofile_init();
 	G_INFORMATION.slaveID = my_profile.slaveid;
 	G_INFORMATION.profile = my_profile;
+#ifdef HW_SAMPLE_TEST
+	G_INFORMATION.profile.run_stt.join_nwk =1;
+#else
 	G_INFORMATION.profile.run_stt.join_nwk =0;
+#endif
 	fl_db_slaveprofile_save(G_INFORMATION.profile);
 //	REBOOT_DEV();
-//	blt_soft_timer_restart(_interval_report,100*100);
+	blt_soft_timer_restart(_interval_report,100*100);
 	return -1;
 }
 #ifdef COUNTER_DEVICE
@@ -301,7 +308,7 @@ void fl_nwk_slave_init(void) {
 
 	memcpy(G_INFORMATION.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_INFORMATION.mac));
 	memcpy(&G_INFORMATION.data[0],G_INFORMATION.mac,6);
-	P_INFO("** Freelux network SLAVE init \r\n");
+	P_INFO("** Freelux network SLAVE Init \r\n");
 	P_INFO("** MAC     :%02X%02X%02X%02X%02X%02X\r\n",G_INFORMATION.mac[0],G_INFORMATION.mac[1],G_INFORMATION.mac[2],
 			G_INFORMATION.mac[3],G_INFORMATION.mac[4],G_INFORMATION.mac[5]);
 	P_INFO("** DevType:%d\r\n",G_INFORMATION.dev_type);
@@ -374,8 +381,9 @@ void _nwk_slave_syncFromPack(fl_dataframe_format_t *packet){
 	SYNC_ORIGIN_MASTER(master_timetamp,packet->milltamp);
 	LOGA(INF,"ORIGINAL MASTER-TIME:%d\r\n",ORIGINAL_MASTER_TIME.milstep);
 
-	G_INFORMATION.active = true;
-	blt_soft_timer_restart(&_isOnline_check,RECHECKING_NETWOK_TIME * 1000);
+//	G_INFORMATION.active = true;
+//	blt_soft_timer_restart(&_isOnline_check,RECHECKING_NETWOK_TIME * 1000);
+	fl_slave_network_checkSTT();
 }
 
 s8 fl_api_slave_req(u8 _cmdid, u8* _data, u8 _len, fl_rsp_callback_fnc _cb, u32 _timeout_ms,u8 _retry) {
@@ -679,7 +687,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 			if (IsJoinedNetwork()) {
 #ifdef POWER_METER_DEVICE
 				//check packet_slaveid
-				if (packet.frame.slaveID.id_u8 == G_INFORMATION.slaveID.id_u8) {
+				if (packet.frame.slaveID == G_INFORMATION.slaveID) {
 					TBS_PowerMeter_RESETbyMaster(packet.frame.payload[0],packet.frame.payload[1],packet.frame.payload[2]);
 					if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
 						u8 ok[2] = { 'o', 'k' };
@@ -703,7 +711,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 			if (IsJoinedNetwork()) {
 #ifdef POWER_METER_DEVICE
 				//check packet_slaveid
-				if (packet.frame.slaveID.id_u8 == G_INFORMATION.slaveID.id_u8) {
+				if (packet.frame.slaveID == G_INFORMATION.slaveID) {
 					u16 chn1 = MAKE_U16(packet.frame.payload[1],packet.frame.payload[0]);
 					u16 chn2= MAKE_U16(packet.frame.payload[3],packet.frame.payload[2]);
 					u16 chn3= MAKE_U16(packet.frame.payload[5],packet.frame.payload[4]);
@@ -785,9 +793,9 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 					memcpy(G_INFORMATION.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_INFORMATION.mac));
 					if (mac_parent == G_INFORMATION.profile.nwk.mac_parent && -1!=plog_IndexOf(packet.frame.payload,G_INFORMATION.mac,6,SIZEU8(packet.frame.payload))) {
 						ERR(APP,"Network leaving.....(%d )s\r\n",1);
-//						Counter_LCD_RemoveDisplay();
-//						blt_soft_timer_add(fl_nwk_slave_nwkRemove,NWK_LEAVE_TIME_DISPLAY);
+#ifdef COUNTER_DEVICE
 						Counter_LCD_RemoveDisplay();
+#endif
 						fl_nwk_slave_nwkRemove();
 						blt_soft_timer_add(REBOOT_DEV,NWK_LEAVE_TIME_DISPLAY);
 						//Process rsp
@@ -809,6 +817,15 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 		case NWK_HDR_COLLECT: {
 //			_nwk_slave_syncFromPack(&packet.frame);
 			fl_nwk_LedSignal_run();
+			/***/
+			u32 master_timetamp = MAKE_U32(packet.frame.timetamp[3],packet.frame.timetamp[2],packet.frame.timetamp[1],packet.frame.timetamp[0]);
+			SYNC_ORIGIN_MASTER(master_timetamp,packet.frame.milltamp);
+			fl_rtc_sync(master_timetamp);
+			//Synchronize debug log
+			NWK_DEBUG_STT = packet.frame.endpoint.dbg;
+			DEBUG_TURN(NWK_DEBUG_STT);
+			/**/
+			//LOGA(INF,"ORIGINAL MASTER-TIME:%d\r\n",ORIGINAL_MASTER_TIME.milstep);
 			if (IsJoinedNetwork() == 0) {
 				if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
 					//get master's mac
@@ -946,7 +963,8 @@ s16 fl_slave_fota_proc(void) {
 //	static u16 head_err =0;
 	while (FL_QUEUE_GET(&G_FW_QUEUE_REC,&fota_pack) > -1) {
 		//
-		blt_soft_timer_restart(&_isOnline_check,RECHECKING_NETWOK_TIME * 1000);
+		//blt_soft_timer_restart(&_isOnline_check,RECHECKING_NETWOK_TIME * 1000);
+		fl_slave_network_checkSTT();
 
 		if (!fl_packet_parse(fota_pack,&packet)) {
 			ERR(INF,"Packet parse fail!!!\r\n");
@@ -1055,7 +1073,8 @@ int fl_slave_ProccesRSP_cbk(void) {
 		if(-1!=fl_queue_REQcRSP_ScanRec(data_in_queue,&G_INFORMATION))
 		{
 			LOGA(API,"Refesh online status (%d ms)\r\n",RECHECKING_NETWOK_TIME);
-			blt_soft_timer_restart(&_isOnline_check,RECHECKING_NETWOK_TIME * 1000);
+//			blt_soft_timer_restart(&_isOnline_check,RECHECKING_NETWOK_TIME * 1000);
+			fl_slave_network_checkSTT();
 		}
 		//process rsp of the protocol
 		fl_pack_t packet_build;
