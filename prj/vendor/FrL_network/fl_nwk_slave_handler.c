@@ -249,11 +249,11 @@ void fl_nwk_slave_displayLCD_Refesh(void){
 	extern fl_version_t _hw;
 	char version_c[16];
 	memset((u8*)version_c,0,SIZEU8(version_c));
-	_fw.patch = DFU_OTA_VERISON_GET();
-	sprintf(version_c,"FW ver:%d.%d.%d", _fw.major,_fw.minor,_fw.patch );
+	//_fw.patch = DFU_OTA_VERISON_GET();
+	sprintf(version_c,"FW :%d.%d.%d (%d)", _fw.major,_fw.minor,_fw.patch,DFU_OTA_VERISON_GET());
 	Counter_LCD_ENDCALL_Display(1,version_c);
 	memset((u8*)version_c,0,SIZEU8(version_c));
-	sprintf(version_c,"HW ver:%d.%d.%d", _hw.major,_hw.minor,_hw.patch );
+	sprintf(version_c,"HW :%d.%d.%d", _hw.major,_hw.minor,_hw.patch );
 	Counter_LCD_ENDCALL_Display(0,version_c);
 	char mess_c[16];
 	memset((u8*)mess_c,0,SIZEU8(mess_c));
