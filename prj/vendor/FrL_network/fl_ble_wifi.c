@@ -753,8 +753,8 @@ void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 			ERR(MCU,"FOTA ERR >> Format packet\r\n");
 			return;
 		}
-		wfdata.len_data = 7; //<OK/ERR> 1 byte + 1B packet type + 1B device type + 1B version+3Bs size/address
-		memcpy(&wfdata.data[1],&data_fw[0],6);
+		wfdata.len_data = 1;//+6 //<OK/ERR> 1 byte + 1B packet type + 1B device type + 1B version+3Bs size/address
+		//memcpy(&wfdata.data[1],&data_fw[0],6);
 		wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
 		u8 payload_len = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
 //		P_INFO_HEX(data_fw,SIZEU8(data_fw),"WIFI2BLE[%d](%d):",data_fw[0],wfdata.data[0]);
