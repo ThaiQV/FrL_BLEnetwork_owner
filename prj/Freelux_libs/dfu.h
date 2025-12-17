@@ -119,12 +119,21 @@
 		CMD_VERIFY,
 		CMD_BOOTLOADER_VERSION,
 		CMD_READ_WORD,
+		CMD_CHANGE_BAUDRATE,
 	}cmt_t;
+
+	typedef enum
+	{
+		CMD_STATE_IDLE = 0,
+		CMD_STATE_WAITING
+	}cmt_state_t;
 
 	typedef struct
 	{
 		cmt_t		cmd;
-		uint8_t		len;
+		cmt_state_t state;
+		uint32_t	len;
+		uint8_t		crc;
 		uint8_t		*data;
 	}command_t;
 

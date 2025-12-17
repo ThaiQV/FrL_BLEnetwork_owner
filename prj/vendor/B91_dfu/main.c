@@ -176,23 +176,14 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 		user_init_deepRetn();
 	}
 	else
-	{ //MCU power_on or wake_up from deepSleep mode
-//		user_init_normal();
-
-		/* Test code */
+	{
 		dfu_uart_init();
 		LOG_P(APP,"DFU\n");
-//		firmware_check();
 
 		irq_enable();
-		// wdt init
-		wd_set_interval_ms(5000);	// 5s
-		wd_start();
 		while(1)
 		{
-//			main_loop();
 			dfu_uart_process();
-			wd_clear();
 		}
 		return 0;
 	}

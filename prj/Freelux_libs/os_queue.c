@@ -176,3 +176,14 @@ uint8_t queue_peek(queue_t *queue)
 {
 	return queue->fifo[queue->tail];
 }
+
+/**
+* @brief: queue get fifo pointer
+* @param: see below
+* @retval: pointer of fifo
+*/
+uint8_t* queue_get_fifo(queue_t *queue)
+{
+	return &queue->fifo[queue->tail];
+}
+

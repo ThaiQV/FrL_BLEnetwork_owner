@@ -1,7 +1,7 @@
 #include "dfu.h"
 
 /* Definition */
-//#define DFU_DEBUG
+#define DFU_DEBUG
 #ifdef DFU_DEBUG
 #define DFU_PRINTF(...)	LOGA(APP,__VA_ARGS__);
 #else
@@ -768,20 +768,24 @@ uint8_t get_dfu_version(void)
 #define BOOTLOADER_VERSION "1.0.0"
 #define MAGIC_WORDS	"IOTBOOTLOADERUART"
 
-#define	TIMEOUT_MAX	100000
+#define	TIMEOUT_MAX					100000
+#define	RESET_QUEUE_TIMEOUT_MAX		500000
+#define	DFU_UART_BUFF_SIZE			8192
 
 #define SEND_BYTE(data)			uart_send_byte(UART1,data)
 #define SEND_BUFF(pdata,len)	uart_send(UART1,pdata,len)
 
 queue_t		dfu_uart_queue;
-uint8_t 	dfu_uart_queue_fifo[64];
-uint8_t 	uart_rx_addr[64];
+volatile uint8_t 	dfu_uart_queue_fifo[DFU_UART_BUFF_SIZE];
+volatile uint8_t 	uart_rx_addr[DFU_UART_BUFF_SIZE];
+
 command_t	cmd;
 uint8_t 	enter_bootloader = 0;
 uint32_t 	timeout_jump = TIMEOUT_MAX;
 uint32_t 	program_address = FLASH_R_BASE_ADDR + APP_IMAGE_ADDR;
 uint32_t 	page, len, crc;
 uint64_t 	doubleword;
+uint32_t	baudrate = 115200;
 
 static void uart1_init(uart_num_e uart_num, uart_tx_pin_e tx_pin, uart_rx_pin_e rx_pin, u32 baudrate)
 {
@@ -838,7 +842,7 @@ void dfu_uart_init(void)
 */
 void dfu_uart_receive(void)
 {
-	uint8_t len;
+	uint16_t len;
 
 	len = uart_get_dma_rev_data_len(UART1,DMA3);
 	uart_receive_dma(UART1,(unsigned char *)uart_rx_addr,sizeof(uart_rx_addr));
@@ -851,45 +855,25 @@ static void wait_for_timeout(void)
 	{
 		if((timeout_jump--) == 0)
 		{
-			printf("DFU timeout\n");
+//			printf("DFU timeout\n");
+			uart_reset(UART1);
 			firmware_check();
 			enter_bootloader = 1;
 		}
 	}
 }
 
-/**
-* @brief: process UART DFU
-* @param: see below
-* [ 0x55    0xAA ][       Length        ][  CMD ][  Data ]
-* [2 Bytes header][1 Byte length of Data][1 Byte][n Bytes]
-*/
-void dfu_uart_process(void)
+static uint8_t crc8(uint8_t *pdata, uint16_t len)
 {
-	uint8_t len = 0;
-	uint8_t buff[64];
-	uint8_t	i;
+	uint32_t 	i;
+	uint8_t		crc = 0;
 
-	len = queue_available_data(&dfu_uart_queue);
-
-	if(len > 0) // minimum of frame length
+	for(i = 0; i < len; i++)
 	{
-		queue_get(&dfu_uart_queue, buff, len);
-//		for(i=0;i<len;i++)
-//		{
-//			printf("%x ",buff[i]);
-//		}
-//		printf("\n");
-
-		if((buff[0] == 0x55) && (buff[1] == 0xAA)) // pass header
-		{
-			cmd.len 	= buff[2];
-			cmd.cmd		= buff[3];
-			cmd.data	= &buff[4];
-			cmd_process();
-		}
+		crc += pdata[i];
 	}
-//	wait_for_timeout();
+
+	return crc;
 }
 
 static void response_ack(cmt_t ack)
@@ -902,6 +886,67 @@ static void response_ack(cmt_t ack)
 	// Send ACK CMD
 	if(ack == CMD_ACK_OK) SEND_BYTE(CMD_ACK_OK);
 	else SEND_BYTE(CMD_ACK_ERROR);
+}
+
+/**
+* @brief: process UART DFU
+* @param: see below
+* -----------------------VERSION 1--------------------------
+* [ 0x55    0xAA ][       Length        ][  CMD  ][  Data  ]
+* [2 Bytes header][1 Byte length of Data][1 Byte ][n Bytes ]
+* -----------------------VERSION 2------------------------------------
+* [ 0x56    0xAA ][       Length         ][  CMD  ][  Data  ][  CRC  ]
+* [2 Bytes header][2 Bytes length of Data][1 Byte ][n Bytes ][1 Byte ]
+*/
+void dfu_uart_process(void)
+{
+	uint32_t		len = 0;
+	uint8_t			buff[DFU_UART_BUFF_SIZE];
+	static uint32_t	buff_cnt = 0;
+	uint8_t			*fifo;
+	static uint32_t reset_queue_timeout = 0;
+	static uint32_t	wrong_len_count = 0;
+	uint8_t			crc = 0;
+
+	len = queue_available_data(&dfu_uart_queue);
+	if(len > 0) // minimum of frame length
+	{
+		fifo = dfu_uart_queue_fifo;
+		if((fifo[0] == 0x55) && (fifo[1] == 0xAA))
+		{
+			if(len > 4)
+			{
+				memcpy((uint8_t*)&cmd.len,&fifo[2],sizeof(uint16_t));
+				if(len >= (cmd.len + 6))
+				{
+					cmd.cmd		= fifo[4];
+					cmd.data	= &fifo[5];
+					cmd.crc		= fifo[cmd.len + 5];
+					crc = crc8(cmd.data,cmd.len);
+//					printf("cmd.len: %d %d crc: %x %x cmd: %d\n",cmd.len,len,crc,cmd.crc,cmd.cmd);
+					if( crc == cmd.crc)
+					{
+						cmd_process();
+					}
+					else
+					{
+//						printf("Wrong crc\n");
+						response_ack(CMD_ACK_ERROR);
+					}
+					// Re-init queue to clear queue data
+					queue_create(&dfu_uart_queue, dfu_uart_queue_fifo, sizeof(dfu_uart_queue_fifo));
+				}
+			}
+		}
+		else
+		{
+//			printf("Wrong frame: %d\n",len);
+			// Re-init queue to clear queue data
+			queue_create(&dfu_uart_queue, dfu_uart_queue_fifo, sizeof(dfu_uart_queue_fifo));
+		}
+	}
+
+	wait_for_timeout();
 }
 
 static void send_version(void)
@@ -963,7 +1008,7 @@ static void program_with_address(void)
 	flash_write_page(program_address, sizeof(doubleword), (uint8_t *)&doubleword);
 }
 
-static void program_array(uint8_t *array, uint8_t len)
+static void program_array(uint8_t *array, uint16_t len)
 {
 	flash_write_page(program_address, len, (uint8_t *)array);
 	program_address += len;
@@ -984,11 +1029,16 @@ static void verify(uint32_t address, uint32_t len, uint32_t crc)
 	if(calculate_crc == crc)
 	{
 		response_ack(CMD_ACK_OK);
+		// Erase header page of current FW
+		flash_erase_sector(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER);
+		uart_reset(UART1); // Reset uart1 before jump to application
+		jump_to_application();
 	}
 	else
 	{
 		response_ack(CMD_ACK_ERROR);
 	}
+//	printf("calculate_crc: %x - %x\n",calculate_crc,crc);
 }
 
 /**
@@ -1063,6 +1113,15 @@ void cmd_process(void)
 		case CMD_READ_WORD:
 			/* [1 Byte CMD] */
 			send_read_word();
+			break;
+		case CMD_CHANGE_BAUDRATE:
+			/* [1 Byte CMD] + [4 Bytes Baud rate] */
+			memcpy((uint8_t*)&baudrate,(uint8_t*)cmd.data,sizeof(baudrate)); // Get baud rate
+			response_ack(CMD_ACK_OK);
+			delay_ms(100);
+			uart_reset(UART1);
+			uart1_init(UART1,UART1_TX_PE0,UART1_RX_PE2,baudrate);
+//			printf("baudrate: %d\n",baudrate);
 			break;
 		default:
 			break;
