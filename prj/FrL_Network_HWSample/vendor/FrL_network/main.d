@@ -171,7 +171,8 @@ vendor/FrL_network/main.d vendor/FrL_network/main.o: \
  ../vendor/FrL_network/fl_wifi2ble_fota.h ../common/../Freelux_libs/dfu.h \
  ../common/../Freelux_libs/SPI_FLASH.h ../common/../Freelux_libs/nvm.h \
  ../common/../Freelux_libs/SPI_FLASH.h ../common/../Freelux_libs/nvm.h \
- ../common/../Freelux_libs/storage_weekly_data.h
+ ../common/../Freelux_libs/storage_weekly_data.h \
+ ../common/../vendor/TBS_dev/TBS_dev_config.h
 
 /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/tl_common.h:
 
@@ -540,3 +541,5 @@ vendor/FrL_network/main.d vendor/FrL_network/main.o: \
 ../common/../Freelux_libs/nvm.h:
 
 ../common/../Freelux_libs/storage_weekly_data.h:
+
+../common/../vendor/TBS_dev/TBS_dev_config.h:

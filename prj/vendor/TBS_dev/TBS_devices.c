@@ -462,6 +462,7 @@ void TBS_Device_Init(void){
 }
 
 void TBS_Device_Run(void){
+//	gpio_toggle(GPIO_PA5);
 #ifdef COUNTER_DEVICE
 	TBS_Counter_Run();
 #endif

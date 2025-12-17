@@ -321,7 +321,7 @@ void fl_nwk_slave_init(void) {
 			U32_BYTE2( G_INFORMATION.profile.nwk.mac_parent),U32_BYTE3( G_INFORMATION.profile.nwk.mac_parent));
 	P_INFO("** Channel:%d,%d,%d\r\n",G_INFORMATION.profile.nwk.chn[0],G_INFORMATION.profile.nwk.chn[1],G_INFORMATION.profile.nwk.chn[2]);
 #ifdef COUNTER_DEVICE
-	fl_nwk_slave_displayLCD_Refesh();
+//	fl_nwk_slave_displayLCD_Refesh();
 #endif
 #ifdef HW_SAMPLE_TEST
 	if(G_INFORMATION.slaveID == G_INFORMATION.profile.slaveid && G_INFORMATION.slaveID == 0xFF){
