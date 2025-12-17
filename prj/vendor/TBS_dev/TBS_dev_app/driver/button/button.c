@@ -930,9 +930,17 @@ static void button_process_state_machine(uint8_t button_id) {
     switch (btn->state) {
         case BUTTON_STATE_IDLE:
             if (raw_state) {
-                // Button pressed - start debounce
-                btn->state = BUTTON_STATE_DEBOUNCE;
-                btn->last_change_time = current_time;
+                // // Button pressed - start debounce
+                // btn->state = BUTTON_STATE_DEBOUNCE;
+                // btn->last_change_time = current_time;
+
+                // Confirmed press
+                btn->state = BUTTON_STATE_PRESSED;
+                btn->stable_state = true;
+                btn->press_start_time = current_time;
+                btn->last_hold_level = 0;
+
+                button_trigger_event(button_id, BUTTON_EVENT_PRESS, 0);
             }
             break;
 
