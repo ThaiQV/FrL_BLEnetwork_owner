@@ -576,7 +576,7 @@ void fl_db_tbsprofile_save(u8 *_data,u8 _size){
 	fl_tbs_data_t entry;
 	memset(entry.data,0,sizeof(entry.data));
 	if(_size>sizeof(entry.data)){
-		ERR(FLA,"TBS profile oversize (max:12 bytes)!!!\r\n");
+		ERR(FLA,"TBS profile oversize (max:%d bytes)!!!\r\n",sizeof(entry.data));
 		return;
 	}
 	memcpy(entry.data,_data,_size);

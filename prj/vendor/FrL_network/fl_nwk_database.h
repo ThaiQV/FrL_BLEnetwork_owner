@@ -33,7 +33,7 @@
 
 #define SLAVEUSERDATA_SIZE				(10*SECTOR_FLASH_SIZE)
 
-#define TBSPROFILE_SIZE					(SECTOR_FLASH_SIZE)
+#define TBSPROFILE_SIZE					(10*SECTOR_FLASH_SIZE)
 
 #define MASTERPROFILE_SIZE				(10*SECTOR_FLASH_SIZE)
 
@@ -151,7 +151,7 @@ void fl_db_slaveuserdata_save(u8 *_data,u8 _size);
 fl_slave_userdata_t fl_db_slaveuserdata_load(void);
 
 typedef struct {
-	u8 data[12];
+	u8 data[64];
 	//Don't change
 	u32 magic; // constant for LSB
 }__attribute__((packed)) fl_tbs_data_t;
