@@ -592,7 +592,23 @@ void pmt_print_info(uint8_t ch)
 
 static void save_calib()
 {
+    
+    // u8 load[36];
+    // for (int i = 0; i < NUMBER_CHANNEL_POWERMETTER; i++)
+    // {
+    //     for (int j = 0; j < 3; j++)
+    //     {
+    //         float f = pmt_handle[i]->calibration[1][j];
+    //         int base = j * 4 + i * 12;
+
+    //         memcpy(&load[base], &f, sizeof(float));
+    //     }
+    // }
+
+    // fl_db_tbsprofile_save((u8 *)load, sizeof(tbs_load));
+    u8 tbs_profile[64] = {0};
     fl_tbs_data_t tbs_load = fl_db_tbsprofile_load();
+    memcpy(tbs_profile, tbs_load.data, 64);
 
     for (int i = 0; i < NUMBER_CHANNEL_POWERMETTER; i++)
     {
@@ -601,16 +617,20 @@ static void save_calib()
             float f = pmt_handle[i]->calibration[1][j];
             int base = j * 4 + i * 12;
 
-            memcpy(&tbs_load.data[base], &f, sizeof(float));
+            memcpy(&tbs_profile[base], &f, sizeof(float));
         }
     }
 
-    fl_db_tbsprofile_save((u8 *)tbs_load.data, sizeof(tbs_load));
+    fl_db_tbsprofile_save((u8*)tbs_profile, sizeof(tbs_profile));
 }
 
 static void read_calib()
 {
    fl_tbs_data_t tbs_load = fl_db_tbsprofile_load(); // 36 bytes
+//    if(tbs_load.data[0] == 0xff)
+//    {
+//     memset(tbs_load.data, 0, 64);
+//    }
 
    for (int i = 0; i < NUMBER_CHANNEL_POWERMETTER; i++)
    {
