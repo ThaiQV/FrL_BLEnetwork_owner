@@ -330,7 +330,14 @@ void power_meter_app_init(void)
     // );
     // spi_set_irq_mask(HSPI_MODULE, SPI_END_INT_EN);
     // plic_interrupt_enable(IRQ22_SPI_AHB);
-    read_calib();
+    fl_tbs_data_t tbs_load = fl_db_tbsprofile_load();
+   if(tbs_load.data[0] == 0xff && tbs_load.data[1] == 0xff && tbs_load.data[2] == 0xff && tbs_load.data[3] == 0xff)
+   {
+        printf("set calib 1\n");
+        pmt_setcalib(1, 1, 1, 1);
+        pmt_setcalib(2, 1, 1, 1);
+        pmt_setcalib(3, 1, 1, 1);
+   }
 }
 
 void power_meter_app_loop(void)
@@ -592,20 +599,6 @@ void pmt_print_info(uint8_t ch)
 
 static void save_calib()
 {
-    
-    // u8 load[36];
-    // for (int i = 0; i < NUMBER_CHANNEL_POWERMETTER; i++)
-    // {
-    //     for (int j = 0; j < 3; j++)
-    //     {
-    //         float f = pmt_handle[i]->calibration[1][j];
-    //         int base = j * 4 + i * 12;
-
-    //         memcpy(&load[base], &f, sizeof(float));
-    //     }
-    // }
-
-    // fl_db_tbsprofile_save((u8 *)load, sizeof(tbs_load));
     u8 tbs_profile[64] = {0};
     fl_tbs_data_t tbs_load = fl_db_tbsprofile_load();
     memcpy(tbs_profile, tbs_load.data, 64);
@@ -626,10 +619,13 @@ static void save_calib()
 
 static void read_calib()
 {
-   fl_tbs_data_t tbs_load = fl_db_tbsprofile_load(); // 36 bytes
+   fl_tbs_data_t tbs_load = fl_db_tbsprofile_load();
 //    if(tbs_load.data[0] == 0xff)
 //    {
-//     memset(tbs_load.data, 0, 64);
+//         printf("set calib 1\n");
+//         pmt_setcalib(1, 1, 1, 1);
+//         pmt_setcalib(2, 1, 1, 1);
+//         pmt_setcalib(3, 1, 1, 1);
 //    }
 
    for (int i = 0; i < NUMBER_CHANNEL_POWERMETTER; i++)
@@ -743,7 +739,7 @@ void pmt_report(void)
         is_send_rp = 0;
         pmt_update_data_to_rp();
         u8 _payload[SIZEU8(tbs_device_powermeter_t)];
-        tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) G_INFORMATION.data;
+        tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) &G_POWER_METER;
         tbs_pack_powermeter_data(pwmeter_data,_payload);
         u8 indx_data = SIZEU8(pwmeter_data->type) + SIZEU8(pwmeter_data->mac) + SIZEU8(pwmeter_data->timetamp);
         fl_api_slave_req(NWK_HDR_55,&_payload[indx_data],SIZEU8(pwmeter_data->data),0,0,1);
