@@ -426,14 +426,11 @@ void stpm_monitoring_loop(stpm_handle_t **p_handle)
     float voltage, current, reactive, power_factor, apparent_power;
     double active;
     
-    
     stpm_latch_reg(p_handle[0]);
     for (uint8_t num_ch = 0; num_ch < 3; num_ch++)
     {
         stpm_handle_t *handle = p_handle[num_ch];
         pmt_data_context_t *ctx = handle->context;
-        
-        
         
         stpm_read_rms_voltage_and_current(handle, 1, &voltage, &current);
         active = stpm_read_active_power(handle, 1);
