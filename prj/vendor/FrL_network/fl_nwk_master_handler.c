@@ -837,7 +837,7 @@ static void _master_updateDB_for_Node(u8 node_indx ,fl_data_frame_u *packet)  {
 //	P_INFO_HEX(G_NODE_LIST.sla_info[node_indx].mac,6,"[0x02X]%%d->[%02d]",G_NODE_LIST.sla_info[node_indx].timelife,G_NODE_LIST.sla_info[node_indx].slaveID);
 	//create MAC + TIMETAMP + DEV_TYPE
 	u8 size_mac = SIZEU8(G_NODE_LIST.sla_info[node_indx].mac);
-	//memcpy(&G_NODE_LIST.sla_info[node_indx].data[0],G_NODE_LIST.sla_info[node_indx].mac,size_mac); //update mac to pointer data
+	memcpy(&G_NODE_LIST.sla_info[node_indx].data[0],G_NODE_LIST.sla_info[node_indx].mac,size_mac); //update mac to pointer data
 	/*Timetamp*/
 //	fl_timetamp_withstep_t timetampStep = fl_rtc_getWithMilliStep();
 //	//	u32 timetamp = fl_rtc_get();
