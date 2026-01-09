@@ -13,6 +13,9 @@
 #ifndef STPM3X_DEFINE_h
 #define STPM3X_DEFINE_h
 
+#ifndef MASTER_CORE
+// #ifdef POWER_METER_DEVICE
+
 #define STPM3x_FRAME_LEN 5
 #define CRC_8 (0x07)
 
@@ -1034,4 +1037,6 @@ typedef enum {
 /*                      HELPER FUNCTIONS PROTOTYPES                       */
 /*========================================================================*/
 
+// #endif /* POWER_METER_DEVICE*/
+#endif /* MASTER_CORE*/
 #endif /* STPM3X_DEFINE_h */

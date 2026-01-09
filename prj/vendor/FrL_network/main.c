@@ -133,13 +133,17 @@ extern void drv_uart_rx_irq_handler(void);
 void uart1_irq_handler(void) {
 	extern void uart1_recieve_irq(void);
 	uart1_recieve_irq();
-
+#ifndef MASTER_CORE
+#ifndef POWER_METER_DEVICE
 	if(uart_get_irq_status(UART1, UART_TXDONE)){
-		drv_uart_tx_irq_handler();
-	}
-	if(uart_get_irq_status(UART1, UART_RXDONE)){
-		drv_uart_rx_irq_handler();
-	}
+			drv_uart_tx_irq_handler();
+		}
+		if(uart_get_irq_status(UART1, UART_RXDONE)){
+			drv_uart_rx_irq_handler();
+		}
+#endif
+#endif
+
 }
 _attribute_ram_code_
 void timer0_irq_handler(void) {

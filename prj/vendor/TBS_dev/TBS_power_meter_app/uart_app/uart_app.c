@@ -5,11 +5,16 @@
  *      Author: hoang
  */
 
-#include "uart_app.h"
-#include "tl_common.h"
-#include "drv_uart.h"
 #include <stdarg.h>
 #include <stdio.h>
+
+#ifndef MASTER_CORE
+#include "tl_common.h"
+#include "vendor/TBS_dev/TBS_dev_config.h"
+#ifdef POWER_METER_DEVICE
+
+#include "uart_app.h"
+#include "drv_uart.h"
 #include "uart_protocol.h"
 #include "pmt_data.h"
 
@@ -74,3 +79,6 @@ static void uart_irq_handler_cb(void)
     uart_rxData_t *rxData = (uart_rxData_t *)rxBuf_uart;
     pmt_protocol_uart_receive(rxData->dataPayload, rxData->dataLen);
 }
+
+#endif /* POWER_METER_DEVICE*/
+#endif /* MASTER_CORE*/

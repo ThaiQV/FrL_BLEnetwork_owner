@@ -26,6 +26,9 @@
 #ifndef DRV_UART_H_
 #define DRV_UART_H_
 
+#ifndef MASTER_CORE
+#ifdef POWER_METER_DEVICE
+
 /* PCLK provides clock source for UART module. */
 #define UART_CLOCK_SOURCE			(sys_clk.pclk * 1000 * 1000)
 
@@ -103,4 +106,7 @@ void drv_uart_exceptionProcess(void);
 // ADDED_BY_HOANG_NGHIA
 bool uart_tx_done(void);
 bool uart_is_idle(void);
+
+#endif /* POWER_METER_DEVICE*/
+#endif /* MASTER_CORE*/
 #endif /**DRV_UART_H_ */

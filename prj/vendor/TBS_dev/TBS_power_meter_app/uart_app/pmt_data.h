@@ -7,6 +7,9 @@
 #ifndef PMT_DATA_H_
 #define PMT_DATA_H_
 
+#ifndef MASTER_CORE
+#ifdef POWER_METER_DEVICE
+
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -59,5 +62,6 @@ uint8_t pmt_read_value(void);
 uint8_t pmt_set_calib(uint8_t ch, uint16_t vol_calib, uint32_t cur_calib);
 #endif
 
-
+#endif /* POWER_METER_DEVICE*/
+#endif /* MASTER_CORE*/
 #endif /* PMT_DATA_H_ */

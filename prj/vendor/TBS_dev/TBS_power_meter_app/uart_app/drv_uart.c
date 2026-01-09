@@ -22,10 +22,15 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-#include "stdlib.h"
-#include "../tl_common.h"
+#include <stdlib.h>
+
+#ifndef MASTER_CORE
+#include "tl_common.h"
+#include "vendor/TBS_dev/TBS_dev_config.h"
+#ifdef POWER_METER_DEVICE
+
 #include "drv_uart.h"
-#include "../power_meter_app.h"
+// #include "../power_meter_app.h"
 
 #define BUILD_U32(b0, b1, b2, b3) ((unsigned int)((((b3) & 0x000000FF) << 24) + (((b2) & 0x000000FF) << 16) + (((b1) & 0x000000FF) << 8) + ((b0) & 0x000000FF)))
 #define UART_RCV_DMA_LEN_FIX()                                                     \
@@ -198,3 +203,6 @@ u8 drv_uart_tx_start(u8 *data, u32 len)
 void drv_uart_exceptionProcess(void)
 {
 }
+
+#endif /* POWER_METER_DEVICE*/
+#endif /* MASTER_CORE*/
