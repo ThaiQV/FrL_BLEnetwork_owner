@@ -8,6 +8,9 @@
 #ifndef VENDOR_TBS_DEV_TBS_POWER_METER_APP_POWER_METER_APP_H_
 #define VENDOR_TBS_DEV_TBS_POWER_METER_APP_POWER_METER_APP_H_
 
+#ifndef MASTER_CORE
+#ifdef POWER_METER_DEVICE
+
 #define NUMBER_CHANNEL_POWERMETTER	3
 
 // #define PMT_DEBUG_UART
@@ -64,4 +67,6 @@ float pmt_read_I(uint8_t ch);
 float pmt_read_P(uint8_t ch);
 void pmt_print_info(uint8_t ch);
 
+#endif /* POWER_METER_DEVICE*/
+#endif /* MASTER_CORE*/
 #endif /* VENDOR_TBS_DEV_TBS_POWER_METER_APP_POWER_METER_APP_H_ */

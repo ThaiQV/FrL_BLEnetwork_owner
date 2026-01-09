@@ -11,12 +11,20 @@
  Corrected by: AI Assistant
  Date: 2025
  ****************************************************/
-
-#include "stpm32_define.h"
-#include "stpm32.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+
+#ifndef MASTER_CORE
+#include "tl_common.h"
+#include "vendor/TBS_dev/TBS_dev_config.h"
+#ifdef POWER_METER_DEVICE
+
+#include "stpm32_define.h"
+#include "stpm32.h"
+
+
+
 
 static const char *energy_names[] = {"Active", "Fundamental", "Reactive", "Apparent"};
 
@@ -1234,3 +1242,6 @@ void stpm_update_calib(stpm_handle_t *handle, uint8_t channel, uint16_t calib_V,
 
     }
 }
+
+#endif /* POWER_METER_DEVICE*/
+#endif /* MASTER_CORE*/

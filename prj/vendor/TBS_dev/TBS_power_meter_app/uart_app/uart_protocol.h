@@ -24,6 +24,9 @@
 #ifndef UART_PROTOCOL_H
 #define UART_PROTOCOL_H
 
+#ifndef MASTER_CORE
+#ifdef POWER_METER_DEVICE
+
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
@@ -414,4 +417,6 @@ extern "C"
 }
 #endif
 
+#endif /* POWER_METER_DEVICE*/
+#endif /* MASTER_CORE*/
 #endif // UART_DRIVER_H

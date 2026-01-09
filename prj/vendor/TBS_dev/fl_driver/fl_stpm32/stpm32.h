@@ -15,6 +15,9 @@
 #ifndef STPM3X_H
 #define STPM3X_H
 
+#ifndef MASTER_CORE
+// #ifdef POWER_METER_DEVICE
+
 #include <stdint.h>
 #include <stdbool.h>
 #include "stpm32_define.h"
@@ -142,4 +145,7 @@ void stpm32_send_frame(stpm_handle_t *handle, uint8_t read_add, uint8_t write_ad
                        uint8_t data_lsb, uint8_t data_msb);
 
 void stpm_update_calib(stpm_handle_t *handle, uint8_t channel, uint16_t calib_V, uint16_t calib_C);
+
+// #endif /* POWER_METER_DEVICE*/
+#endif /* MASTER_CORE*/
 #endif // STPM3X_H

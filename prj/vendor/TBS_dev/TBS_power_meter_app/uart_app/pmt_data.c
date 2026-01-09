@@ -5,10 +5,16 @@
  *      Author: hoang
  */
 
-#include "pmt_data.h"
-#include "uart_protocol.h"
 #include <stdio.h>
 #include <string.h>
+
+#ifndef MASTER_CORE
+#include "tl_common.h"
+#include "vendor/TBS_dev/TBS_dev_config.h"
+#ifdef POWER_METER_DEVICE
+
+#include "pmt_data.h"
+#include "uart_protocol.h"
 #include "../power_meter_app.h"
 
 uart_driver_t g_uart_driver;
@@ -415,3 +421,6 @@ static void process_data(const uint8_t *data, uint16_t len)
         }
     }
 }
+
+#endif /* POWER_METER_DEVICE*/
+#endif /* MASTER_CORE*/

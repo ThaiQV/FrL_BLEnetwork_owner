@@ -5,8 +5,11 @@
  *      Author: hoang
  */
 
+#ifndef MASTER_CORE
 #include "tl_common.h"
-#include "../TBS_dev_config.h"
+#include "vendor/TBS_dev/TBS_dev_config.h"
+#ifdef POWER_METER_DEVICE
+
 #include "vendor/FrL_network/fl_nwk_handler.h"
 #include "vendor/FrL_network/fl_nwk_api.h"
 #include "vendor/FrL_network/fl_nwk_database.h"
@@ -751,3 +754,6 @@ void pmt_report(void)
     }
     
 }
+
+#endif /* POWER_METER_DEVICE*/
+#endif /* MASTER_CORE*/

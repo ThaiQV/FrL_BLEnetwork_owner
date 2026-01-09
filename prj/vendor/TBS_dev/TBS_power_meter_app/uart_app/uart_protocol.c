@@ -3,9 +3,16 @@
  * @brief UART Driver Implementation
  */
 
-#include "uart_protocol.h"
-#include "../power_meter_app.h"
 #include <stdlib.h>
+
+#ifndef MASTER_CORE
+#include "tl_common.h"
+#include "vendor/TBS_dev/TBS_dev_config.h"
+#ifdef POWER_METER_DEVICE
+
+#include "uart_protocol.h"
+// #include "../power_meter_app.h"
+
 /*============================================================================
  *********************** UART DRIVER ******************************************
  *============================================================================*/
@@ -662,3 +669,6 @@ void protocol_reset_stats(protocol_context_t *protocol)
     protocol->rx_crc_error_count = 0;
     protocol->rx_frame_error_count = 0;
 }
+
+#endif /* POWER_METER_DEVICE*/
+#endif /* MASTER_CORE*/
