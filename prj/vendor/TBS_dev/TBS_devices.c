@@ -20,6 +20,7 @@
 
 #define COUNTER_LCD_REMOVE_DISPLAY		ct_remove_nwwk
 #define COUNTER_LCD_PRESS_DISPLAY		ct_add_bt_print
+#include "TBS_power_meter_app/power_meter_app.h"
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -320,14 +321,28 @@ void TBS_PowerMeter_init(void){
 
 	P_INFO("Threshold channel:%d-%d-%d\r\n",G_POWER_METER_PARAMETER[0],	G_POWER_METER_PARAMETER[1],	G_POWER_METER_PARAMETER[2]);
 	P_INFO("SamplePeriod:%d ms\r\n",PW_SAMPLE_PERIOD);
-//	memcpy(G_POWER_METER.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_POWER_METER.mac));
+	memcpy(G_POWER_METER.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_POWER_METER.mac));
 	G_POWER_METER.type = TBS_POWERMETER;
 	G_POWER_METER.timetamp= fl_rtc_get();
 	test_powermeter();
 	//todo:Init Butt,lcd,7segs,.....
-//	TBS_PowerMeter_TimerIRQ_Init(15);
+	for(int i= 0; i < 3; i++)
+	{
+		G_POWER_METER_PARAMETER[i] = (G_POWER_METER_PARAMETER[i] == 0) ? 5: G_POWER_METER_PARAMETER[i];
+	}
+	// fl_tbs_data_t tbs_load = fl_db_tbsprofile_load();
+	// memcpy(G_POWER_METER_PARAMETER, &tbs_load.data[40], sizeof(G_POWER_METER_PARAMETER));
+	printf("G_POWER_METER_PARAMETER0: %d\n", G_POWER_METER_PARAMETER[0]);
+	printf("G_POWER_METER_PARAMETER1: %d\n", G_POWER_METER_PARAMETER[1]);
+	printf("G_POWER_METER_PARAMETER2: %d\n", G_POWER_METER_PARAMETER[2]);
+	printf("G_POWER_METER_PARAMETER3: %d\n", G_POWER_METER_PARAMETER[3]);
+
+	power_meter_app_init();
+
+	// TBS_PowerMeter_TimerIRQ_Init(100);
 }
 void TBS_PowerMeter_Run(void){
+	memcpy(G_POWER_METER.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_POWER_METER.mac));
 	G_POWER_METER.timetamp = fl_rtc_get();
 	//For testing : randon valid of fields
 //	G_POWER_METER.data.frequency = RAND(0,128);
@@ -341,6 +356,8 @@ void TBS_PowerMeter_Run(void){
 //	G_POWER_METER.data.energy1 = RAND(0,16777216);
 //	G_POWER_METER.data.energy2 = RAND(0,16777216);
 //	G_POWER_METER.data.energy3 = RAND(0,16777216);
+	
+	power_meter_app_loop();
 }
 #endif
 /******************************************************************************/
@@ -378,8 +395,14 @@ void TBS_PwMeter_SetThreshod(u16 _chn1,u16 _chn2,u16 _chn3){
 	G_POWER_METER_PARAMETER[0]=_chn1;
 	G_POWER_METER_PARAMETER[1]=_chn2;
 	G_POWER_METER_PARAMETER[2]=_chn3;
+	printf("G_POWER_METER_PARAMETER0: %d\n", G_POWER_METER_PARAMETER[0]);
+	printf("G_POWER_METER_PARAMETER1: %d\n", G_POWER_METER_PARAMETER[1]);
+	printf("G_POWER_METER_PARAMETER2: %d\n", G_POWER_METER_PARAMETER[2]);
+	printf("G_POWER_METER_PARAMETER3: %d\n", G_POWER_METER_PARAMETER[3]);
+	fl_tbs_data_t tbs_load = fl_db_tbsprofile_load();
+	memcpy(&tbs_load.data[40],  G_POWER_METER_PARAMETER, sizeof(G_POWER_METER_PARAMETER));
 	//Store settings
-	fl_db_slavesettings_save((u8*)G_POWER_METER_PARAMETER,SIZEU8(G_POWER_METER_PARAMETER));
+	// fl_db_slavesettings_save((u8*)G_POWER_METER_PARAMETER,SIZEU8(G_POWER_METER_PARAMETER));
 	//For testing
 //	u8 settings[6];
 //	memcpy(settings,fl_db_slavesettings_load().setting_arr,SIZEU8(settings));
@@ -459,6 +482,7 @@ void TBS_Device_Init(void){
 	TBS_History_Init();
 #endif
 	blt_soft_timer_add(TBS_Device_Store_run,TBS_DEVICE_STORE_INTERVAL);
+
 }
 
 void TBS_Device_Run(void){
