@@ -92,6 +92,30 @@ u8 G_COUNTER_LCD[COUNTER_LCD_MESS_MAX][LCD_MESSAGE_SIZE];
 #define G_TBS_DEVICE		G_COUNTER_DEV
 #endif
 #ifdef POWER_METER_DEVICE
+
+#define LED_SIGNNAL_PIN_INIT(pin)				do{													\
+												gpio_function_en(pin);								\
+												gpio_set_output(pin, 1);							\
+												gpio_set_up_down_res(pin, GPIO_PIN_PULLUP_1M);		\
+												gpio_set_high_level(pin);							\
+											}while(0)
+#define LED_SIGNAL_ONOFF(pin,x)				{(x!=1)?gpio_set_high_level(pin):gpio_set_low_level(pin);}
+
+#define LED_PAIR_PIN_INIT()					LED_SIGNNAL_PIN_INIT(GPIO_PA6)
+#define LED_PAIR_ONOFF(on)					LED_SIGNAL_ONOFF(GPIO_PA6,on)
+
+#define LED_NETWORK_PIN_INIT()				LED_SIGNNAL_PIN_INIT(GPIO_PA5)
+#define LED_NETWORK_ONOFF(on)				LED_SIGNAL_ONOFF(GPIO_PA5,on)
+
+#define BUTTON_PIN_INIT(pin)				do{														\
+												gpio_function_en(pin);								\
+												gpio_set_output(pin, 0);							\
+												gpio_set_input(pin, 1);								\
+											}while(0)
+
+#define BUTTON_CONFIG_INIT()				BUTTON_PIN_INIT(GPIO_PB0)
+#define BUTTON_CONFIG_STATE					gpio_read(GPIO_PB0)
+
 tbs_device_powermeter_t G_POWER_METER = {
 				        .mac = {0, 0, 0, 0, 0, 0},
 				        .timetamp = 0,
@@ -272,6 +296,52 @@ void TBS_Counter_Run(void){
 #endif
 #ifdef POWER_METER_DEVICE
 
+void TBS_PowerMeter_Button_Exc(void){
+#define PRESS_VALUE  			0
+#define RELEASE_VALUE 			1
+#define DEBOUCE_FILTER			50 //ms
+#define FACTORY_REBOOTnHOLD		5*1000 //s
+#define PAIRING_HOLD			5*1000 //s
+
+	// Flag Reboot
+	static bool rst_flag = true;
+	//get frequency callback
+	static u32 lasttick = 0;
+	u32 deltaT = (clock_time()-lasttick)/SYSTEM_TIMER_TICK_1MS;
+	if (deltaT < DEBOUCE_FILTER) {
+		return;
+	}
+	lasttick = clock_time();
+	// process timing button
+	static u32 press_time = 0; //ms
+	if(BUTTON_CONFIG_STATE == PRESS_VALUE){
+		press_time += deltaT;
+		//Excute features
+		if (rst_flag && press_time >= FACTORY_REBOOTnHOLD) {
+			ERR(APP,"Factory default......(%d,%d)\r\n",press_time,rst_flag);
+			sys_reboot();
+		} else {
+			if (press_time >= PAIRING_HOLD) {
+				if (!IsPairing()) {
+					ERR(APP,"Pairing......(%d,%d)\r\n",press_time,rst_flag);
+					fl_nwk_slave_nwkclear();
+				}
+				press_time = 0;
+			}
+		}
+	}
+	if (BUTTON_CONFIG_STATE == RELEASE_VALUE) {
+		//Clear Reboot flag
+		rst_flag = false;
+		//Reset time
+		press_time=0;
+	}
+
+#undef PRESS_VALUE
+#undef RELEASE_VALUE
+#undef DEBOUCE_SCAN
+#undef FACTORY_REBOOTnHOLD
+}
 
 void TBS_PowerMeter_TimerIRQ_handler(void) {
 	//todo
@@ -338,26 +408,22 @@ void TBS_PowerMeter_init(void){
 	printf("G_POWER_METER_PARAMETER3: %d\n", G_POWER_METER_PARAMETER[3]);
 
 	power_meter_app_init();
-
+	///Init LED SIGNAL & BUTTONS Excution
+	LED_PAIR_PIN_INIT();
+	LED_NETWORK_PIN_INIT();
+	//Button config
+	BUTTON_CONFIG_INIT();
 	// TBS_PowerMeter_TimerIRQ_Init(100);
 }
 void TBS_PowerMeter_Run(void){
 	memcpy(G_POWER_METER.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_POWER_METER.mac));
 	G_POWER_METER.timetamp = fl_rtc_get();
-	//For testing : randon valid of fields
-//	G_POWER_METER.data.frequency = RAND(0,128);
-//	G_POWER_METER.data.voltage = RAND(0,512);
-//	G_POWER_METER.data.current1 = RAND(0,1024);
-//	G_POWER_METER.data.current2 = RAND(0,1024);
-//	G_POWER_METER.data.current3 = RAND(0,1024);
-//	G_POWER_METER.data.power1 = RAND(0,16384);
-//	G_POWER_METER.data.power2 = RAND(0,16384);
-//	G_POWER_METER.data.power3 = RAND(0,16384);
-//	G_POWER_METER.data.energy1 = RAND(0,16777216);
-//	G_POWER_METER.data.energy2 = RAND(0,16777216);
-//	G_POWER_METER.data.energy3 = RAND(0,16777216);
-	
+	TBS_PowerMeter_Button_Exc();
 	power_meter_app_loop();
+	//status network
+	LED_NETWORK_ONOFF(IsOnline());
+	//status pairing mode
+	LED_PAIR_ONOFF(IsPairing());
 }
 #endif
 /******************************************************************************/
@@ -370,12 +436,6 @@ void TBS_Device_Flash_Init_n_Reload(void) {
 	LOGA(FLA,"TBS_Device flash init and reload  !! \r\n");
 	fl_db_userdata_t userdata = fl_db_slaveuserdata_init();
 	memcpy((u8*) &G_TBS_DEVICE.timetamp,userdata.payload,SIZEU8(G_TBS_DEVICE) - 6);
-//
-//	///FOR TESTING DEBUG 2621
-//	if (G_TBS_DEVICE.data.index == 0) {
-//		G_TBS_DEVICE.data.index = 2600;
-//		ERR(APP,"DEBUG 2621:%d\r\n",G_TBS_DEVICE.data.index);
-//	}
 }
 
 /******************************************************************************/
