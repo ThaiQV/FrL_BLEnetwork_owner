@@ -295,21 +295,22 @@ void TBS_Counter_Run(void){
 }
 #endif
 #ifdef POWER_METER_DEVICE
+void TBS_PowerMeter_RMS_Read(void);
 
 void TBS_PowerMeter_Button_Exc(void){
 #define PRESS_VALUE  			0
 #define RELEASE_VALUE 			1
-#define DEBOUCE_FILTER			50 //ms
+#define DEBOUCE_FILTER			30 //ms
+#define FAST_PRESSnRELEASE		150 //ms
 #define FACTORY_REBOOTnHOLD		5*1000 //s
 #define PAIRING_HOLD			5*1000 //s
-
 	// Flag Reboot
 	static bool rst_flag = true;
 	//get frequency callback
 	static u32 lasttick = 0;
 	u32 deltaT = (clock_time()-lasttick)/SYSTEM_TIMER_TICK_1MS;
 	if (deltaT < DEBOUCE_FILTER) {
-		return;
+		//return;
 	}
 	lasttick = clock_time();
 	// process timing button
@@ -330,9 +331,14 @@ void TBS_PowerMeter_Button_Exc(void){
 			}
 		}
 	}
-	if (BUTTON_CONFIG_STATE == RELEASE_VALUE) {
+	else if (BUTTON_CONFIG_STATE == RELEASE_VALUE) {
 		//Clear Reboot flag
 		rst_flag = false;
+		//short press and release
+		if (press_time < PAIRING_HOLD && press_time > FAST_PRESSnRELEASE) {
+			//ERR(APP,"Fast Press(%d ms)...\r\n",press_time);
+			TBS_PowerMeter_RMS_Read();
+		}
 		//Reset time
 		press_time=0;
 	}
@@ -340,7 +346,14 @@ void TBS_PowerMeter_Button_Exc(void){
 #undef PRESS_VALUE
 #undef RELEASE_VALUE
 #undef DEBOUCE_SCAN
+#undef PAIRING_HOLD
 #undef FACTORY_REBOOTnHOLD
+}
+
+void TBS_PowerMeter_RMS_Read(void){
+	P_INFO("ch1: U: %10.3f I: %10.3f P: %10.3f\n",pmt_read_U(1),pmt_read_I(1),pmt_read_P(1));
+	P_INFO("ch2: U: %10.3f I: %10.3f P: %10.3f\n",pmt_read_U(2),pmt_read_I(2),pmt_read_P(2));
+	P_INFO("ch3: U: %10.3f I: %10.3f P: %10.3f\n",pmt_read_U(3),pmt_read_I(3),pmt_read_P(3));
 }
 
 void TBS_PowerMeter_TimerIRQ_handler(void) {
@@ -418,7 +431,9 @@ void TBS_PowerMeter_init(void){
 void TBS_PowerMeter_Run(void){
 	memcpy(G_POWER_METER.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_POWER_METER.mac));
 	G_POWER_METER.timetamp = fl_rtc_get();
+	//button excution
 	TBS_PowerMeter_Button_Exc();
+	//power meter app
 	power_meter_app_loop();
 	//status network
 	LED_NETWORK_ONOFF(IsOnline());

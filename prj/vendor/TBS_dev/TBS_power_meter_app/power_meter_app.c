@@ -378,8 +378,6 @@ void power_meter_app_read(void)
     }
 }
 
-
-
 void read_stpm_data(stpm_handle_t *handle)
 {
     if (handle == NULL)
