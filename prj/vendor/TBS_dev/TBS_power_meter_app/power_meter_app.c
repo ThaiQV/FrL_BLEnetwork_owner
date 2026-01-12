@@ -592,7 +592,6 @@ void pmt_print_info(uint8_t ch)
     //     PMT_LOGA("time%d: %d\n",i , time[i]);
     // }
 
-
     // time_max = 0;
     // time_min = 0;
 }
@@ -742,7 +741,9 @@ void pmt_report(void)
         tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) &G_POWER_METER;
         tbs_pack_powermeter_data(pwmeter_data,_payload);
         u8 indx_data = SIZEU8(pwmeter_data->type) + SIZEU8(pwmeter_data->mac) + SIZEU8(pwmeter_data->timetamp);
-        fl_api_slave_req(NWK_HDR_55,&_payload[indx_data],SIZEU8(pwmeter_data->data),0,0,1);
+		if (IsJoinedNetwork()) {
+			fl_api_slave_req(NWK_HDR_55,&_payload[indx_data],SIZEU8(pwmeter_data->data),0,0,1);
+		}
 
         // G_POWER_METER.data.time1 = 0;
         // G_POWER_METER.data.time2 = 0;
