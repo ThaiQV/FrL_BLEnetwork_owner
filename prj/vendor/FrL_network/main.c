@@ -134,7 +134,7 @@ void uart1_irq_handler(void) {
 	extern void uart1_recieve_irq(void);
 	uart1_recieve_irq();
 #ifndef MASTER_CORE
-#ifndef POWER_METER_DEVICE
+#ifdef POWER_METER_DEVICE
 	if(uart_get_irq_status(UART1, UART_TXDONE)){
 			drv_uart_tx_irq_handler();
 		}

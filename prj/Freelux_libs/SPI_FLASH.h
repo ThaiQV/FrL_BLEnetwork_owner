@@ -22,9 +22,17 @@
 #include <string.h>
 #include <stdint.h>
 #include "tl_common.h"
+#include "vendor/TBS_dev/TBS_dev_config.h"
+
 /******************************************************************************/
 /* SPI Pins */
+
+#ifdef POWER_METER_DEVICE
 #define PIN_CS		GPIO_PE7 //GPIO_PE7 GPIO_PB0
+#else
+#define PIN_CS		GPIO_PB0 //GPIO_PE7 GPIO_PB0
+#endif
+
 #define PIN_WP		GPIO_PB1
 #define PIN_MISO	GPIO_PB2
 #define PIN_MOSI	GPIO_PB3
