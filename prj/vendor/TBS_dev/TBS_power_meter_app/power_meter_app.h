@@ -57,7 +57,7 @@ typedef struct
 void power_meter_app_init(void);
 void power_meter_app_loop(void);
 void power_meter_app_read(void);
-
+void pmt_clear_energy(u8 chn);
 void pmt_setcalib(uint8_t ch, float calib_U, float calib_I, float calib_P);
 void pmt_getcalib(uint8_t ch, float *calib_U, float *calib_I, float *calib_P);
 void pmt_setcalibr(uint8_t ch, uint16_t calib_U, uint16_t calib_I, uint16_t calib_P);

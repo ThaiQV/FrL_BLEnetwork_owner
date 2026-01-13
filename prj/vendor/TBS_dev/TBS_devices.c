@@ -54,9 +54,10 @@ void tbs_power_meter_printf(type_debug_t _plog_type,void* _p) {
 	LOGA(_plog_type,"Index     :%d\r\n",dev->data.index);
 	LOGA(_plog_type,"Frequency :%u\r\n",dev->data.frequency);
 	LOGA(_plog_type,"Voltage   :%u\r\n",dev->data.voltage);
-	LOGA(_plog_type,"Current1  :%u\r\n",dev->data.current1);
-	LOGA(_plog_type,"Current2  :%u\r\n",dev->data.current2);
-	LOGA(_plog_type,"Current3  :%u\r\n",dev->data.current3);
+	LOGA(_plog_type,"Current1  :%u(%s)\r\n",dev->data.current1,dev->data.current_type1==1?"A":"mA");
+	LOGA(_plog_type,"Current2  :%u(%s)\r\n",dev->data.current2,dev->data.current_type2==1?"A":"mA");
+	LOGA(_plog_type,"Current3  :%u(%s)\r\n",dev->data.current3,dev->data.current_type3==1?"A":"mA");
+
 	LOGA(_plog_type,"Power1    :%u\r\n",dev->data.power1);
 	LOGA(_plog_type,"Power2    :%u\r\n",dev->data.power2);
 	LOGA(_plog_type,"Power3    :%u\r\n",dev->data.power3);
@@ -338,6 +339,16 @@ void TBS_PowerMeter_Button_Exc(void){
 		if (press_time < PAIRING_HOLD && press_time > FAST_PRESSnRELEASE) {
 			//ERR(APP,"Fast Press(%d ms)...\r\n",press_time);
 			TBS_PowerMeter_RMS_Read();
+			//TEST
+			extern void pmt_update_data_to_rp(void);
+			pmt_update_data_to_rp();
+			u8 _payload[SIZEU8(tbs_device_powermeter_t)];
+			tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) &G_POWER_METER;
+			tbs_pack_powermeter_data(pwmeter_data,_payload);
+			u8 indx_data = SIZEU8(pwmeter_data->type) + SIZEU8(pwmeter_data->mac) + SIZEU8(pwmeter_data->timetamp);
+			if (IsJoinedNetwork()) {
+				fl_api_slave_req(NWK_HDR_55,&_payload[indx_data],SIZEU8(pwmeter_data->data),0,0,1);
+			}
 		}
 		//Reset time
 		press_time=0;
@@ -350,12 +361,21 @@ void TBS_PowerMeter_Button_Exc(void){
 #undef FACTORY_REBOOTnHOLD
 }
 
-void TBS_PowerMeter_RMS_Read(void){
-	P_INFO("ch1: U: %10.3f I: %10.3f P: %10.3f\n",pmt_read_U(1),pmt_read_I(1),pmt_read_P(1));
-	P_INFO("ch2: U: %10.3f I: %10.3f P: %10.3f\n",pmt_read_U(2),pmt_read_I(2),pmt_read_P(2));
-	P_INFO("ch3: U: %10.3f I: %10.3f P: %10.3f\n",pmt_read_U(3),pmt_read_I(3),pmt_read_P(3));
+void TBS_PowerMeter_RMS_Read(void) {
+	float calib_U, calib_I, calib_P;
+	for (u8 chn = 1; chn < 4; chn++) {
+		pmt_getcalib(chn,&calib_U,&calib_I,&calib_P);
+		P_INFO("[%d]Urms(%.3f):%.3f,Irms(%.3f):%.3f,Prms(%.3f):%.3f\r\n",chn,calib_U,pmt_read_U(chn),calib_I,pmt_read_I(chn),calib_P,pmt_read_P(chn));
+	}
+	P_INFO("==================================\r\n");
 }
 
+void TBS_PowerMeter_Upload2Master(void){
+	extern void pmt_update_data_to_rp(void);
+	TBS_PowerMeter_RMS_Read();
+	LOG_P(APP,"Upload data to server....\r\n");
+	pmt_update_data_to_rp();
+}
 void TBS_PowerMeter_TimerIRQ_handler(void) {
 	//todo
 //	gpio_toggle(GPIO_PA6);
@@ -427,6 +447,7 @@ void TBS_PowerMeter_init(void){
 	//Button config
 	BUTTON_CONFIG_INIT();
 	// TBS_PowerMeter_TimerIRQ_Init(100);
+	TBS_PowerMeter_RMS_Read();
 }
 void TBS_PowerMeter_Run(void){
 	memcpy(G_POWER_METER.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_POWER_METER.mac));
@@ -463,6 +484,9 @@ void TBS_Device_Flash_Init_n_Reload(void) {
 void TBS_PowerMeter_RESETbyMaster(u8 _ch1,u8 _ch2,u8 _ch3){
 	LOGA(PERI,"Master RESET PWMeter channel:%d-%d-%d\r\n",_ch1,_ch2,_ch3);
 	//todo: RESET pwmeter struct
+	if(_ch1)pmt_clear_energy(0);
+	if(_ch2)pmt_clear_energy(1);
+	if(_ch3)pmt_clear_energy(2);
 }
 
 void TBS_PwMeter_SetThreshod(u16 _chn1,u16 _chn2,u16 _chn3){
@@ -557,7 +581,6 @@ void TBS_Device_Init(void){
 	TBS_History_Init();
 #endif
 	blt_soft_timer_add(TBS_Device_Store_run,TBS_DEVICE_STORE_INTERVAL);
-
 }
 
 void TBS_Device_Run(void){

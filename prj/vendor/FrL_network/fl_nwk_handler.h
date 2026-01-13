@@ -134,6 +134,7 @@ typedef struct {
  * | Frequency | Voltage | Current 1 | Current 2 | Current 3 | Power 1 | Power 2 | Power 3 | Energy 1 | Energy 2 | Energy 3 | Reserve | (sum 176 bits)
  * |   7 bits  |  9 bits |  10 bits  |  10 bits  |  10 bits  | 14 bits | 14 bits | 14 bits | 24 bits  | 24 bits  | 24 bits  | 16 bits |
  */
+/*
 typedef struct {
 	u8 mac[6];         	// MAC address (48 bits)
 	u32 timetamp;     	// timetamp (32 bits)
@@ -253,6 +254,141 @@ static inline void tbs_unpack_powermeter_data(tbs_device_powermeter_t *dst, cons
 
     #undef READ_BITS
 }
+*/
+
+//For POWER-METER DEVICEs
+/*
+ * | Frequency | Voltage | Current 1 | Current 2 | Current 3 | CurrentType1+Power1 | CurrentType2+Power2 | CurrentType3+Power3 | Energy 1 | Energy 2 | Energy 3 | Reserve | (sum 176 bits)
+ * |   7 bits  |  9 bits |   10 bits |   10 bits |   10 bits |        1+7 bits     |        1+7 bits     |        1+7 bits     |  24 bits |  24 bits |  24 bits |  16 bits |
+ */
+typedef struct {
+    u8 mac[6];         // MAC address (48 bits)
+    u32 timetamp;      // timestamp (32 bits)
+    u8 type;           // device type
+    struct {
+        u16 index;         // 16 bits
+        u8 frequency;      // 7 bits
+        u16 voltage;       // 9 bits
+        u16 current1;      // 10 bits
+        u16 current2;      // 10 bits
+        u16 current3;      // 10 bits
+        u8 current_type1;  // 1 bit
+        u8 power1;         // 7 bits
+        u8 current_type2;  // 1 bit
+        u8 power2;         // 7 bits
+        u8 current_type3;  // 1 bit
+        u8 power3;         // 7 bits
+
+        u8 time1;          // 6 bits
+        u8 time2;          // 6 bits
+        u8 time3;          // 6 bits
+        u32 energy1;       // 24 bits
+        u32 energy2;       // 24 bits
+        u32 energy3;       // 24 bits
+    } data;
+} __attribute__((packed)) tbs_device_powermeter_t;
+
+#define POWER_METER_STRUCT_BYTESIZE (SIZEU8(tbs_device_powermeter_t))
+#define POWER_METER_BITSIZE         34
+#define POWER_DATA_INSTRUCT         22
+
+static inline void tbs_pack_powermeter_data(const tbs_device_powermeter_t *src, u8 *dst) {
+    u32 bitpos = 0;
+    u32 byte_idx = 0;
+    memset(dst, 0, POWER_METER_BITSIZE);
+
+    memcpy(&dst[byte_idx], src->mac, sizeof(src->mac));
+    byte_idx += sizeof(src->mac);
+
+    memcpy(&dst[byte_idx], &src->timetamp, sizeof(src->timetamp));
+    byte_idx += sizeof(src->timetamp);
+
+    dst[byte_idx++] = src->type;
+
+    bitpos = byte_idx * 8;
+
+    #define WRITE_BITS(val, bits) do { \
+        for (int i = 0; i < (bits); ++i) { \
+            u32 byte_index = (bitpos + i) / 8; \
+            u32 bit_index  = (bitpos + i) % 8; \
+            dst[byte_index] |= ((val >> i) & 1) << bit_index; \
+        } \
+        bitpos += (bits); \
+    } while (0)
+
+    WRITE_BITS(src->data.index, 16);
+    WRITE_BITS(src->data.frequency, 7);
+    WRITE_BITS(src->data.voltage, 9);
+    WRITE_BITS(src->data.current1, 10);
+    WRITE_BITS(src->data.current2, 10);
+    WRITE_BITS(src->data.current3, 10);
+
+    WRITE_BITS(src->data.current_type1, 1);
+    WRITE_BITS(src->data.power1, 7);
+    WRITE_BITS(src->data.current_type2, 1);
+    WRITE_BITS(src->data.power2, 7);
+    WRITE_BITS(src->data.current_type3, 1);
+    WRITE_BITS(src->data.power3, 7);
+
+    WRITE_BITS(src->data.time1, 6);
+    WRITE_BITS(src->data.time2, 6);
+    WRITE_BITS(src->data.time3, 6);
+    WRITE_BITS(src->data.energy1, 24);
+    WRITE_BITS(src->data.energy2, 24);
+    WRITE_BITS(src->data.energy3, 24);
+
+    #undef WRITE_BITS
+}
+
+static inline void tbs_unpack_powermeter_data(tbs_device_powermeter_t *dst, const u8 *src) {
+    u32 bitpos = 0;
+    u32 byte_idx = 0;
+
+    memcpy(dst->mac, &src[byte_idx], sizeof(dst->mac));
+    byte_idx += sizeof(dst->mac);
+
+    memcpy(&dst->timetamp, &src[byte_idx], sizeof(dst->timetamp));
+    byte_idx += sizeof(dst->timetamp);
+
+    dst->type = src[byte_idx++];
+
+    bitpos = byte_idx * 8;
+
+    #define READ_BITS(var, bits) do { \
+        var = 0; \
+        for (int i = 0; i < (bits); ++i) { \
+            u32 byte_index = (bitpos + i) / 8; \
+            u32 bit_index  = (bitpos + i) % 8; \
+            var |= ((src[byte_index] >> bit_index) & 1) << i; \
+        } \
+        bitpos += (bits); \
+    } while (0)
+
+    READ_BITS(dst->data.index, 16);
+    READ_BITS(dst->data.frequency, 7);
+    READ_BITS(dst->data.voltage, 9);
+    READ_BITS(dst->data.current1, 10);
+    READ_BITS(dst->data.current2, 10);
+    READ_BITS(dst->data.current3, 10);
+
+    READ_BITS(dst->data.current_type1, 1);
+    READ_BITS(dst->data.power1, 7);
+    READ_BITS(dst->data.current_type2, 1);
+    READ_BITS(dst->data.power2, 7);
+    READ_BITS(dst->data.current_type3, 1);
+    READ_BITS(dst->data.power3, 7);
+
+    READ_BITS(dst->data.time1, 6);
+    READ_BITS(dst->data.time2, 6);
+    READ_BITS(dst->data.time3, 6);
+    READ_BITS(dst->data.energy1, 24);
+    READ_BITS(dst->data.energy2, 24);
+    READ_BITS(dst->data.energy3, 24);
+
+    #undef READ_BITS
+}
+
+
 
 typedef struct {
 	u8 mac[6];
