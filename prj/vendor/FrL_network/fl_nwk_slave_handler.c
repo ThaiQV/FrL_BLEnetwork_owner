@@ -331,6 +331,12 @@ void fl_nwk_slave_init(void) {
 	}
 #endif
 
+	if(G_INFORMATION.slaveID == G_INFORMATION.profile.slaveid && G_INFORMATION.slaveID == 0xFF){
+		ERR(APP,"Turn on install mode\r\n");
+		G_INFORMATION.profile.run_stt.join_nwk = 1;
+		G_INFORMATION.profile.run_stt.rst_factory  = 1 ; //has reset factory device
+	}
+
 	blt_soft_timer_add(_nwk_slave_backup,2*1020*999);
 	//Interval checking network
 //	fl_nwk_slave_reconnectNstoragedata();
@@ -1154,11 +1160,11 @@ int _interval_report(void) {
 #ifdef COUNTER_DEVICE
 				fl_api_slave_req(NWK_HDR_55,(u8*) &G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data),0,0,1);//NWK_HDR_11_REACTIVE
 #else //POWERMETER
-				u8 _payload[SIZEU8(tbs_device_powermeter_t)];
-				tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) G_INFORMATION.data;
-				tbs_pack_powermeter_data(pwmeter_data,_payload);
-				u8 indx_data = SIZEU8(pwmeter_data->type) + SIZEU8(pwmeter_data->mac) + SIZEU8(pwmeter_data->timetamp);
-				fl_api_slave_req(NWK_HDR_55,&_payload[indx_data],SIZEU8(pwmeter_data->data),0,0,1);
+				// u8 _payload[SIZEU8(tbs_device_powermeter_t)];
+				// tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) G_INFORMATION.data;
+				// tbs_pack_powermeter_data(pwmeter_data,_payload);
+				// u8 indx_data = SIZEU8(pwmeter_data->type) + SIZEU8(pwmeter_data->mac) + SIZEU8(pwmeter_data->timetamp);
+				// fl_api_slave_req(NWK_HDR_55,&_payload[indx_data],SIZEU8(pwmeter_data->data),0,0,1);
 #endif
 				//increase index if using NWK_HDR_11_REACTIVE
 				//TBS_Device_Index_manage();

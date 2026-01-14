@@ -51,7 +51,7 @@
 
 #define UART_PRINT_DEBUG_ENABLE  			1
 #ifdef UART_PRINT_DEBUG_ENABLE
-#define PRINT_DEBUG_PRIORITY_IRQ			1 //highest priority for debugging
+#define PRINT_DEBUG_PRIORITY_IRQ			0 //highest priority for debugging
 #endif
 #define DEBUG_GPIO_ENABLE					0
 #define JTAG_DEBUG_ENABLE					0
@@ -224,7 +224,7 @@
 //the baud rate should not bigger than 115200 when MCU clock is 16M)
 //the baud rate should not bigger than 1000000 when MCU clock is 24M)
 #define PRINT_BAUD_RATE             		115200
-#define DEBUG_INFO_TX_PIN           		GPIO_PA7
+#define DEBUG_INFO_TX_PIN           		GPIO_PE0
 #define PULL_WAKEUP_SRC_PA7         		PM_PIN_PULLUP_10K
 #define PA7_OUTPUT_ENABLE         			1
 #define PA7_DATA_OUT                     	1 //must

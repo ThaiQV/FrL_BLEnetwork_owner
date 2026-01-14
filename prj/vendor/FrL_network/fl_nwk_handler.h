@@ -134,7 +134,7 @@ typedef struct {
  * | Frequency | Voltage | Current 1 | Current 2 | Current 3 | Power 1 | Power 2 | Power 3 | Energy 1 | Energy 2 | Energy 3 | Reserve | (sum 176 bits)
  * |   7 bits  |  9 bits |  10 bits  |  10 bits  |  10 bits  | 14 bits | 14 bits | 14 bits | 24 bits  | 24 bits  | 24 bits  | 16 bits |
  */
-/*
+
 typedef struct {
 	u8 mac[6];         	// MAC address (48 bits)
 	u32 timetamp;     	// timetamp (32 bits)
@@ -254,7 +254,7 @@ static inline void tbs_unpack_powermeter_data(tbs_device_powermeter_t *dst, cons
 
     #undef READ_BITS
 }
-*/
+
 
 
 //For POWER-METER DEVICEs
@@ -262,6 +262,7 @@ static inline void tbs_unpack_powermeter_data(tbs_device_powermeter_t *dst, cons
  * | Frequency | Voltage | Current 1 | Current 2 | Current 3 | CurrentType1+Power1 | CurrentType2+Power2 | CurrentType3+Power3 | Energy 1 | Energy 2 | Energy 3 | Reserve | (sum 176 bits)
  * |   7 bits  |  9 bits |   10 bits |   10 bits |   10 bits |        1+7 bits     |        1+7 bits     |        1+7 bits     |  24 bits |  24 bits |  24 bits |  16 bits |
  */
+/*
 typedef struct {
     u8 mac[6];         // MAC address (48 bits)
     u32 timetamp;      // timestamp (32 bits)
@@ -388,7 +389,7 @@ static inline void tbs_unpack_powermeter_data(tbs_device_powermeter_t *dst, cons
 
     #undef READ_BITS
 }
-
+*/
 
 typedef struct {
 	u8 mac[6];

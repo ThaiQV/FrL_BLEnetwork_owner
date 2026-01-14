@@ -20,6 +20,7 @@
 
 #define COUNTER_LCD_REMOVE_DISPLAY		ct_remove_nwwk
 #define COUNTER_LCD_PRESS_DISPLAY		ct_add_bt_print
+#include "TBS_power_meter_app/power_meter_app.h"
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -43,6 +44,30 @@ void tbs_counter_printf(type_debug_t _plog_type,void* _p){
 	LOGA(_plog_type,"pre_mode    :%d\r\n",data->data.pre_mode);
 	LOGA(_plog_type,"pre_timetamp:%d\r\n",data->data.pre_timetamp);
 }
+
+void tbs_power_meter_printf(type_debug_t _plog_type,void* _p) {
+	tbs_device_powermeter_t* dev = (tbs_device_powermeter_t*)_p;
+	LOGA(_plog_type,"POWERMETER STRUCT SIZE :%d/%d\r\n",SIZEU8(tbs_device_powermeter_t),SIZEU8(dev->data));
+	LOGA(_plog_type,"MAC       :0x%02X%02X%02X%02X%02X%02X\r\n",dev->mac[0],dev->mac[1],dev->mac[2],dev->mac[3],dev->mac[4],dev->mac[5]);
+	LOGA(_plog_type,"Timetamp  :%d\r\n",dev->timetamp);
+	LOGA(_plog_type,"Type      :%d\r\n",dev->type);
+	LOGA(_plog_type,"Index     :%d\r\n",dev->data.index);
+	LOGA(_plog_type,"Frequency :%u\r\n",dev->data.frequency);
+	LOGA(_plog_type,"Voltage   :%u\r\n",dev->data.voltage);
+	LOGA(_plog_type,"Current1  :%u (%s)\r\n",dev->data.current1 & 0x7FFF,(dev->data.current1 & 0x8000)>0?"A":"mA");
+	LOGA(_plog_type,"Current2  :%u (%s)\r\n",dev->data.current2 & 0x7FFF,(dev->data.current2 & 0x8000)>0?"A":"mA");
+	LOGA(_plog_type,"Current3  :%u (%s)\r\n",dev->data.current3 & 0x7FFF,(dev->data.current3 & 0x8000)>0?"A":"mA");
+	LOGA(_plog_type,"Power1    :%u\r\n",dev->data.power1);
+	LOGA(_plog_type,"Power2    :%u\r\n",dev->data.power2);
+	LOGA(_plog_type,"Power3    :%u\r\n",dev->data.power3);
+	LOGA(_plog_type,"Time1     :%u\r\n",dev->data.time1);
+	LOGA(_plog_type,"Time2     :%u\r\n",dev->data.time2);
+	LOGA(_plog_type,"Time3     :%u\r\n",dev->data.time3);
+	LOGA(_plog_type,"Energy1   :%u\r\n",dev->data.energy1);
+	LOGA(_plog_type,"Energy2   :%u\r\n",dev->data.energy2);
+	LOGA(_plog_type,"Energy3   :%u\r\n",dev->data.energy3);
+}
+/*
 void tbs_power_meter_printf(type_debug_t _plog_type,void* _p) {
 	tbs_device_powermeter_t* dev = (tbs_device_powermeter_t*)_p;
 	LOGA(_plog_type,"POWERMETER STRUCT SIZE :%d/%d\r\n",SIZEU8(tbs_device_powermeter_t),SIZEU8(dev->data));
@@ -66,7 +91,7 @@ void tbs_power_meter_printf(type_debug_t _plog_type,void* _p) {
 	LOGA(_plog_type,"Energy2   :%u\r\n",dev->data.energy2);
 	LOGA(_plog_type,"Energy3   :%u\r\n",dev->data.energy3);
 }
-
+*/
 #ifndef MASTER_CORE
 
 #ifdef COUNTER_DEVICE
@@ -320,14 +345,28 @@ void TBS_PowerMeter_init(void){
 
 	P_INFO("Threshold channel:%d-%d-%d\r\n",G_POWER_METER_PARAMETER[0],	G_POWER_METER_PARAMETER[1],	G_POWER_METER_PARAMETER[2]);
 	P_INFO("SamplePeriod:%d ms\r\n",PW_SAMPLE_PERIOD);
-//	memcpy(G_POWER_METER.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_POWER_METER.mac));
+	memcpy(G_POWER_METER.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_POWER_METER.mac));
 	G_POWER_METER.type = TBS_POWERMETER;
 	G_POWER_METER.timetamp= fl_rtc_get();
 	test_powermeter();
 	//todo:Init Butt,lcd,7segs,.....
-//	TBS_PowerMeter_TimerIRQ_Init(15);
+	for(int i= 0; i < 3; i++)
+	{
+		G_POWER_METER_PARAMETER[i] = (G_POWER_METER_PARAMETER[i] == 0) ? 5: G_POWER_METER_PARAMETER[i];
+	}
+	// fl_tbs_data_t tbs_load = fl_db_tbsprofile_load();
+	// memcpy(G_POWER_METER_PARAMETER, &tbs_load.data[40], sizeof(G_POWER_METER_PARAMETER));
+	printf("G_POWER_METER_PARAMETER0: %d\n", G_POWER_METER_PARAMETER[0]);
+	printf("G_POWER_METER_PARAMETER1: %d\n", G_POWER_METER_PARAMETER[1]);
+	printf("G_POWER_METER_PARAMETER2: %d\n", G_POWER_METER_PARAMETER[2]);
+	printf("G_POWER_METER_PARAMETER3: %d\n", G_POWER_METER_PARAMETER[3]);
+
+	power_meter_app_init();
+
+	// TBS_PowerMeter_TimerIRQ_Init(100);
 }
 void TBS_PowerMeter_Run(void){
+	memcpy(G_POWER_METER.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_POWER_METER.mac));
 	G_POWER_METER.timetamp = fl_rtc_get();
 	//For testing : randon valid of fields
 //	G_POWER_METER.data.frequency = RAND(0,128);
@@ -341,6 +380,8 @@ void TBS_PowerMeter_Run(void){
 //	G_POWER_METER.data.energy1 = RAND(0,16777216);
 //	G_POWER_METER.data.energy2 = RAND(0,16777216);
 //	G_POWER_METER.data.energy3 = RAND(0,16777216);
+	
+	power_meter_app_loop();
 }
 #endif
 /******************************************************************************/
@@ -378,8 +419,14 @@ void TBS_PwMeter_SetThreshod(u16 _chn1,u16 _chn2,u16 _chn3){
 	G_POWER_METER_PARAMETER[0]=_chn1;
 	G_POWER_METER_PARAMETER[1]=_chn2;
 	G_POWER_METER_PARAMETER[2]=_chn3;
+	printf("G_POWER_METER_PARAMETER0: %d\n", G_POWER_METER_PARAMETER[0]);
+	printf("G_POWER_METER_PARAMETER1: %d\n", G_POWER_METER_PARAMETER[1]);
+	printf("G_POWER_METER_PARAMETER2: %d\n", G_POWER_METER_PARAMETER[2]);
+	printf("G_POWER_METER_PARAMETER3: %d\n", G_POWER_METER_PARAMETER[3]);
+	fl_tbs_data_t tbs_load = fl_db_tbsprofile_load();
+	memcpy(&tbs_load.data[40],  G_POWER_METER_PARAMETER, sizeof(G_POWER_METER_PARAMETER));
 	//Store settings
-	fl_db_slavesettings_save((u8*)G_POWER_METER_PARAMETER,SIZEU8(G_POWER_METER_PARAMETER));
+	// fl_db_slavesettings_save((u8*)G_POWER_METER_PARAMETER,SIZEU8(G_POWER_METER_PARAMETER));
 	//For testing
 //	u8 settings[6];
 //	memcpy(settings,fl_db_slavesettings_load().setting_arr,SIZEU8(settings));
@@ -459,6 +506,7 @@ void TBS_Device_Init(void){
 	TBS_History_Init();
 #endif
 	blt_soft_timer_add(TBS_Device_Store_run,TBS_DEVICE_STORE_INTERVAL);
+
 }
 
 void TBS_Device_Run(void){
