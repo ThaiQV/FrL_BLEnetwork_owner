@@ -54,9 +54,9 @@ void tbs_power_meter_printf(type_debug_t _plog_type,void* _p) {
 	LOGA(_plog_type,"Index     :%d\r\n",dev->data.index);
 	LOGA(_plog_type,"Frequency :%u\r\n",dev->data.frequency);
 	LOGA(_plog_type,"Voltage   :%u\r\n",dev->data.voltage);
-	LOGA(_plog_type,"Current1  :%u (%s)\r\n",dev->data.current1 & 0x7FFF,(dev->data.current1 > 15)>0?"A":"mA");
-	LOGA(_plog_type,"Current2  :%u (%s)\r\n",dev->data.current2 & 0x7FFF,(dev->data.current2 > 15)>0?"A":"mA");
-	LOGA(_plog_type,"Current3  :%u (%s)\r\n",dev->data.current3 & 0x7FFF,(dev->data.current3 > 15)>0?"A":"mA");
+	LOGA(_plog_type,"Current1  :%u (%s)\r\n",dev->data.current1 ,((dev->data.power1 >> 7)& 0x1) > 0?"A":"mA");
+	LOGA(_plog_type,"Current2  :%u (%s)\r\n",dev->data.current2 ,((dev->data.power2 >> 7)& 0x1) > 0?"A":"mA");
+	LOGA(_plog_type,"Current3  :%u (%s)\r\n",dev->data.current3 ,((dev->data.power3 >> 7)& 0x1) > 0?"A":"mA");
 	LOGA(_plog_type,"Power1    :%u\r\n",dev->data.power1);
 	LOGA(_plog_type,"Power2    :%u\r\n",dev->data.power2);
 	LOGA(_plog_type,"Power3    :%u\r\n",dev->data.power3);
