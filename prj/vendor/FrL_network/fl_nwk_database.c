@@ -656,7 +656,9 @@ void fl_db_clearAll(void){
 	_db_earse_sector_full(ADDR_SLAVE_SETTINGS_START,SLAVESETTINGS_SIZE/SECTOR_FLASH_SIZE);
 //	flash_erase_sector(ADDR_SLAVE_USERDATA_START);
 	_db_earse_sector_full(ADDR_SLAVE_USERDATA_START,SLAVEUSERDATA_SIZE/SECTOR_FLASH_SIZE);
+#ifdef COUNTER_DEVICE
 	_db_earse_sector_full(ADDR_TBS_PROFILE_START,TBSPROFILE_SIZE/SECTOR_FLASH_SIZE);
+#endif
 #endif
 }
 /******************************************************************************/

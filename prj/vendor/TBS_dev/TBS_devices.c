@@ -321,6 +321,8 @@ void TBS_PowerMeter_Button_Exc(void){
 		//Excute features
 		if (rst_flag && press_time >= FACTORY_REBOOTnHOLD) {
 			ERR(APP,"Factory default......(%d,%d)\r\n",press_time,rst_flag);
+			fl_db_clearAll();
+			TBS_History_ClearAll();
 			sys_reboot();
 		} else {
 			if (press_time >= PAIRING_HOLD) {

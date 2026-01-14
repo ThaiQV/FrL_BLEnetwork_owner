@@ -276,7 +276,7 @@ void fl_nwk_slave_displayLCD_Refesh(void){
 }
 #endif
 void fl_nwk_slave_init(void) {
-//	PLOG_Start(APP);
+	PLOG_Start(ALL);
 //	PLOG_Start(FLA);
 	DEBUG_TURN(NWK_DEBUG_STT);
 //	fl_input_external_init();
@@ -331,11 +331,11 @@ void fl_nwk_slave_init(void) {
 	}
 #endif
 
-	if(G_INFORMATION.slaveID == G_INFORMATION.profile.slaveid && G_INFORMATION.slaveID == 0xFF){
-		ERR(APP,"Turn on install mode\r\n");
-		G_INFORMATION.profile.run_stt.join_nwk = 1;
-		G_INFORMATION.profile.run_stt.rst_factory  = 1 ; //has reset factory device
-	}
+//	if(G_INFORMATION.slaveID == G_INFORMATION.profile.slaveid && G_INFORMATION.slaveID == 0xFF){
+//		ERR(APP,"Turn on install mode\r\n");
+//		G_INFORMATION.profile.run_stt.join_nwk = 1;
+//		G_INFORMATION.profile.run_stt.rst_factory  = 1 ; //has reset factory device
+//	}
 
 	blt_soft_timer_add(_nwk_slave_backup,2*1020*999);
 	//Interval checking network

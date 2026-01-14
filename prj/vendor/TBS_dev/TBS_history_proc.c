@@ -64,6 +64,7 @@ typedef struct {
 typedef struct {
 	u32 timetamp;     	// timetamp (32 bits)
 	// Measurement fields (bit-level precision noted)
+	u8 type;
 	struct {
 		u16 index;          // 16 bits
 		u8 frequency;     	// 7 bits
@@ -71,15 +72,18 @@ typedef struct {
 		u16 current1;       // 10 bits
 		u16 current2;       // 10 bits
 		u16 current3;       // 10 bits
-		u8 power1;          // 8 bits
-		u8 power2;          // 8 bits
-		u8 power3;          // 8 bits
-		u8 time1;           // 6 bits
-		u8 time2;           // 6 bits
-		u8 time3;           // 6 bits
-		u32 energy1;        // 24 bits
-		u32 energy2;        // 24 bits
-		u32 energy3;        // 24 bits
+//        u8 current_type1;   // 1 bit
+        u8 power1_current_type1;			// 7 bits + 1 bit
+//        u8 current_type2;  // 1 bit
+        u8 power2_current_type2;			// 7 bits+ 1 bit
+//        u8 current_type3;  // 1 bit
+        u8 power3_current_type3;			// 7 bits + 1 bit
+        u8 time1;          // 6 bits
+        u8 time2;          // 6 bits
+        u8 time3;          // 6 bits
+        u32 energy1;       // 24 bits
+        u32 energy2;       // 24 bits
+        u32 energy3;       // 24 bits
 	} data;
 }__attribute__((packed)) tbs_history_powermeter_t;
 
@@ -280,11 +284,8 @@ void TBS_History_StoreToFlash(u8* _data_struct){
 #ifdef POWER_METER_DEVICE
 	tbs_history_powermeter_t his_dev;
 #endif
-
 	memcpy((u8*)&his_dev,&_data_struct[6],DATA_HISTORY_SIZE);
-
 	tbs_history_store((u8*)&his_dev,DATA_HISTORY_SIZE);
-
 	P_PRINTFHEX_A(FLA,his_dev,DATA_HISTORY_SIZE,"STORE|[%d]%d:",his_dev.data.index,his_dev.timetamp);
 }
 
