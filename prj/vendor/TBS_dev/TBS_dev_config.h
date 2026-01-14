@@ -30,7 +30,7 @@ void TBS_PowerMeter_RESETbyMaster(u8 _ch1,u8 _ch2,u8 _ch3);
 void TBS_PwMeter_SetThreshod(u16 _chn1,u16 _chn2,u16 _chn3);
 #endif
 #else
-#define MASTER_BLOCK_MAC_SLAVE
+//#define MASTER_BLOCK_MAC_SLAVE
 #endif
 #ifdef COUNTER_DEVICE
 void Counter_LCD_RemoveDisplay(void);
