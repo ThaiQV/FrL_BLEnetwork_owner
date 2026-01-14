@@ -134,7 +134,7 @@ typedef struct {
  * | Frequency | Voltage | Current 1 | Current 2 | Current 3 | Power 1 | Power 2 | Power 3 | Energy 1 | Energy 2 | Energy 3 | Reserve | (sum 176 bits)
  * |   7 bits  |  9 bits |  10 bits  |  10 bits  |  10 bits  | 14 bits | 14 bits | 14 bits | 24 bits  | 24 bits  | 24 bits  | 16 bits |
  */
-/*
+
 typedef struct {
 	u8 mac[6];         	// MAC address (48 bits)
 	u32 timetamp;     	// timetamp (32 bits)
@@ -254,13 +254,14 @@ static inline void tbs_unpack_powermeter_data(tbs_device_powermeter_t *dst, cons
 
     #undef READ_BITS
 }
-*/
+
 
 //For POWER-METER DEVICEs
 /*
  * | Frequency | Voltage | Current 1 | Current 2 | Current 3 | CurrentType1+Power1 | CurrentType2+Power2 | CurrentType3+Power3 | Energy 1 | Energy 2 | Energy 3 | Reserve | (sum 176 bits)
  * |   7 bits  |  9 bits |   10 bits |   10 bits |   10 bits |        1+7 bits     |        1+7 bits     |        1+7 bits     |  24 bits |  24 bits |  24 bits |  16 bits |
  */
+/*
 typedef struct {
     u8 mac[6];         // MAC address (48 bits)
     u32 timetamp;      // timestamp (32 bits)
@@ -386,7 +387,7 @@ static inline void tbs_unpack_powermeter_data(tbs_device_powermeter_t *dst, cons
 
     #undef READ_BITS
 }
-
+*/
 
 
 typedef struct {
@@ -457,10 +458,10 @@ inline u8 fl_crc8(u8* _pdata, u8 _len) {
 	return (u8) (crc % 256);
 }
 
-#define DEBUG_TURN(x) /*do { \
+#define DEBUG_TURN(x) do { \
 							if (x) { PLOG_Start(ALL); } \
 							else   { PLOG_Stop(ALL);  }\
-						} while(0)*/
+						} while(0)
 static inline uint32_t swap_endian32(uint32_t val) {
     return ((val >> 24) & 0x000000FF) |
            ((val >> 8)  & 0x0000FF00) |

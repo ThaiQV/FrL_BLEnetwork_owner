@@ -44,7 +44,29 @@ void tbs_counter_printf(type_debug_t _plog_type,void* _p){
 	LOGA(_plog_type,"pre_mode    :%d\r\n",data->data.pre_mode);
 	LOGA(_plog_type,"pre_timetamp:%d\r\n",data->data.pre_timetamp);
 }
-
+void tbs_power_meter_printf(type_debug_t _plog_type,void* _p) {
+	tbs_device_powermeter_t* dev = (tbs_device_powermeter_t*)_p;
+	LOGA(_plog_type,"POWERMETER STRUCT SIZE :%d/%d\r\n",SIZEU8(tbs_device_powermeter_t),SIZEU8(dev->data));
+	LOGA(_plog_type,"MAC       :0x%02X%02X%02X%02X%02X%02X\r\n",dev->mac[0],dev->mac[1],dev->mac[2],dev->mac[3],dev->mac[4],dev->mac[5]);
+	LOGA(_plog_type,"Timetamp  :%d\r\n",dev->timetamp);
+	LOGA(_plog_type,"Type      :%d\r\n",dev->type);
+	LOGA(_plog_type,"Index     :%d\r\n",dev->data.index);
+	LOGA(_plog_type,"Frequency :%u\r\n",dev->data.frequency);
+	LOGA(_plog_type,"Voltage   :%u\r\n",dev->data.voltage);
+	LOGA(_plog_type,"Current1  :%u (%s)\r\n",dev->data.current1 ,((dev->data.power1 >> 7)& 0x1) > 0?"A":"mA");
+	LOGA(_plog_type,"Current2  :%u (%s)\r\n",dev->data.current2 ,((dev->data.power2 >> 7)& 0x1) > 0?"A":"mA");
+	LOGA(_plog_type,"Current3  :%u (%s)\r\n",dev->data.current3 ,((dev->data.power3 >> 7)& 0x1) > 0?"A":"mA");
+	LOGA(_plog_type,"Power1    :%u\r\n",dev->data.power1);
+	LOGA(_plog_type,"Power2    :%u\r\n",dev->data.power2);
+	LOGA(_plog_type,"Power3    :%u\r\n",dev->data.power3);
+	LOGA(_plog_type,"Time1     :%u\r\n",dev->data.time1);
+	LOGA(_plog_type,"Time2     :%u\r\n",dev->data.time2);
+	LOGA(_plog_type,"Time3     :%u\r\n",dev->data.time3);
+	LOGA(_plog_type,"Energy1   :%u\r\n",dev->data.energy1);
+	LOGA(_plog_type,"Energy2   :%u\r\n",dev->data.energy2);
+	LOGA(_plog_type,"Energy3   :%u\r\n",dev->data.energy3);
+}
+/*
 void tbs_power_meter_printf(type_debug_t _plog_type,void* _p) {
 	tbs_device_powermeter_t* dev = (tbs_device_powermeter_t*)_p;
 	LOGA(_plog_type,"POWERMETER STRUCT SIZE :%d/%d\r\n",SIZEU8(tbs_device_powermeter_t),SIZEU8(dev->data));
@@ -68,7 +90,7 @@ void tbs_power_meter_printf(type_debug_t _plog_type,void* _p) {
 	LOGA(_plog_type,"Energy2   :%u\r\n",dev->data.energy2);
 	LOGA(_plog_type,"Energy3   :%u\r\n",dev->data.energy3);
 }
-
+*/
 #ifndef MASTER_CORE
 
 #ifdef COUNTER_DEVICE

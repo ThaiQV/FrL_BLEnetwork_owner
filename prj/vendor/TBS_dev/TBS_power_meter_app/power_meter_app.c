@@ -715,32 +715,35 @@ void pmt_update_data_to_rp(void)
 
     u32 i_cal = calc_I(ctx);
 	G_POWER_METER.data.current1 = i_cal & 0x3FF;
-	G_POWER_METER.data.current_type1 =  (i_cal >> 31) & 0x1;
+	u8 current_unit = ((i_cal >> 31) & 0x1)<<7;
+    G_POWER_METER.data.power1 = ((u8)calc_phi(ctx))|current_unit;
+//	G_POWER_METER.data.current_type1 =  (i_cal >> 31) & 0x1;
     G_POWER_METER.data.energy1 = ctx->measurement.active_energy;
     G_POWER_METER.data.time1 =(int)(ctx->measurement.timems / 1000) + 1;
-    G_POWER_METER.data.power1 = calc_phi(ctx);
     P_INFO("PF:%d(%f/%f*%f)\r\n",G_POWER_METER.data.power1,ctx->measurement.active_power,ctx->measurement.voltage ,ctx->measurement.current);
     //ch2
     handle = pmt_handle[1];
     ctx = handle->context;
     i_cal = calc_I(ctx);
 	G_POWER_METER.data.current2 = i_cal & 0x3FF;
-	G_POWER_METER.data.current_type2 = (i_cal >> 31) & 0x1;
+	current_unit = ((i_cal >> 31) & 0x1)<<7;
+    G_POWER_METER.data.power2 = ((u8)calc_phi(ctx))|current_unit;
+//	G_POWER_METER.data.current_type2 = (i_cal >> 31) & 0x1;
     // printf("G_POWER_METER.data.power2: %d\n", G_POWER_METER.data.power2);
     G_POWER_METER.data.energy2 = ctx->measurement.active_energy;
     G_POWER_METER.data.time2 = (int)(ctx->measurement.timems / 1000) + 1;
-    G_POWER_METER.data.power2 = calc_phi(ctx);
     P_INFO("PF:%d(%f/%f*%f)\r\n",G_POWER_METER.data.power2,ctx->measurement.active_power,ctx->measurement.voltage ,ctx->measurement.current);
     //ch3
     handle = pmt_handle[2];
     ctx = handle->context;
     i_cal = calc_I(ctx);
 	G_POWER_METER.data.current3 = i_cal & 0x3FF;
-	G_POWER_METER.data.current_type3 = (i_cal >> 31) & 0x1;
+	current_unit = ((i_cal >> 31) & 0x1)<<7;
+    G_POWER_METER.data.power3 = ((u8)calc_phi(ctx))|current_unit;
+//	G_POWER_METER.data.current_type3 = (i_cal >> 31) & 0x1;
     // printf("G_POWER_METER.data.power3: %d\n", G_POWER_METER.data.power3);
     G_POWER_METER.data.energy3 = ctx->measurement.active_energy;
     G_POWER_METER.data.time3 = (int)(ctx->measurement.timems / 1000) + 1;
-    G_POWER_METER.data.power3 = calc_phi(ctx);
     P_INFO("PF:%d(%f/%f*%f)\r\n",G_POWER_METER.data.power3,ctx->measurement.active_power,ctx->measurement.voltage ,ctx->measurement.current);
 }
 

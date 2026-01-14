@@ -192,22 +192,36 @@ fl_pack_t tbs_history_create_pack(u8* _data) {
 	/* parse parameter in the _data */
 #ifdef COUNTER_DEVICE
 	tbs_history_counter_t *data_dev = (tbs_history_counter_t*)_data;
-#else
-	tbs_history_powermeter_t *data_dev = (tbs_history_powermeter_t*)_data;
-#endif
-	packet.frame.hdr = NWK_HDR_A5_HIS;
-
+	//payload
+	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
+	memcpy(packet.frame.payload,&data_dev->data,SIZEU8(data_dev->data));
 	packet.frame.timetamp[0] = U32_BYTE0(data_dev->timetamp);
 	packet.frame.timetamp[1] = U32_BYTE1(data_dev->timetamp);
 	packet.frame.timetamp[2] = U32_BYTE2(data_dev->timetamp);
 	packet.frame.timetamp[3] = U32_BYTE3(data_dev->timetamp);
+#else
+//	tbs_history_powermeter_t *data_dev = (tbs_history_powermeter_t*)_data;
+	tbs_device_powermeter_t data_dev;
+	memcpy(data_dev.mac,fl_nwk_mySlaveMac,SIZEU8(data_dev.mac));
+	memcpy((u8*)&data_dev + SIZEU8(data_dev.mac),_data,SIZEU8(tbs_device_powermeter_t)-SIZEU8(data_dev.mac));
+	P_PRINTFHEX_A(INF,data_dev,SIZEU8(tbs_device_powermeter_t)-SIZEU8(data_dev.mac),"HIS PACK:");
+	u8 packed_data[POWER_METER_BITSIZE];
+	tbs_pack_powermeter_data(&data_dev,packed_data);
+	u8 indx_data = SIZEU8(data_dev.type) + SIZEU8(data_dev.mac) + SIZEU8(data_dev.timetamp);
+	//payload
+	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
+	memcpy(packet.frame.payload,&packed_data[indx_data],SIZEU8(packet.frame.payload));
+	packet.frame.timetamp[0] = U32_BYTE0(data_dev.timetamp);
+	packet.frame.timetamp[1] = U32_BYTE1(data_dev.timetamp);
+	packet.frame.timetamp[2] = U32_BYTE2(data_dev.timetamp);
+	packet.frame.timetamp[3] = U32_BYTE3(data_dev.timetamp);
+#endif
+	packet.frame.hdr = NWK_HDR_A5_HIS;
+
 	packet.frame.milltamp = next_req++;
 
 	packet.frame.slaveID = fl_nwk_mySlaveID();
 
-	//payload
-	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
-	memcpy(packet.frame.payload,&data_dev->data,SIZEU8(data_dev->data));
 	//crc
 	packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
 	//endpoint
@@ -276,6 +290,7 @@ void TBS_History_LoadFromFlash(void){
 		}
 	}
 }
+/*
 void TBS_History_StoreToFlash(u8* _data_struct){
 #ifdef COUNTER_DEVICE
 	tbs_history_counter_t his_dev;
@@ -294,6 +309,24 @@ void TBS_History_StoreToFlash(u8* _data_struct){
 #endif
 	tbs_history_store((u8*)&his_dev,DATA_HISTORY_SIZE);
 }
+*/
+
+void TBS_History_StoreToFlash(u8* _data_struct){
+#ifdef COUNTER_DEVICE
+	tbs_history_counter_t his_dev;
+#endif
+#ifdef POWER_METER_DEVICE
+	tbs_history_powermeter_t his_dev;
+#endif
+
+	memcpy((u8*)&his_dev,&_data_struct[6],DATA_HISTORY_SIZE);
+
+	tbs_history_store((u8*)&his_dev,DATA_HISTORY_SIZE);
+
+	P_PRINTFHEX_A(FLA,his_dev,DATA_HISTORY_SIZE,"STORE|[%d]%d:",his_dev.data.index,his_dev.timetamp);
+}
+
+
 void TBS_History_ClearAll(void){
 	tbs_history_cleanAll();
 }
