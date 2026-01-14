@@ -135,6 +135,13 @@ void FLASH_Port_Init(void)
 	gpio_set_up_down_res(PIN_CLK,GPIO_PIN_PULLUP_10K);
 	PIN_CLEAR(PIN_CLK);
 #else
+	//
+	gpio_function_en(GPIO_PE4|GPIO_PE5|GPIO_PE6);
+	gpio_set_output(GPIO_PE4|GPIO_PE5|GPIO_PE6,1); 		//enable output
+	gpio_set_up_down_res(GPIO_PE4|GPIO_PE5|GPIO_PE6,GPIO_PIN_PULLUP_10K);
+	PIN_SET(GPIO_PE4|GPIO_PE5|GPIO_PE6);
+	//
+
 	hspi_pin_config_t config;
 
 	config.hspi_clk_pin = HSPI_CLK_PB4;

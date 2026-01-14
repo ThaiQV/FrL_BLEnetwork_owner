@@ -124,7 +124,8 @@ Freelux_libs/storage_weekly_data.d Freelux_libs/storage_weekly_data.o: \
  /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/fl_common.h \
  /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/plog.h \
  /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/queue_fifo.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/fl_sys_datetime.h
+ /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/fl_sys_datetime.h \
+ /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/vendor/TBS_dev/TBS_dev_config.h
 
 ../Freelux_libs/storage_weekly_data.h:
 
@@ -393,3 +394,5 @@ Freelux_libs/storage_weekly_data.d Freelux_libs/storage_weekly_data.o: \
 /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/queue_fifo.h:
 
 /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/fl_sys_datetime.h:
+
+/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/vendor/TBS_dev/TBS_dev_config.h:

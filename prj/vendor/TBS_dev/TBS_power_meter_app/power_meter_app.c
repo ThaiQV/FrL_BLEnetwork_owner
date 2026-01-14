@@ -251,11 +251,12 @@ uint32_t pmt_get_millis(void)
 
 void power_meter_app_init(void)
 {
-    delay_ms(100);
-    uart_app_init();
+//    delay_ms(1000);
+   uart_app_init();
 
     PMT_LOGA("power_meter_app_init \n");
     pmt_protocol_init();
+
     u8 rx_frame[5] = {0};
 
     gpio_function_en(PIN_SYN_);
@@ -333,6 +334,7 @@ void power_meter_app_init(void)
     // );
     // spi_set_irq_mask(HSPI_MODULE, SPI_END_INT_EN);
     // plic_interrupt_enable(IRQ22_SPI_AHB);
+
     fl_tbs_data_t tbs_load = fl_db_tbsprofile_load();
    if(tbs_load.data[0] == 0xff && tbs_load.data[1] == 0xff && tbs_load.data[2] == 0xff && tbs_load.data[3] == 0xff)
    {
@@ -341,6 +343,7 @@ void power_meter_app_init(void)
         pmt_setcalib(2, 1, 1, 1);
         pmt_setcalib(3, 1, 1, 1);
    }
+
 }
 
 void power_meter_app_loop(void)

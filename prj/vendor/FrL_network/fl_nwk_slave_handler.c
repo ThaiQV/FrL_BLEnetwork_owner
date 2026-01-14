@@ -276,7 +276,7 @@ void fl_nwk_slave_displayLCD_Refesh(void){
 }
 #endif
 void fl_nwk_slave_init(void) {
-//	PLOG_Start(ALL);
+	PLOG_Start(ALL);
 //	PLOG_Start(FLA);
 	DEBUG_TURN(NWK_DEBUG_STT);
 //	fl_input_external_init();

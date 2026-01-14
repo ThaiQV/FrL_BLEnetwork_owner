@@ -414,6 +414,10 @@ void TBS_PowerMeter_TimerIRQ_Init(u8 _period_ms) {
 	gpio_set_level(GPIO_PA5,1);
 }
 
+void TBS_PowerMeter_UART_init(void){
+	extern void uart_app_init(void);
+	uart_app_init();
+}
 void TBS_PowerMeter_init(void){
 	//init db settings
 	fl_db_slavesettings_init();
@@ -429,7 +433,7 @@ void TBS_PowerMeter_init(void){
 	memcpy(G_POWER_METER.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_POWER_METER.mac));
 	G_POWER_METER.type = TBS_POWERMETER;
 	G_POWER_METER.timetamp= fl_rtc_get();
-	test_powermeter();
+//	test_powermeter();
 	//todo:Init Butt,lcd,7segs,.....
 	for(int i= 0; i < 3; i++)
 	{
@@ -443,6 +447,7 @@ void TBS_PowerMeter_init(void){
 	printf("G_POWER_METER_PARAMETER3: %d\n", G_POWER_METER_PARAMETER[3]);
 
 	power_meter_app_init();
+
 	///Init LED SIGNAL & BUTTONS Excution
 	LED_PAIR_PIN_INIT();
 	LED_NETWORK_PIN_INIT();
@@ -570,18 +575,19 @@ void TBS_Device_Index_manage(void) {
 
 void TBS_Device_Init(void){
 	TBS_Device_Flash_Init_n_Reload();
+
 #ifdef COUNTER_DEVICE
 	TBS_Counter_init();
 #endif
 #ifdef POWER_METER_DEVICE
 	TBS_PowerMeter_init();
 #endif
-	if(G_TBS_DEVICE.type == TBS_COUNTER) tbs_counter_printf(FLA,(void*)&G_TBS_DEVICE);
-	else tbs_power_meter_printf(FLA,(void*)&G_TBS_DEVICE);
 #ifndef HW_SAMPLE_TEST
 	//History init
 	TBS_History_Init();
 #endif
+	if(G_TBS_DEVICE.type == TBS_COUNTER) tbs_counter_printf(FLA,(void*)&G_TBS_DEVICE);
+	else tbs_power_meter_printf(FLA,(void*)&G_TBS_DEVICE);
 	blt_soft_timer_add(TBS_Device_Store_run,TBS_DEVICE_STORE_INTERVAL);
 }
 

@@ -167,7 +167,9 @@ vendor/B91_dfu/main.d vendor/B91_dfu/main.o: ../vendor/B91_dfu/main.c \
  /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/service/hids.h \
  /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/stack/ble/service/uuid.h \
  ../vendor/B91_dfu/app.h ../common/../Freelux_libs/dfu.h \
- ../common/../Freelux_libs/SPI_FLASH.h ../common/../Freelux_libs/nvm.h \
+ ../common/../Freelux_libs/SPI_FLASH.h \
+ /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/vendor/TBS_dev/TBS_dev_config.h \
+ ../common/../Freelux_libs/nvm.h \
  ../common/../Freelux_libs/storage_weekly_data.h
 
 /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/tl_common.h:
@@ -525,6 +527,8 @@ vendor/B91_dfu/main.d vendor/B91_dfu/main.o: ../vendor/B91_dfu/main.c \
 ../common/../Freelux_libs/dfu.h:
 
 ../common/../Freelux_libs/SPI_FLASH.h:
+
+/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/vendor/TBS_dev/TBS_dev_config.h:
 
 ../common/../Freelux_libs/nvm.h:
 

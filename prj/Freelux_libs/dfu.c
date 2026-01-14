@@ -16,6 +16,7 @@
 uint8_t crc128[CRC128_LENGTH];
 
 uint8_t  ota_map[16];
+
 /* Functions */
 
 /**

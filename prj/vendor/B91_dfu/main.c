@@ -145,9 +145,19 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 	DEBUG_TX_PIN_INIT()
 	;
 #endif
-	_fw.patch = get_current_fw_version();
+//	_fw.patch = get_current_fw_version();
 	PLOG_DEVICE_PROFILE(_bootloader,_fw,_hw);
-
+//#ifdef POWER_METER_DEVICE
+	P_INFO("Startup");
+	u8 wait = 0;
+	extern void delay_ms(unsigned int millisec);
+	while (wait < 5) {
+		P_INFO(".");
+		delay_ms(100);
+		wait++;
+	}
+	P_INFO("ok\r\n");
+//#endif
 	if (!deepRetWakeUp)  //read flash size
 	{
 		blc_readFlashSize_autoConfigCustomFlashSector();

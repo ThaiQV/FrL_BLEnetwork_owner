@@ -23,7 +23,7 @@
 /******************************************************************************/
 /******************************************************************************/
 #include "../Freelux_libs/storage_weekly_data.h"
-#define tbs_history_flash_init()				{nvm_init();storage_init();}
+#define tbs_history_flash_init					storage_init
 #define tbs_history_store						storage_put_data
 #define tbs_history_load						storage_get_data
 #define tbs_history_cleanAll					storage_clean
@@ -105,7 +105,7 @@ tbs_history_t G_HISTORY_CONTAINER[NUM_HISTORY];
 /***                           Private definitions                           **/
 /******************************************************************************/
 /******************************************************************************/
-#define DATA_HISTORY_SIZE 			SIZEU8(G_HISTORY_CONTAINER[0].data)
+#define DATA_HISTORY_SIZE 			22//SIZEU8(G_HISTORY_CONTAINER[0].data)
 
 //EXAMPLE DATABASE
 u8 sample_history_database[NUM_HISTORY][DATA_HISTORY_SIZE];
@@ -276,19 +276,24 @@ void TBS_History_LoadFromFlash(void){
 		}
 	}
 }
-
 void TBS_History_StoreToFlash(u8* _data_struct){
 #ifdef COUNTER_DEVICE
 	tbs_history_counter_t his_dev;
+
+	memcpy((u8*)&his_dev,&_data_struct[6],DATA_HISTORY_SIZE);
+	P_PRINTFHEX_A(FLA,his_dev,DATA_HISTORY_SIZE,"STORE|[%d]%d:",his_dev.data.index,his_dev.timetamp);
 #endif
 #ifdef POWER_METER_DEVICE
-	tbs_history_powermeter_t his_dev;
+	u8 his_dev[DATA_HISTORY_SIZE];
+	u8 data_packed[POWER_METER_BITSIZE];
+	tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) &_data_struct;
+	tbs_pack_powermeter_data(pwmeter_data,data_packed);
+	u8 indx_data = SIZEU8(pwmeter_data->mac);
+	memcpy((u8*)&his_dev,&data_packed[indx_data],DATA_HISTORY_SIZE);
+	P_PRINTFHEX_A(FLA,his_dev,DATA_HISTORY_SIZE,"STORE|[%d]%d:",pwmeter_data->data.index,pwmeter_data->timetamp);
 #endif
-	memcpy((u8*)&his_dev,&_data_struct[6],DATA_HISTORY_SIZE);
 	tbs_history_store((u8*)&his_dev,DATA_HISTORY_SIZE);
-	P_PRINTFHEX_A(FLA,his_dev,DATA_HISTORY_SIZE,"STORE|[%d]%d:",his_dev.data.index,his_dev.timetamp);
 }
-
 void TBS_History_ClearAll(void){
 	tbs_history_cleanAll();
 }

@@ -135,12 +135,12 @@ void uart1_irq_handler(void) {
 	uart1_recieve_irq();
 #ifndef MASTER_CORE
 #ifdef POWER_METER_DEVICE
-	if(uart_get_irq_status(UART1, UART_TXDONE)){
-			drv_uart_tx_irq_handler();
-		}
-		if(uart_get_irq_status(UART1, UART_RXDONE)){
-			drv_uart_rx_irq_handler();
-		}
+	if (uart_get_irq_status(UART1,UART_TXDONE)) {
+		drv_uart_tx_irq_handler();
+	}
+	if (uart_get_irq_status(UART1,UART_RXDONE)) {
+		drv_uart_rx_irq_handler();
+	}
 #endif
 #endif
 
@@ -217,30 +217,29 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 	CCLK_16M_HCLK_16M_PCLK_16M;
 
 	rf_drv_ble_init();
-	printf("main\n");
+//	printf("main\n");
 
 	gpio_init(!deepRetWakeUp);
+#ifdef POWER_METER_DEVICE
+//	TBS_PowerMeter_UART_init();
+//	gpio_function_dis(GPIO_PA7);
+#endif
 #if (UART_PRINT_DEBUG_ENABLE)
-	DEBUG_TX_PIN_INIT()
-	;
+	DEBUG_TX_PIN_INIT();
 #endif
 
 	PLOG_DEVICE_PROFILE(_bootloader,_fw,_hw);
-#ifdef MASTER_CORE
+//#ifdef MASTER_CORE
 //	P_INFO("Startup from FOTA");
-	u8 wait=0;
-	extern void delay_ms(unsigned int millisec);
-	while(wait<10){
-		P_INFO(".");
-		delay_ms(400);
-		wait++;
-	}
-	P_INFO("ok\r\n");
-#endif
-//	while(1){
-//		delay_ms(2000);
-//		ERR(APP,"FOTA ok.....\r\n");
+//	u8 wait=0;
+//	extern void delay_ms(unsigned int millisec);
+//	while(wait<10){
+//		P_INFO(".");
+//		delay_ms(400);
+//		wait++;
 //	}
+//	P_INFO("ok\r\n");
+//#endif
 	//OFF ALL LOG
 	PLOG_Stop(ALL);
 	if (!deepRetWakeUp) {  //read flash size

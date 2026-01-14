@@ -40,6 +40,7 @@ void Counter_LCD_PED_Display(u8 _row,char* _mess);
 void Counter_LCD_PPD_Display(u8 _row,char* _mess);
 void Counter_LCD_ENDCALL_Display(u8 _row,char* _mess);
 #else
+void TBS_PowerMeter_UART_init(void);
 void TBS_PowerMeter_TimerIRQ_handler(void);
 #endif
 void tbs_counter_printf(type_debug_t _plog_type,void* _p);

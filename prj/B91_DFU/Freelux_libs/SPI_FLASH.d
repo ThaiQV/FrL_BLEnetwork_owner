@@ -122,7 +122,8 @@ Freelux_libs/SPI_FLASH.d Freelux_libs/SPI_FLASH.o: \
  /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/fl_common.h \
  /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/plog.h \
  /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/queue_fifo.h \
- /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/fl_sys_datetime.h
+ /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/fl_sys_datetime.h \
+ /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/vendor/TBS_dev/TBS_dev_config.h
 
 ../Freelux_libs/SPI_FLASH.h:
 
@@ -387,3 +388,5 @@ Freelux_libs/SPI_FLASH.d Freelux_libs/SPI_FLASH.o: \
 /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/queue_fifo.h:
 
 /cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/Freelux_libs/fl_sys_datetime.h:
+
+/cygdrive/D/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/vendor/TBS_dev/TBS_dev_config.h:
