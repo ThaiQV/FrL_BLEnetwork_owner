@@ -324,14 +324,7 @@ void power_meter_app_init(void)
         PMT_LOGA("init 0ke \n");
         //		stpm_reset_energies(handle[0]);
     }
-    // spi_clr_irq_mask(HSPI_MODULE, \
-    //       SPI_RXFIFO_OR_INT_EN \
-    //     | SPI_TXFIFO_UR_INT_EN \
-    //     | SPI_RXFIFO_INT_EN \
-    //     | SPI_TXFIFO_INT_EN \
-    //     | SPI_END_INT_EN \
-    //     | SPI_SLV_CMD_EN \
-    // );
+    // spi_clr_irq_mask(HSPI_MODULE, SPI_RXFIFO_OR_INT_EN | SPI_TXFIFO_UR_INT_EN | SPI_RXFIFO_INT_EN  | SPI_TXFIFO_INT_EN | SPI_END_INT_EN | SPI_SLV_CMD_EN );
     // spi_set_irq_mask(HSPI_MODULE, SPI_END_INT_EN);
     // plic_interrupt_enable(IRQ22_SPI_AHB);
 
@@ -463,9 +456,11 @@ void stpm_monitoring_loop(stpm_handle_t **p_handle)
 
         ctx->measurement.uT = ctx->accumulator.voltage_sum / ctx->measurement.time;
         ctx->measurement.iT = ctx->accumulator.current_sum / ctx->measurement.time;
+
         //use rms for U and I
 //        ctx->measurement.uT = ctx->measurement.voltage;
 //        ctx->measurement.iT = ctx->measurement.current;
+
         ctx->measurement.pT = ctx->accumulator.active_power_sum / ctx->measurement.time;
     }
 }

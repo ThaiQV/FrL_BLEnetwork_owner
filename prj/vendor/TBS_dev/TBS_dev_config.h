@@ -22,15 +22,18 @@ typedef enum{
 #ifndef HW_SAMPLE_TEST
 #define OTA_ENABLE
 #endif
-//#define COUNTER_DEVICE
+#define COUNTER_DEVICE
+#define __NAME_PROJECT__ "Counter"
 #define COUNTER_LCD_MESS_MAX				10
 #ifndef COUNTER_DEVICE
-#define POWER_METER_DEVICE
+//#define POWER_METER_DEVICE
+#define __NAME_PROJECT__ "PowerMeter"
 void TBS_PowerMeter_RESETbyMaster(u8 _ch1,u8 _ch2,u8 _ch3);
 void TBS_PwMeter_SetThreshod(u16 _chn1,u16 _chn2,u16 _chn3);
 void TBS_PowerMeter_Upload2Master(void);
 #endif
 #else
+#define __NAME_PROJECT__ "Master"
 //#define MASTER_BLOCK_MAC_SLAVE
 #endif
 #ifdef COUNTER_DEVICE
