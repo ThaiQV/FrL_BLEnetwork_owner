@@ -22,18 +22,15 @@ typedef enum{
 #ifndef HW_SAMPLE_TEST
 #define OTA_ENABLE
 #endif
-#define COUNTER_DEVICE
-#define __NAME_PROJECT__ "Counter"
+//#define COUNTER_DEVICE
 #define COUNTER_LCD_MESS_MAX				10
 #ifndef COUNTER_DEVICE
-//#define POWER_METER_DEVICE
-#define __NAME_PROJECT__ "PowerMeter"
+#define POWER_METER_DEVICE
 void TBS_PowerMeter_RESETbyMaster(u8 _ch1,u8 _ch2,u8 _ch3);
 void TBS_PwMeter_SetThreshod(u16 _chn1,u16 _chn2,u16 _chn3);
 void TBS_PowerMeter_Upload2Master(void);
 #endif
 #else
-#define __NAME_PROJECT__ "Master"
 //#define MASTER_BLOCK_MAC_SLAVE
 #endif
 #ifdef COUNTER_DEVICE
@@ -46,6 +43,7 @@ void Counter_LCD_ENDCALL_Display(u8 _row,char* _mess);
 void TBS_PowerMeter_UART_init(void);
 void TBS_PowerMeter_TimerIRQ_handler(void);
 #endif
+
 void tbs_counter_printf(type_debug_t _plog_type,void* _p);
 void tbs_power_meter_printf(type_debug_t _plog_type,void* _p);
 void TBS_Device_Init(void);
@@ -57,4 +55,5 @@ void TBS_History_ClearAll(void);
 s8 TBS_History_Get(u16 _from, u16 _to) ;
 void TBS_History_Init(void);
 void TBS_History_Proc(void);
+
 #endif /* VENDOR_FRL_NETWORK_TBS_DEV_CONFIG_H_ */
