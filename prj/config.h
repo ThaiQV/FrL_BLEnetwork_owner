@@ -24,36 +24,26 @@
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
-
 #pragma once
 
-
 #define	CHIP_TYPE_9518		1
-
 
 #ifndef CHIP_TYPE
 #define	CHIP_TYPE 			1000
 #endif
 
-
-
-
-
-
 #define	MCU_CORE_9518 		1
 
-
 #if(CHIP_TYPE == CHIP_TYPE_9518)
-	#define MCU_CORE_TYPE	MCU_CORE_9518
+#define MCU_CORE_TYPE	MCU_CORE_9518
 #elif(CHIP_TYPE == CHIP_TYPE_825x)
-	#define MCU_CORE_TYPE	MCU_CORE_825x
+#define MCU_CORE_TYPE	MCU_CORE_825x
 #elif(CHIP_TYPE == CHIP_TYPE_827x)
-	#define MCU_CORE_TYPE	MCU_CORE_827x
+#define MCU_CORE_TYPE	MCU_CORE_827x
 #else
-	#define MCU_CORE_TYPE	1000
+#define MCU_CORE_TYPE	1000
 #endif
 
 #define FREERTOS_ENABLE		0
-
 
 #endif /* CONFIG_H_ */

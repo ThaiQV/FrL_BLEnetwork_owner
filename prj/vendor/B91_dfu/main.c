@@ -145,7 +145,7 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 	DEBUG_TX_PIN_INIT()
 	;
 #endif
-	_fw.patch = get_current_fw_version();
+//	_fw.patch = get_current_fw_version();
 	PLOG_DEVICE_PROFILE(_bootloader,_fw,_hw);
 
 	if (!deepRetWakeUp)  //read flash size

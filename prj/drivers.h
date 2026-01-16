@@ -26,5 +26,48 @@
 #include "drivers/B91/driver.h"
 #include "drivers/B91/ext_driver/driver_ext.h"
 
-
 #define write_log32(err_code)   write_sram32(0x00014, err_code)
+
+///**
+// * TBS project define pinout
+// * */
+#ifndef MASTER_CORE
+#define TBS_COUNTER_DEVICE 1 			//0: Counter, 1: PowerMeter
+#if TBS_COUNTER_DEVICE
+#define COUNTER_DEVICE
+#else
+#define POWER_METER_DEVICE
+#endif
+#else
+#endif
+
+#define TBS_GATEWAY_DEVICE  // uncomment if build for the master
+
+#if MASTER_CORE
+#ifndef TBS_GATEWAY_DEVICE
+    #error "Please uncomment #define TBS_GATEWAY_DEVICE"
+#endif
+#else
+#ifdef TBS_GATEWAY_DEVICE
+    #error "Please comment #define TBS_GATEWAY_DEVICE"
+#endif
+#endif
+
+//// HSPI common
+#define HSPI_CLK						GPIO_PB4
+#define HSPI_MISO						GPIO_PB2
+#define HSPI_MOSI						GPIO_PB3
+
+#if (defined MASTER_CORE | defined COUNTER_DEVICE | !defined DFU_POWER_METER_DEVICE)
+	#define HSPI_CS							GPIO_PB0
+	#define HSPI_IO							GPIO_PB1
+#else
+	#ifdef POWER_METER_DEVICE
+		#define HSPI_IO							GPIO_PB1
+		#define HSPI_CS							GPIO_PE7
+		#define HSPI_CS_POWER_METER_STPM1		GPIO_PE6
+		#define HSPI_CS_POWER_METER_STPM2		GPIO_PE5
+		#define HSPI_CS_POWER_METER_STPM3		GPIO_PE4
+	#endif
+#endif
+

@@ -51,7 +51,7 @@
 
 #define UART_PRINT_DEBUG_ENABLE  			1
 #ifdef UART_PRINT_DEBUG_ENABLE
-#define PRINT_DEBUG_PRIORITY_IRQ			0 //highest priority for debugging
+#define PRINT_DEBUG_PRIORITY_IRQ			1 //highest priority for debugging
 #endif
 #define DEBUG_GPIO_ENABLE					0
 #define JTAG_DEBUG_ENABLE					0

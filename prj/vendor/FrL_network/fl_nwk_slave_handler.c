@@ -276,7 +276,7 @@ void fl_nwk_slave_displayLCD_Refesh(void){
 }
 #endif
 void fl_nwk_slave_init(void) {
-//	PLOG_Start(APP);
+	PLOG_Start(ALL);
 //	PLOG_Start(FLA);
 	DEBUG_TURN(NWK_DEBUG_STT);
 //	fl_input_external_init();
@@ -330,12 +330,6 @@ void fl_nwk_slave_init(void) {
 		G_INFORMATION.profile.run_stt.rst_factory  = 1 ; //has reset factory device
 	}
 #endif
-
-	if(G_INFORMATION.slaveID == G_INFORMATION.profile.slaveid && G_INFORMATION.slaveID == 0xFF){
-		ERR(APP,"Turn on install mode\r\n");
-		G_INFORMATION.profile.run_stt.join_nwk = 1;
-		G_INFORMATION.profile.run_stt.rst_factory  = 1 ; //has reset factory device
-	}
 
 	blt_soft_timer_add(_nwk_slave_backup,2*1020*999);
 	//Interval checking network
@@ -1147,31 +1141,20 @@ int _slave_reconnect(void){
 	return 0;
 }
 
+//FOR TESST FLASH
+//
 int _interval_report(void) {
 #ifdef COUNTER_DEVICE
 	fl_nwk_slave_displayLCD_Refesh();
 #endif
 	int offset_spread = (fl_rtc_getWithMilliStep().milstep - WIFI_ORIGINAL_GETALL.milstep)*10;
 #define INTERVAL_REPORT_TIME (55 - FL_SLAVEID_MEMID(G_INFORMATION.slaveID))
-	extern const u32 ORIGINAL_TIME_TRUST;
+//	extern const u32 ORIGINAL_TIME_TRUST;
 	if (IsJoinedNetwork()) {
-		if (WIFI_ORIGINAL_GETALL.timetamp < fl_rtc_get() && WIFI_ORIGINAL_GETALL.timetamp > ORIGINAL_TIME_TRUST) {
-			if (fl_rtc_get() - WIFI_ORIGINAL_GETALL.timetamp >= INTERVAL_REPORT_TIME) {
 #ifdef COUNTER_DEVICE
-				fl_api_slave_req(NWK_HDR_55,(u8*) &G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data),0,0,1);//NWK_HDR_11_REACTIVE
-#else //POWERMETER
-				// u8 _payload[SIZEU8(tbs_device_powermeter_t)];
-				// tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) G_INFORMATION.data;
-				// tbs_pack_powermeter_data(pwmeter_data,_payload);
-				// u8 indx_data = SIZEU8(pwmeter_data->type) + SIZEU8(pwmeter_data->mac) + SIZEU8(pwmeter_data->timetamp);
-				// fl_api_slave_req(NWK_HDR_55,&_payload[indx_data],SIZEU8(pwmeter_data->data),0,0,1);
+		fl_api_slave_req(NWK_HDR_55,(u8*) &G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data),0,0,1);
 #endif
-				//increase index if using NWK_HDR_11_REACTIVE
-				//TBS_Device_Index_manage();
-//				P_INFO("Auto update (%d s) - indx:%d\r\n",INTERVAL_REPORT_TIME*1000*1000 + offset_spread,G_COUNTER_DEV.data.index-1);
-				return INTERVAL_REPORT_TIME*1000*1000 + offset_spread;
-			}
-		}
+		return 5*1000*1000;
 	}else{
 		if(IsPairing()){
 			fl_nwk_LedSignal_run();
@@ -1181,6 +1164,41 @@ int _interval_report(void) {
 #undef INTERVAL_REPORT_TIME
 	return 100 * 1000 + offset_spread;
 }
+
+//int _interval_report(void) {
+//#ifdef COUNTER_DEVICE
+//	fl_nwk_slave_displayLCD_Refesh();
+//#endif
+//	int offset_spread = (fl_rtc_getWithMilliStep().milstep - WIFI_ORIGINAL_GETALL.milstep)*10;
+//#define INTERVAL_REPORT_TIME (55 - FL_SLAVEID_MEMID(G_INFORMATION.slaveID))
+//	extern const u32 ORIGINAL_TIME_TRUST;
+//	if (IsJoinedNetwork()) {
+//		if (WIFI_ORIGINAL_GETALL.timetamp < fl_rtc_get() && WIFI_ORIGINAL_GETALL.timetamp > ORIGINAL_TIME_TRUST) {
+//			if (fl_rtc_get() - WIFI_ORIGINAL_GETALL.timetamp >= INTERVAL_REPORT_TIME) {
+//#ifdef COUNTER_DEVICE
+//				fl_api_slave_req(NWK_HDR_55,(u8*) &G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data),0,0,1);//NWK_HDR_11_REACTIVE
+//#else //POWERMETER
+//				// u8 _payload[SIZEU8(tbs_device_powermeter_t)];
+//				// tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) G_INFORMATION.data;
+//				// tbs_pack_powermeter_data(pwmeter_data,_payload);
+//				// u8 indx_data = SIZEU8(pwmeter_data->type) + SIZEU8(pwmeter_data->mac) + SIZEU8(pwmeter_data->timetamp);
+//				// fl_api_slave_req(NWK_HDR_55,&_payload[indx_data],SIZEU8(pwmeter_data->data),0,0,1);
+//#endif
+//				//increase index if using NWK_HDR_11_REACTIVE
+//				//TBS_Device_Index_manage();
+////				P_INFO("Auto update (%d s) - indx:%d\r\n",INTERVAL_REPORT_TIME*1000*1000 + offset_spread,G_COUNTER_DEV.data.index-1);
+//				return INTERVAL_REPORT_TIME*1000*1000 + offset_spread;
+//			}
+//		}
+//	}else{
+//		if(IsPairing()){
+//			fl_nwk_LedSignal_run();
+//			return 500 * 1000;
+//		}
+//	}
+//#undef INTERVAL_REPORT_TIME
+//	return 100 * 1000 + offset_spread;
+//}
 
 /******************************************************************************/
 /******************************************************************************/

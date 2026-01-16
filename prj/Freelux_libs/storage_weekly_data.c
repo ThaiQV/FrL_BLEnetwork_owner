@@ -32,6 +32,7 @@ void storage_init(void)
 	ret = nvm_record_read(STORAGE_MAP,(uint8_t*)map,sizeof(map));
 	if(ret == NVM_NO_RECORD)
 	{
+		printf("NO REPORT.....\r\n");
 		// If there is no record of timeslot map, erase the whole device storage
 		for(i = 0; i < (DEVICE_STORAGE_SIZE/DEF_UDISK_SECTOR_SIZE);i++)
 		{
@@ -40,6 +41,15 @@ void storage_init(void)
 		memset(map,0x00,sizeof(map));
 		nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
 	}
+
+	///
+
+	printf("STORAGE_MAP: ");
+	for(i=0;i<sizeof(map);i++)
+	{
+		printf("%x ",map[i]);
+	}
+	printf("\n");
 }
 
 /**

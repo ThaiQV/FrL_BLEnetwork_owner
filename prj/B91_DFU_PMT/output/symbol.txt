@@ -1,0 +1,271 @@
+00000000 T _IRESET_ENTRY	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:246
+00000000 W _ITB_BASE_
+00000000 T _RETENTION_RESET_VMA_START	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:246
+00000022 t _ISTART	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:260
+0000002a t _ISWS_USB_DIS	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:268
+00000040 a irqno
+00000088 t _WAKEUP_FLASH	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:322
+000000a2 t _MSPI_WAIT	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:330
+000000bc t _WAIT_EFUSE_LOAD_FINISH	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:346
+000000c2 t _MULTI_ADDRESS_BEGIN	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:356
+000000d2 t _IDATA_INIT	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:379
+000000ea t _IDATA_INIT_BEGIN	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:383
+000000fc t _IZERO_BSS	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:394
+00000110 t _IZERO_BSS_BEGIN	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:398
+0000011c t _IZERO_AES	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:405
+00000130 t _IZERO_AES_BEGIN	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:409
+0000013c t _IFILL_STK	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:430
+0000013c t _IMAIN_FUNC	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:430
+00000152 t _IEND	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:441
+00000154 T _RETENTION_RESET_VMA_END
+00000158 D _AES_VMA_END
+00000158 D _AES_VMA_START
+00000158 D _RETENTION_DATA_VMA_START
+00000158 d bltParam	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../stack/ble/controller/ll/ll.c:45
+00000184 d ll_irq_systemTick_conn_cb	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../stack/ble/controller/ll/ll.c:82
+00000188 d blt_rxfifo	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../stack/ble/controller/ll/ll.c:58
+00000198 d blt_conn_phy	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../stack/ble/controller/ll/ll_conn/ll_conn_phy.c:41
+000001a4 d bltData	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../stack/ble/controller/ll/ll.c:46
+000001b8 d blttcon	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../stack/ble/controller/ll/ll_conn/ll_conn.c:32
+00000210 d ll_irq_rx_data_cb	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../stack/ble/controller/ll/ll.c:78
+00000214 d blc_tlkEvent_pending	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../stack/ble/controller/ll/ll.c:51
+00000218 d ll_irq_scan_rx_pri_chn_cb	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../stack/ble/controller/ll/ll.c:37
+0000021c d blc_rf_pa_cb	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/ext_driver/software_pa.c:29
+00000220 d ll_irq_tx_cb	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../stack/ble/controller/ll/ll.c:76
+00000224 d blt_txfifo	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../stack/ble/controller/ll/ll.c:57
+00000234 d g_rnd_m_w	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/lib/src/trng.c:49
+00000238 d g_rnd_m_z	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/lib/src/trng.c:50
+0000023c d pmcd	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/lib/src/pm.c:422
+00000268 d g_pm_tick_32k_calib	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/lib/src/pm.c:51
+0000026c d g_pm_long_suspend	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/lib/src/pm.c:54
+00000270 d flash_sector_calibration	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../vendor/common/blt_common.c:31
+00000274 d pm_get_32k_tick	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/ext_driver/ext_pm.c:86
+00000278 d g_pm_suspend_power_cfg	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/lib/src/pm.c:57
+0000027c d func_before_suspend	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/ext_driver/ext_pm.c:81
+00000280 d g_pm_tick_32k_cur	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/lib/src/pm.c:53
+00000284 d g_pm_tick_cur	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/lib/src/pm.c:52
+00000288 D g_pm_multi_addr	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/lib/src/pm.c:58
+0000028c d blt_miscParam	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/ext_driver/ext_pm.c:79
+00000290 d adc_vref_cfg	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/adc.c:33
+00000298 d pm_tim_recover	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/ext_driver/ext_pm.c:84
+0000029c d cpu_sleep_wakeup	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/ext_driver/ext_pm.c:83
+000002a0 d blt_timer	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../vendor/common/blt_soft_timer.c:32
+00000394 d flash_write_page	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/flash.c:46
+00000398 d flash_read_page	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/flash.c:45
+0000039c d F_SENDING_STATE	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../vendor/B91_dfu/fl_adv_proc.c:34
+000003a0 d ORIGINAL_MASTER_TIME	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../vendor/B91_dfu/fl_nwk_slave_handler.c:31
+000003a5 d g_plic_preempt_en	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/lib/src/plic.c:31
+000003a6 D _RETENTION_DATA_VMA_END
+00000400 T _RAMCODE_VMA_START	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/ext_driver/ext_rf.c:86
+00000400 t ble_rf_set_rx_dma	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/ext_driver/ext_rf.c:81
+00000448 t irq_ll_system_timer	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../stack/ble/controller/ll/ll.c:796
+0000046c t irq_blc_ll_rx	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../stack/ble/controller/ll/ll.c:656
+00000648 t irq_blt_sdk_handler	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../stack/ble/controller/ll/ll.c:809
+000007e8 t trng_rand	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/lib/src/trng.c:95
+00000834 t pm_tim_recover_32k_rc	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/lib/src/pm_32k_rc.c:384
+0000087c t pm_get_32k_rc_calib	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/lib/src/pm.c:465
+000008c4 t pm_update_32k_rc_sleep_tick	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/lib/src/pm.c:434
+00000920 t stimer_irq_handler	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../vendor/B91_dfu/main.c:110
+00000924 t rf_irq_handler	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../vendor/B91_dfu/main.c:67
+00000928 t delay_ms	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/stimer.c:42
+0000094c t delay_us	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/stimer.c:30
+00000968 t flash_send_addr	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/flash.c:103
+000009ac t flash_send_cmd	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/flash.c:89
+000009f8 t flash_mspi_read_ram	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/flash.c:143
+00000b60 t flash_wait_done	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/flash.c:116
+00000ba8 t flash_mspi_write_ram	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/flash.c:207
+00000c80 t clock_set_32k_tick	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/clock.c:202
+00000ce0 t clock_get_32k_tick	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/clock.c:239
+00000d10 t analog_write_reg8	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/analog.c:123
+00000d4c t analog_read_reg8	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/analog.c:105
+00000d90 t clock_init.constprop.6	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/clock.c:279
+00000ed0 t pm_wait_bbpll_done	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/lib/src/pm.c:188
+00000f84 t pm_sleep_start	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/lib/src/pm.c:254
+00001128 t cpu_sleep_wakeup_32k_rc_ram	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/lib/src/pm_32k_rc.c:77
+0000158c t clock_cal_24m_rc	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/clock.c:160
+00001618 t dr_putchar	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../application/print/printf.c:62
+000016f0 t sys_init.constprop.0	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/ext_driver/ext_pm.c:323
+00001944 t gpio_irq_handler	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../vendor/B91_dfu/main.c:79
+000019f8 T main	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../vendor/B91_dfu/main.c:129
+00002254 T entry_irq63	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:710
+0000229c T entry_irq62	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:701
+000022e4 T entry_irq61	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:692
+0000232c T entry_irq60	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:683
+00002374 T entry_irq59	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:674
+000023bc T entry_irq58	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:665
+00002404 T entry_irq57	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:656
+0000244c T entry_irq56	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:647
+00002494 T entry_irq55	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:638
+000024dc T entry_irq54	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:629
+00002524 T entry_irq53	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:620
+0000256c T entry_irq52	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:611
+000025b4 T entry_irq51	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:602
+000025fc T entry_irq50	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:593
+00002644 T entry_irq49	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:584
+00002648 T entry_irq48	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:578
+0000264c T entry_irq47	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:572
+00002650 T entry_irq46	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:565
+00002698 T entry_irq45	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:556
+0000269c T entry_irq44	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:551
+000026e4 T entry_irq43	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:541
+0000272c T entry_irq42	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:532
+00002774 T entry_irq41	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:523
+00002778 T entry_irq40	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:518
+0000277c T entry_irq39	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:513
+00002780 T entry_irq38	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:508
+00002784 T entry_irq37	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:501
+000027cc T entry_irq36	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:492
+00002814 T entry_irq35	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:483
+0000285c T entry_irq34	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:474
+000028a4 T entry_irq33	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:465
+000028ec T entry_irq32	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:455
+00002934 T entry_irq31	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:446
+00002978 T entry_irq30	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:437
+000029bc T entry_irq29	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:428
+00002a00 T entry_irq28	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:417
+00002a44 T entry_irq27	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:407
+00002a88 T entry_irq26	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:396
+00002acc T entry_irq25	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:386
+00002ba0 T entry_irq24	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:376
+00002be4 T entry_irq23	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:365
+00002c28 T entry_irq22	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:354
+00002c6c T entry_irq21	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:343
+00002cb0 T entry_irq20	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:333
+00002cf4 T entry_irq19	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:322
+00002d38 T entry_irq18	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:310
+00002d7c T entry_irq17	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:298
+00002dc0 T entry_irq16	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:288
+00002e04 T entry_irq15	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:276
+00002ed8 T entry_irq14	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:266
+00002f1c T entry_irq13	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:255
+00002f60 T entry_irq12	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:245
+00002fa4 T entry_irq11	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:235
+00002fe8 T entry_irq10	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:225
+0000302c T entry_irq9	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:214
+00003070 T entry_irq8	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:204
+000030b4 T entry_irq7	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:194
+000030f8 T entry_irq6	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:183
+0000313c T entry_irq5	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:173
+00003180 T entry_irq4	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:162
+000031c4 T entry_irq3	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:152
+00003208 T entry_irq2	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:141
+0000324c T entry_irq1	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:131
+00003320 T trap_entry	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:53
+00003400 T __vectors
+00003502 T _RAMCODE_VMA_END
+000057ce A BIN_SIZE
+00080000 d FmDebug	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../Freelux_libs/plog.c:44
+00080000 D _DATA_VMA_START
+00080004 d g_pm_early_wakeup_time_us	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/lib/src/pm.c:61
+0008000c d g_pm_r_delay_cycle	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/lib/src/pm.c:76
+00080010 d sys_clk	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/clock.c:46
+00080016 D _DATA_VMA_END
+00080018 S _BSS_VMA_START
+00080018 s g_chip_version	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/lib/src/sys.c:39
+0008001c s g_pm_status_info	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/lib/src/pm.c:44
+00080020 s mcause	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:34
+00080024 s mepc	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../common/plic_isr.c:35
+00080028 s __vprintf_buf
+0008002c s __vprintf_buf_len
+00080030 S __printf_count
+00080034 b crc128	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../Freelux_libs/dfu.c:16
+00080048 B _BSS_VMA_END
+00080048 B _end
+00080800 D __global_pointer$
+000a0000 A _STACK_TOP
+00100000 A FLASH_SIZE
+20000000 T BIN_BEGIN	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:40
+20000000 A NDS_SAG_LMA_FLASH
+20000000 W _RELAX_END_	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:40
+20000000 T _RESET_ENTRY	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:40
+20000028 t _START	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:71
+20000030 t _SWS_USB_DIS	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:79
+2000008e t _RETENTION_RESET_INIT	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:131
+200000a6 t _RETENTION_RESET_BEGIN	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:135
+200000b8 t _RETENTION_DATA_INIT	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:145
+200000cc t _RETENTION_DATA_INIT_BEGIN	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:149
+200000de t _RAMCODE_INIT	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:159
+200000f6 t _RAMCODE_INIT_BEGIN	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:163
+20000108 t _DATA_INIT	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:173
+20000120 t _DATA_INIT_BEGIN	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:177
+20000132 t _ZERO_BSS	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:188
+20000146 t _ZERO_BSS_BEGIN	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:192
+20000152 t _ZERO_AES	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:199
+20000166 t _ZERO_AES_BEGIN	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:203
+20000172 t _FILL_STK	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:223
+20000172 t _MAIN_FUNC	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:223
+20000188 t _END	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../boot/B91/cstartup_B91.S:234
+20000190 A _RETENTION_RESET_LMA_START
+200002e8 A _RETENTION_DATA_LMA_START
+20000538 A _RAMCODE_LMA_START
+20003640 t flash_read_status	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/flash.c:438
+20003670 t flash_read_mid	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/flash.c:573
+2000369c t flash_page_program	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/flash.c:392
+200036f8 t flash_dread	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/flash.c:314
+20003724 t flash_erase_sector	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/flash.c:265
+20003758 t cpu_sleep_wakeup_32k_rc	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/lib/src/pm_32k_rc.c:374
+20003774 t pwm_kick_32k_pad.constprop.2	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/ext_driver/ext_pm.c:134
+200037dc t blc_readFlashSize_autoConfigCustomFlashSector	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../vendor/common/blt_common.c:40
+20003844 t writeSPIByte	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../Freelux_libs/SPI_FLASH.c:26
+200038dc t W25XXX_Read	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../Freelux_libs/SPI_FLASH.c:336
+20003948 t FLASH_ReadStatusReg	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../Freelux_libs/SPI_FLASH.c:251
+20003984 t W25XXX_WR_Page	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../Freelux_libs/SPI_FLASH.c:352
+20003a34 t W25XXX_WR_Block	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../Freelux_libs/SPI_FLASH.c:385
+20003b4c t FLASH_Erase_Sector	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../Freelux_libs/SPI_FLASH.c:268
+20003bcc t analog_read_reg32.constprop.7	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/core.h:101
+20003c10 t pwm_kick_32k_pad_times.constprop.1	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/ext_driver/ext_pm.c:165
+20003c94 t cpu_wakeup_no_deepretn_back_init	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/ext_driver/ext_pm.c:252
+20003e3c t gpio_set_up_down_res	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/gpio.c:372
+20003ed4 t hspi_set_pin_mux.part.0
+200040c8 t flash_unlock_mid146085	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../drivers/B91/flash/flash_mid146085.c:101
+20004124 t main_loop	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../vendor/B91_dfu/app.c:165
+2000433c t fw_copy	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../Freelux_libs/dfu.c:121
+200046a0 T _write	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU_PMT/../application/print/printf.c:98
+200046ec T memcmp
+2000473c T memcpy
+20004836 T memset
+200048e0 T printf
+200048fe T strrchr
+2000492a t __vprintf_help
+20004962 T vprintf
+200049ac T __print_integral
+200049f8 T __printf_impl
+20004e72 T __int_to_poly
+20004e92 T __print_integral_poly
+20004f22 T __printf_float_impl
+20005324 T strchr
+20005358 T strcpy
+200053d6 T strnlen
+200053f0 T __lshrdi3	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/libgcc2.c:404
+20005420 T __ashldi3	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/libgcc2.c:432
+20005450 T __riscv_save_12	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:336
+20005458 T __riscv_save_10	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:348
+20005458 T __riscv_save_11	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:348
+20005458 T __riscv_save_8	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:348
+20005458 T __riscv_save_9	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:348
+20005466 T __riscv_save_4	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:371
+20005466 T __riscv_save_5	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:371
+20005466 T __riscv_save_6	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:371
+20005466 T __riscv_save_7	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:371
+20005480 T __riscv_save_0	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:404
+20005480 T __riscv_save_1	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:404
+20005480 T __riscv_save_2	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:404
+20005480 T __riscv_save_3	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:404
+2000548c T __riscv_restore_12	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:432
+20005490 T __riscv_restore_10	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:442
+20005490 T __riscv_restore_11	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:442
+20005490 T __riscv_restore_8	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:442
+20005490 T __riscv_restore_9	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:442
+2000549a T __riscv_restore_4	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:462
+2000549a T __riscv_restore_5	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:462
+2000549a T __riscv_restore_6	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:462
+2000549a T __riscv_restore_7	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:462
+200054a4 T __riscv_restore_0	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:485
+200054a4 T __riscv_restore_1	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:485
+200054a4 T __riscv_restore_2	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:485
+200054a4 T __riscv_restore_3	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:485
+200054c0 r __FUNCTION__.13002
+200054d8 r __FUNCTION__.13160
+20005684 R __digits
+2000569c r __FUNCTION__.13197
+200057b8 A _DATA_LMA_START

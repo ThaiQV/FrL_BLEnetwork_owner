@@ -268,6 +268,9 @@ void TBS_History_LoadFromFlash(void){
 					G_HISTORY_CONTAINER[i].status_proc = 1;
 				//exit to step-one-step
 				return;
+			}else{
+				ERR(FLA,"HIS idx-err:%d\r\n",G_HISTORY_CONTAINER[i].indx);
+				P_PRINTFHEX_A(FLA,G_HISTORY_CONTAINER[i].data,DATA_HISTORY_SIZE,"HIS idx-err:");
 			}
 		}
 	}

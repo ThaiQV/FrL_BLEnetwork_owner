@@ -20,7 +20,7 @@
 
 #define COUNTER_LCD_REMOVE_DISPLAY		ct_remove_nwwk
 #define COUNTER_LCD_PRESS_DISPLAY		ct_add_bt_print
-#include "TBS_power_meter_app/power_meter_app.h"
+
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/
@@ -116,6 +116,7 @@ u8 G_COUNTER_LCD[COUNTER_LCD_MESS_MAX][LCD_MESSAGE_SIZE];
 #define G_TBS_DEVICE		G_COUNTER_DEV
 #endif
 #ifdef POWER_METER_DEVICE
+#include "TBS_power_meter_app/power_meter_app.h"
 tbs_device_powermeter_t G_POWER_METER = {
 				        .mac = {0, 0, 0, 0, 0, 0},
 				        .timetamp = 0,

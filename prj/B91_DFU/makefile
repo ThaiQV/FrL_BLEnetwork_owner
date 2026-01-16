@@ -26,6 +26,23 @@ RM := rm -rf
 -include 3rd-party/freertos-V5/subdir.mk
 -include 3rd-party/freertos-V5/portable/GCC/RISC-V/subdir.mk
 -include 3rd-party/freertos-V5/portable/MemMang/subdir.mk
+-include B91_DFU_Master/3rd-party/freertos-V5/subdir.mk
+-include B91_DFU_Master/3rd-party/freertos-V5/portable/GCC/RISC-V/subdir.mk
+-include B91_DFU_Master/3rd-party/freertos-V5/portable/MemMang/subdir.mk
+-include B91_DFU_Master/Freelux_libs/subdir.mk
+-include B91_DFU_Master/application/app/subdir.mk
+-include B91_DFU_Master/application/audio/subdir.mk
+-include B91_DFU_Master/application/keyboard/subdir.mk
+-include B91_DFU_Master/application/print/subdir.mk
+-include B91_DFU_Master/application/usbstd/subdir.mk
+-include B91_DFU_Master/boot/B91/subdir.mk
+-include B91_DFU_Master/common/subdir.mk
+-include B91_DFU_Master/common/usb_dbg/subdir.mk
+-include B91_DFU_Master/drivers/B91/subdir.mk
+-include B91_DFU_Master/drivers/B91/ext_driver/subdir.mk
+-include B91_DFU_Master/drivers/B91/flash/subdir.mk
+-include B91_DFU_Master/vendor/B91_dfu/Peri_libs/subdir.mk
+-include B91_DFU_Master/vendor/B91_dfu/subdir.mk
 -include Freelux_libs/subdir.mk
 -include application/app/subdir.mk
 -include application/audio/subdir.mk
@@ -133,7 +150,7 @@ clean:
 	-@echo ' '
 
 post-build:
-	-"D:\Job\Freelux\Working\TBS_Monitoring\FrL_BLEnetwork_owner\prj/tl_check_fw.bat"   B91_DFU
+	-"D:\Job\Freelux\Working\TBS_Monitoring\FrL_BLEnetwork_owner\prj/tl_check_boot.bat"   B91_DFU
 	-@echo ' '
 
 secondary-outputs: $(SYMBOL_OUTPUTS) $(READELF_OUTPUTS) $(OBJDUMP_OUTPUTS) $(SIZE_OUTPUTS)

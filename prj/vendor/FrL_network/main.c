@@ -128,13 +128,14 @@ _attribute_ram_code_ void gpio_irq_handler(void){
  * @param[in]	none
  * @return      none
  */
-extern void drv_uart_tx_irq_handler(void);
-extern void drv_uart_rx_irq_handler(void);
+
 void uart1_irq_handler(void) {
 	extern void uart1_recieve_irq(void);
 	uart1_recieve_irq();
 #ifndef MASTER_CORE
-#ifndef POWER_METER_DEVICE
+#ifdef POWER_METER_DEVICE
+	extern void drv_uart_tx_irq_handler(void);
+	extern void drv_uart_rx_irq_handler(void);
 	if(uart_get_irq_status(UART1, UART_TXDONE)){
 			drv_uart_tx_irq_handler();
 		}
@@ -143,8 +144,8 @@ void uart1_irq_handler(void) {
 		}
 #endif
 #endif
-
 }
+
 _attribute_ram_code_
 void timer0_irq_handler(void) {
 #ifndef MASTER_CORE
@@ -160,7 +161,7 @@ void timer0_irq_handler(void) {
  * @return      none
  */
 void uart0_irq_handler(void) {
-	printf("uart0_irq_handler \n");
+//	printf("uart0_irq_handler \n");
 //	if (uart_get_irq_status(UART1,UART_RXBUF_IRQ_STATUS)) {
 //		extern void uart1_recieve_irq(void);
 //		uart1_recieve_irq();
@@ -217,14 +218,13 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 	CCLK_16M_HCLK_16M_PCLK_16M;
 
 	rf_drv_ble_init();
-	printf("main\n");
 
 	gpio_init(!deepRetWakeUp);
 #if (UART_PRINT_DEBUG_ENABLE)
 	DEBUG_TX_PIN_INIT()
 	;
 #endif
-
+	PLOG_Start(ALL);
 	PLOG_DEVICE_PROFILE(_bootloader,_fw,_hw);
 #ifdef MASTER_CORE
 //	P_INFO("Startup from FOTA");
@@ -242,7 +242,7 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 //		ERR(APP,"FOTA ok.....\r\n");
 //	}
 	//OFF ALL LOG
-	PLOG_Stop(ALL);
+//	PLOG_Stop(ALL);
 	if (!deepRetWakeUp) {  //read flash size
 #if (BATT_CHECK_ENABLE)
 	user_battery_power_check();

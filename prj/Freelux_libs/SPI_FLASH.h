@@ -22,13 +22,14 @@
 #include <string.h>
 #include <stdint.h>
 #include "tl_common.h"
+
 /******************************************************************************/
 /* SPI Pins */
-#define PIN_CS		GPIO_PE7 //GPIO_PE7 GPIO_PB0
-#define PIN_WP		GPIO_PB1
-#define PIN_MISO	GPIO_PB2
-#define PIN_MOSI	GPIO_PB3
-#define PIN_CLK		GPIO_PB4
+#define PIN_CS		HSPI_CS //GPIO_PE7 GPIO_PB0
+#define PIN_WP		HSPI_IO
+#define PIN_MISO	HSPI_MISO
+#define PIN_MOSI	HSPI_MOSI
+#define PIN_CLK		HSPI_CLK
 
 #define PIN_SET(pin)	gpio_set_high_level(pin)
 #define PIN_CLEAR(pin)	gpio_set_low_level(pin)
