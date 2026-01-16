@@ -279,6 +279,10 @@ typedef struct {
         u8 power2;         // 7 bits
         u8 current_type3;  // 1 bit
         u8 power3;         // 7 bits
+<<<<<<< HEAD
+=======
+
+>>>>>>> 25519f49f5d5c2b1ebfb897622c1dc0a55accdde
         u8 time1;          // 6 bits
         u8 time2;          // 6 bits
         u8 time3;          // 6 bits
@@ -388,7 +392,6 @@ static inline void tbs_unpack_powermeter_data(tbs_device_powermeter_t *dst, cons
     #undef READ_BITS
 }
 */
-
 
 typedef struct {
 	u8 mac[6];

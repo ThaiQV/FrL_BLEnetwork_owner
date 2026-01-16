@@ -331,12 +331,6 @@ void fl_nwk_slave_init(void) {
 	}
 #endif
 
-//	if(G_INFORMATION.slaveID == G_INFORMATION.profile.slaveid && G_INFORMATION.slaveID == 0xFF){
-//		ERR(APP,"Turn on install mode\r\n");
-//		G_INFORMATION.profile.run_stt.join_nwk = 1;
-//		G_INFORMATION.profile.run_stt.rst_factory  = 1 ; //has reset factory device
-//	}
-
 	blt_soft_timer_add(_nwk_slave_backup,2*1020*999);
 	//Interval checking network
 //	fl_nwk_slave_reconnectNstoragedata();
@@ -1130,6 +1124,7 @@ void fl_nwk_slave_joinnwk_exc(void) {
  *
  ***************************************************/
 int _slave_reconnect(void){
+	/*
 	if(IsJoinedNetwork()){
 		LOGA(INF,"Reconnect network (%d s)!!!\r\n",RECONNECT_TIME/1000/1000);
 		//
@@ -1144,8 +1139,33 @@ int _slave_reconnect(void){
 #endif
 		return RECONNECT_TIME;
 	}
+	*/
 	return 0;
 }
+
+//FOR TESST FLASH
+//
+//int _interval_report(void) {
+//#ifdef COUNTER_DEVICE
+//	fl_nwk_slave_displayLCD_Refesh();
+//#endif
+//	int offset_spread = (fl_rtc_getWithMilliStep().milstep - WIFI_ORIGINAL_GETALL.milstep)*10;
+//#define INTERVAL_REPORT_TIME (55 - FL_SLAVEID_MEMID(G_INFORMATION.slaveID))
+////	extern const u32 ORIGINAL_TIME_TRUST;
+//	if (IsJoinedNetwork()) {
+//#ifdef COUNTER_DEVICE
+//		fl_api_slave_req(NWK_HDR_55,(u8*) &G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data),0,0,1);
+//#endif
+//		return 5*1000*1000;
+//	}else{
+//		if(IsPairing()){
+//			fl_nwk_LedSignal_run();
+//			return 500 * 1000;
+//		}
+//	}
+//#undef INTERVAL_REPORT_TIME
+//	return 100 * 1000 + offset_spread;
+//}
 
 int _interval_report(void) {
 #ifdef COUNTER_DEVICE

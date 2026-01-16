@@ -16,7 +16,7 @@ Program Header:
          filesz 0x000025b8 memsz 0x000025b8 flags r-x
     LOAD off    0x00008000 vaddr 0x00080000 paddr 0x200057f8 align 2**12
          filesz 0x00000016 memsz 0x00000048 flags rw-
-0x70000000 off    0x00020493 vaddr 0x00000000 paddr 0x00000000 align 2**0
+0x70000000 off    0x0002046b vaddr 0x00000000 paddr 0x00000000 align 2**0
          filesz 0x0000003b memsz 0x00000000 flags r--
 
 Sections:
@@ -41,25 +41,25 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
   9 .bss          00000014  00080034  2000582c  00008016  2**2
                   ALLOC
- 10 .debug_info   0000991c  00000000  00000000  00008016  2**0
+ 10 .debug_info   00009911  00000000  00000000  00008016  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_abbrev 00000b86  00000000  00000000  00011932  2**0
+ 11 .debug_abbrev 00000b6e  00000000  00000000  00011927  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_loc    00003eba  00000000  00000000  000124b8  2**0
+ 12 .debug_loc    00003eb4  00000000  00000000  00012495  2**0
                   CONTENTS, READONLY, DEBUGGING
- 13 .debug_aranges 00000458  00000000  00000000  00016378  2**3
+ 13 .debug_aranges 00000458  00000000  00000000  00016350  2**3
                   CONTENTS, READONLY, DEBUGGING
- 14 .debug_ranges 00001050  00000000  00000000  000167d0  2**3
+ 14 .debug_ranges 00001050  00000000  00000000  000167a8  2**3
                   CONTENTS, READONLY, DEBUGGING
- 15 .debug_line   00004a74  00000000  00000000  00017820  2**0
+ 15 .debug_line   00004a74  00000000  00000000  000177f8  2**0
                   CONTENTS, READONLY, DEBUGGING
- 16 .debug_str    000041c8  00000000  00000000  0001c294  2**0
+ 16 .debug_str    000041c8  00000000  00000000  0001c26c  2**0
                   CONTENTS, READONLY, DEBUGGING
- 17 .comment      00000037  00000000  00000000  0002045c  2**0
+ 17 .comment      00000037  00000000  00000000  00020434  2**0
                   CONTENTS, READONLY
- 18 .riscv.attributes 0000003b  00000000  00000000  00020493  2**0
+ 18 .riscv.attributes 0000003b  00000000  00000000  0002046b  2**0
                   CONTENTS, READONLY
- 19 .debug_frame  000012d8  00000000  00000000  000204d0  2**2
+ 19 .debug_frame  000012d8  00000000  00000000  000204a8  2**2
                   CONTENTS, READONLY, DEBUGGING
 SYMBOL TABLE:
 20000000 l    d  .vectors	00000000 .vectors
@@ -204,7 +204,7 @@ SYMBOL TABLE:
 000003a0 l     O .retention_data	00000005 ORIGINAL_MASTER_TIME
 000003a5 l     O .retention_data	00000001 g_plic_preempt_en
 200054f8 l     O .rodata	00000017 __FUNCTION__.13002
-20005510 l     O .rodata	00000011 __FUNCTION__.13203
+20005510 l     O .rodata	00000011 __FUNCTION__.13160
 00080018 l     O .sbss	00000004 g_chip_version
 0008001c l     O .sbss	00000004 g_pm_status_info
 00080020 l     O .sbss	00000004 mcause
@@ -213,7 +213,7 @@ SYMBOL TABLE:
 00080004 l     O .data	00000008 g_pm_early_wakeup_time_us
 0008000c l     O .data	00000004 g_pm_r_delay_cycle
 00080010 l     O .data	00000006 sys_clk
-200056e8 l     O .rodata	00000005 __FUNCTION__.13291
+200056e8 l     O .rodata	00000005 __FUNCTION__.13248
 00000000 l    df *ABS*	00000000 memcpy.c
 00000000 l    df *ABS*	00000000 printf.c
 00000000 l    df *ABS*	00000000 strrchr.c
@@ -2277,14 +2277,14 @@ Disassembly of section .ram_code:
     1962:	8082                	c.jr	ra
     1964:	20005537          	lui	a0,0x20005
     1968:	1141                	c.addi	sp,-16
-    196a:	59c50513          	addi	a0,a0,1436 # 2000559c <__FUNCTION__.13203+0x8c>
+    196a:	59c50513          	addi	a0,a0,1436 # 2000559c <__FUNCTION__.13160+0x8c>
     196e:	c606                	c.swsp	ra,12(sp)
     1970:	00812423          	sw	s0,8(sp)
     1974:	20003097          	auipc	ra,0x20003
     1978:	fa4080e7          	jalr	-92(ra) # 20004918 <printf>
     197c:	20005437          	lui	s0,0x20005
     1980:	02f00593          	li	a1,47
-    1984:	58040513          	addi	a0,s0,1408 # 20005580 <__FUNCTION__.13203+0x70>
+    1984:	58040513          	addi	a0,s0,1408 # 20005580 <__FUNCTION__.13160+0x70>
     1988:	20003097          	auipc	ra,0x20003
     198c:	fae080e7          	jalr	-82(ra) # 20004936 <strrchr>
     1990:	58040593          	addi	a1,s0,1408
@@ -2297,12 +2297,12 @@ Disassembly of section .ram_code:
     19ac:	20005637          	lui	a2,0x20005
     19b0:	20005537          	lui	a0,0x20005
     19b4:	05000693          	li	a3,80
-    19b8:	51060613          	addi	a2,a2,1296 # 20005510 <__FUNCTION__.13203>
-    19bc:	5a450513          	addi	a0,a0,1444 # 200055a4 <__FUNCTION__.13203+0x94>
+    19b8:	51060613          	addi	a2,a2,1296 # 20005510 <__FUNCTION__.13160>
+    19bc:	5a450513          	addi	a0,a0,1444 # 200055a4 <__FUNCTION__.13160+0x94>
     19c0:	20003097          	auipc	ra,0x20003
     19c4:	f58080e7          	jalr	-168(ra) # 20004918 <printf>
     19c8:	20005537          	lui	a0,0x20005
-    19cc:	5c450513          	addi	a0,a0,1476 # 200055c4 <__FUNCTION__.13203+0xb4>
+    19cc:	5c450513          	addi	a0,a0,1476 # 200055c4 <__FUNCTION__.13160+0xb4>
     19d0:	20003097          	auipc	ra,0x20003
     19d4:	f48080e7          	jalr	-184(ra) # 20004918 <printf>
     19d8:	801407b7          	lui	a5,0x80140
@@ -2453,7 +2453,7 @@ Disassembly of section .ram_code:
     1bd0:	e70080e7          	jalr	-400(ra) # 20003a3c <gpio_set_up_down_res>
     1bd4:	30348683          	lb	a3,771(s1)
     1bd8:	200057b7          	lui	a5,0x20005
-    1bdc:	60078793          	addi	a5,a5,1536 # 20005600 <__FUNCTION__.13203+0xf0>
+    1bdc:	60078793          	addi	a5,a5,1536 # 20005600 <__FUNCTION__.13160+0xf0>
     1be0:	f806e693          	ori	a3,a3,-128
     1be4:	0ff6f693          	andi	a3,a3,255
     1be8:	01010713          	addi	a4,sp,16
@@ -2470,7 +2470,7 @@ Disassembly of section .ram_code:
     1c04:	fec798e3          	bne	a5,a2,1bf4 <main+0x1fc>
     1c08:	439c                	c.lw	a5,0(a5)
     1c0a:	20005a37          	lui	s4,0x20005
-    1c0e:	5cca0513          	addi	a0,s4,1484 # 200055cc <__FUNCTION__.13203+0xbc>
+    1c0e:	5cca0513          	addi	a0,s4,1484 # 200055cc <__FUNCTION__.13160+0xbc>
     1c12:	c31c                	c.sw	a5,0(a4)
     1c14:	20003097          	auipc	ra,0x20003
     1c18:	d04080e7          	jalr	-764(ra) # 20004918 <printf>
@@ -2487,14 +2487,14 @@ Disassembly of section .ram_code:
     1c32:	c002                	c.swsp	zero,0(sp)
     1c34:	20003097          	auipc	ra,0x20003
     1c38:	ce4080e7          	jalr	-796(ra) # 20004918 <printf>
-    1c3c:	5c448513          	addi	a0,s1,1476 # 200055c4 <__FUNCTION__.13203+0xb4>
+    1c3c:	5c448513          	addi	a0,s1,1476 # 200055c4 <__FUNCTION__.13160+0xb4>
     1c40:	20003097          	auipc	ra,0x20003
     1c44:	cd8080e7          	jalr	-808(ra) # 20004918 <printf>
     1c48:	5cca0513          	addi	a0,s4,1484
     1c4c:	20003097          	auipc	ra,0x20003
     1c50:	ccc080e7          	jalr	-820(ra) # 20004918 <printf>
     1c54:	20005537          	lui	a0,0x20005
-    1c58:	5d450513          	addi	a0,a0,1492 # 200055d4 <__FUNCTION__.13203+0xc4>
+    1c58:	5d450513          	addi	a0,a0,1492 # 200055d4 <__FUNCTION__.13160+0xc4>
     1c5c:	20003097          	auipc	ra,0x20003
     1c60:	cbc080e7          	jalr	-836(ra) # 20004918 <printf>
     1c64:	5c448513          	addi	a0,s1,1476
@@ -2505,7 +2505,7 @@ Disassembly of section .ram_code:
     1c78:	5cca0513          	addi	a0,s4,1484
     1c7c:	20003097          	auipc	ra,0x20003
     1c80:	c9c080e7          	jalr	-868(ra) # 20004918 <printf>
-    1c84:	5dca8513          	addi	a0,s5,1500 # 200055dc <__FUNCTION__.13203+0xcc>
+    1c84:	5dca8513          	addi	a0,s5,1500 # 200055dc <__FUNCTION__.13160+0xcc>
     1c88:	20003097          	auipc	ra,0x20003
     1c8c:	c90080e7          	jalr	-880(ra) # 20004918 <printf>
     1c90:	5c448513          	addi	a0,s1,1476
@@ -2520,7 +2520,7 @@ Disassembly of section .ram_code:
     1cb4:	20003097          	auipc	ra,0x20003
     1cb8:	c64080e7          	jalr	-924(ra) # 20004918 <printf>
     1cbc:	20005537          	lui	a0,0x20005
-    1cc0:	5e050513          	addi	a0,a0,1504 # 200055e0 <__FUNCTION__.13203+0xd0>
+    1cc0:	5e050513          	addi	a0,a0,1504 # 200055e0 <__FUNCTION__.13160+0xd0>
     1cc4:	20003097          	auipc	ra,0x20003
     1cc8:	c54080e7          	jalr	-940(ra) # 20004918 <printf>
     1ccc:	5c448513          	addi	a0,s1,1476
@@ -2609,12 +2609,12 @@ Disassembly of section .ram_code:
     1de8:	148481a3          	sb	s0,323(s1) # 80140143 <_DATA_LMA_START+0x6013a94b>
     1dec:	ff5ff06f          	j	1de0 <main+0x3e8>
     1df0:	20005537          	lui	a0,0x20005
-    1df4:	59c50513          	addi	a0,a0,1436 # 2000559c <__FUNCTION__.13203+0x8c>
+    1df4:	59c50513          	addi	a0,a0,1436 # 2000559c <__FUNCTION__.13160+0x8c>
     1df8:	20003097          	auipc	ra,0x20003
     1dfc:	b20080e7          	jalr	-1248(ra) # 20004918 <printf>
     1e00:	20005437          	lui	s0,0x20005
     1e04:	02f00593          	li	a1,47
-    1e08:	58040513          	addi	a0,s0,1408 # 20005580 <__FUNCTION__.13203+0x70>
+    1e08:	58040513          	addi	a0,s0,1408 # 20005580 <__FUNCTION__.13160+0x70>
     1e0c:	20003097          	auipc	ra,0x20003
     1e10:	b2a080e7          	jalr	-1238(ra) # 20004936 <strrchr>
     1e14:	58040593          	addi	a1,s0,1408
@@ -2627,8 +2627,8 @@ Disassembly of section .ram_code:
     1e30:	20005637          	lui	a2,0x20005
     1e34:	20005537          	lui	a0,0x20005
     1e38:	0ba00693          	li	a3,186
-    1e3c:	6e860613          	addi	a2,a2,1768 # 200056e8 <__FUNCTION__.13291>
-    1e40:	5e850513          	addi	a0,a0,1512 # 200055e8 <__FUNCTION__.13203+0xd8>
+    1e3c:	6e860613          	addi	a2,a2,1768 # 200056e8 <__FUNCTION__.13248>
+    1e40:	5e850513          	addi	a0,a0,1512 # 200055e8 <__FUNCTION__.13160+0xd8>
     1e44:	20003097          	auipc	ra,0x20003
     1e48:	ad4080e7          	jalr	-1324(ra) # 20004918 <printf>
     1e4c:	5c448513          	addi	a0,s1,1476
@@ -4666,13 +4666,13 @@ Disassembly of section .text:
 200034e4:	c422                	c.swsp	s0,8(sp)
 200034e6:	c226                	c.swsp	s1,4(sp)
 200034e8:	c04a                	c.swsp	s2,0(sp)
-200034ea:	32370783          	lb	a5,803(a4) # 80140323 <_DATA_LMA_START+0x6013ab2b>
+200034ea:	30b70783          	lb	a5,779(a4) # 8014030b <_DATA_LMA_START+0x6013ab13>
 200034ee:	842a                	c.mv	s0,a0
-200034f0:	07f7f793          	andi	a5,a5,127
+200034f0:	0fe7f793          	andi	a5,a5,254
 200034f4:	450d                	c.li	a0,3
 200034f6:	892e                	c.mv	s2,a1
 200034f8:	84b2                	c.mv	s1,a2
-200034fa:	32f701a3          	sb	a5,803(a4)
+200034fa:	30f705a3          	sb	a5,779(a4)
 200034fe:	3799                	c.jal	20003444 <writeSPIByte>
 20003500:	5d09255b          	bfoz	a0,s2,23,16
 20003504:	f41ff0ef          	jal	ra,20003444 <writeSPIByte>
@@ -4687,10 +4687,10 @@ Disassembly of section .text:
 20003520:	fea40fa3          	sb	a0,-1(s0)
 20003524:	fe941ae3          	bne	s0,s1,20003518 <W25XXX_Read+0x3c>
 20003528:	80140737          	lui	a4,0x80140
-2000352c:	32370783          	lb	a5,803(a4) # 80140323 <_DATA_LMA_START+0x6013ab2b>
-20003530:	f807e793          	ori	a5,a5,-128
-20003534:	0ff7f793          	andi	a5,a5,255
-20003538:	32f701a3          	sb	a5,803(a4)
+2000352c:	30b70783          	lb	a5,779(a4) # 8014030b <_DATA_LMA_START+0x6013ab13>
+20003530:	0ff7f793          	andi	a5,a5,255
+20003534:	0017e793          	ori	a5,a5,1
+20003538:	30f705a3          	sb	a5,779(a4)
 2000353c:	40b2                	c.lwsp	ra,12(sp)
 2000353e:	4422                	c.lwsp	s0,8(sp)
 20003540:	4492                	c.lwsp	s1,4(sp)
@@ -4703,17 +4703,17 @@ Disassembly of section .text:
 2000354a:	c422                	c.swsp	s0,8(sp)
 2000354c:	80140437          	lui	s0,0x80140
 20003550:	c606                	c.swsp	ra,12(sp)
-20003552:	32340783          	lb	a5,803(s0) # 80140323 <_DATA_LMA_START+0x6013ab2b>
+20003552:	30b40783          	lb	a5,779(s0) # 8014030b <_DATA_LMA_START+0x6013ab13>
 20003556:	4515                	c.li	a0,5
-20003558:	07f7f793          	andi	a5,a5,127
-2000355c:	32f401a3          	sb	a5,803(s0)
+20003558:	0fe7f793          	andi	a5,a5,254
+2000355c:	30f405a3          	sb	a5,779(s0)
 20003560:	ee5ff0ef          	jal	ra,20003444 <writeSPIByte>
 20003564:	00000513          	li	a0,0
 20003568:	eddff0ef          	jal	ra,20003444 <writeSPIByte>
-2000356c:	32340783          	lb	a5,803(s0)
-20003570:	f807e793          	ori	a5,a5,-128
-20003574:	0ff7f793          	andi	a5,a5,255
-20003578:	32f401a3          	sb	a5,803(s0)
+2000356c:	30b40783          	lb	a5,779(s0)
+20003570:	0ff7f793          	andi	a5,a5,255
+20003574:	0017e793          	ori	a5,a5,1
+20003578:	30f405a3          	sb	a5,779(s0)
 2000357c:	40b2                	c.lwsp	ra,12(sp)
 2000357e:	4422                	c.lwsp	s0,8(sp)
 20003580:	0141                	c.addi	sp,16
@@ -4727,22 +4727,22 @@ Disassembly of section .text:
 2000358e:	cc22                	c.swsp	s0,24(sp)
 20003590:	c84a                	c.swsp	s2,16(sp)
 20003592:	c64e                	c.swsp	s3,12(sp)
-20003594:	32348783          	lb	a5,803(s1) # 80140323 <_DATA_LMA_START+0x6013ab2b>
+20003594:	30b48783          	lb	a5,779(s1) # 8014030b <_DATA_LMA_START+0x6013ab13>
 20003598:	842a                	c.mv	s0,a0
-2000359a:	07f7f793          	andi	a5,a5,127
+2000359a:	0fe7f793          	andi	a5,a5,254
 2000359e:	4519                	c.li	a0,6
 200035a0:	89ae                	c.mv	s3,a1
 200035a2:	8932                	c.mv	s2,a2
-200035a4:	32f481a3          	sb	a5,803(s1)
+200035a4:	30f485a3          	sb	a5,779(s1)
 200035a8:	e9dff0ef          	jal	ra,20003444 <writeSPIByte>
-200035ac:	32348783          	lb	a5,803(s1)
+200035ac:	30b48783          	lb	a5,779(s1)
 200035b0:	4509                	c.li	a0,2
-200035b2:	f807e793          	ori	a5,a5,-128
-200035b6:	0ff7f793          	andi	a5,a5,255
-200035ba:	32f481a3          	sb	a5,803(s1)
-200035be:	32348783          	lb	a5,803(s1)
-200035c2:	07f7f793          	andi	a5,a5,127
-200035c6:	32f481a3          	sb	a5,803(s1)
+200035b2:	0ff7f793          	andi	a5,a5,255
+200035b6:	0017e793          	ori	a5,a5,1
+200035ba:	30f485a3          	sb	a5,779(s1)
+200035be:	30b48783          	lb	a5,779(s1)
+200035c2:	0fe7f793          	andi	a5,a5,254
+200035c6:	30f485a3          	sb	a5,779(s1)
 200035ca:	3dad                	c.jal	20003444 <writeSPIByte>
 200035cc:	5d09a55b          	bfoz	a0,s3,23,16
 200035d0:	e75ff0ef          	jal	ra,20003444 <writeSPIByte>
@@ -4761,10 +4761,10 @@ Disassembly of section .text:
 20003602:	3589                	c.jal	20003444 <writeSPIByte>
 20003604:	fe941ce3          	bne	s0,s1,200035fc <W25XXX_WR_Page+0x78>
 20003608:	80140737          	lui	a4,0x80140
-2000360c:	32370783          	lb	a5,803(a4) # 80140323 <_DATA_LMA_START+0x6013ab2b>
-20003610:	f807e793          	ori	a5,a5,-128
-20003614:	0ff7f793          	andi	a5,a5,255
-20003618:	32f701a3          	sb	a5,803(a4)
+2000360c:	30b70783          	lb	a5,779(a4) # 8014030b <_DATA_LMA_START+0x6013ab13>
+20003610:	0ff7f793          	andi	a5,a5,255
+20003614:	0017e793          	ori	a5,a5,1
+20003618:	30f705a3          	sb	a5,779(a4)
 2000361c:	f2dff0ef          	jal	ra,20003548 <FLASH_ReadStatusReg>
 20003620:	fe057e5b          	bbs	a0,0,2000361c <W25XXX_WR_Page+0x98>
 20003624:	40f2                	c.lwsp	ra,28(sp)
@@ -4886,20 +4886,20 @@ Disassembly of section .text:
 20003750:	80140437          	lui	s0,0x80140
 20003754:	c606                	c.swsp	ra,12(sp)
 20003756:	c226                	c.swsp	s1,4(sp)
-20003758:	32340783          	lb	a5,803(s0) # 80140323 <_DATA_LMA_START+0x6013ab2b>
+20003758:	30b40783          	lb	a5,779(s0) # 8014030b <_DATA_LMA_START+0x6013ab13>
 2000375c:	84aa                	c.mv	s1,a0
-2000375e:	07f7f793          	andi	a5,a5,127
+2000375e:	0fe7f793          	andi	a5,a5,254
 20003762:	4519                	c.li	a0,6
-20003764:	32f401a3          	sb	a5,803(s0)
+20003764:	30f405a3          	sb	a5,779(s0)
 20003768:	cddff0ef          	jal	ra,20003444 <writeSPIByte>
-2000376c:	32340783          	lb	a5,803(s0)
+2000376c:	30b40783          	lb	a5,779(s0)
 20003770:	02000513          	li	a0,32
-20003774:	f807e793          	ori	a5,a5,-128
-20003778:	0ff7f793          	andi	a5,a5,255
-2000377c:	32f401a3          	sb	a5,803(s0)
-20003780:	32340783          	lb	a5,803(s0)
-20003784:	07f7f793          	andi	a5,a5,127
-20003788:	32f401a3          	sb	a5,803(s0)
+20003774:	0ff7f793          	andi	a5,a5,255
+20003778:	0017e793          	ori	a5,a5,1
+2000377c:	30f405a3          	sb	a5,779(s0)
+20003780:	30b40783          	lb	a5,779(s0)
+20003784:	0fe7f793          	andi	a5,a5,254
+20003788:	30f405a3          	sb	a5,779(s0)
 2000378c:	cb9ff0ef          	jal	ra,20003444 <writeSPIByte>
 20003790:	5d04a55b          	bfoz	a0,s1,23,16
 20003794:	cb1ff0ef          	jal	ra,20003444 <writeSPIByte>
@@ -4907,10 +4907,10 @@ Disassembly of section .text:
 2000379c:	ca9ff0ef          	jal	ra,20003444 <writeSPIByte>
 200037a0:	00000513          	li	a0,0
 200037a4:	ca1ff0ef          	jal	ra,20003444 <writeSPIByte>
-200037a8:	32340783          	lb	a5,803(s0)
-200037ac:	f807e793          	ori	a5,a5,-128
-200037b0:	0ff7f793          	andi	a5,a5,255
-200037b4:	32f401a3          	sb	a5,803(s0)
+200037a8:	30b40783          	lb	a5,779(s0)
+200037ac:	0ff7f793          	andi	a5,a5,255
+200037b0:	0017e793          	ori	a5,a5,1
+200037b4:	30f405a3          	sb	a5,779(s0)
 200037b8:	d91ff0ef          	jal	ra,20003548 <FLASH_ReadStatusReg>
 200037bc:	fe057e5b          	bbs	a0,0,200037b8 <FLASH_Erase_Sector+0x6c>
 200037c0:	40b2                	c.lwsp	ra,12(sp)
@@ -5470,11 +5470,11 @@ Disassembly of section .text:
 20003e8c:	238cc783          	lbu	a5,568(s9)
 20003e90:	efdff06f          	j	20003d8c <main_loop+0xc4>
 20003e94:	20005537          	lui	a0,0x20005
-20003e98:	54c50513          	addi	a0,a0,1356 # 2000554c <__FUNCTION__.13203+0x3c>
+20003e98:	54c50513          	addi	a0,a0,1356 # 2000554c <__FUNCTION__.13160+0x3c>
 20003e9c:	27d000ef          	jal	ra,20004918 <printf>
 20003ea0:	20005437          	lui	s0,0x20005
 20003ea4:	02f00593          	li	a1,47
-20003ea8:	52840513          	addi	a0,s0,1320 # 20005528 <__FUNCTION__.13203+0x18>
+20003ea8:	52840513          	addi	a0,s0,1320 # 20005528 <__FUNCTION__.13160+0x18>
 20003eac:	28b000ef          	jal	ra,20004936 <strrchr>
 20003eb0:	52840593          	addi	a1,s0,1320
 20003eb4:	00050a63          	beqz	a0,20003ec8 <main_loop+0x200>
@@ -5486,10 +5486,10 @@ Disassembly of section .text:
 20003ecc:	20005537          	lui	a0,0x20005
 20003ed0:	0e000693          	li	a3,224
 20003ed4:	4f860613          	addi	a2,a2,1272 # 200054f8 <__FUNCTION__.13002>
-20003ed8:	55450513          	addi	a0,a0,1364 # 20005554 <__FUNCTION__.13203+0x44>
+20003ed8:	55450513          	addi	a0,a0,1364 # 20005554 <__FUNCTION__.13160+0x44>
 20003edc:	23d000ef          	jal	ra,20004918 <printf>
 20003ee0:	20005537          	lui	a0,0x20005
-20003ee4:	5c450513          	addi	a0,a0,1476 # 200055c4 <__FUNCTION__.13203+0xb4>
+20003ee4:	5c450513          	addi	a0,a0,1476 # 200055c4 <__FUNCTION__.13160+0xb4>
 20003ee8:	231000ef          	jal	ra,20004918 <printf>
 20003eec:	bf21                	c.j	20003e04 <main_loop+0x13c>
 20003eee:	0001                	c.nop
@@ -5848,21 +5848,21 @@ Disassembly of section .text:
 20004380:	f54ff0ef          	jal	ra,20003ad4 <hspi_set_pin_mux.part.0>
 20004384:	00000513          	li	a0,0
 20004388:	f4cff0ef          	jal	ra,20003ad4 <hspi_set_pin_mux.part.0>
-2000438c:	32640783          	lb	a5,806(s0) # 80140326 <_DATA_LMA_START+0x6013ab2e>
+2000438c:	30e40783          	lb	a5,782(s0) # 8014030e <_DATA_LMA_START+0x6013ab16>
 20004390:	00300593          	li	a1,3
-20004394:	f807e793          	ori	a5,a5,-128
-20004398:	0ff7f793          	andi	a5,a5,255
-2000439c:	32f40323          	sb	a5,806(s0)
-200043a0:	32240783          	lb	a5,802(s0)
-200043a4:	48000513          	li	a0,1152
-200043a8:	07f7f793          	andi	a5,a5,127
-200043ac:	32f40123          	sb	a5,802(s0)
+20004394:	0ff7f793          	andi	a5,a5,255
+20004398:	0017e793          	ori	a5,a5,1
+2000439c:	30f40723          	sb	a5,782(s0)
+200043a0:	30a40783          	lb	a5,778(s0)
+200043a4:	10100513          	li	a0,257
+200043a8:	0fe7f793          	andi	a5,a5,254
+200043ac:	30f40523          	sb	a5,778(s0)
 200043b0:	e8cff0ef          	jal	ra,20003a3c <gpio_set_up_down_res>
-200043b4:	32340783          	lb	a5,803(s0)
+200043b4:	30b40783          	lb	a5,779(s0)
 200043b8:	00300593          	li	a1,3
-200043bc:	f807e793          	ori	a5,a5,-128
-200043c0:	0ff7f793          	andi	a5,a5,255
-200043c4:	32f401a3          	sb	a5,803(s0)
+200043bc:	0ff7f793          	andi	a5,a5,255
+200043c0:	0017e793          	ori	a5,a5,1
+200043c4:	30f405a3          	sb	a5,779(s0)
 200043c8:	30e40783          	lb	a5,782(s0)
 200043cc:	10200513          	li	a0,258
 200043d0:	0ff7f793          	andi	a5,a5,255
@@ -6074,12 +6074,12 @@ Disassembly of section .text:
 20004678:	f93d92e3          	bne	s11,s3,200045fc <firmware_check+0x340>
 2000467c:	200059b7          	lui	s3,0x20005
 20004680:	000cc583          	lbu	a1,0(s9)
-20004684:	52498513          	addi	a0,s3,1316 # 20005524 <__FUNCTION__.13203+0x14>
+20004684:	52498513          	addi	a0,s3,1316 # 20005524 <__FUNCTION__.13160+0x14>
 20004688:	0c85                	c.addi	s9,1
 2000468a:	2479                	c.jal	20004918 <printf>
 2000468c:	ff941ae3          	bne	s0,s9,20004680 <firmware_check+0x3c4>
 20004690:	20005537          	lui	a0,0x20005
-20004694:	5fc50513          	addi	a0,a0,1532 # 200055fc <__FUNCTION__.13203+0xec>
+20004694:	5fc50513          	addi	a0,a0,1532 # 200055fc <__FUNCTION__.13160+0xec>
 20004698:	280000ef          	jal	ra,20004918 <printf>
 2000469c:	67c1                	c.lui	a5,0x10
 2000469e:	835f958b          	addigp	a1,-1996 # 80034 <crc128>

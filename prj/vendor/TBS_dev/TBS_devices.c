@@ -20,7 +20,7 @@
 
 #define COUNTER_LCD_REMOVE_DISPLAY		ct_remove_nwwk
 #define COUNTER_LCD_PRESS_DISPLAY		ct_add_bt_print
-#include "TBS_power_meter_app/power_meter_app.h"
+
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/

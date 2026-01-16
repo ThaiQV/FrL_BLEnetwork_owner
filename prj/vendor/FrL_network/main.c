@@ -128,23 +128,24 @@ _attribute_ram_code_ void gpio_irq_handler(void){
  * @param[in]	none
  * @return      none
  */
-extern void drv_uart_tx_irq_handler(void);
-extern void drv_uart_rx_irq_handler(void);
+
 void uart1_irq_handler(void) {
 	extern void uart1_recieve_irq(void);
 	uart1_recieve_irq();
 #ifndef MASTER_CORE
 #ifdef POWER_METER_DEVICE
-	if (uart_get_irq_status(UART1,UART_TXDONE)) {
-		drv_uart_tx_irq_handler();
-	}
-	if (uart_get_irq_status(UART1,UART_RXDONE)) {
-		drv_uart_rx_irq_handler();
-	}
+	extern void drv_uart_tx_irq_handler(void);
+	extern void drv_uart_rx_irq_handler(void);
+	if(uart_get_irq_status(UART1, UART_TXDONE)){
+			drv_uart_tx_irq_handler();
+		}
+		if(uart_get_irq_status(UART1, UART_RXDONE)){
+			drv_uart_rx_irq_handler();
+		}
 #endif
 #endif
-
 }
+
 _attribute_ram_code_
 void timer0_irq_handler(void) {
 #ifndef MASTER_CORE
@@ -160,7 +161,7 @@ void timer0_irq_handler(void) {
  * @return      none
  */
 void uart0_irq_handler(void) {
-	printf("uart0_irq_handler \n");
+//	printf("uart0_irq_handler \n");
 //	if (uart_get_irq_status(UART1,UART_RXBUF_IRQ_STATUS)) {
 //		extern void uart1_recieve_irq(void);
 //		uart1_recieve_irq();
@@ -201,7 +202,7 @@ void proto_task( void *pvParameters );
  * @return      none
  */
 fl_version_t _bootloader = { 1, 0, 3};
-fl_version_t _fw = { 1, 5,1 };
+fl_version_t _fw = { 1, 5,2 };
 fl_version_t _hw = { 1, 0, 0 };
 
 _attribute_ram_code_ int main(void)   //must on ramcode
@@ -217,7 +218,6 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 	CCLK_16M_HCLK_16M_PCLK_16M;
 
 	rf_drv_ble_init();
-//	printf("main\n");
 
 	gpio_init(!deepRetWakeUp);
 #ifdef POWER_METER_DEVICE
@@ -227,7 +227,7 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 #if (UART_PRINT_DEBUG_ENABLE)
 	DEBUG_TX_PIN_INIT();
 #endif
-
+//	PLOG_Start(ALL);
 	PLOG_DEVICE_PROFILE(_bootloader,_fw,_hw);
 //#ifdef MASTER_CORE
 //	P_INFO("Startup from FOTA");

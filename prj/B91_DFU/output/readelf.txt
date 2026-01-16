@@ -10,7 +10,7 @@ ELF Header:
   Version:                           0x1
   Entry point address:               0x20000000
   Start of program headers:          52 (bytes into file)
-  Start of section headers:          146372 (bytes into file)
+  Start of section headers:          146332 (bytes into file)
   Flags:                             0x3, RVC, single-float ABI
   Size of this header:               52 (bytes)
   Size of program headers:           32 (bytes)
@@ -32,19 +32,19 @@ Section Headers:
   [ 8] .data             PROGBITS        00080000 008000 000016 00  WA  0   0  4
   [ 9] .sbss             NOBITS          00080018 008016 00001c 00  WA  0   0  4
   [10] .bss              NOBITS          00080034 008016 000014 00  WA  0   0  4
-  [11] .debug_info       PROGBITS        00000000 008016 00991c 00      0   0  1
-  [12] .debug_abbrev     PROGBITS        00000000 011932 000b86 00      0   0  1
-  [13] .debug_loc        PROGBITS        00000000 0124b8 003eba 00      0   0  1
-  [14] .debug_aranges    PROGBITS        00000000 016378 000458 00      0   0  8
-  [15] .debug_ranges     PROGBITS        00000000 0167d0 001050 00      0   0  8
-  [16] .debug_line       PROGBITS        00000000 017820 004a74 00      0   0  1
-  [17] .debug_str        PROGBITS        00000000 01c294 0041c8 01  MS  0   0  1
-  [18] .comment          PROGBITS        00000000 02045c 000037 01  MS  0   0  1
-  [19] .riscv.attributes RISCV_ATTRIBUTE 00000000 020493 00003b 00      0   0  1
-  [20] .debug_frame      PROGBITS        00000000 0204d0 0012d8 00      0   0  4
-  [21] .symtab           SYMTAB          00000000 0217a8 001320 10     22 167  4
-  [22] .strtab           STRTAB          00000000 022ac8 001003 00      0   0  1
-  [23] .shstrtab         STRTAB          00000000 023acb 0000f9 00      0   0  1
+  [11] .debug_info       PROGBITS        00000000 008016 009911 00      0   0  1
+  [12] .debug_abbrev     PROGBITS        00000000 011927 000b6e 00      0   0  1
+  [13] .debug_loc        PROGBITS        00000000 012495 003eb4 00      0   0  1
+  [14] .debug_aranges    PROGBITS        00000000 016350 000458 00      0   0  8
+  [15] .debug_ranges     PROGBITS        00000000 0167a8 001050 00      0   0  8
+  [16] .debug_line       PROGBITS        00000000 0177f8 004a74 00      0   0  1
+  [17] .debug_str        PROGBITS        00000000 01c26c 0041c8 01  MS  0   0  1
+  [18] .comment          PROGBITS        00000000 020434 000037 01  MS  0   0  1
+  [19] .riscv.attributes RISCV_ATTRIBUTE 00000000 02046b 00003b 00      0   0  1
+  [20] .debug_frame      PROGBITS        00000000 0204a8 0012d8 00      0   0  4
+  [21] .symtab           SYMTAB          00000000 021780 001320 10     22 167  4
+  [22] .strtab           STRTAB          00000000 022aa0 001003 00      0   0  1
+  [23] .shstrtab         STRTAB          00000000 023aa3 0000f9 00      0   0  1
 Key to Flags:
   W (write), A (alloc), X (execute), M (merge), S (strings), I (info),
   L (link order), O (extra OS processing required), G (group), T (TLS),
@@ -60,7 +60,7 @@ Program Headers:
   LOAD           0x002400 0x00000400 0x20000538 0x02d02 0x02d02 R E 0x1000
   LOAD           0x005240 0x20003240 0x20003240 0x025b8 0x025b8 R E 0x1000
   LOAD           0x008000 0x00080000 0x200057f8 0x00016 0x00048 RW  0x1000
-  RISCV_ATTRIBUT 0x020493 0x00000000 0x00000000 0x0003b 0x00000 R   0x1
+  RISCV_ATTRIBUT 0x02046b 0x00000000 0x00000000 0x0003b 0x00000 R   0x1
 
  Section to Segment mapping:
   Segment Sections...
@@ -222,7 +222,7 @@ Symbol table '.symtab' contains 306 entries:
    140: 000003a0     5 OBJECT  LOCAL  DEFAULT    3 ORIGINAL_MASTER_TIME
    141: 000003a5     1 OBJECT  LOCAL  DEFAULT    3 g_plic_preempt_en
    142: 200054f8    23 OBJECT  LOCAL  DEFAULT    6 __FUNCTION__.13002
-   143: 20005510    17 OBJECT  LOCAL  DEFAULT    6 __FUNCTION__.13203
+   143: 20005510    17 OBJECT  LOCAL  DEFAULT    6 __FUNCTION__.13160
    144: 00080018     4 OBJECT  LOCAL  DEFAULT    9 g_chip_version
    145: 0008001c     4 OBJECT  LOCAL  DEFAULT    9 g_pm_status_info
    146: 00080020     4 OBJECT  LOCAL  DEFAULT    9 mcause
@@ -231,7 +231,7 @@ Symbol table '.symtab' contains 306 entries:
    149: 00080004     8 OBJECT  LOCAL  DEFAULT    8 g_pm_early_wakeup_time_us
    150: 0008000c     4 OBJECT  LOCAL  DEFAULT    8 g_pm_r_delay_cycle
    151: 00080010     6 OBJECT  LOCAL  DEFAULT    8 sys_clk
-   152: 200056e8     5 OBJECT  LOCAL  DEFAULT    6 __FUNCTION__.13291
+   152: 200056e8     5 OBJECT  LOCAL  DEFAULT    6 __FUNCTION__.13248
    153: 00000000     0 FILE    LOCAL  DEFAULT  ABS memcpy.c
    154: 00000000     0 FILE    LOCAL  DEFAULT  ABS printf.c
    155: 00000000     0 FILE    LOCAL  DEFAULT  ABS strrchr.c
