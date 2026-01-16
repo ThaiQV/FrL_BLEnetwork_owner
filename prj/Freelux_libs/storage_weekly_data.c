@@ -144,17 +144,57 @@ storage_ret_t storage_map_check(uint16_t index, uint32_t len)
 void storage_map_fill_status(uint32_t index, uint32_t len)
 {
 	uint32_t sector = 0;
+	uint8_t rslt = 0;
+
+//	sector = ((index*len)/DEF_UDISK_SECTOR_SIZE);
+//	u8 rslt = (0x01 << ((sector%8) - 1));
+//	// Set status of previous sector is written
+//	if(sector > 0)
+//	{
+//		if((map[(sector/8)] && rslt) == 0x00)
+//		{
+//			map[(sector/8)] |= (0x01 << ((sector%8) - 1));
+//			nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
+//			STORAGE_LOG("storage_map_fill_status: %d - %d\n",sector,map[(sector/8)]);
+//		}
+//	}
+//	else if(sector == 0) // Set status of the last sector is written
+//	{
+//		if((map[(MAP_LENGTH - 1)] && (0x01 << (7))) == 0x00)
+//		{
+//			map[(MAP_LENGTH - 1)] |= (0x01 << (7));
+//			nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
+//			STORAGE_LOG("storage_map_fill_status: %d - %d\n",sector,map[(MAP_LENGTH - 1)]);
+//		}
+//	}
 
 	sector = ((index*len)/DEF_UDISK_SECTOR_SIZE);
-	u8 rslt = (0x01 << ((sector%8) - 1));
+
+	if((sector%8) > 0)
+	{
+		rslt = (0x01 << ((sector%8) - 1));
+	}
+
 	// Set status of previous sector is written
 	if(sector > 0)
 	{
-		if((map[(sector/8)] && rslt) == 0x00)
+		if((sector%8) == 0)
 		{
-			map[(sector/8)] |= (0x01 << ((sector%8) - 1));
-			nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
-			STORAGE_LOG("storage_map_fill_status: %d - %d\n",sector,map[(sector/8)]);
+			if((map[(sector/8) - 1] && (0x01 << (7))) == 0x00)
+			{
+				map[(sector/8) - 1] |= (0x01 << (7));
+				nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
+				STORAGE_LOG("storage_map_fill_status: %d - %d\n",sector,map[(sector/8)]);
+			}
+		}
+		else
+		{
+			if((map[(sector/8)] && rslt) == 0x00)
+			{
+				map[(sector/8)] |= rslt;
+				nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
+				STORAGE_LOG("storage_map_fill_status: %d - %d\n",sector,map[(sector/8)]);
+			}
 		}
 	}
 	else if(sector == 0) // Set status of the last sector is written
