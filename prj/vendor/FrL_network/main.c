@@ -202,7 +202,7 @@ void proto_task( void *pvParameters );
  * @return      none
  */
 fl_version_t _bootloader = { 1, 0, 3};
-fl_version_t _fw = { 1, 5,1 };
+fl_version_t _fw = { 1, 5,2 };
 fl_version_t _hw = { 1, 0, 0 };
 
 _attribute_ram_code_ int main(void)   //must on ramcode
@@ -224,7 +224,7 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 	DEBUG_TX_PIN_INIT()
 	;
 #endif
-	PLOG_Start(ALL);
+//	PLOG_Start(ALL);
 	PLOG_DEVICE_PROFILE(_bootloader,_fw,_hw);
 #ifdef MASTER_CORE
 //	P_INFO("Startup from FOTA");
@@ -242,7 +242,7 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 //		ERR(APP,"FOTA ok.....\r\n");
 //	}
 	//OFF ALL LOG
-//	PLOG_Stop(ALL);
+	PLOG_Stop(ALL);
 	if (!deepRetWakeUp) {  //read flash size
 #if (BATT_CHECK_ENABLE)
 	user_battery_power_check();

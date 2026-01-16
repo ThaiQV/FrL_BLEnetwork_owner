@@ -283,7 +283,7 @@ void fl_wifi2ble_fota_init(void){
 	fl_wifi2ble_fota_ContainerClear();
 	DFU_OTA_INIT();
 	//change version
-	DFU_OTA_VERISON_SET(67);
+	DFU_OTA_VERISON_SET(68);
 	LOG_P(INF_FILE,"FOTA Initilization!!!\r\n");
 #ifdef MASTER_CORE
 	//set interval
