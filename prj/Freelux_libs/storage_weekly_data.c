@@ -49,6 +49,8 @@ void storage_init(void)
 */
 void storage_clean(void)
 {
+	//clear all nv
+	nvm_erase();
 	uint32_t i;
 
 	// Erase device storage area
@@ -59,6 +61,7 @@ void storage_clean(void)
 	// Reset timestamp map
 	memset(map,0x00,sizeof(map));
 	nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
+
 }
 
 /**

@@ -1148,28 +1148,6 @@ int _slave_reconnect(void){
 }
 
 //FOR TESST FLASH
-//
-//int _interval_report(void) {
-//#ifdef COUNTER_DEVICE
-//	fl_nwk_slave_displayLCD_Refesh();
-//#endif
-//	int offset_spread = (fl_rtc_getWithMilliStep().milstep - WIFI_ORIGINAL_GETALL.milstep)*10;
-//#define INTERVAL_REPORT_TIME (55 - FL_SLAVEID_MEMID(G_INFORMATION.slaveID))
-////	extern const u32 ORIGINAL_TIME_TRUST;
-//	if (IsJoinedNetwork()) {
-//#ifdef COUNTER_DEVICE
-//		fl_api_slave_req(NWK_HDR_55,(u8*) &G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data),0,0,1);
-//#endif
-//		return 5*1000*1000;
-//	}else{
-//		if(IsPairing()){
-//			fl_nwk_LedSignal_run();
-//			return 500 * 1000;
-//		}
-//	}
-//#undef INTERVAL_REPORT_TIME
-//	return 100 * 1000 + offset_spread;
-//}
 
 int _interval_report(void) {
 #ifdef COUNTER_DEVICE
@@ -1177,23 +1155,12 @@ int _interval_report(void) {
 #endif
 	int offset_spread = (fl_rtc_getWithMilliStep().milstep - WIFI_ORIGINAL_GETALL.milstep)*10;
 #define INTERVAL_REPORT_TIME (55 - FL_SLAVEID_MEMID(G_INFORMATION.slaveID))
-	extern const u32 ORIGINAL_TIME_TRUST;
+//	extern const u32 ORIGINAL_TIME_TRUST;
 	if (IsJoinedNetwork()) {
-		if (WIFI_ORIGINAL_GETALL.timetamp < fl_rtc_get() && WIFI_ORIGINAL_GETALL.timetamp > ORIGINAL_TIME_TRUST) {
-			if (fl_rtc_get() - WIFI_ORIGINAL_GETALL.timetamp >= INTERVAL_REPORT_TIME) {
 #ifdef COUNTER_DEVICE
-				fl_api_slave_req(NWK_HDR_55,(u8*) &G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data),0,0,1);//NWK_HDR_11_REACTIVE
-#else //POWERMETER
-				TBS_PowerMeter_Upload2Master();
-				 u8 _payload[SIZEU8(tbs_device_powermeter_t)];
-				 tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) G_INFORMATION.data;
-				 tbs_pack_powermeter_data(pwmeter_data,_payload);
-				 u8 indx_data = SIZEU8(pwmeter_data->type) + SIZEU8(pwmeter_data->mac) + SIZEU8(pwmeter_data->timetamp);
-				 fl_api_slave_req(NWK_HDR_55,&_payload[indx_data],SIZEU8(pwmeter_data->data),0,0,1);
+		fl_api_slave_req(NWK_HDR_55,(u8*) &G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data),0,0,1);
 #endif
-				return INTERVAL_REPORT_TIME*1000*1000 + offset_spread;
-			}
-		}
+		return 5*1000*1000;
 	}else{
 		if(IsPairing()){
 			fl_nwk_LedSignal_run();
@@ -1203,6 +1170,39 @@ int _interval_report(void) {
 #undef INTERVAL_REPORT_TIME
 	return 100 * 1000 + offset_spread;
 }
+//
+//int _interval_report(void) {
+//#ifdef COUNTER_DEVICE
+//	fl_nwk_slave_displayLCD_Refesh();
+//#endif
+//	int offset_spread = (fl_rtc_getWithMilliStep().milstep - WIFI_ORIGINAL_GETALL.milstep)*10;
+//#define INTERVAL_REPORT_TIME (55 - FL_SLAVEID_MEMID(G_INFORMATION.slaveID))
+//	extern const u32 ORIGINAL_TIME_TRUST;
+//	if (IsJoinedNetwork()) {
+//		if (WIFI_ORIGINAL_GETALL.timetamp < fl_rtc_get() && WIFI_ORIGINAL_GETALL.timetamp > ORIGINAL_TIME_TRUST) {
+//			if (fl_rtc_get() - WIFI_ORIGINAL_GETALL.timetamp >= INTERVAL_REPORT_TIME) {
+//#ifdef COUNTER_DEVICE
+//				fl_api_slave_req(NWK_HDR_55,(u8*) &G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data),0,0,1);//NWK_HDR_11_REACTIVE
+//#else //POWERMETER
+//				TBS_PowerMeter_Upload2Master();
+//				 u8 _payload[SIZEU8(tbs_device_powermeter_t)];
+//				 tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) G_INFORMATION.data;
+//				 tbs_pack_powermeter_data(pwmeter_data,_payload);
+//				 u8 indx_data = SIZEU8(pwmeter_data->type) + SIZEU8(pwmeter_data->mac) + SIZEU8(pwmeter_data->timetamp);
+//				 fl_api_slave_req(NWK_HDR_55,&_payload[indx_data],SIZEU8(pwmeter_data->data),0,0,1);
+//#endif
+//				return INTERVAL_REPORT_TIME*1000*1000 + offset_spread;
+//			}
+//		}
+//	}else{
+//		if(IsPairing()){
+//			fl_nwk_LedSignal_run();
+//			return 500 * 1000;
+//		}
+//	}
+//#undef INTERVAL_REPORT_TIME
+//	return 100 * 1000 + offset_spread;
+//}
 
 /******************************************************************************/
 /******************************************************************************/
