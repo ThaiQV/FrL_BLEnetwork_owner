@@ -58,9 +58,9 @@
 #define HSPI_MISO						GPIO_PB2
 #define HSPI_MOSI						GPIO_PB3
 
-#if (defined MASTER_CORE | defined COUNTER_DEVICE | !defined DFU_POWER_METER_DEVICE)
-	#define HSPI_CS							GPIO_PB0
-	#define HSPI_IO							GPIO_PB1
+#if (defined MASTER_CORE | defined COUNTER_DEVICE | (!defined DFU_POWER_METER_DEVICE & !defined POWER_METER_DEVICE))
+#define HSPI_CS							GPIO_PB0
+#define HSPI_IO							GPIO_PB1
 #else
 	#ifdef POWER_METER_DEVICE
 		#define HSPI_IO							GPIO_PB1
@@ -69,5 +69,30 @@
 		#define HSPI_CS_POWER_METER_STPM2		GPIO_PE5
 		#define HSPI_CS_POWER_METER_STPM3		GPIO_PE4
 	#endif
+#endif
+
+/////////////////////////////////////// PRINT DEBUG INFO ///////////////////////////////////////
+#if (UART_PRINT_DEBUG_ENABLE)
+//the baud rate should not bigger than 115200 when MCU clock is 16M)
+//the baud rate should not bigger than 1000000 when MCU clock is 24M)
+#ifdef POWER_METER_DEVICE
+#define PRINT_BAUD_RATE             		115200
+#define DEBUG_INFO_TX_PIN           		GPIO_PE0
+#define PULL_WAKEUP_SRC_PE0         		PM_PIN_PULLUP_10K
+#define PE0_OUTPUT_ENABLE         			1
+#define PE0_DATA_OUT                     	1 //must
+#else
+#define PRINT_BAUD_RATE             		115200
+#define DEBUG_INFO_TX_PIN           		GPIO_PA7
+#define PULL_WAKEUP_SRC_PA7         		PM_PIN_PULLUP_10K
+#define PA7_OUTPUT_ENABLE         			1
+#define PA7_DATA_OUT                     	1 //must
+#endif
+#define DEBUG_TX_PIN_INIT()					do{	\
+												gpio_function_en(DEBUG_INFO_TX_PIN);								\
+												gpio_set_output(DEBUG_INFO_TX_PIN, 1);								\
+												gpio_set_up_down_res(DEBUG_INFO_TX_PIN, GPIO_PIN_PULLUP_1M);		\
+												gpio_set_high_level(DEBUG_INFO_TX_PIN);								\
+											}while(0)
 #endif
 

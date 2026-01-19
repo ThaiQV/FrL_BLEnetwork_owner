@@ -36,7 +36,7 @@ typedef struct
 extern u8 *pUartRxBuf;
 
 __attribute__((aligned(4))) u8 moduleTest_uartTxBuf[4] = {0};
-__attribute__((aligned(4))) u8 rxBuf_uart[256] = {0};
+__attribute__((aligned(4))) u8 rxBuf_uart[128] = {0};
 volatile u8 T_uartPktSentSeqNo = 0;
 volatile u32 T_uartPktRecvSeqNo = 0;
 volatile u32 T_uartPktRecvLen = 0;
@@ -68,7 +68,7 @@ void print_uart(const char *fmt, ...)
 
     if (len > 0)
     {
-        drv_uart_tx_start((uint8_t *)buf, len);
+        drv_uart_tx_start((uint8_t *)buf, (u32)len);
     }
 }
 

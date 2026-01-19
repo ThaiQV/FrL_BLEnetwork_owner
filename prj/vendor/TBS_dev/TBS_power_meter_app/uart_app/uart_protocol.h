@@ -4,21 +4,21 @@
  * @version 2.0
  *
  * Architecture:
- * ┌─────────────────────────────────────────────────┐
- * │  Protocol Layer (can have multiple instances)   │
- * │  - Protocol A, Protocol B, Protocol C...        │
- * └─────────────────────────────────────────────────┘
- *                      ↕ (callback)
- * ┌─────────────────────────────────────────────────┐
- * │  UART Driver Layer (shared, singleton)          │
- * │  - Receive data from IRQ                        │
- * │  - Distribute to correct protocol handler       │
- * └─────────────────────────────────────────────────┘
- *                      ↕
- * ┌─────────────────────────────────────────────────┐
- * │  HAL Layer (platform specific)                  │
- * │  - UART hardware, IRQ                           │
- * └─────────────────────────────────────────────────┘
+ * â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”�
+ * â”‚  Protocol Layer (can have multiple instances)   â”‚
+ * â”‚  - Protocol A, Protocol B, Protocol C...        â”‚
+ * â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+ *                      â†• (callback)
+ * â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”�
+ * â”‚  UART Driver Layer (shared, singleton)          â”‚
+ * â”‚  - Receive data from IRQ                        â”‚
+ * â”‚  - Distribute to correct protocol handler       â”‚
+ * â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+ *                      â†•
+ * â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”�
+ * â”‚  HAL Layer (platform specific)                  â”‚
+ * â”‚  - UART hardware, IRQ                           â”‚
+ * â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
  */
 
 #ifndef UART_PROTOCOL_H
@@ -76,7 +76,7 @@ extern "C"
      * HAL function to send data via UART hardware
      * User implements this function for each platform
      */
-    typedef void (*uart_hal_send_fn_t)(const uint8_t *data, uint16_t len);
+    typedef void (*uart_hal_send_fn_t)( uint8_t *data, uint16_t len);
 
     /**
      * HAL function to get system tick (milliseconds)
@@ -397,9 +397,9 @@ extern "C"
 #define PROTOCOL_DEBUG(...)           \
     do                                \
     {                                 \
-        PMT_LOGA("PROTOCOL_DEBUG: "); \
-        PMT_LOGA(__VA_ARGS__);        \
-        PMT_LOGA("\n");               \
+        LOG_P(PERI,"PROTOCOL_DEBUG: "); \
+        LOGA(PERI,__VA_ARGS__);        \
+        LOG_P(PERI,"\n");               \
     } while (0)
 #endif
 /**

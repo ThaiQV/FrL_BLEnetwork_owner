@@ -17,7 +17,7 @@
 #ifdef PMT_DEBUG_UART
 #define PMT_LOGA(...)  print_uart(__VA_ARGS__)
 #else
-#define PMT_LOGA(...)  printf(__VA_ARGS__)
+//#define PMT_LOGA(...)  LOGA(PERI,__VA_ARGS__)
 #endif
 typedef struct {
     float voltage;              //  (V)

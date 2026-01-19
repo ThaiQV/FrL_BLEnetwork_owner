@@ -1,8 +1,10 @@
 # Ignore build output folders
 prj/FrL_Network/
 prj/FrL_Network_Master/
+prj/FrL_Network_HWSample/
 prj/B91_ble_sample/
 prj/B91_module/
+prj/B91_*/
 
 # Ignore temporary files
 *.log

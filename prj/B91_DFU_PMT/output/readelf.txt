@@ -10,7 +10,7 @@ ELF Header:
   Version:                           0x1
   Entry point address:               0x20000000
   Start of program headers:          52 (bytes into file)
-  Start of section headers:          146336 (bytes into file)
+  Start of section headers:          146364 (bytes into file)
   Flags:                             0x3, RVC, single-float ABI
   Size of this header:               52 (bytes)
   Size of program headers:           32 (bytes)
@@ -32,19 +32,19 @@ Section Headers:
   [ 8] .data             PROGBITS        00080000 008000 000016 00  WA  0   0  4
   [ 9] .sbss             NOBITS          00080018 008016 00001c 00  WA  0   0  4
   [10] .bss              NOBITS          00080034 008016 000014 00  WA  0   0  4
-  [11] .debug_info       PROGBITS        00000000 008016 009911 00      0   0  1
-  [12] .debug_abbrev     PROGBITS        00000000 011927 000b6e 00      0   0  1
-  [13] .debug_loc        PROGBITS        00000000 012495 003eb4 00      0   0  1
-  [14] .debug_aranges    PROGBITS        00000000 016350 000458 00      0   0  8
-  [15] .debug_ranges     PROGBITS        00000000 0167a8 001050 00      0   0  8
-  [16] .debug_line       PROGBITS        00000000 0177f8 004a74 00      0   0  1
-  [17] .debug_str        PROGBITS        00000000 01c26c 0041cc 01  MS  0   0  1
-  [18] .comment          PROGBITS        00000000 020438 000037 01  MS  0   0  1
-  [19] .riscv.attributes RISCV_ATTRIBUTE 00000000 02046f 00003b 00      0   0  1
-  [20] .debug_frame      PROGBITS        00000000 0204ac 0012d8 00      0   0  4
-  [21] .symtab           SYMTAB          00000000 021784 001320 10     22 167  4
-  [22] .strtab           STRTAB          00000000 022aa4 001003 00      0   0  1
-  [23] .shstrtab         STRTAB          00000000 023aa7 0000f9 00      0   0  1
+  [11] .debug_info       PROGBITS        00000000 008016 00991c 00      0   0  1
+  [12] .debug_abbrev     PROGBITS        00000000 011932 000b76 00      0   0  1
+  [13] .debug_loc        PROGBITS        00000000 0124a8 003ebb 00      0   0  1
+  [14] .debug_aranges    PROGBITS        00000000 016368 000458 00      0   0  8
+  [15] .debug_ranges     PROGBITS        00000000 0167c0 001050 00      0   0  8
+  [16] .debug_line       PROGBITS        00000000 017810 004a7a 00      0   0  1
+  [17] .debug_str        PROGBITS        00000000 01c28a 0041cc 01  MS  0   0  1
+  [18] .comment          PROGBITS        00000000 020456 000037 01  MS  0   0  1
+  [19] .riscv.attributes RISCV_ATTRIBUTE 00000000 02048d 00003b 00      0   0  1
+  [20] .debug_frame      PROGBITS        00000000 0204c8 0012d8 00      0   0  4
+  [21] .symtab           SYMTAB          00000000 0217a0 001320 10     22 167  4
+  [22] .strtab           STRTAB          00000000 022ac0 001003 00      0   0  1
+  [23] .shstrtab         STRTAB          00000000 023ac3 0000f9 00      0   0  1
 Key to Flags:
   W (write), A (alloc), X (execute), M (merge), S (strings), I (info),
   L (link order), O (extra OS processing required), G (group), T (TLS),
@@ -60,7 +60,7 @@ Program Headers:
   LOAD           0x002400 0x00000400 0x20000538 0x02d02 0x02d02 R E 0x1000
   LOAD           0x005240 0x20003240 0x20003240 0x025b8 0x025b8 R E 0x1000
   LOAD           0x008000 0x00080000 0x200057f8 0x00016 0x00048 RW  0x1000
-  RISCV_ATTRIBUT 0x02046f 0x00000000 0x00000000 0x0003b 0x00000 R   0x1
+  RISCV_ATTRIBUT 0x02048d 0x00000000 0x00000000 0x0003b 0x00000 R   0x1
 
  Section to Segment mapping:
   Segment Sections...
@@ -246,89 +246,89 @@ Symbol table '.symtab' contains 306 entries:
    164: 00000000     0 FILE    LOCAL  DEFAULT  ABS libgcc2.c
    165: 00000000     0 FILE    LOCAL  DEFAULT  ABS libgcc2.c
    166: 00000000     0 FILE    LOCAL  DEFAULT  ABS printf_data.c
-   167: 000020f0    72 FUNC    GLOBAL DEFAULT    4 entry_irq55
-   168: 00002b78    68 FUNC    GLOBAL DEFAULT    4 entry_irq13
+   167: 000020f4    72 FUNC    GLOBAL DEFAULT    4 entry_irq55
+   168: 00002b7c    68 FUNC    GLOBAL DEFAULT    4 entry_irq13
    169: 20005390   124 FUNC    GLOBAL DEFAULT    5 strcpy
-   170: 00002a60   212 FUNC    GLOBAL DEFAULT    4 entry_irq15
+   170: 00002a64   212 FUNC    GLOBAL DEFAULT    4 entry_irq15
    171: 20005458    46 FUNC    GLOBAL HIDDEN     5 __ashldi3
-   172: 000026a0    68 FUNC    GLOBAL DEFAULT    4 entry_irq27
-   173: 00001f88    72 FUNC    GLOBAL DEFAULT    4 entry_irq60
-   174: 00002ea8   212 FUNC    GLOBAL DEFAULT    4 entry_irq1
-   175: 000021c8    72 FUNC    GLOBAL DEFAULT    4 entry_irq52
-   176: 00002258    72 FUNC    GLOBAL DEFAULT    4 entry_irq50
-   177: 00001ef8    72 FUNC    GLOBAL DEFAULT    4 entry_irq62
+   172: 000026a4    68 FUNC    GLOBAL DEFAULT    4 entry_irq27
+   173: 00001f8c    72 FUNC    GLOBAL DEFAULT    4 entry_irq60
+   174: 00002eac   212 FUNC    GLOBAL DEFAULT    4 entry_irq1
+   175: 000021cc    72 FUNC    GLOBAL DEFAULT    4 entry_irq52
+   176: 0000225c    72 FUNC    GLOBAL DEFAULT    4 entry_irq50
+   177: 00001efc    72 FUNC    GLOBAL DEFAULT    4 entry_irq62
    178: 20004918    30 FUNC    GLOBAL DEFAULT    5 printf
    179: 00080800     0 NOTYPE  GLOBAL DEFAULT    8 __global_pointer$
    180: 20005490     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_8
-   181: 00002018    72 FUNC    GLOBAL DEFAULT    4 entry_irq58
+   181: 0000201c    72 FUNC    GLOBAL DEFAULT    4 entry_irq58
    182: 200054dc     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_3
    183: 000003a6     0 NOTYPE  GLOBAL DEFAULT    3 _RETENTION_DATA_VMA_END
    184: 200054c8     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_10
    185: 20005490     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_11
    186: 200049e4    76 FUNC    GLOBAL DEFAULT    5 __print_integral
    187: 00000000     0 NOTYPE  GLOBAL DEFAULT    2 _RETENTION_RESET_VMA_STAR
-   188: 00002c44    68 FUNC    GLOBAL DEFAULT    4 entry_irq10
-   189: 000028c8    68 FUNC    GLOBAL DEFAULT    4 entry_irq21
+   188: 00002c48    68 FUNC    GLOBAL DEFAULT    4 entry_irq10
+   189: 000028cc    68 FUNC    GLOBAL DEFAULT    4 entry_irq21
    190: 00000158     0 NOTYPE  GLOBAL DEFAULT    3 _AES_VMA_START
-   191: 000022a4     4 FUNC    GLOBAL DEFAULT    4 entry_irq48
+   191: 000022a8     4 FUNC    GLOBAL DEFAULT    4 entry_irq48
    192: 200054dc     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_2
-   193: 00002ccc    68 FUNC    GLOBAL DEFAULT    4 entry_irq8
-   194: 00002500    72 FUNC    GLOBAL DEFAULT    4 entry_irq33
+   193: 00002cd0    68 FUNC    GLOBAL DEFAULT    4 entry_irq8
+   194: 00002504    72 FUNC    GLOBAL DEFAULT    4 entry_irq33
    195: 00080048     0 NOTYPE  GLOBAL DEFAULT   10 _BSS_VMA_END
    196: 20004774   250 FUNC    GLOBAL DEFAULT    5 memcpy
    197: 20000190     0 NOTYPE  GLOBAL DEFAULT  ABS _RETENTION_RESET_LMA_STAR
    198: 20004a30  1146 FUNC    GLOBAL DEFAULT    5 __printf_impl
-   199: 00002bbc    68 FUNC    GLOBAL DEFAULT    4 entry_irq12
-   200: 00002b34    68 FUNC    GLOBAL DEFAULT    4 entry_irq14
+   199: 00002bc0    68 FUNC    GLOBAL DEFAULT    4 entry_irq12
+   200: 00002b38    68 FUNC    GLOBAL DEFAULT    4 entry_irq14
    201: 20005488     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_12
-   202: 00002e64    68 FUNC    GLOBAL DEFAULT    4 entry_irq2
-   203: 00002210    72 FUNC    GLOBAL DEFAULT    4 entry_irq51
+   202: 00002e68    68 FUNC    GLOBAL DEFAULT    4 entry_irq2
+   203: 00002214    72 FUNC    GLOBAL DEFAULT    4 entry_irq51
    204: 200054c8     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_11
-   205: 0000265c    68 FUNC    GLOBAL DEFAULT    4 entry_irq28
-   206: 00002340    72 FUNC    GLOBAL DEFAULT    4 entry_irq43
+   205: 00002660    68 FUNC    GLOBAL DEFAULT    4 entry_irq28
+   206: 00002344    72 FUNC    GLOBAL DEFAULT    4 entry_irq43
    207: 200054b8     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_1
    208: 200054dc     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_0
-   209: 0000290c    68 FUNC    GLOBAL DEFAULT    4 entry_irq20
+   209: 00002910    68 FUNC    GLOBAL DEFAULT    4 entry_irq20
    210: 2000549e     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_7
    211: 00080018     0 NOTYPE  GLOBAL DEFAULT    9 _BSS_VMA_START
-   212: 00001eb0    72 FUNC    GLOBAL DEFAULT    4 entry_irq63
+   212: 00001eb4    72 FUNC    GLOBAL DEFAULT    4 entry_irq63
    213: 00080016     0 NOTYPE  GLOBAL DEFAULT    8 _DATA_VMA_END
-   214: 000022ac    72 FUNC    GLOBAL DEFAULT    4 entry_irq46
-   215: 00002590    68 FUNC    GLOBAL DEFAULT    4 entry_irq31
-   216: 00002a1c    68 FUNC    GLOBAL DEFAULT    4 entry_irq16
+   214: 000022b0    72 FUNC    GLOBAL DEFAULT    4 entry_irq46
+   215: 00002594    68 FUNC    GLOBAL DEFAULT    4 entry_irq31
+   216: 00002a20    68 FUNC    GLOBAL DEFAULT    4 entry_irq16
    217: 00100000     0 NOTYPE  GLOBAL DEFAULT  ABS FLASH_SIZE
    218: 200054d2     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_5
    219: 00080000     0 NOTYPE  GLOBAL DEFAULT    8 _DATA_VMA_START
-   220: 00002180    72 FUNC    GLOBAL DEFAULT    4 entry_irq53
-   221: 00002c00    68 FUNC    GLOBAL DEFAULT    4 entry_irq11
+   220: 00002184    72 FUNC    GLOBAL DEFAULT    4 entry_irq53
+   221: 00002c04    68 FUNC    GLOBAL DEFAULT    4 entry_irq11
    222: 00000154     0 NOTYPE  GLOBAL DEFAULT    2 _RETENTION_RESET_VMA_END
    223: 2000540e    24 FUNC    GLOBAL DEFAULT    5 strnlen
    224: 200054d2     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_6
    225: 20004936    44 FUNC    GLOBAL DEFAULT    5 strrchr
-   226: 00002d98    68 FUNC    GLOBAL DEFAULT    4 entry_irq5
-   227: 00002840    68 FUNC    GLOBAL DEFAULT    4 entry_irq23
-   228: 000024b8    72 FUNC    GLOBAL DEFAULT    4 entry_irq34
+   226: 00002d9c    68 FUNC    GLOBAL DEFAULT    4 entry_irq5
+   227: 00002844    68 FUNC    GLOBAL DEFAULT    4 entry_irq23
+   228: 000024bc    72 FUNC    GLOBAL DEFAULT    4 entry_irq34
    229: 20005428    46 FUNC    GLOBAL HIDDEN     5 __lshrdi3
-   230: 00002428    72 FUNC    GLOBAL DEFAULT    4 entry_irq36
+   230: 0000242c    72 FUNC    GLOBAL DEFAULT    4 entry_irq36
    231: 20005490     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_9
-   232: 000022f8    72 FUNC    GLOBAL DEFAULT    4 entry_irq44
+   232: 000022fc    72 FUNC    GLOBAL DEFAULT    4 entry_irq44
    233: 2000499a    74 FUNC    GLOBAL DEFAULT    5 vprintf
-   234: 000022f4     4 FUNC    GLOBAL DEFAULT    4 entry_irq45
-   235: 000026e4    68 FUNC    GLOBAL DEFAULT    4 entry_irq26
+   234: 000022f8     4 FUNC    GLOBAL DEFAULT    4 entry_irq45
+   235: 000026e8    68 FUNC    GLOBAL DEFAULT    4 entry_irq26
    236: 2000549e     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_4
-   237: 000023d0     4 FUNC    GLOBAL DEFAULT    4 entry_irq41
-   238: 00001f40    72 FUNC    GLOBAL DEFAULT    4 entry_irq61
+   237: 000023d4     4 FUNC    GLOBAL DEFAULT    4 entry_irq41
+   238: 00001f44    72 FUNC    GLOBAL DEFAULT    4 entry_irq61
    239: 20000000     0 NOTYPE  GLOBAL DEFAULT    1 BIN_BEGIN
    240: 200054b8     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_3
-   241: 000023dc     4 FUNC    GLOBAL DEFAULT    4 entry_irq38
+   241: 000023e0     4 FUNC    GLOBAL DEFAULT    4 entry_irq38
    242: 00003000     0 NOTYPE  GLOBAL DEFAULT    4 __vectors
    243: 0000580e     0 NOTYPE  GLOBAL DEFAULT  ABS BIN_SIZE
    244: 200056d0    16 OBJECT  GLOBAL DEFAULT    6 __digits
    245: 20000538     0 NOTYPE  GLOBAL DEFAULT  ABS _RAMCODE_LMA_START
    246: 00080030     4 OBJECT  GLOBAL DEFAULT    9 __printf_count
-   247: 00001fd0    72 FUNC    GLOBAL DEFAULT    4 entry_irq59
+   247: 00001fd4    72 FUNC    GLOBAL DEFAULT    4 entry_irq59
    248: 20004724    78 FUNC    GLOBAL DEFAULT    5 memcmp
-   249: 00002d54    68 FUNC    GLOBAL DEFAULT    4 entry_irq6
+   249: 00002d58    68 FUNC    GLOBAL DEFAULT    4 entry_irq6
    250: 20005490     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_10
    251: 200057f8     0 NOTYPE  GLOBAL DEFAULT  ABS _DATA_LMA_START
    252: 20004eca   144 FUNC    GLOBAL DEFAULT    5 __print_integral_poly
@@ -341,50 +341,50 @@ Symbol table '.symtab' contains 306 entries:
    259: 2000486e   170 FUNC    GLOBAL DEFAULT    5 memset
    260: 200054c8     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_9
    261: 200054d2     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_7
-   262: 000019f8  1208 FUNC    GLOBAL DEFAULT    4 main
-   263: 00002e20    68 FUNC    GLOBAL DEFAULT    4 entry_irq3
-   264: 00002f7c    52 FUNC    GLOBAL DEFAULT    4 trap_entry
+   262: 000019f8  1212 FUNC    GLOBAL DEFAULT    4 main
+   263: 00002e24    68 FUNC    GLOBAL DEFAULT    4 entry_irq3
+   264: 00002f80    52 FUNC    GLOBAL DEFAULT    4 trap_entry
    265: 00000158     0 NOTYPE  GLOBAL DEFAULT    3 _AES_VMA_END
-   266: 000023d8     4 FUNC    GLOBAL DEFAULT    4 entry_irq39
-   267: 000022a0     4 FUNC    GLOBAL DEFAULT    4 entry_irq49
+   266: 000023dc     4 FUNC    GLOBAL DEFAULT    4 entry_irq39
+   267: 000022a4     4 FUNC    GLOBAL DEFAULT    4 entry_irq49
    268: 00000288     4 OBJECT  GLOBAL DEFAULT    3 g_pm_multi_addr
-   269: 00002060    72 FUNC    GLOBAL DEFAULT    4 entry_irq57
-   270: 000022a8     4 FUNC    GLOBAL DEFAULT    4 entry_irq47
+   269: 00002064    72 FUNC    GLOBAL DEFAULT    4 entry_irq57
+   270: 000022ac     4 FUNC    GLOBAL DEFAULT    4 entry_irq47
    271: 200002e8     0 NOTYPE  GLOBAL DEFAULT  ABS _RETENTION_DATA_LMA_START
    272: 20000000     0 FUNC    GLOBAL DEFAULT    1 _RESET_ENTRY
    273: 00000158     0 NOTYPE  GLOBAL DEFAULT    3 _RETENTION_DATA_VMA_START
-   274: 00002ddc    68 FUNC    GLOBAL DEFAULT    4 entry_irq4
+   274: 00002de0    68 FUNC    GLOBAL DEFAULT    4 entry_irq4
    275: 000a0000     0 NOTYPE  GLOBAL DEFAULT  ABS _STACK_TOP
-   276: 00002884    68 FUNC    GLOBAL DEFAULT    4 entry_irq22
-   277: 000025d4    68 FUNC    GLOBAL DEFAULT    4 entry_irq30
-   278: 00002388    72 FUNC    GLOBAL DEFAULT    4 entry_irq42
-   279: 000027fc    68 FUNC    GLOBAL DEFAULT    4 entry_irq24
+   276: 00002888    68 FUNC    GLOBAL DEFAULT    4 entry_irq22
+   277: 000025d8    68 FUNC    GLOBAL DEFAULT    4 entry_irq30
+   278: 0000238c    72 FUNC    GLOBAL DEFAULT    4 entry_irq42
+   279: 00002800    68 FUNC    GLOBAL DEFAULT    4 entry_irq24
    280: 200054b8     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_2
    281: 00003102     0 NOTYPE  GLOBAL DEFAULT    4 _RAMCODE_VMA_END
    282: 00000000     0 NOTYPE  WEAK   DEFAULT  ABS _ITB_BASE_
    283: 2000549e     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_5
-   284: 00002950    68 FUNC    GLOBAL DEFAULT    4 entry_irq19
+   284: 00002954    68 FUNC    GLOBAL DEFAULT    4 entry_irq19
    285: 200046d8    76 FUNC    GLOBAL DEFAULT    5 _write
    286: 00080048     0 NOTYPE  GLOBAL DEFAULT   10 _end
-   287: 000029d8    68 FUNC    GLOBAL DEFAULT    4 entry_irq17
-   288: 00002c88    68 FUNC    GLOBAL DEFAULT    4 entry_irq9
-   289: 000020a8    72 FUNC    GLOBAL DEFAULT    4 entry_irq56
-   290: 00002470    72 FUNC    GLOBAL DEFAULT    4 entry_irq35
-   291: 000023e0    72 FUNC    GLOBAL DEFAULT    4 entry_irq37
-   292: 00002138    72 FUNC    GLOBAL DEFAULT    4 entry_irq54
-   293: 000023d4     4 FUNC    GLOBAL DEFAULT    4 entry_irq40
+   287: 000029dc    68 FUNC    GLOBAL DEFAULT    4 entry_irq17
+   288: 00002c8c    68 FUNC    GLOBAL DEFAULT    4 entry_irq9
+   289: 000020ac    72 FUNC    GLOBAL DEFAULT    4 entry_irq56
+   290: 00002474    72 FUNC    GLOBAL DEFAULT    4 entry_irq35
+   291: 000023e4    72 FUNC    GLOBAL DEFAULT    4 entry_irq37
+   292: 0000213c    72 FUNC    GLOBAL DEFAULT    4 entry_irq54
+   293: 000023d8     4 FUNC    GLOBAL DEFAULT    4 entry_irq40
    294: 200054c4     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_12
    295: 00000400     0 NOTYPE  GLOBAL DEFAULT    4 _RAMCODE_VMA_START
    296: 200054b8     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_save_0
-   297: 00002618    68 FUNC    GLOBAL DEFAULT    4 entry_irq29
+   297: 0000261c    68 FUNC    GLOBAL DEFAULT    4 entry_irq29
    298: 2000535c    48 FUNC    GLOBAL DEFAULT    5 strchr
    299: 200054dc     0 NOTYPE  GLOBAL HIDDEN     5 __riscv_restore_1
-   300: 00002d10    68 FUNC    GLOBAL DEFAULT    4 entry_irq7
-   301: 00002548    72 FUNC    GLOBAL DEFAULT    4 entry_irq32
+   300: 00002d14    68 FUNC    GLOBAL DEFAULT    4 entry_irq7
+   301: 0000254c    72 FUNC    GLOBAL DEFAULT    4 entry_irq32
    302: 00000000     0 FUNC    GLOBAL DEFAULT    2 _IRESET_ENTRY
-   303: 00002994    68 FUNC    GLOBAL DEFAULT    4 entry_irq18
+   303: 00002998    68 FUNC    GLOBAL DEFAULT    4 entry_irq18
    304: 20004eaa    32 FUNC    GLOBAL DEFAULT    5 __int_to_poly
-   305: 00002728   212 FUNC    GLOBAL DEFAULT    4 entry_irq25
+   305: 0000272c   212 FUNC    GLOBAL DEFAULT    4 entry_irq25
 
 No version information found in this file.
 Attribute Section: riscv

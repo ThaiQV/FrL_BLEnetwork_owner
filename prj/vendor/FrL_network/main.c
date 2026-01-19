@@ -227,7 +227,7 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 #if (UART_PRINT_DEBUG_ENABLE)
 	DEBUG_TX_PIN_INIT();
 #endif
-//	PLOG_Start(ALL);
+
 	PLOG_DEVICE_PROFILE(_bootloader,_fw,_hw);
 //#ifdef MASTER_CORE
 //	P_INFO("Startup from FOTA");
@@ -241,7 +241,8 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 //	P_INFO("ok\r\n");
 //#endif
 	//OFF ALL LOG
-	PLOG_Stop(ALL);
+//	PLOG_Stop(ALL);
+	PLOG_Start(ALL);
 	if (!deepRetWakeUp) {  //read flash size
 #if (BATT_CHECK_ENABLE)
 	user_battery_power_check();

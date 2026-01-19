@@ -304,7 +304,7 @@ static void process_rx_frame(protocol_context_t *protocol)
     // Check if this frame belongs to this protocol
     if (frame_protocol_id != protocol->protocol_id)
     {
-        PMT_LOGA("err_id\n");
+        LOG_P(PERI,"err_id\n");
         return; // Not for this protocol, ignore
     }
     // // Extract length
