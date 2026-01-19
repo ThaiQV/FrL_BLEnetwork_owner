@@ -245,12 +245,12 @@ int fl_nwk_slave_nwkRemove(void){
 void fl_nwk_slave_displayLCD_Refesh(void){
 #ifndef HW_SAMPLE_TEST
 	//display version
-	extern fl_version_t _fw;
+//	extern fl_version_t _fw;
 	extern fl_version_t _hw;
 	char version_c[16];
 	memset((u8*)version_c,0,SIZEU8(version_c));
 	//_fw.patch = DFU_OTA_VERISON_GET();
-	sprintf(version_c,"FW :%d.%d.%d (%d)", _fw.major,_fw.minor,_fw.patch,DFU_OTA_VERISON_GET());
+	sprintf(version_c,"FW :%d.%d.%d", DFU_OTA_VERSION_GET().major,DFU_OTA_VERSION_GET().minor,DFU_OTA_VERSION_GET().patch);
 	Counter_LCD_ENDCALL_Display(1,version_c);
 	memset((u8*)version_c,0,SIZEU8(version_c));
 	sprintf(version_c,"HW :%d.%d.%d", _hw.major,_hw.minor,_hw.patch );
@@ -742,8 +742,10 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 					if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
 						u8 ok[2] = { 'o', 'k' };
 						memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
-						packet.frame.payload[0]= DFU_OTA_VERISON_GET();//test version
-						memcpy(packet.frame.payload+1,ok,SIZEU8(ok));
+						packet.frame.payload[0]= DFU_OTA_VERSION_GET().major;//dfu version get
+						packet.frame.payload[1]= DFU_OTA_VERSION_GET().minor;//dfu version get
+						packet.frame.payload[2]= DFU_OTA_VERSION_GET().patch;//dfu version get
+						memcpy(packet.frame.payload+3,ok,SIZEU8(ok));
 						//change endpoint to node source
 						packet.frame.endpoint.master = FL_FROM_SLAVE;
 						//add repeat_cnt
@@ -764,8 +766,10 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 					if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
 						u8 ok[2] = { 'o', 'k' };
 						memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
-						packet.frame.payload[0]= DFU_OTA_VERISON_GET();//test version
-						memcpy(packet.frame.payload+1,ok,SIZEU8(ok));
+						packet.frame.payload[0]= DFU_OTA_VERSION_GET().major;//dfu version get
+						packet.frame.payload[1]= DFU_OTA_VERSION_GET().minor;//dfu version get
+						packet.frame.payload[2]= DFU_OTA_VERSION_GET().patch;//dfu version get
+						memcpy(packet.frame.payload+3,ok,SIZEU8(ok));
 						//change endpoint to node source
 						packet.frame.endpoint.master = FL_FROM_SLAVE;
 						//add repeat_cnt

@@ -22,7 +22,9 @@
 
 /* Definition */
 	/* For bootloader */
+	#define DFU_VERSION   					1
 	#define FLASH_R_BASE_ADDR   			0x20000000
+	#define DFU_HEADER						0xE000
 	#define APP_IMAGE_HEADER				0xF000
 	#define APP_IMAGE_ADDR					0x10000
 	#define APP_IMAGE_SIZE_MAX				0x30000
@@ -98,6 +100,43 @@
 		uint8_t				signature[OTA_PACKET_LENGTH];
 	}ota_fw_header_t;
 
+	/* For UART DFU */
+	typedef enum
+	{
+		CMD_IDLE = 0,
+		CMD_ENTER_BOOTLOADER,
+		CMD_MCU_RESET,
+		CMD_ERASE,
+		CMD_FULL_ERASE,
+		CMD_SET_ADDRESS,
+		CMD_PROGRAM_DOUBLEWORD,
+		CMD_PROGRAM_WITH_ADDRESS,
+		CMD_PROGRAM_ARRAY,
+		CMD_ACK_OK,
+		CMD_ACK_ERROR,
+		CMD_PING,
+		CMD_JUMP_APPLICATION,
+		CMD_VERIFY,
+		CMD_BOOTLOADER_VERSION,
+		CMD_READ_WORD,
+		CMD_CHANGE_BAUDRATE,
+	}cmt_t;
+
+	typedef enum
+	{
+		CMD_STATE_IDLE = 0,
+		CMD_STATE_WAITING
+	}cmt_state_t;
+
+	typedef struct
+	{
+		cmt_t		cmd;
+		cmt_state_t state;
+		uint32_t	len;
+		uint8_t		crc;
+		uint8_t		*data;
+	}command_t;
+
 /* Prototypes */
 	/* For bootloader t */
 	void jump_to_application(void);
@@ -117,7 +156,15 @@
 	ota_ret_t ota_fw_put(uint8_t *pdata, uint8_t crc);
 	ota_ret_t ota_packet_header_set(ota_fw_header_t *header);
 	ota_ret_t ota_packet_header_get(ota_fw_header_t *header);
-	uint8_t set_current_fw_version(uint8_t fw_patch);
-	uint8_t get_current_fw_version(void);
-	void test_ota(void);
+	uint8_t set_current_fw_version(fw_header_t *fw_header);
+	void get_current_fw_version(fw_header_t *fw_header);
+	uint8_t set_dfu_version(void);
+	uint8_t get_dfu_version(void);
+
+	/* For UART DFU */
+	void dfu_uart_init(void);
+	void dfu_uart_receive(void);
+	void dfu_uart_process(void);
+	void cmd_process(void);
+
 #endif //__DFU_H__

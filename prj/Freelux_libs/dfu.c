@@ -1,7 +1,7 @@
 #include "dfu.h"
 
 /* Definition */
-//#define DFU_DEBUG	1
+//#define DFU_DEBUG
 #ifdef DFU_DEBUG
 #define DFU_PRINTF(...)	LOGA(APP,__VA_ARGS__);
 #else
@@ -16,7 +16,6 @@
 uint8_t crc128[CRC128_LENGTH];
 
 uint8_t  ota_map[16];
-
 /* Functions */
 
 /**
@@ -342,6 +341,7 @@ void firmware_check(void)
 
 	// Init ex-flash
 	FLASH_Port_Init();
+	set_dfu_version();
 
 //	ex_flash_region_erase(ORIGINAL_FW_ADDRESS);
 //	ex_flash_region_erase(OTA_FW_ADDRESS);
@@ -552,11 +552,11 @@ ota_ret_t ota_fw_put(uint8_t *pdata, uint8_t crc)
 				memcpy(ota_header.crc128,(uint8_t*)packet_header.signature,OTA_PACKET_LENGTH);
 
 				DFU_PRINTF("Signature: ");
-//				for(i = 0; i < CRC128_LENGTH; i++)
-//				{
-//					printf("%x ",ota_header.crc128[i]);
-//				}
-//				printf("\n");
+				for(i = 0; i < CRC128_LENGTH; i++)
+				{
+					printf("%x ",ota_header.crc128[i]);
+				}
+				printf("\n");
 
 				// Erase OTA Header sector before write
 				FLASH_Erase_Sector(OTA_FW_HEADER);
@@ -638,16 +638,60 @@ ota_ret_t ota_packet_header_get(ota_fw_header_t *header)
 	}
 	return OTA_RET_ERROR;
 }
+
+///**
+//* @brief: set current FW version
+//* @param: see below
+//*/
+//uint8_t set_current_fw_version(uint8_t fw_patch)
+//{
+//	fw_header_t header_current_fw;
+//	flash_read_page(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER, sizeof(fw_header_t), (uint8_t *)&header_current_fw);
+//	// Only set version if it is not set
+//	if((header_current_fw.major == 0xFF) && (header_current_fw.minor == 0xFF) && (header_current_fw.patch == 0xFF))
+//	{
+//		// Erase header page before write new header
+//		flash_read_mid();
+//		flash_unlock_mid146085();
+//		flash_erase_sector(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER);
+//
+//		// Write Application current FW header
+//		header_current_fw.major = 0; // Set default = 1 due to only use 1 byte version
+//		header_current_fw.minor = 0; // Set default = 1 due to only use 1 byte version
+//		header_current_fw.patch = fw_patch;
+//		header_current_fw.size  = 0x40000; // Set default = 0x40000
+//		flash_write_page(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER, sizeof(header_current_fw), (uint8_t *)&header_current_fw);
+//		return 1;
+//	}
+//	return 0;
+//}
+//
+///**
+//* @brief: Get current FW version, due to OTA only send 1 byte version so return only "patch" of version
+//* @param: see below
+//*/
+//uint8_t get_current_fw_version(void)
+//{
+//	fw_header_t header_current_fw;
+//
+//	// Read header of current FW in internal-flash
+//	flash_read_page(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER, sizeof(fw_header_t), (uint8_t *)&header_current_fw);
+//	DFU_PRINTF("Current FW ver: %x.%x.%x\n",header_current_fw.major,header_current_fw.minor,header_current_fw.patch);
+//	DFU_PRINTF("Size: %x\n",header_current_fw.size);
+//	return header_current_fw.patch;
+//}
+
 /**
-* @brief: set current FW verison
+* @brief: set current FW version
 * @param: see below
 */
-uint8_t set_current_fw_version(uint8_t fw_patch)
+uint8_t set_current_fw_version(fw_header_t *fw_header)
 {
 	fw_header_t header_current_fw;
 	flash_read_page(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER, sizeof(fw_header_t), (uint8_t *)&header_current_fw);
 	// Only set version if it is not set
-	if((header_current_fw.major == 0xFF) && (header_current_fw.minor == 0xFF) && (header_current_fw.patch == 0xFF))
+//	if((header_current_fw.major == 0xFF) && (header_current_fw.minor == 0xFF) && (header_current_fw.patch == 0xFF))
+	if((header_current_fw.major != fw_header->major) || (header_current_fw.minor != fw_header->minor) || (header_current_fw.patch != fw_header->patch))
 	{
 		// Erase header page before write new header
 		flash_read_mid();
@@ -655,11 +699,11 @@ uint8_t set_current_fw_version(uint8_t fw_patch)
 		flash_erase_sector(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER);
 
 		// Write Application current FW header
-		header_current_fw.major = 0; // Set default = 1 due to only use 1 byte version
-		header_current_fw.minor = 0; // Set default = 1 due to only use 1 byte version
-		header_current_fw.patch = fw_patch;
-		header_current_fw.size  = 0x40000; // Set default = 0x40000
+		header_current_fw.major = fw_header->major; // Set default = 1 due to only use 1 byte version
+		header_current_fw.minor = fw_header->minor; // Set default = 1 due to only use 1 byte version
+		header_current_fw.patch = fw_header->patch;
 		flash_write_page(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER, sizeof(header_current_fw), (uint8_t *)&header_current_fw);
+		return 1;
 	}
 	return 0;
 }
@@ -668,13 +712,418 @@ uint8_t set_current_fw_version(uint8_t fw_patch)
 * @brief: Get current FW version, due to OTA only send 1 byte version so return only "patch" of version
 * @param: see below
 */
-uint8_t get_current_fw_version(void)
+void get_current_fw_version(fw_header_t *fw_header)
 {
-	fw_header_t header_current_fw;
-
 	// Read header of current FW in internal-flash
-	flash_read_page(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER, sizeof(fw_header_t), (uint8_t *)&header_current_fw);
-	DFU_PRINTF("Current FW ver: %x.%x.%x\n",header_current_fw.major,header_current_fw.minor,header_current_fw.patch);
-	DFU_PRINTF("Size: %x\n",header_current_fw.size);
-	return header_current_fw.patch;
+	flash_read_page(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER, sizeof(fw_header_t), (uint8_t *)fw_header);
+	DFU_PRINTF("Current FW ver: %x.%x.%x\n",fw_header->major,fw_header->minor,fw_header->patch);
+	DFU_PRINTF("Size: %x\n",fw_header->size);
+}
+
+/**
+* @brief: set DFU version
+* @param: see below
+*/
+uint8_t set_dfu_version(void)
+{
+	fw_header_t header_dfu;
+	flash_read_page(FLASH_R_BASE_ADDR + DFU_HEADER, sizeof(fw_header_t), (uint8_t *)&header_dfu);
+	// Only set version if it is not set
+	if(header_dfu.patch != DFU_VERSION)
+	{
+		// Erase header page before write new header
+		flash_read_mid();
+		flash_unlock_mid146085();
+		flash_erase_sector(FLASH_R_BASE_ADDR + DFU_HEADER);
+
+		// Write Application current FW header
+		header_dfu.major = 0; 				// Set default = 1 due to only use 1 byte version
+		header_dfu.minor = 0; 				// Set default = 1 due to only use 1 byte version
+		header_dfu.patch = DFU_VERSION;
+		header_dfu.size  = 0xE000; 			// Set default = 0xE000
+		flash_write_page(FLASH_R_BASE_ADDR + DFU_HEADER, sizeof(header_dfu), (uint8_t *)&header_dfu);
+		return 1;
+	}
+	return 0;
+}
+
+/**
+* @brief: Get DFU version
+* @param: see below
+*/
+uint8_t get_dfu_version(void)
+{
+	fw_header_t header_dfu;
+
+	// Read header of DFU in internal-flash
+	flash_read_page(FLASH_R_BASE_ADDR + DFU_HEADER, sizeof(fw_header_t), (uint8_t *)&header_dfu);
+	DFU_PRINTF("Current FW ver: %x.%x.%x\n",header_dfu.major,header_dfu.minor,header_dfu.patch);
+	DFU_PRINTF("Size: %x\n",header_dfu.size);
+	return header_dfu.patch;
+}
+
+/****************************************** For UART DFU ******************************************/
+
+#include "os_queue.h"
+#define BOOTLOADER_VERSION "1.0.0"
+#define MAGIC_WORDS	"IOTBOOTLOADERUART"
+
+#define	TIMEOUT_MAX					100000
+#define	RESET_QUEUE_TIMEOUT_MAX		500000
+#define	DFU_UART_BUFF_SIZE			8192
+
+#define SEND_BYTE(data)			uart_send_byte(UART1,data)
+#define SEND_BUFF(pdata,len)	uart_send(UART1,pdata,len)
+
+queue_t		dfu_uart_queue;
+uint8_t 	dfu_uart_queue_fifo[DFU_UART_BUFF_SIZE];
+uint8_t 	uart_rx_addr[DFU_UART_BUFF_SIZE];
+
+command_t	cmd;
+uint8_t 	enter_bootloader = 0;
+uint32_t 	timeout_jump = TIMEOUT_MAX;
+uint32_t 	program_address = FLASH_R_BASE_ADDR + APP_IMAGE_ADDR;
+uint32_t 	page, len, crc;
+uint64_t 	doubleword;
+uint32_t	baudrate = 115200;
+
+static void uart1_init(uart_num_e uart_num, uart_tx_pin_e tx_pin, uart_rx_pin_e rx_pin, u32 baudrate)
+{
+	unsigned short div;
+	unsigned char bwpc;
+
+	uart_reset(uart_num);
+	uart_set_pin(tx_pin,rx_pin); // uart tx/rx pin set
+	uart_cal_div_and_bwpc(baudrate,sys_clk.pclk * 1000 * 1000,&div,&bwpc);
+	LOGA(APP,"div: %d, bwpc: %d, pclk: %d\n",div,bwpc,sys_clk.pclk);
+	uart_set_rx_timeout(uart_num,bwpc,12,UART_BW_MUL1);
+	uart_init(uart_num,div,bwpc,UART_PARITY_NONE,UART_STOP_BIT_ONE);
+
+	uart_clr_irq_mask(uart_num,UART_ERR_IRQ_MASK|UART_RX_IRQ_MASK | UART_TX_IRQ_MASK | UART_TXDONE_MASK | UART_RXDONE_MASK);
+
+
+	uart_set_tx_dma_config(uart_num,DMA2);
+	uart_set_rx_dma_config(uart_num,DMA3);
+
+	uart_clr_tx_done(uart_num);
+	uart_set_irq_mask(uart_num,UART_ERR_IRQ_MASK|UART_RX_IRQ_MASK | UART_TXDONE_MASK | UART_RXDONE_MASK);
+
+	core_interrupt_enable();
+	plic_interrupt_enable(IRQ18_UART1);
+
+	uart_receive_dma(uart_num,(unsigned char *)uart_rx_addr,sizeof(uart_rx_addr));
+}
+
+static void send_cmd_ping(void)
+{
+	// Send Header
+	SEND_BYTE(0x55);
+	SEND_BYTE(0xAA);
+	// Send Length = 0
+	SEND_BYTE(0x00);
+	// Send PING CMD
+	SEND_BYTE(CMD_PING);
+}
+
+/**
+* @brief: Initialize UART DFU
+* @param: see below
+*/
+void dfu_uart_init(void)
+{
+	uart1_init(UART1,UART1_TX_PE0,UART1_RX_PE2,115200);
+	queue_create(&dfu_uart_queue, dfu_uart_queue_fifo, sizeof(dfu_uart_queue_fifo));
+	send_cmd_ping();
+}
+
+/**
+* @brief: receive data from interrupt
+* @param: see below
+*/
+void dfu_uart_receive(void)
+{
+	uint16_t len;
+
+	len = uart_get_dma_rev_data_len(UART1,DMA3);
+	uart_receive_dma(UART1,(unsigned char *)uart_rx_addr,sizeof(uart_rx_addr));
+	queue_put(&dfu_uart_queue, uart_rx_addr, len);
+}
+
+static void wait_for_timeout(void)
+{
+	if(enter_bootloader == 0)
+	{
+		if((timeout_jump--) == 0)
+		{
+//			printf("DFU timeout\n");
+			uart_reset(UART1);
+			firmware_check();
+			enter_bootloader = 1;
+		}
+	}
+}
+
+static uint8_t crc8(uint8_t *pdata, uint16_t len)
+{
+	uint32_t 	i;
+	uint8_t		crc = 0;
+
+	for(i = 0; i < len; i++)
+	{
+		crc += pdata[i];
+	}
+
+	return crc;
+}
+
+static void response_ack(cmt_t ack)
+{
+	// Send Header
+	SEND_BYTE(0x55);
+	SEND_BYTE(0xAA);
+	// Send Length = 0
+	SEND_BYTE(0x00);
+	// Send ACK CMD
+	if(ack == CMD_ACK_OK) SEND_BYTE(CMD_ACK_OK);
+	else SEND_BYTE(CMD_ACK_ERROR);
+}
+
+/**
+* @brief: process UART DFU
+* @param: see below
+* -----------------------VERSION 1--------------------------
+* [ 0x55    0xAA ][       Length        ][  CMD  ][  Data  ]
+* [2 Bytes header][1 Byte length of Data][1 Byte ][n Bytes ]
+* -----------------------VERSION 2------------------------------------
+* [ 0x56    0xAA ][       Length         ][  CMD  ][  Data  ][  CRC  ]
+* [2 Bytes header][2 Bytes length of Data][1 Byte ][n Bytes ][1 Byte ]
+*/
+void dfu_uart_process(void)
+{
+	uint32_t		len = 0;
+//	uint8_t			buff[DFU_UART_BUFF_SIZE];
+//	static uint32_t	buff_cnt = 0;
+	uint8_t			*fifo;
+//	static uint32_t reset_queue_timeout = 0;
+//	static uint32_t	wrong_len_count = 0;
+	uint8_t			crc = 0;
+
+	len = queue_available_data(&dfu_uart_queue);
+	if(len > 0) // minimum of frame length
+	{
+		fifo = dfu_uart_queue_fifo;
+		if((fifo[0] == 0x55) && (fifo[1] == 0xAA))
+		{
+			if(len > 4)
+			{
+				memcpy((uint8_t*)&cmd.len,&fifo[2],sizeof(uint16_t));
+				if(len >= (cmd.len + 6))
+				{
+					cmd.cmd		= fifo[4];
+					cmd.data	= &fifo[5];
+					cmd.crc		= fifo[cmd.len + 5];
+					crc = crc8(cmd.data,cmd.len);
+//					printf("cmd.len: %d %d crc: %x %x cmd: %d\n",cmd.len,len,crc,cmd.crc,cmd.cmd);
+					if( crc == cmd.crc)
+					{
+						cmd_process();
+					}
+					else
+					{
+//						printf("Wrong crc\n");
+						response_ack(CMD_ACK_ERROR);
+					}
+					// Re-init queue to clear queue data
+					queue_create(&dfu_uart_queue, dfu_uart_queue_fifo, sizeof(dfu_uart_queue_fifo));
+				}
+			}
+		}
+		else
+		{
+//			printf("Wrong frame: %d\n",len);
+			// Re-init queue to clear queue data
+			queue_create(&dfu_uart_queue, dfu_uart_queue_fifo, sizeof(dfu_uart_queue_fifo));
+		}
+	}
+
+	wait_for_timeout();
+}
+
+static void send_version(void)
+{
+	uint8_t length;
+
+	length = sizeof(BOOTLOADER_VERSION) - 1;
+	// Send Header
+	SEND_BYTE(0x55);
+	SEND_BYTE(0xAA);
+	// Send Length
+	SEND_BYTE(length);
+	// Send CMD_BOOTLOADER_VERSION
+	SEND_BYTE(CMD_BOOTLOADER_VERSION);
+	// Send Version
+	SEND_BUFF((unsigned char *)BOOTLOADER_VERSION, length);
+}
+
+static void send_read_word(void)
+{
+	uint32_t *p;
+	// Send Header
+	SEND_BYTE(0x55);
+	SEND_BYTE(0xAA);
+	// Send Length
+	SEND_BYTE(0x04);
+	// Send CMD_BOOTLOADER_VERSION
+	SEND_BYTE(CMD_READ_WORD);
+	// Send Version
+	p = (uint32_t*)program_address;
+	SEND_BUFF((unsigned char *)p, sizeof(uint32_t));
+}
+
+static void full_erase_application_region(void)
+{
+	uint32_t i;
+
+	// Erase running region to copy OTA FW
+	flash_read_mid();
+	flash_unlock_mid146085();
+	DFU_PRINTF("Erase Running region\n");
+	for(i = 0; i < (APP_IMAGE_SIZE_MAX/APP_PAGE_SIZE); i++)
+	{
+		flash_erase_sector(FLASH_R_BASE_ADDR + APP_IMAGE_ADDR + i*APP_PAGE_SIZE);
+	}
+	response_ack(CMD_ACK_OK);
+}
+
+static void erase_page(uint32_t page)
+{
+	if(page > 15) // 16 first pages for boot loader region
+	{
+		flash_erase_sector(FLASH_R_BASE_ADDR + APP_IMAGE_ADDR + page*APP_PAGE_SIZE);
+	}
+}
+
+static void program_with_address(void)
+{
+	flash_write_page(program_address, sizeof(doubleword), (uint8_t *)&doubleword);
+}
+
+static void program_array(uint8_t *array, uint16_t len)
+{
+	flash_write_page(program_address, len, (uint8_t *)array);
+	program_address += len;
+	response_ack(CMD_ACK_OK);
+}
+
+static void verify(uint32_t address, uint32_t len, uint32_t crc)
+{
+	uint32_t calculate_crc = 0xFFFFFFFF;
+	uint32_t *p;
+
+	p = (uint32_t*)address;
+	len = len/4; // convert length of  byte to length of word
+	for(int i=0;i<len;i++)
+	{
+		calculate_crc = (calculate_crc ^ p[i]);
+	}
+	if(calculate_crc == crc)
+	{
+		response_ack(CMD_ACK_OK);
+		// Erase header page of current FW
+		flash_erase_sector(FLASH_R_BASE_ADDR + APP_IMAGE_HEADER);
+		uart_reset(UART1); // Reset uart1 before jump to application
+		jump_to_application();
+	}
+	else
+	{
+		response_ack(CMD_ACK_ERROR);
+	}
+//	printf("calculate_crc: %x - %x\n",calculate_crc,crc);
+}
+
+/**
+* @brief: process commands
+* @param: see below
+*/
+void cmd_process(void)
+{
+	switch(cmd.cmd)
+	{
+		case CMD_IDLE:
+			/* [1 Byte CMD] */
+			break;
+		case CMD_ENTER_BOOTLOADER:
+			/* [1 Byte CMD] + [MAGIC WORDS] */
+			if(memcmp(cmd.data,MAGIC_WORDS,sizeof(MAGIC_WORDS) - 1) == 0)
+			{
+				enter_bootloader = 1;
+				flash_read_mid();
+				flash_unlock_mid146085();
+				response_ack(CMD_ACK_OK);
+			}
+			break;
+		case CMD_MCU_RESET:
+			/* [1 Byte CMD] */
+			sys_reboot();
+			break;
+		case CMD_ERASE:
+			/* [1 Byte CMD] + [4 Bytes Page] */
+			memcpy((uint8_t*)&page,(uint8_t*)cmd.data,sizeof(page));
+			erase_page(page);
+			break;
+		case CMD_FULL_ERASE:
+			/* [1 Byte CMD]*/
+			full_erase_application_region();
+			break;
+		case CMD_SET_ADDRESS:
+			/* [1 Byte CMD] + [4 Byte Address] */
+//			memcpy((uint8_t*)&program_address,(uint8_t*)cmd.data,sizeof(program_address));
+			program_address = FLASH_R_BASE_ADDR + APP_IMAGE_ADDR; // Set default program address
+			break;
+		case CMD_PROGRAM_DOUBLEWORD:
+			/* [1 Byte CMD] + [8 Byte double word] */
+			program_array(cmd.data,8);
+			break;
+		case CMD_PROGRAM_WITH_ADDRESS:
+			/* [1 Byte CMD] + [4 Byte Address] + [4 Byte double word] */
+			memcpy((uint8_t*)&program_address,(uint8_t*)cmd.data,sizeof(program_address)); // Get address first
+			memcpy((uint8_t*)&doubleword,(uint8_t*)(cmd.data + sizeof(program_address)),sizeof(doubleword)); // Then get doubleword next to address
+			program_with_address();
+			break;
+		case CMD_PROGRAM_ARRAY:
+			/* [1 Byte CMD] + [n Byte Data] */
+			program_array(cmd.data,cmd.len);
+			break;
+		case CMD_JUMP_APPLICATION:
+			/* [1 Byte CMD] */
+			jump_to_application();
+			break;
+		case CMD_VERIFY:
+			/* [1 Byte CMD] + [4 Byte Address] + [4 Byte Length] + [4 Byte CRC] */
+//			memcpy((uint8_t*)&program_address,(uint8_t*)cmd.data,sizeof(program_address)); 										// Get address first
+			program_address = FLASH_R_BASE_ADDR + APP_IMAGE_ADDR; // Set default program address
+			memcpy((uint8_t*)&len,(uint8_t*)(cmd.data + sizeof(program_address)),sizeof(len)); 								// Get length next to address
+			memcpy((uint8_t*)&crc,(uint8_t*)(cmd.data + sizeof(program_address) + sizeof(len)),sizeof(crc)); 	// Get CRC next to length
+			verify(program_address, len, crc);
+			break;
+		case CMD_BOOTLOADER_VERSION:
+			/* [1 Byte CMD] */
+			send_version();
+			break;
+		case CMD_READ_WORD:
+			/* [1 Byte CMD] */
+			send_read_word();
+			break;
+		case CMD_CHANGE_BAUDRATE:
+			/* [1 Byte CMD] + [4 Bytes Baud rate] */
+			memcpy((uint8_t*)&baudrate,(uint8_t*)cmd.data,sizeof(baudrate)); // Get baud rate
+			response_ack(CMD_ACK_OK);
+			delay_ms(100);
+			uart_reset(UART1);
+			uart1_init(UART1,UART1_TX_PE0,UART1_RX_PE2,baudrate);
+//			printf("baudrate: %d\n",baudrate);
+			break;
+		default:
+			break;
+	}
 }

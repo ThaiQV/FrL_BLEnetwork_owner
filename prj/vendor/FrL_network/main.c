@@ -241,8 +241,8 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 //	P_INFO("ok\r\n");
 //#endif
 	//OFF ALL LOG
-//	PLOG_Stop(ALL);
-	PLOG_Start(ALL);
+	PLOG_Stop(ALL);
+//	PLOG_Start(ALL);
 	if (!deepRetWakeUp) {  //read flash size
 #if (BATT_CHECK_ENABLE)
 	user_battery_power_check();

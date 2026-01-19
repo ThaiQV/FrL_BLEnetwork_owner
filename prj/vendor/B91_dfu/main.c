@@ -33,20 +33,28 @@
  * @param[in]  none
  * @return     none
  */
-void uart1_recieve_irq(void) {
-#ifdef MASTER_CORE
-	extern unsigned char FLAG_uart_dma_send;
-	if (uart_get_irq_status(UART1,UART_TXDONE)) {
-		FLAG_uart_dma_send = 0;
+void uart1_recieve_irq(void)
+{
+	unsigned int irq_flags = uart_get_irq_status(UART1,0xFFFFFFFF);
+
+	if(irq_flags & UART_RXBUF_IRQ_STATUS)
+	{
+		uart_clr_irq_status(UART1, UART_CLR_RX);
+		uart_clr_irq_mask(UART1,UART_RXBUF_IRQ_STATUS);
+	}
+	else if (irq_flags & UART_TXDONE)
+	{
 		uart_clr_tx_done(UART1);
 	}
-	if (uart_get_irq_status(UART1,UART_RXDONE)) //A0-SOC can't use RX-DONE status,so this interrupt can noly used in A1-SOC.
-			{
-		/************************cll rx_irq****************************/
-		fl_input_serial_rec();
+	else if (irq_flags & UART_RXDONE) //A0-SOC can't use RX-DONE status,so this interrupt can noly used in A1-SOC.
+	{
+		dfu_uart_receive();
 		uart_clr_irq_status(UART1,UART_CLR_RX);
 	}
-#endif
+	else if(irq_flags & UART_RX_ERR)
+	{
+		uart_clr_irq_status(UART1,UART_CLR_RX);
+	}
 }
 #ifdef MASTER_CORE
 /**
@@ -120,8 +128,8 @@ void stimer_irq_handler(void) {
  * @param[in]	none
  * @return      none
  */
-fl_version_t _bootloader = { 1, 0, 3 };
-fl_version_t _fw = { 1, 4, 0 };
+fl_version_t _bootloader = { 1, 0, 1 };
+fl_version_t _fw = { 0, 0, 0 };
 fl_version_t _hw = { 0, 0, 0 };
 
 uint8_t buff[20] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
@@ -145,19 +153,8 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 	DEBUG_TX_PIN_INIT()
 	;
 #endif
-//	_fw.patch = get_current_fw_version();
 	PLOG_DEVICE_PROFILE(_bootloader,_fw,_hw);
-//#ifdef POWER_METER_DEVICE
-	P_INFO("Startup");
-	u8 wait = 0;
-	extern void delay_ms(unsigned int millisec);
-	while (wait < 5) {
-		P_INFO(".");
-		delay_ms(100);
-		wait++;
-	}
-	P_INFO("ok\r\n");
-//#endif
+
 	if (!deepRetWakeUp)  //read flash size
 	{
 		blc_readFlashSize_autoConfigCustomFlashSector();
@@ -179,27 +176,15 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 		user_init_deepRetn();
 	}
 	else
-	{ //MCU power_on or wake_up from deepSleep mode
-//		user_init_normal();
-
-		/* Test code */
+	{
+		dfu_uart_init();
 		LOG_P(APP,"DFU\n");
-		firmware_check();
-//		storage_init();
-
-//		ota_init();
-//		test_ota();
 
 		irq_enable();
-		// wdt init
-		wd_set_interval_ms(5000);	// 5s
-		wd_start();
 		while(1)
 		{
-			main_loop();
-			wd_clear();
+			dfu_uart_process();
 		}
 		return 0;
 	}
 }
-

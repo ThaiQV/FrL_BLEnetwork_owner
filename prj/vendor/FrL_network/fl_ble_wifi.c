@@ -536,14 +536,16 @@ void REMOVE_REQ(u8* _pdata, RspFunc rspfnc) {
 void _PING_slave_rsp_callback(void *_data, void* _data2) {
 	fl_rsp_container_t *data = (fl_rsp_container_t*) _data;
 	u8 status = 0;
-	u8 version = 0;
+	u8 version[3];
 	//rsp data
 	if (data->timeout > 0) {
 		LOGA(API,"RTT:%d ms\r\n",(data->timeout_set - data->timeout) / 1000);
 		fl_pack_t *packet = (fl_pack_t *) _data2;
 		P_PRINTFHEX_A(API,packet->data_arr,packet->length,"RSP: ");
 		status= 1;
-		version = packet->data_arr[7];
+		version[0] = packet->data_arr[7];
+		version[1] = packet->data_arr[8];
+		version[2] = packet->data_arr[9];
 	} else {
 		LOGA(API,"RTT: TIMEOUT (%d ms)\r\n",(data->timeout_set) / 1000);
 		status=0;
@@ -559,8 +561,10 @@ void _PING_slave_rsp_callback(void *_data, void* _data2) {
 		memset(wfdata.data,0,SIZEU8(wfdata.data));
 		memcpy(wfdata.data,mac,SIZEU8(mac));
 		wfdata.data[6] = status;
-		wfdata.data[7] = version;
-		wfdata.len_data = SIZEU8(mac) + 1 + 1; // 1byte status + 1 byte version
+		wfdata.data[7] = version[0];
+		wfdata.data[8] = version[1];
+		wfdata.data[9] = version[2];
+		wfdata.len_data = SIZEU8(mac) + 1 + SIZEU8(version); // 1byte status + 3 bytes version
 		wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
 		u8 payload_len = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
 		fl_ble_send_wifi((u8*) &wfdata,payload_len);

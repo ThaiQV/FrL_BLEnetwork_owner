@@ -23,15 +23,8 @@ typedef enum{
 		#define OTA_ENABLE
 	#endif
 	#define COUNTER_LCD_MESS_MAX				10
-	//#define HW_SAMPLE_TEST
-	//#define BLOCK_MASTER
-	#ifndef HW_SAMPLE_TEST
-		#define OTA_ENABLE
-	#endif
-	#ifdef COUNTER_DEVICE
-		#define COUNTER_LCD_MESS_MAX				10
-	#endif
 #else
+	#define OTA_ENABLE
 	//#define MASTER_BLOCK_MAC_SLAVE
 #endif
 #ifdef COUNTER_DEVICE
