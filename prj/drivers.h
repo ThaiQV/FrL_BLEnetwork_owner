@@ -32,7 +32,7 @@
 // * TBS project define pinout
 // * */
 #ifndef MASTER_CORE
-#define TBS_COUNTER_DEVICE 0 			//0: Counter, 1: PowerMeter
+#define TBS_COUNTER_DEVICE 					1//0: Counter, 1: PowerMeter
 #if TBS_COUNTER_DEVICE
 #define COUNTER_DEVICE
 #else

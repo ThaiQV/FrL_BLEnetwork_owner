@@ -32,7 +32,6 @@ void storage_init(void)
 	ret = nvm_record_read(STORAGE_MAP,(uint8_t*)map,sizeof(map));
 	if(ret == NVM_NO_RECORD)
 	{
-		printf("NO REPORT.....\r\n");
 		// If there is no record of timeslot map, erase the whole device storage
 		for(i = 0; i < (DEVICE_STORAGE_SIZE/DEF_UDISK_SECTOR_SIZE);i++)
 		{
@@ -41,15 +40,6 @@ void storage_init(void)
 		memset(map,0x00,sizeof(map));
 		nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
 	}
-
-	///
-
-	printf("STORAGE_MAP: ");
-	for(i=0;i<sizeof(map);i++)
-	{
-		printf("%x ",map[i]);
-	}
-	printf("\n");
 }
 
 /**
@@ -154,17 +144,57 @@ storage_ret_t storage_map_check(uint16_t index, uint32_t len)
 void storage_map_fill_status(uint32_t index, uint32_t len)
 {
 	uint32_t sector = 0;
+	uint8_t rslt = 0;
+
+//	sector = ((index*len)/DEF_UDISK_SECTOR_SIZE);
+//	u8 rslt = (0x01 << ((sector%8) - 1));
+//	// Set status of previous sector is written
+//	if(sector > 0)
+//	{
+//		if((map[(sector/8)] && rslt) == 0x00)
+//		{
+//			map[(sector/8)] |= (0x01 << ((sector%8) - 1));
+//			nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
+//			STORAGE_LOG("storage_map_fill_status: %d - %d\n",sector,map[(sector/8)]);
+//		}
+//	}
+//	else if(sector == 0) // Set status of the last sector is written
+//	{
+//		if((map[(MAP_LENGTH - 1)] && (0x01 << (7))) == 0x00)
+//		{
+//			map[(MAP_LENGTH - 1)] |= (0x01 << (7));
+//			nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
+//			STORAGE_LOG("storage_map_fill_status: %d - %d\n",sector,map[(MAP_LENGTH - 1)]);
+//		}
+//	}
 
 	sector = ((index*len)/DEF_UDISK_SECTOR_SIZE);
-	u8 rslt = (0x01 << ((sector%8) - 1));
+
+	if((sector%8) > 0)
+	{
+		rslt = (0x01 << ((sector%8) - 1));
+	}
+
 	// Set status of previous sector is written
 	if(sector > 0)
 	{
-		if((map[(sector/8)] && rslt) == 0x00)
+		if((sector%8) == 0)
 		{
-			map[(sector/8)] |= (0x01 << ((sector%8) - 1));
-			nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
-			STORAGE_LOG("storage_map_fill_status: %d - %d\n",sector,map[(sector/8)]);
+			if((map[(sector/8) - 1] && (0x01 << (7))) == 0x00)
+			{
+				map[(sector/8) - 1] |= (0x01 << (7));
+				nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
+				STORAGE_LOG("storage_map_fill_status: %d - %d\n",sector,map[(sector/8)]);
+			}
+		}
+		else
+		{
+			if((map[(sector/8)] && rslt) == 0x00)
+			{
+				map[(sector/8)] |= rslt;
+				nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
+				STORAGE_LOG("storage_map_fill_status: %d - %d\n",sector,map[(sector/8)]);
+			}
 		}
 	}
 	else if(sector == 0) // Set status of the last sector is written
@@ -245,10 +275,8 @@ storage_ret_t storage_put_data(uint8_t *pdata,uint32_t pdata_len)
 	storage_map_check(pdata_index,len);
 	// Write to flash
 	address = EX_FLASH_DEVICE_STORAGE_ADDRESS + pdata_index*len;
-
 	W25XXX_WR_Block(write,address,len);
 	W25XXX_Read(read,address,len);
-
 	if(memcmp(read,write,len) == 0) // check write successfully
 	{
 		return STORAGE_RET_OK;
@@ -314,4 +342,3 @@ storage_ret_t storage_get_data(uint8_t *pdata,uint32_t len)
 	}
 	return STORAGE_RET_ERROR;
 }
-
