@@ -40,6 +40,13 @@ void storage_init(void)
 		memset(map,0x00,sizeof(map));
 		nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
 	}
+
+	printf("STORAGE MAP: ");
+	for(i=0;i<sizeof(map);i++)
+	{
+		printf("%x ",map[i]);
+	}
+	printf("\n");
 }
 
 /**
