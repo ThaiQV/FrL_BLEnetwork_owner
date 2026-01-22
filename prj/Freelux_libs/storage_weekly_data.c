@@ -41,6 +41,7 @@ void storage_init(void)
 		nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
 	}
 
+
 	printf("STORAGE MAP: ");
 	for(i=0;i<sizeof(map);i++)
 	{
@@ -56,8 +57,6 @@ void storage_init(void)
 */
 void storage_clean(void)
 {
-	//clear all nv
-	nvm_erase();
 	uint32_t i;
 
 	// Erase device storage area
@@ -68,7 +67,6 @@ void storage_clean(void)
 	// Reset timestamp map
 	memset(map,0x00,sizeof(map));
 	nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
-
 }
 
 /**
@@ -154,29 +152,9 @@ storage_ret_t storage_map_check(uint16_t index, uint32_t len)
 void storage_map_fill_status(uint32_t index, uint32_t len)
 {
 	uint32_t sector = 0;
+	uint32_t sector_max = 0;
 	uint8_t rslt = 0;
 
-//	sector = ((index*len)/DEF_UDISK_SECTOR_SIZE);
-//	u8 rslt = (0x01 << ((sector%8) - 1));
-//	// Set status of previous sector is written
-//	if(sector > 0)
-//	{
-//		if((map[(sector/8)] && rslt) == 0x00)
-//		{
-//			map[(sector/8)] |= (0x01 << ((sector%8) - 1));
-//			nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
-//			STORAGE_LOG("storage_map_fill_status: %d - %d\n",sector,map[(sector/8)]);
-//		}
-//	}
-//	else if(sector == 0) // Set status of the last sector is written
-//	{
-//		if((map[(MAP_LENGTH - 1)] && (0x01 << (7))) == 0x00)
-//		{
-//			map[(MAP_LENGTH - 1)] |= (0x01 << (7));
-//			nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
-//			STORAGE_LOG("storage_map_fill_status: %d - %d\n",sector,map[(MAP_LENGTH - 1)]);
-//		}
-//	}
 
 	sector = ((index*len)/DEF_UDISK_SECTOR_SIZE);
 
@@ -190,7 +168,7 @@ void storage_map_fill_status(uint32_t index, uint32_t len)
 	{
 		if((sector%8) == 0)
 		{
-			if((map[(sector/8) - 1] && (0x01 << (7))) == 0x00)
+			if((map[(sector/8) - 1] & (0x01 << (7))) == 0x00)
 			{
 				map[(sector/8) - 1] |= (0x01 << (7));
 				nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
@@ -199,7 +177,7 @@ void storage_map_fill_status(uint32_t index, uint32_t len)
 		}
 		else
 		{
-			if((map[(sector/8)] && rslt) == 0x00)
+			if((map[(sector/8)] & rslt) == 0x00)
 			{
 				map[(sector/8)] |= rslt;
 				nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
@@ -209,11 +187,21 @@ void storage_map_fill_status(uint32_t index, uint32_t len)
 	}
 	else if(sector == 0) // Set status of the last sector is written
 	{
-		if((map[(MAP_LENGTH - 1)] && (0x01 << (7))) == 0x00)
+		sector_max = ((STORAGE_INDEX_MAX*len)/DEF_UDISK_SECTOR_SIZE);
+
+        if((sector_max%8) > 0)
+        {
+            rslt = (0x01 << ((sector_max%8) - 1));
+        }
+        else
+        {
+            rslt = 0;
+        }
+		if((map[(sector_max/8)] & rslt) == 0x00)
 		{
-			map[(MAP_LENGTH - 1)] |= (0x01 << (7));
+			map[(sector_max/8)] |= rslt;
 			nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
-			STORAGE_LOG("storage_map_fill_status: %d - %d\n",sector,map[(MAP_LENGTH - 1)]);
+			STORAGE_LOG("storage_map_fill_status: %d - %d\n",sector,map[(sector_max/8)]);
 		}
 	}
 }

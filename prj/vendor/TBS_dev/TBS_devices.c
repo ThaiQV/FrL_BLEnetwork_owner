@@ -560,7 +560,6 @@ void TBS_Device_Index_manage(void) {
 //	P_INFO("After:%d\r\n",G_TBS_DEVICE.data.index);
 #endif
 	G_TBS_DEVICE.data.index++;
-	TBS_Device_Store_run();
 //	P_INFO("Current:%d\r\n",G_TBS_DEVICE.data.index);
 	if(CHECK_ERR == G_TBS_DEVICE.data.index){
 		ERR(PERI,"ERR Index <Err-%d>\r\n",G_TBS_DEVICE.data.index);
@@ -568,6 +567,7 @@ void TBS_Device_Index_manage(void) {
 	if (G_TBS_DEVICE.data.index >= TBS_PACKET_INDEX_MAX) {
 		G_TBS_DEVICE.data.index = 0;
 	}
+	TBS_Device_Store_run();
 	//ERR(FLA,"0x%02X callback (indx:%d)!!\r\n",_cmdID,G_TBS_DEVICE.data.index);
 }
 
