@@ -280,18 +280,18 @@ static uint16_t build_frame(
 
     return idx;
 }
-
-static void send_ack(protocol_context_t *protocol)
-{
-    uint8_t ack = PROTOCOL_ACK;
-    uart_driver_send(protocol->uart_driver, &ack, 1);
-}
-
-static void send_nack(protocol_context_t *protocol)
-{
-    uint8_t nack = PROTOCOL_NACK;
-    uart_driver_send(protocol->uart_driver, &nack, 1);
-}
+//
+//static void send_ack(protocol_context_t *protocol)
+//{
+//    uint8_t ack = PROTOCOL_ACK;
+//    uart_driver_send(protocol->uart_driver, &ack, 1);
+//}
+//
+//static void send_nack(protocol_context_t *protocol)
+//{
+//    uint8_t nack = PROTOCOL_NACK;
+//    uart_driver_send(protocol->uart_driver, &nack, 1);
+//}
 
 /*============================================================================
  * FRAME PROCESSING

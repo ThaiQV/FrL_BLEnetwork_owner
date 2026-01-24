@@ -23,10 +23,7 @@
 #include "stpm32_define.h"
 #include "stpm32.h"
 
-
-
-
-static const char *energy_names[] = {"Active", "Fundamental", "Reactive", "Apparent"};
+//static const char *energy_names[] = {"Active", "Fundamental", "Reactive", "Apparent"};
 
 // Internal helper functions
 static void latch(stpm_handle_t *handle);
@@ -37,7 +34,7 @@ static void send_frame_crc(stpm_handle_t *handle, uint8_t read_add, uint8_t writ
                            uint8_t data_lsb, uint8_t data_msb);
 static uint8_t calc_crc8(stpm_handle_t *handle, uint8_t *buf);
 static void crc8_calc(stpm_handle_t *handle, uint8_t data);
-static bool init_stpm34(stpm_handle_t *handle);
+//static bool init_stpm34(stpm_handle_t *handle);
 
 // Conversion functions
 static inline float calc_period(uint16_t value);
@@ -124,101 +121,102 @@ bool stpm_init(stpm_handle_t *handle) {
 
     uint8_t buff[5];
 	read_frame(handle, DSP_CR1_Address, buff);
-	printf("%02x%02x%02x%02x\n", buff[0], buff[1], buff[2], buff[3] );
+//	printf("%02x%02x%02x%02x\n", buff[0], buff[1], buff[2], buff[3] );
 
     // bool success = init_stpm34(handle);
     return true;
 }
-// extern void print_uart(const char *fmt, ...);
-static bool init_stpm34(stpm_handle_t *handle) {
-    uint8_t data_lsb, data_msb;
-    DSP_CR1_LSW_bits_t dsp_cr1_lsw;
-	DSP_CR1_MSW_bits_t dsp_cr1_msw;
-	DSP_CR2_LSW_bits_t dsp_cr2_lsw;
-	DSP_CR2_MSW_bits_t dsp_cr2_msw;
-	DFE_CR1_LSW_bits_t dfe_cr1_lsw;
-	DFE_CR1_MSW_bits_t dfe_cr1_msw;
-//	DFE_CR2_LSW_bits_t dfe_cr2_lsw;
-//	DFE_CR2_MSW_bits_t dfe_cr2_msw;
-
-    // Configure DSP Control Register 1 LSW
-    memset(&dsp_cr1_lsw, 0, sizeof(dsp_cr1_lsw));
-    dsp_cr1_lsw.ENVREF1 = 1;  // Enable internal voltage reference
-    dsp_cr1_lsw.TC1 = 0x02;   // Temperature compensation
-
-    data_lsb = dsp_cr1_lsw.LSB;
-    data_msb = dsp_cr1_lsw.MSB;
-    send_frame_crc(handle, DSP_CR1_Address, DSP_CR1_Address, data_lsb, data_msb);
-
-    
-
-    // Configure DSP Control Register 1 MSW
-    memset(&dsp_cr1_msw, 0, sizeof(dsp_cr1_msw));
-    dsp_cr1_msw.BHPFV1 = 1;   // Enable HPF voltage
-    dsp_cr1_msw.BHPFC1 = 1;   // Enable HPF current
-    dsp_cr1_msw.LPW1 = 0x04;  // LED speed divider
-    dsp_cr1_msw.AEM1 = 1;     // Enable Active Energy accumulation
-    dsp_cr1_msw.APM1 = 1;     // Enable Active Power calculation
-    data_lsb = dsp_cr1_msw.LSB;
-    data_msb = dsp_cr1_msw.MSB;
-    send_frame_crc(handle, DSP_CR1_Address, DSP_CR1_Address + 1, data_lsb, data_msb);
-
-    uint8_t buff[5];
-    read_frame(handle, DSP_CR1_Address, buff);
-	printf("%02x%02x%02x%02x\n", buff[0], buff[1], buff[2], buff[3] );
-
-    // Configure DFE Control Register 1 -
-    memset(&dfe_cr1_lsw, 0, sizeof(dfe_cr1_lsw));
-    dfe_cr1_msw.ENC1 = 1;  // Enable current channel 1
-
-    data_lsb = dfe_cr1_lsw.LSB;
-    data_msb = dfe_cr1_lsw.MSB;
-    send_frame_crc(handle, DFE_CR1_Address, DFE_CR1_Address, data_lsb, data_msb);
-
-    memset(&dfe_cr1_msw, 0, sizeof(dfe_cr1_msw));
-    dfe_cr1_lsw.ENV1 = 1;   // Enable voltage measurement 1
-
-    data_lsb = dfe_cr1_msw.LSB;
-    data_msb = dfe_cr1_msw.MSB;
-    send_frame_crc(handle, DFE_CR1_Address, DFE_CR1_Address + 1, data_lsb, data_msb);
-
-
-    // Configure DSP Control Register 2 LSW
-    memset(&dsp_cr2_lsw, 0, sizeof(dsp_cr2_lsw));
-    dsp_cr2_lsw.ENVREF2 = 1;  // Enable internal voltage reference
-    dsp_cr2_lsw.TC2 = 0x02;   // Temperature compensation
-    data_lsb = dsp_cr2_lsw.LSB;
-    data_msb = dsp_cr2_lsw.MSB;
-    send_frame_crc(handle, DSP_CR2_Address, DSP_CR2_Address, data_lsb, data_msb);
-
-    // Configure DSP Control Register 2 MSW
-    memset(&dsp_cr2_msw, 0, sizeof(dsp_cr2_msw));
-    dsp_cr2_msw.BHPFV2 = 0;   // Enable HPF voltage
-    dsp_cr2_msw.BHPFC2 = 0;   // Enable HPF current
-//    dsp_cr2_msw.BLPFV2 = 1;   // Bypass LPF voltage (wideband)
-//    dsp_cr2_msw.BLPFC2 = 1;   // Bypass LPF current (wideband)
-    dsp_cr2_msw.LPW2 = 0x04;  // LED speed divider
-    data_lsb = dsp_cr2_msw.LSB;
-    data_msb = dsp_cr2_msw.MSB;
-    send_frame_crc(handle, DSP_CR2_Address, DSP_CR2_Address + 1, data_lsb, data_msb);
-
-    // Set current gain for both channels
-    stpm_set_current_gain(handle, 1, STPM3X_GAIN_16X);
-    stpm_set_current_gain(handle, 2, STPM3X_GAIN_16X);
-
-    // Verify STPM is working by checking gain settings
-    read_frame(handle, DFE_CR1_Address, handle->read_buffer);
-    bool success = stpm_check_gain(handle, 1, handle->read_buffer);
-
-    read_frame(handle, DFE_CR2_Address, handle->read_buffer);
-    success = success && stpm_check_gain(handle, 2, handle->read_buffer);
-
-    // Configure latch and CRC
-    stpm_auto_latch(handle, false);
-    stpm_crc(handle, false);
-
-    return success;
-}
+//
+//// extern void print_uart(const char *fmt, ...);
+//static bool init_stpm34(stpm_handle_t *handle) {
+//    uint8_t data_lsb, data_msb;
+//    DSP_CR1_LSW_bits_t dsp_cr1_lsw;
+//	DSP_CR1_MSW_bits_t dsp_cr1_msw;
+//	DSP_CR2_LSW_bits_t dsp_cr2_lsw;
+//	DSP_CR2_MSW_bits_t dsp_cr2_msw;
+//	DFE_CR1_LSW_bits_t dfe_cr1_lsw;
+//	DFE_CR1_MSW_bits_t dfe_cr1_msw;
+////	DFE_CR2_LSW_bits_t dfe_cr2_lsw;
+////	DFE_CR2_MSW_bits_t dfe_cr2_msw;
+//
+//    // Configure DSP Control Register 1 LSW
+//    memset(&dsp_cr1_lsw, 0, sizeof(dsp_cr1_lsw));
+//    dsp_cr1_lsw.ENVREF1 = 1;  // Enable internal voltage reference
+//    dsp_cr1_lsw.TC1 = 0x02;   // Temperature compensation
+//
+//    data_lsb = dsp_cr1_lsw.LSB;
+//    data_msb = dsp_cr1_lsw.MSB;
+//    send_frame_crc(handle, DSP_CR1_Address, DSP_CR1_Address, data_lsb, data_msb);
+//
+//
+//
+//    // Configure DSP Control Register 1 MSW
+//    memset(&dsp_cr1_msw, 0, sizeof(dsp_cr1_msw));
+//    dsp_cr1_msw.BHPFV1 = 1;   // Enable HPF voltage
+//    dsp_cr1_msw.BHPFC1 = 1;   // Enable HPF current
+//    dsp_cr1_msw.LPW1 = 0x04;  // LED speed divider
+//    dsp_cr1_msw.AEM1 = 1;     // Enable Active Energy accumulation
+//    dsp_cr1_msw.APM1 = 1;     // Enable Active Power calculation
+//    data_lsb = dsp_cr1_msw.LSB;
+//    data_msb = dsp_cr1_msw.MSB;
+//    send_frame_crc(handle, DSP_CR1_Address, DSP_CR1_Address + 1, data_lsb, data_msb);
+//
+//    uint8_t buff[5];
+//    read_frame(handle, DSP_CR1_Address, buff);
+//	printf("%02x%02x%02x%02x\n", buff[0], buff[1], buff[2], buff[3] );
+//
+//    // Configure DFE Control Register 1 -
+//    memset(&dfe_cr1_lsw, 0, sizeof(dfe_cr1_lsw));
+//    dfe_cr1_msw.ENC1 = 1;  // Enable current channel 1
+//
+//    data_lsb = dfe_cr1_lsw.LSB;
+//    data_msb = dfe_cr1_lsw.MSB;
+//    send_frame_crc(handle, DFE_CR1_Address, DFE_CR1_Address, data_lsb, data_msb);
+//
+//    memset(&dfe_cr1_msw, 0, sizeof(dfe_cr1_msw));
+//    dfe_cr1_lsw.ENV1 = 1;   // Enable voltage measurement 1
+//
+//    data_lsb = dfe_cr1_msw.LSB;
+//    data_msb = dfe_cr1_msw.MSB;
+//    send_frame_crc(handle, DFE_CR1_Address, DFE_CR1_Address + 1, data_lsb, data_msb);
+//
+//
+//    // Configure DSP Control Register 2 LSW
+//    memset(&dsp_cr2_lsw, 0, sizeof(dsp_cr2_lsw));
+//    dsp_cr2_lsw.ENVREF2 = 1;  // Enable internal voltage reference
+//    dsp_cr2_lsw.TC2 = 0x02;   // Temperature compensation
+//    data_lsb = dsp_cr2_lsw.LSB;
+//    data_msb = dsp_cr2_lsw.MSB;
+//    send_frame_crc(handle, DSP_CR2_Address, DSP_CR2_Address, data_lsb, data_msb);
+//
+//    // Configure DSP Control Register 2 MSW
+//    memset(&dsp_cr2_msw, 0, sizeof(dsp_cr2_msw));
+//    dsp_cr2_msw.BHPFV2 = 0;   // Enable HPF voltage
+//    dsp_cr2_msw.BHPFC2 = 0;   // Enable HPF current
+////    dsp_cr2_msw.BLPFV2 = 1;   // Bypass LPF voltage (wideband)
+////    dsp_cr2_msw.BLPFC2 = 1;   // Bypass LPF current (wideband)
+//    dsp_cr2_msw.LPW2 = 0x04;  // LED speed divider
+//    data_lsb = dsp_cr2_msw.LSB;
+//    data_msb = dsp_cr2_msw.MSB;
+//    send_frame_crc(handle, DSP_CR2_Address, DSP_CR2_Address + 1, data_lsb, data_msb);
+//
+//    // Set current gain for both channels
+//    stpm_set_current_gain(handle, 1, STPM3X_GAIN_16X);
+//    stpm_set_current_gain(handle, 2, STPM3X_GAIN_16X);
+//
+//    // Verify STPM is working by checking gain settings
+//    read_frame(handle, DFE_CR1_Address, handle->read_buffer);
+//    bool success = stpm_check_gain(handle, 1, handle->read_buffer);
+//
+//    read_frame(handle, DFE_CR2_Address, handle->read_buffer);
+//    success = success && stpm_check_gain(handle, 2, handle->read_buffer);
+//
+//    // Configure latch and CRC
+//    stpm_auto_latch(handle, false);
+//    stpm_crc(handle, false);
+//
+//    return success;
+//}
 
 void stpm_set_calibration(stpm_handle_t *handle, uint32_t cal_v, uint32_t cal_i) {
     if (!handle) return;
@@ -361,23 +359,23 @@ bool stpm_check_gain(stpm_handle_t *handle, uint8_t channel, uint8_t *buffer) {
 
 float stpm_read_period(stpm_handle_t *handle, uint8_t channel)
 {
-    if (!handle || (channel != 1 && channel != 2)) return;
-    if (!handle->auto_latch) latch(handle);
+    if (!handle || (channel != 1 && channel != 2)) return 0;
+//    if (!handle->auto_latch) latch(handle);
 
     uint8_t address = DSP_REG1_Address;
     read_frame(handle, address, handle->read_buffer);
-    float frequency;
+    float frequency=1.0;
     if (channel == 1)
     {
        frequency = buffer_0to11(handle->read_buffer);
     }
-
-    return frequency = 1000000.0 / ( frequency * 8.0);
+    frequency = 1000000.0 / ( frequency * 8.0);
+    return frequency;
 }
 
 void stpm_update_energy(stpm_handle_t *handle, uint8_t channel) {
     if (!handle || channel > 2) return;
-    if (!handle->auto_latch) latch(handle);
+//    if (!handle->auto_latch) latch(handle);
 
     int8_t address;
     stpm_energy_t *energy;
@@ -818,7 +816,7 @@ float stpm_read_fundamental_current(stpm_handle_t *handle, uint8_t channel) {
 void stpm_read_rms_voltage_and_current(stpm_handle_t *handle, uint8_t channel,
                                        float *voltage, float *current) {
     if (!handle || (channel != 1 && channel != 2)) return;
-    if (!handle->auto_latch) latch(handle);
+//    if (!handle->auto_latch) latch(handle);
 
     uint8_t address = (channel == 1) ? DSP_REG14_Address : DSP_REG15_Address;
     read_frame(handle, address, handle->read_buffer);
@@ -893,11 +891,12 @@ void stpm_read_periods(stpm_handle_t *handle, uint32_t *ch1, uint32_t *ch2) {
 
 void stpm_latch_reg(stpm_handle_t *handle) {
 //    latch(handle);
+	handle->pin_write(handle->syn_pin, true);
 	handle->delay_us(4);
     handle->pin_write(handle->syn_pin, false);
     handle->delay_us(4);
     handle->pin_write(handle->syn_pin, true);
-    handle->delay_us(4);
+//    handle->delay_us(4);
 }
 
 char* stpm_register_to_str(stpm_handle_t *handle, uint8_t *frame) {
@@ -1198,14 +1197,14 @@ void stpm_update_calib(stpm_handle_t *handle, uint8_t channel, uint16_t calib_V,
         dsp_cr5.LSW.MSB = handle->read_buffer[1];
         dsp_cr5.MSW.LSB = handle->read_buffer[2];
         dsp_cr5.MSW.MSB = handle->read_buffer[3];
-        printf("dsp_cr5: %08x\n", dsp_cr5);
+//        printf("dsp_cr5: %08x\n", dsp_cr5);
 
         read_frame(handle, DSP_CR6_Address, handle->read_buffer);
         dsp_cr6.LSW.LSB = handle->read_buffer[0];
         dsp_cr6.LSW.MSB = handle->read_buffer[1];
         dsp_cr6.MSW.LSB = handle->read_buffer[2];
         dsp_cr6.MSW.MSB = handle->read_buffer[3];
-        printf("dsp_cr6: %08x\n", dsp_cr6);
+//        printf("dsp_cr6: %08x\n", dsp_cr6);
 
         dsp_cr5.CHV1 = calib_V;
         dsp_cr6.CHC1 = calib_C;
@@ -1223,14 +1222,14 @@ void stpm_update_calib(stpm_handle_t *handle, uint8_t channel, uint16_t calib_V,
         dsp_cr5.LSW.MSB = handle->read_buffer[1];
         dsp_cr5.MSW.LSB = handle->read_buffer[2];
         dsp_cr5.MSW.MSB = handle->read_buffer[3];
-        printf("dsp_cr5: %08x\n", dsp_cr5);
+//        printf("dsp_cr5: %08x\n", dsp_cr5);
 
         read_frame(handle, DSP_CR6_Address, handle->read_buffer);
         dsp_cr6.LSW.LSB = handle->read_buffer[0];
         dsp_cr6.LSW.MSB = handle->read_buffer[1];
         dsp_cr6.MSW.LSB = handle->read_buffer[2];
         dsp_cr6.MSW.MSB = handle->read_buffer[3];
-        printf("dsp_cr6: %08x\n", dsp_cr6);
+//        printf("dsp_cr6: %08x\n", dsp_cr6);
 
     }
     else if(channel == 2)

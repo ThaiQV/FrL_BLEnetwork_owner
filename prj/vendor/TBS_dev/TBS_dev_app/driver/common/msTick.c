@@ -10,7 +10,7 @@
 #include "tl_common.h"
 #include "stdio.h"
 #include "msTick.h"
-#include <stdint.h>
+//#include <stdint.h>
 
 //reg_system_tick
 
@@ -27,22 +27,22 @@ static inline void update_tick_ext(void)
     last_tick = cur;
 }
 
-uint64_t get_system_time_us(void)
+u64 get_system_time_us(void)
 {
     update_tick_ext();
 
-    uint64_t tick64 = tick_ext | last_tick;
+    u64 tick64 = tick_ext | last_tick;
 
     return tick64 / SYSTEM_TIMER_TICK_1US;
 }
 
-uint64_t get_system_time_ms(void)
+u64 get_system_time_ms(void)
 {
     update_tick_ext();
 
-    uint64_t tick64 = tick_ext | last_tick;
+    u64 tick64 = tick_ext | last_tick;
 
-    return tick64 / SYSTEM_TIMER_TICK_1MS;
+    return (u64)(tick64 / SYSTEM_TIMER_TICK_1MS);
 }
 
 #endif /* MASTER_CORE*/

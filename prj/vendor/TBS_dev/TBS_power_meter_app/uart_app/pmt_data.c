@@ -110,7 +110,7 @@ void pmt_protocol_uart_receive(uint8_t *rx_buff, uint16_t len)
 
 static void my_uart_send( uint8_t *data, uint16_t len)
 {
-    drv_uart_tx_start((uint8_t *)data,(u32)len);
+    drv_uart_tx_start(data,(u32)len);
 }
 
 static uint32_t my_get_tick(void)

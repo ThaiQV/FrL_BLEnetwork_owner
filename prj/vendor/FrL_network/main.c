@@ -220,10 +220,6 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 	rf_drv_ble_init();
 
 	gpio_init(!deepRetWakeUp);
-#ifdef POWER_METER_DEVICE
-//	TBS_PowerMeter_UART_init();
-//	gpio_function_dis(GPIO_PA7);
-#endif
 #if (UART_PRINT_DEBUG_ENABLE)
 	DEBUG_TX_PIN_INIT();
 #endif

@@ -14,6 +14,10 @@
 #include "../FrL_Network/fl_nwk_handler.h"
 #include "../FrL_Network/fl_nwk_api.h"
 
+#ifdef POWER_METER_DEVICE
+#include "TBS_power_meter_app/power_meter_app.h"
+#endif
+
 #define TBS_DEVICE_STORE_INTERVAL 		2*1010*1001 //5s
 #define TBS_PACKET_INDEX_MAX			12288
 #include "TBS_dev_app/user_lib.h"
@@ -412,10 +416,6 @@ void TBS_PowerMeter_TimerIRQ_Init(u8 _period_ms) {
 	gpio_set_level(GPIO_PA5,1);
 }
 
-void TBS_PowerMeter_UART_init(void){
-	extern void uart_app_init(void);
-	uart_app_init();
-}
 void TBS_PowerMeter_init(void){
 	//init db settings
 	fl_db_slavesettings_init();
@@ -439,10 +439,10 @@ void TBS_PowerMeter_init(void){
 	}
 	// fl_tbs_data_t tbs_load = fl_db_tbsprofile_load();
 	// memcpy(G_POWER_METER_PARAMETER, &tbs_load.data[40], sizeof(G_POWER_METER_PARAMETER));
-	printf("G_POWER_METER_PARAMETER0: %d\n", G_POWER_METER_PARAMETER[0]);
-	printf("G_POWER_METER_PARAMETER1: %d\n", G_POWER_METER_PARAMETER[1]);
-	printf("G_POWER_METER_PARAMETER2: %d\n", G_POWER_METER_PARAMETER[2]);
-	printf("G_POWER_METER_PARAMETER3: %d\n", G_POWER_METER_PARAMETER[3]);
+//	printf("G_POWER_METER_PARAMETER0: %d\n", G_POWER_METER_PARAMETER[0]);
+//	printf("G_POWER_METER_PARAMETER1: %d\n", G_POWER_METER_PARAMETER[1]);
+//	printf("G_POWER_METER_PARAMETER2: %d\n", G_POWER_METER_PARAMETER[2]);
+//	printf("G_POWER_METER_PARAMETER3: %d\n", G_POWER_METER_PARAMETER[3]);
 
 	power_meter_app_init();
 
@@ -452,7 +452,6 @@ void TBS_PowerMeter_init(void){
 	//Button config
 	BUTTON_CONFIG_INIT();
 	// TBS_PowerMeter_TimerIRQ_Init(100);
-	TBS_PowerMeter_RMS_Read();
 }
 void TBS_PowerMeter_Run(void){
 	memcpy(G_POWER_METER.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_POWER_METER.mac));

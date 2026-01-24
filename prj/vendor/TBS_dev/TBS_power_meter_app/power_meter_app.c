@@ -19,14 +19,14 @@
 #include "uart_app/uart_app.h"
 #include "uart_app/pmt_data.h"
 
-#define PIN_CS1 GPIO_PE6 // GPIO_PE6
-#define PIN_CS2 GPIO_PE5
-#define PIN_CS3 GPIO_PE4
-#define PIN_CS_ PIN_CS1
-#define PIN_EN GPIO_PD3
-#define PIN_SYN_ GPIO_PB1
-#define PIN_MISO GPIO_PB2
-#define PIN_MOSI GPIO_PB3
+#define PIN_CS1 HSPI_CS_POWER_METER_STPM1 // GPIO_PE6
+#define PIN_CS2 HSPI_CS_POWER_METER_STPM2
+#define PIN_CS3 HSPI_CS_POWER_METER_STPM3
+#define PIN_CS_ PIN_CS1 //not use
+#define PIN_EN 	GPIO_PD3
+#define PIN_SYN_ HSPI_IO
+#define PIN_MISO HSPI_MISO
+#define PIN_MOSI HSPI_MOSI
 
 static pmt_data_context_t pmt_ctx[NUMBER_CHANNEL_POWERMETTER];
 static stpm_handle_t *pmt_handle[NUMBER_CHANNEL_POWERMETTER];
@@ -63,7 +63,7 @@ void read_stpm_data(stpm_handle_t *handle);
 void update_energy(stpm_handle_t *handle);
 void stpm_monitoring_loop(stpm_handle_t **handle);
 void pmt_update_data_to_rp(void);
-void pmt_report(void);
+//void pmt_report(void);
 static uint32_t calc_I(pmt_data_context_t *ctx);
 static uint32_t calc_phi(pmt_data_context_t *ctx);
 //static uint32_t calc_E(pmt_data_context_t *ctx);
@@ -184,7 +184,7 @@ uint8_t pmt_spi_transfer(uint8_t data);
 void pmt_pin_write(int pin, bool state);
 void pmt_delay_us(uint32_t us);
 void pmt_delay_ms(uint32_t ms);
-uint32_t pmt_get_millis(void);
+uint64_t pmt_get_millis(void);
 
 void pmt_spi_begin(void)
 {
@@ -242,7 +242,7 @@ void pmt_delay_ms(uint32_t ms)
     delay_ms(ms);
 }
 
-uint32_t pmt_get_millis(void)
+uint64_t pmt_get_millis(void)
 {
     return get_system_time_ms();
 }
@@ -294,7 +294,6 @@ void power_meter_app_init(void)
 
     for (int i = 0; i < NUMBER_CHANNEL_POWERMETTER; i++)
     {
-
         pmt_handle[i]->spi_begin = pmt_spi_begin;
         pmt_handle[i]->spi_end = pmt_spi_end;
         pmt_handle[i]->spi_begin_transaction = pmt_spi_begin_transaction;
@@ -326,7 +325,7 @@ void power_meter_app_init(void)
     fl_tbs_data_t tbs_load = fl_db_tbsprofile_load();
    if(tbs_load.data[0] == 0xff && tbs_load.data[1] == 0xff && tbs_load.data[2] == 0xff && tbs_load.data[3] == 0xff)
    {
-        printf("set calib 1\n");
+//        printf("set calib 1\n");
         pmt_setcalib(1, 1, 1, 1);
         pmt_setcalib(2, 1, 1, 1);
         pmt_setcalib(3, 1, 1, 1);
@@ -336,11 +335,9 @@ void power_meter_app_init(void)
 
 void power_meter_app_loop(void)
 {
-    uart_print_app();
-    uart_app_loop();
     pmt_protocol_loop();
     static uint64_t appTimeTick = 0;
-    if (get_system_time_us() - appTimeTick > 10000)
+    if (get_system_time_us() - appTimeTick >= 10000)
     {
         appTimeTick = get_system_time_us(); // 10ms
     }
@@ -413,52 +410,93 @@ void update_energy(stpm_handle_t *handle)
     ctx->measurement.reactive_energy = stpm_read_reactive_energy(handle, 1);
 }
 
-void stpm_monitoring_loop(stpm_handle_t **p_handle)
-{
-    uint32_t current_time = pmt_get_millis();
-    float voltage, current;//, reactive, power_factor, apparent_power;
-    double active;
-    
-    stpm_latch_reg(p_handle[0]);
-    for (uint8_t num_ch = 0; num_ch < 3; num_ch++)
-    {
+void stpm_monitoring_loop(stpm_handle_t **p_handle) {
+	uint64_t current_time = pmt_get_millis();
+	uint64_t delta_t=0;
+	float voltage, current,freq;    //, reactive, power_factor, apparent_power;
+	double active;
+	stpm_latch_reg(p_handle[0]);
+
+	for (uint8_t num_ch = 0; num_ch < 3; num_ch++) {
         stpm_handle_t *handle = p_handle[num_ch];
         pmt_data_context_t *ctx = handle->context;
-        
+        //Read data from the sensor
         stpm_read_rms_voltage_and_current(handle, 1, &voltage, &current);
+
         active = stpm_read_active_power(handle, 1);
-        // apparent_power = stpm_read_apparent_rms_power(handle, 1);
+        freq = stpm_read_period(handle, 1);
+        //
+		delta_t = current_time - ctx->measurement.timestamp;
+		// Filter EMA (V,A,p,f)
+		ctx->measurement.voltage += 0.3 * (fabs(voltage) - ctx->measurement.voltage);
+		ctx->measurement.current += 0.3 * (fabs(current) - ctx->measurement.current);
+		ctx->measurement.active_power += 0.3 * (fabs(active) - ctx->measurement.active_power);
+		ctx->measurement.frequency += 0.3 * (fabs(freq) - ctx->measurement.frequency);
+		// Energy(Wh)
+		ctx->measurement.active_energy += (ctx->measurement.active_power * delta_t) / 3600000.0;
 
-        ctx->measurement.voltage += 3 * 0.1 * (voltage - ctx->measurement.voltage);
-        ctx->measurement.current += 3 * 0.1 * (current - ctx->measurement.current);
+		// Sum and  average
+		ctx->accumulator.voltage_sum += ctx->measurement.voltage * delta_t;
+		ctx->accumulator.current_sum += ctx->measurement.current * delta_t;
+		ctx->accumulator.active_power_sum += ctx->measurement.active_power * delta_t;
 
-        // ctx->measurement.power_factor += 3 * 0.1 * (power_factor - ctx->measurement.power_factor);
-        ctx->measurement.active_power += 3 * 0.1 * (active - ctx->measurement.active_power);
-        // ctx->measurement.apparent_power += 3 * 0.1 * (apparent_power - ctx->measurement.apparent_power);
-        ctx->measurement.active_energy += (ctx->measurement.active_power * (current_time -ctx->measurement.timestamp)) / 3600000;
-        
-        ctx->accumulator.voltage_sum += ctx->measurement.voltage * (current_time -ctx->measurement.timestamp);
-        ctx->accumulator.current_sum += ctx->measurement.current * (current_time -ctx->measurement.timestamp);
-        ctx->accumulator.active_power_sum += ctx->measurement.active_power * (current_time -ctx->measurement.timestamp);
-        
-        ctx->measurement.time += current_time - ctx->measurement.timestamp;
-        if (G_POWER_METER_PARAMETER[num_ch] <= ctx->measurement.active_power)
-        {
-            ctx->measurement.timems += current_time - ctx->measurement.timestamp;
-        }
-        
-        ctx->measurement.timestamp = current_time;
+		// update timing
+		ctx->measurement.time += delta_t;
+		if (G_POWER_METER_PARAMETER[num_ch] <= ctx->measurement.active_power) {
+			ctx->measurement.timems += delta_t;
+		}
+		ctx->measurement.timestamp = current_time;
 
-        ctx->measurement.uT = ctx->accumulator.voltage_sum / ctx->measurement.time;
-        ctx->measurement.iT = ctx->accumulator.current_sum / ctx->measurement.time;
-
-        //use rms for U and I
-//        ctx->measurement.uT = ctx->measurement.voltage;
-//        ctx->measurement.iT = ctx->measurement.current;
-
-        ctx->measurement.pT = ctx->accumulator.active_power_sum / ctx->measurement.time;
-    }
+		// Average calculate
+		ctx->measurement.uT = ctx->accumulator.voltage_sum / ctx->measurement.time;
+		ctx->measurement.iT = ctx->accumulator.current_sum / ctx->measurement.time;
+		ctx->measurement.pT = ctx->accumulator.active_power_sum / ctx->measurement.time;
+	}
 }
+
+//
+//void stpm_monitoring_loop(stpm_handle_t **p_handle)
+//{
+//    uint32_t current_time = pmt_get_millis();
+//    float voltage, current;//, reactive, power_factor, apparent_power;
+//    double active;
+//
+//    stpm_latch_reg(p_handle[0]);
+//    for (uint8_t num_ch = 0; num_ch < 3; num_ch++)
+//    {
+//        stpm_handle_t *handle = p_handle[num_ch];
+//        pmt_data_context_t *ctx = handle->context;
+//
+//        stpm_read_rms_voltage_and_current(handle, 1, &voltage, &current);
+//        active = stpm_read_active_power(handle, 1);
+////        apparent_power = stpm_read_apparent_rms_power(handle, 1);
+//
+//        ctx->measurement.voltage += 3 * 0.1 * (voltage - ctx->measurement.voltage);
+//        ctx->measurement.current += 3 * 0.1 * (current - ctx->measurement.current);
+//
+//        // ctx->measurement.power_factor += 3 * 0.1 * (power_factor - ctx->measurement.power_factor);
+//        ctx->measurement.active_power += 3 * 0.1 * (active - ctx->measurement.active_power);
+//        // ctx->measurement.apparent_power += 3 * 0.1 * (apparent_power - ctx->measurement.apparent_power);
+//        ctx->measurement.active_energy += (ctx->measurement.active_power * (current_time -ctx->measurement.timestamp)) / 3600000;
+//
+//        ctx->accumulator.voltage_sum += ctx->measurement.voltage * (current_time -ctx->measurement.timestamp);
+//        ctx->accumulator.current_sum += ctx->measurement.current * (current_time -ctx->measurement.timestamp);
+//        ctx->accumulator.active_power_sum += ctx->measurement.active_power * (current_time -ctx->measurement.timestamp);
+//
+//        ctx->measurement.time += current_time - ctx->measurement.timestamp;
+//        if (G_POWER_METER_PARAMETER[num_ch] <= ctx->measurement.active_power)
+//        {
+//            ctx->measurement.timems += current_time - ctx->measurement.timestamp;
+//        }
+//
+//        ctx->measurement.timestamp = current_time;
+//
+//        ctx->measurement.uT = ctx->accumulator.voltage_sum / ctx->measurement.time;
+//        ctx->measurement.iT = ctx->accumulator.current_sum / ctx->measurement.time;
+//        ctx->measurement.pT = ctx->accumulator.active_power_sum / ctx->measurement.time;
+//    }
+//}
+
 
 void pmt_setcalib(uint8_t ch, float calib_U, float calib_I, float calib_P)
 {
@@ -524,6 +562,7 @@ float pmt_read_P(uint8_t ch)
     pmt_data_context_t *ctx = pmt_handle[ch - 1]->context;
     return ctx->measurement.active_power;
 }
+
 
 void pmt_print_info(uint8_t ch)
 {
@@ -639,7 +678,7 @@ static void read_calib()
 static uint32_t calc_I(pmt_data_context_t *ctx)
 {
     uint32_t result;
-    float_t value_used = ctx->measurement.current;//ctx->measurement.iT;
+    float_t value_used = ctx->measurement.iT;//ctx->measurement.current
 	if (value_used*1000 > 1023) {
 		result = (uint32_t)(value_used*10);
 		result |= 0x80000000;         //
@@ -673,13 +712,14 @@ static uint32_t calc_phi(pmt_data_context_t *ctx)
     // printf("ctx->accumulator.voltage_sum: %f\n", ctx->accumulator.voltage_sum);
     // printf("ctx->accumulator.current_sum: %f\n", ctx->accumulator.current_sum);
 
-	float value_use = abs(100*(ctx->measurement.active_power) / (ctx->measurement.voltage * (ctx->measurement.current)));
+	//    ctx->measurement.timems = 0;
+	//    ctx->measurement.time = 0;
+	//    ctx->accumulator.active_power_sum = 0;
+	//    ctx->accumulator.voltage_sum = 0;
+	//    ctx->accumulator.current_sum = 0;
 
-//    ctx->measurement.timems = 0;
-//    ctx->measurement.time = 0;
-//    ctx->accumulator.active_power_sum = 0;
-//    ctx->accumulator.voltage_sum = 0;
-//    ctx->accumulator.current_sum = 0;
+	//float value_use = abs(100*(ctx->measurement.active_power) / (ctx->measurement.voltage * (ctx->measurement.current)));
+	float value_use = (ctx->measurement.pT * 100) / (ctx->measurement.uT * ctx->measurement.iT);
 
     return (uint32_t) (value_use > 99 ? 99 : value_use);
 }
@@ -705,21 +745,21 @@ void pmt_clear_context(u8 _chn){
 	ctx->accumulator.voltage_sum = 0;
 	ctx->accumulator.current_sum = 0;
 }
+
 void pmt_update_data_to_rp(void)
 {
     //ch1
     stpm_handle_t *handle = pmt_handle[0];
     pmt_data_context_t *ctx = handle->context;
-    G_POWER_METER.data.voltage = abs((int)ctx->measurement.voltage);//(int)ctx->measurement.uT;//(int)ctx->measurement.voltage;//
-    G_POWER_METER.data.frequency = abs((int)stpm_read_period(handle, 1));
+    G_POWER_METER.data.voltage = (int)ctx->measurement.uT;////(int)ctx->measurement.voltage;//
+    G_POWER_METER.data.frequency = (int)ctx->measurement.frequency;
 
     u32 i_cal = calc_I(ctx);
 	G_POWER_METER.data.current1 = i_cal & 0x3FF;
 	u8 current_unit = ((i_cal >> 31) & 0x1)<<7;
     G_POWER_METER.data.power1 = ((u8)calc_phi(ctx))|current_unit;
-//	G_POWER_METER.data.current_type1 =  (i_cal >> 31) & 0x1;
     G_POWER_METER.data.energy1 = ctx->measurement.active_energy;
-    G_POWER_METER.data.time1 =(int)(ctx->measurement.timems / 1000) + 1;
+    G_POWER_METER.data.time1 = (u8)(ctx->measurement.timems / 1000);
     P_INFO("PF:%d(%f/%f*%f)\r\n",G_POWER_METER.data.power1,ctx->measurement.active_power,ctx->measurement.voltage ,ctx->measurement.current);
     //ch2
     handle = pmt_handle[1];
@@ -728,10 +768,8 @@ void pmt_update_data_to_rp(void)
 	G_POWER_METER.data.current2 = i_cal & 0x3FF;
 	current_unit = ((i_cal >> 31) & 0x1)<<7;
     G_POWER_METER.data.power2 = ((u8)calc_phi(ctx))|current_unit;
-//	G_POWER_METER.data.current_type2 = (i_cal >> 31) & 0x1;
-    // printf("G_POWER_METER.data.power2: %d\n", G_POWER_METER.data.power2);
     G_POWER_METER.data.energy2 = ctx->measurement.active_energy;
-    G_POWER_METER.data.time2 = (int)(ctx->measurement.timems / 1000) + 1;
+    G_POWER_METER.data.time2 =  (u8)(ctx->measurement.timems / 1000);
     P_INFO("PF:%d(%f/%f*%f)\r\n",G_POWER_METER.data.power2,ctx->measurement.active_power,ctx->measurement.voltage ,ctx->measurement.current);
     //ch3
     handle = pmt_handle[2];
@@ -740,10 +778,8 @@ void pmt_update_data_to_rp(void)
 	G_POWER_METER.data.current3 = i_cal & 0x3FF;
 	current_unit = ((i_cal >> 31) & 0x1)<<7;
     G_POWER_METER.data.power3 = ((u8)calc_phi(ctx))|current_unit;
-//	G_POWER_METER.data.current_type3 = (i_cal >> 31) & 0x1;
-    // printf("G_POWER_METER.data.power3: %d\n", G_POWER_METER.data.power3);
     G_POWER_METER.data.energy3 = ctx->measurement.active_energy;
-    G_POWER_METER.data.time3 = (int)(ctx->measurement.timems / 1000) + 1;
+    G_POWER_METER.data.time3 =  (u8)(ctx->measurement.timems / 1000);
     P_INFO("PF:%d(%f/%f*%f)\r\n",G_POWER_METER.data.power3,ctx->measurement.active_power,ctx->measurement.voltage ,ctx->measurement.current);
     //Clear and re-calculate
     pmt_clear_context(0);
@@ -751,32 +787,33 @@ void pmt_update_data_to_rp(void)
     pmt_clear_context(2);
 }
 
-void pmt_report(void)
-{
-    static int is_send_rp = 1;
-    uint32_t secs = G_POWER_METER.timetamp % 86400;
-    if(((secs % 60) == 0) && (is_send_rp == 1))
-    {
-        // printf("send rp time : %d\n", secs);
-        is_send_rp = 0;
-        pmt_update_data_to_rp();
-        u8 _payload[SIZEU8(tbs_device_powermeter_t)];
-        tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) &G_POWER_METER;
-        tbs_pack_powermeter_data(pwmeter_data,_payload);
-        u8 indx_data = SIZEU8(pwmeter_data->type) + SIZEU8(pwmeter_data->mac) + SIZEU8(pwmeter_data->timetamp);
-		if (IsJoinedNetwork()) {
-			fl_api_slave_req(NWK_HDR_55,&_payload[indx_data],SIZEU8(pwmeter_data->data),0,0,1);
-		}
-        // G_POWER_METER.data.time1 = 0;
-        // G_POWER_METER.data.time2 = 0;
-        // G_POWER_METER.data.time3 = 0;
-    }
-    else if( (secs % 60) != 0 )
-    {
-        is_send_rp = 1;
-    }
-    
-}
+//
+//void pmt_report(void)
+//{
+//    static int is_send_rp = 1;
+//    uint32_t secs = G_POWER_METER.timetamp % 86400;
+//    if(((secs % 60) == 0) && (is_send_rp == 1))
+//    {
+//        // printf("send rp time : %d\n", secs);
+//        is_send_rp = 0;
+//        pmt_update_data_to_rp();
+//        u8 _payload[SIZEU8(tbs_device_powermeter_t)];
+//        tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) &G_POWER_METER;
+//        tbs_pack_powermeter_data(pwmeter_data,_payload);
+//        u8 indx_data = SIZEU8(pwmeter_data->type) + SIZEU8(pwmeter_data->mac) + SIZEU8(pwmeter_data->timetamp);
+//		if (IsJoinedNetwork()) {
+//			fl_api_slave_req(NWK_HDR_55,&_payload[indx_data],SIZEU8(pwmeter_data->data),0,0,1);
+//		}
+//        // G_POWER_METER.data.time1 = 0;
+//        // G_POWER_METER.data.time2 = 0;
+//        // G_POWER_METER.data.time3 = 0;
+//    }
+//    else if( (secs % 60) != 0 )
+//    {
+//        is_send_rp = 1;
+//    }
+//
+//}
 
 #endif /* POWER_METER_DEVICE*/
 #endif /* MASTER_CORE*/

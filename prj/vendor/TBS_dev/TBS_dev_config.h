@@ -34,7 +34,6 @@ void Counter_LCD_PED_Display(u8 _row,char* _mess);
 void Counter_LCD_PPD_Display(u8 _row,char* _mess);
 void Counter_LCD_ENDCALL_Display(u8 _row,char* _mess);
 #else
-void TBS_PowerMeter_UART_init(void);
 void TBS_PowerMeter_TimerIRQ_handler(void);
 void TBS_PowerMeter_RESETbyMaster(u8 _ch1,u8 _ch2,u8 _ch3);
 void TBS_PwMeter_SetThreshod(u16 _chn1,u16 _chn2,u16 _chn3);

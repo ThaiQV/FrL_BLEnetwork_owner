@@ -22,6 +22,7 @@
 typedef struct {
     float voltage;              //  (V)
     float current;              //  (A)
+    float frequency;
     float power_factor;
     double active_power;         // (W)
     float reactive_power;       // (VAR)
@@ -31,9 +32,9 @@ typedef struct {
     float iT;
     float uT;
     float pT;
-    uint32_t time;
+    uint64_t time;
     uint32_t timems;              //
-    uint32_t timestamp;         // (ms)
+    uint64_t timestamp;         // (ms)
 } measurement_data_t;
 
 typedef struct {

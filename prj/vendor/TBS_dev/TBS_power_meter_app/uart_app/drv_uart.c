@@ -174,8 +174,7 @@ u8 drv_uart_tx_start(u8 *data, u32 len)
 {
 	if (!uart_is_idle())
 	{
-		while (!uart_tx_done()){}
-			;
+		while (!uart_tx_done()){};
 		return 0;
 	}
 
@@ -192,8 +191,7 @@ u8 drv_uart_tx_start(u8 *data, u32 len)
 			memcpy(uartDrvTxBuf + 4, data, len);
 			if (myUartDriver.send)
 			{
-				while (!myUartDriver.send(uartDrvTxBuf))
-					;
+				while (!myUartDriver.send(uartDrvTxBuf));
 				return 1;
 			}
 		}

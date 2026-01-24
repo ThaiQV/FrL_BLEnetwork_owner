@@ -74,7 +74,7 @@ typedef struct {
     void (*pin_write)(int pin, bool state);
     void (*delay_us)(uint32_t us);
     void (*delay_ms)(uint32_t ms);
-    uint32_t (*get_millis)(void);
+    uint64_t (*get_millis)(void);
 } stpm_handle_t;
 
 // Initialization

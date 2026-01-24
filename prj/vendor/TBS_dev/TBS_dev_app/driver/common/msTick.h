@@ -21,8 +21,8 @@ enum{
 };
 */
 
-uint64_t get_system_time_us(void);
-uint64_t get_system_time_ms(void);
+u64 get_system_time_us(void);
+u64 get_system_time_ms(void);
 
 #endif /* MASTER_CORE*/
 #endif /* APPS_USER_MSTICK_H_ */
