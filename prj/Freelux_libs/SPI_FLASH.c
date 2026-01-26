@@ -140,13 +140,14 @@ void FLASH_Port_Init(void)
 	gpio_set_output(GPIO_PE4|GPIO_PE5|GPIO_PE6,1); 		//enable output
 	gpio_set_up_down_res(GPIO_PE4|GPIO_PE5|GPIO_PE6,GPIO_PIN_PULLUP_10K);
 	PIN_SET(GPIO_PE4|GPIO_PE5|GPIO_PE6);
+	delay_ms(10);
 	//
 
 	hspi_pin_config_t config;
 
-	config.hspi_clk_pin = HSPI_CLK_PB4;
-	config.hspi_mosi_io0_pin = HSPI_MOSI_IO0_PB3;
-	config.hspi_miso_io1_pin = HSPI_MISO_IO1_PB2;
+	config.hspi_clk_pin = PIN_CLK;
+	config.hspi_mosi_io0_pin = PIN_MOSI;
+	config.hspi_miso_io1_pin = PIN_MISO;
 
     spi_master_init(HSPI_MODULE,4, SPI_MODE3);
     hspi_set_pin(&config);
@@ -155,13 +156,14 @@ void FLASH_Port_Init(void)
 	gpio_set_output(PIN_CS,1); 		//enable output
 	gpio_set_up_down_res(PIN_CS,GPIO_PIN_PULLUP_10K);
 	PIN_SET(PIN_CS);
+
 	gpio_function_en(PIN_WP);
 	gpio_set_output(PIN_WP,1); 		//enable output
 	gpio_set_up_down_res(PIN_WP,GPIO_PIN_PULLUP_10K);
 	PIN_SET(PIN_WP);
 #endif
 
-//	LOG_P(DRV,"FLASH_Port_Init\r\n");
+//	printf("FLASH_Port_Init\r\n");
 }
 
 /*********************************************************************
@@ -470,7 +472,7 @@ void FLASH_IC_Check(void)
 
     /* Read FLASH ID */    
     Flash_ID = FLASH_ReadID();
-//    LOGA(DRV,"Flash_ID: %08x\n",(uint32_t)Flash_ID);
+//    P_INFO("Flash_ID: %d\n",(uint32_t)Flash_ID);
 
     Flash_Type = 0x00;                                                                
     Flash_Sector_Count = 0x00;
@@ -541,7 +543,7 @@ void FLASH_IC_Check(void)
     }
     else
     {
-//        LOG_P(DRV,"External Flash not connected\r\n");
+    	P_INFO("External Flash not connected\r\n");
         while(1);
     }
 }

@@ -422,7 +422,6 @@ void stpm_monitoring_loop(stpm_handle_t **p_handle) {
         pmt_data_context_t *ctx = handle->context;
         //Read data from the sensor
         stpm_read_rms_voltage_and_current(handle, 1, &voltage, &current);
-
         active = stpm_read_active_power(handle, 1);
         freq = stpm_read_period(handle, 1);
         //

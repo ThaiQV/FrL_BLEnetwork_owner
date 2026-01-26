@@ -13,13 +13,21 @@
 
 #pragma once
 #ifdef MASTER_CORE
-
 #define FL_RXFIFO_SIZE		128
 #define FL_RXFIFO_NUM		256
 #define FL_TXFIFO_SIZE		128
 #define FL_TXFIFO_NUM		256
 
 #define UART_DATA_LEN    	(FL_TXFIFO_SIZE - 2)   // data max 252
+#else
+#ifdef POWER_METER_DEVICE
+#define FL_RXFIFO_SIZE		64
+#define FL_RXFIFO_NUM		8
+#define FL_TXFIFO_SIZE		32
+#define FL_TXFIFO_NUM		8
+
+#define UART_DATA_LEN    	(FL_TXFIFO_SIZE - 2)   // data max 252
+#endif
 #endif
 
 typedef enum {
@@ -43,7 +51,7 @@ typedef u8 (*FncExc)(fl_exButton_states_e,void*);
 void fl_input_external_init(void);
 void fl_input_collection_node_handle(blt_timer_callback_t _fnc, u16 _timeout_ms);
 
-#ifdef MASTER_CORE
+#if (defined MASTER_CORE | defined POWER_METER_DEVICE)
 int fl_serial_send(u8* _data, u8 _len);
 void fl_input_serial_init(uart_num_e uart_num, uart_tx_pin_e tx_pin, uart_rx_pin_e rx_pin, u32 baudrate);
 void fl_input_serial_rec(void);

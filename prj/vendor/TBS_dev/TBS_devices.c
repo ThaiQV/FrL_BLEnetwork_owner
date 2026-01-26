@@ -20,7 +20,7 @@
 
 #define TBS_DEVICE_STORE_INTERVAL 		2*1010*1001 //5s
 #define TBS_PACKET_INDEX_MAX			12288
-#include "TBS_dev_app/user_lib.h"
+#include <vendor/TBS_dev/TBS_Counter_app/user_lib.h>
 
 #define COUNTER_LCD_REMOVE_DISPLAY		ct_remove_nwwk
 #define COUNTER_LCD_PRESS_DISPLAY		ct_add_bt_print
@@ -344,8 +344,8 @@ void TBS_PowerMeter_Button_Exc(void){
 			//ERR(APP,"Fast Press(%d ms)...\r\n",press_time);
 			TBS_PowerMeter_RMS_Read();
 			//TEST
-			extern void pmt_update_data_to_rp(void);
-			pmt_update_data_to_rp();
+//			extern void pmt_update_data_to_rp(void);
+//			pmt_update_data_to_rp();
 			u8 _payload[SIZEU8(tbs_device_powermeter_t)];
 			tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) &G_POWER_METER;
 			tbs_pack_powermeter_data(pwmeter_data,_payload);
@@ -366,19 +366,19 @@ void TBS_PowerMeter_Button_Exc(void){
 }
 
 void TBS_PowerMeter_RMS_Read(void) {
-	float calib_U, calib_I, calib_P;
-	for (u8 chn = 1; chn < 4; chn++) {
-		pmt_getcalib(chn,&calib_U,&calib_I,&calib_P);
-		P_INFO("[%d]Urms(%.3f):%.3f,Irms(%.3f):%.3f,Prms(%.3f):%.3f\r\n",chn,calib_U,pmt_read_U(chn),calib_I,pmt_read_I(chn),calib_P,pmt_read_P(chn));
-	}
-	P_INFO("==================================\r\n");
+//	float calib_U, calib_I, calib_P;
+//	for (u8 chn = 1; chn < 4; chn++) {
+//		pmt_getcalib(chn,&calib_U,&calib_I,&calib_P);
+//		P_INFO("[%d]Urms(%.3f):%.3f,Irms(%.3f):%.3f,Prms(%.3f):%.3f\r\n",chn,calib_U,pmt_read_U(chn),calib_I,pmt_read_I(chn),calib_P,pmt_read_P(chn));
+//	}
+//	P_INFO("==================================\r\n");
 }
 
 void TBS_PowerMeter_Upload2Master(void){
 	extern void pmt_update_data_to_rp(void);
 	TBS_PowerMeter_RMS_Read();
 	LOG_P(APP,"Upload data to server....\r\n");
-	pmt_update_data_to_rp();
+//	pmt_update_data_to_rp();
 }
 void TBS_PowerMeter_TimerIRQ_handler(void) {
 	//todo
@@ -427,7 +427,7 @@ void TBS_PowerMeter_init(void){
 	G_POWER_METER_PARAMETER[2] = MAKE_U16(settings[5],settings[4]);
 
 	P_INFO("Threshold channel:%d-%d-%d\r\n",G_POWER_METER_PARAMETER[0],	G_POWER_METER_PARAMETER[1],	G_POWER_METER_PARAMETER[2]);
-	P_INFO("SamplePeriod:%d ms\r\n",PW_SAMPLE_PERIOD);
+//	P_INFO("SamplePeriod:%d ms\r\n",PW_SAMPLE_PERIOD);
 	memcpy(G_POWER_METER.mac,blc_ll_get_macAddrPublic(),SIZEU8(G_POWER_METER.mac));
 	G_POWER_METER.type = TBS_POWERMETER;
 	G_POWER_METER.timetamp= fl_rtc_get();
@@ -437,14 +437,14 @@ void TBS_PowerMeter_init(void){
 	{
 		G_POWER_METER_PARAMETER[i] = (G_POWER_METER_PARAMETER[i] == 0) ? 5: G_POWER_METER_PARAMETER[i];
 	}
-	// fl_tbs_data_t tbs_load = fl_db_tbsprofile_load();
-	// memcpy(G_POWER_METER_PARAMETER, &tbs_load.data[40], sizeof(G_POWER_METER_PARAMETER));
+	 fl_tbs_data_t tbs_load = fl_db_tbsprofile_load();
+	 memcpy(G_POWER_METER_PARAMETER, &tbs_load.data[40], sizeof(G_POWER_METER_PARAMETER));
 //	printf("G_POWER_METER_PARAMETER0: %d\n", G_POWER_METER_PARAMETER[0]);
 //	printf("G_POWER_METER_PARAMETER1: %d\n", G_POWER_METER_PARAMETER[1]);
 //	printf("G_POWER_METER_PARAMETER2: %d\n", G_POWER_METER_PARAMETER[2]);
 //	printf("G_POWER_METER_PARAMETER3: %d\n", G_POWER_METER_PARAMETER[3]);
 
-	power_meter_app_init();
+//	power_meter_app_init();
 
 	///Init LED SIGNAL & BUTTONS Excution
 	LED_PAIR_PIN_INIT();
@@ -459,7 +459,7 @@ void TBS_PowerMeter_Run(void){
 	//button excution
 	TBS_PowerMeter_Button_Exc();
 	//power meter app
-	power_meter_app_loop();
+//	power_meter_app_loop();
 	//status network
 	LED_NETWORK_ONOFF(IsOnline());
 	//status pairing mode
@@ -488,9 +488,9 @@ void TBS_Device_Flash_Init_n_Reload(void) {
 void TBS_PowerMeter_RESETbyMaster(u8 _ch1,u8 _ch2,u8 _ch3){
 	LOGA(PERI,"Master RESET PWMeter channel:%d-%d-%d\r\n",_ch1,_ch2,_ch3);
 	//todo: RESET pwmeter struct
-	if(_ch1)pmt_clear_energy(0);
-	if(_ch2)pmt_clear_energy(1);
-	if(_ch3)pmt_clear_energy(2);
+//	if(_ch1)pmt_clear_energy(0);
+//	if(_ch2)pmt_clear_energy(1);
+//	if(_ch3)pmt_clear_energy(2);
 }
 
 void TBS_PwMeter_SetThreshod(u16 _chn1,u16 _chn2,u16 _chn3){
@@ -585,6 +585,7 @@ void TBS_Device_Init(void){
 #endif
 	if(G_TBS_DEVICE.type == TBS_COUNTER) tbs_counter_printf(FLA,(void*)&G_TBS_DEVICE);
 	else tbs_power_meter_printf(FLA,(void*)&G_TBS_DEVICE);
+
 	blt_soft_timer_add(TBS_Device_Store_run,TBS_DEVICE_STORE_INTERVAL);
 }
 

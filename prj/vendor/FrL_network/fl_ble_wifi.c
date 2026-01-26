@@ -537,6 +537,7 @@ void _PING_slave_rsp_callback(void *_data, void* _data2) {
 	fl_rsp_container_t *data = (fl_rsp_container_t*) _data;
 	u8 status = 0;
 	u8 version[3];
+	memset(version,0,SIZEU8(version));
 	//rsp data
 	if (data->timeout > 0) {
 		LOGA(API,"RTT:%d ms\r\n",(data->timeout_set - data->timeout) / 1000);

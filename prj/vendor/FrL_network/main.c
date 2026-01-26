@@ -46,7 +46,7 @@
  * @return     none
  */
 void uart1_recieve_irq(void) {
-#ifdef MASTER_CORE
+#if (defined MASTER_CORE | defined POWER_METER_DEVICE)
 	extern unsigned char FLAG_uart_dma_send;
 	unsigned int irq_flags = uart_get_irq_status(UART1,0xFFFFFFFF);
 //	char bit_flag[9]; // 8 bit + 1 end
@@ -132,26 +132,26 @@ _attribute_ram_code_ void gpio_irq_handler(void){
 void uart1_irq_handler(void) {
 	extern void uart1_recieve_irq(void);
 	uart1_recieve_irq();
-#ifndef MASTER_CORE
-#ifdef POWER_METER_DEVICE
-	extern void drv_uart_tx_irq_handler(void);
-	extern void drv_uart_rx_irq_handler(void);
-	if(uart_get_irq_status(UART1, UART_TXDONE)){
-			drv_uart_tx_irq_handler();
-		}
-		if(uart_get_irq_status(UART1, UART_RXDONE)){
-			drv_uart_rx_irq_handler();
-		}
-#endif
-#endif
+//
+//#ifndef MASTER_CORE
+//#ifdef POWER_METER_DEVICE
+//	extern void drv_uart_tx_irq_handler(void);
+//	extern void drv_uart_rx_irq_handler(void);
+//	if(uart_get_irq_status(UART1, UART_TXDONE)){
+//			drv_uart_tx_irq_handler();
+//		}
+//		if(uart_get_irq_status(UART1, UART_RXDONE)){
+//			drv_uart_rx_irq_handler();
+//		}
+//#endif
+//#endif
+
 }
 
 _attribute_ram_code_
 void timer0_irq_handler(void) {
-#ifndef MASTER_CORE
-#ifndef COUNTER_DEVICE
+#ifdef POWER_METER_DEVICE
 	TBS_PowerMeter_TimerIRQ_handler();
-#endif
 #endif
 }
 
@@ -201,8 +201,8 @@ void proto_task( void *pvParameters );
  * @param[in]	none
  * @return      none
  */
-fl_version_t _bootloader = { 1, 0, 3};
-fl_version_t _fw = { 1, 5,2 };
+fl_version_t _bootloader = { 1, 0, 4};
+fl_version_t _fw = { 1, 5,6 };
 fl_version_t _hw = { 1, 0, 0 };
 
 _attribute_ram_code_ int main(void)   //must on ramcode
@@ -237,8 +237,8 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 //	P_INFO("ok\r\n");
 //#endif
 	//OFF ALL LOG
-	PLOG_Stop(ALL);
-//	PLOG_Start(ALL);
+//	PLOG_Stop(ALL);
+	PLOG_Start(ALL);
 	if (!deepRetWakeUp) {  //read flash size
 #if (BATT_CHECK_ENABLE)
 	user_battery_power_check();

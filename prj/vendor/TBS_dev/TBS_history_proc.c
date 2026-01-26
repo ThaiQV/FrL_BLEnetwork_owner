@@ -23,10 +23,12 @@
 /******************************************************************************/
 /******************************************************************************/
 #include "../Freelux_libs/storage_weekly_data.h"
+
 #define tbs_history_flash_init					storage_init
 #define tbs_history_store						storage_put_data
 #define tbs_history_load						storage_get_data
 #define tbs_history_cleanAll					storage_clean
+
 /******************************************************************************/
 /******************************************************************************/
 /***                                Global Parameters                        **/

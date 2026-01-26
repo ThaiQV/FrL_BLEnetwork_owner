@@ -47,7 +47,7 @@ typedef struct {
 }__attribute__((packed)) fl_exIO_t;
 
 typedef struct {
-#ifdef MASTER_CORE
+#if (defined MASTER_CORE | defined POWER_METER_DEVICE)
 	struct {
 		uart_num_e uart_num;
 		uart_tx_pin_e tx_pin;
@@ -77,7 +77,7 @@ fl_exIO_t G_IN_POLLING[10];
 
 #define  IN_POLLING_SIZE		(sizeof(G_IN_POLLING)/sizeof(G_IN_POLLING[0]))
 
-#ifdef MASTER_CORE
+#if (defined MASTER_CORE | defined POWER_METER_DEVICE)
 
 typedef struct {
 	unsigned int len; // data max 252
@@ -132,7 +132,7 @@ s8 RegisterPOLLING(fl_exIO_t _io) {
 /***                       Functions declare                   		         **/
 /******************************************************************************/
 /******************************************************************************/
-#ifdef MASTER_CORE
+#if (defined MASTER_CORE | defined POWER_METER_DEVICE)
 /////////////////////////////////////blc_register_hci_handler for spp////////////////////////////
 
 void fl_serial_buffer_ClearAll(void){
@@ -164,13 +164,17 @@ static int rx_from_uart_cb(void) //UART data send to Master,we will handler the 
 		return 0;
 	}
 	u8* p = my_fifo_get(&fl_rx_fifo);
+#ifdef MASTER_CORE
 //Add WIFI <-> BLE process cmd
 	fl_ble_wifi_proc(p);
+#endif
 //	fl_serial_send(p,(unsigned int) p[0]+1);
 	u8 data_verify[FL_RXFIFO_SIZE];
 	memset(data_verify,0,sizeof(data_verify));
 	memcpy(data_verify,p + 1,p[0]);
+#ifdef MASTER_CORE
 	PLOG_Parser_Cmd(data_verify);
+#endif
 	my_fifo_pop(&fl_rx_fifo);
 	return 0;
 }
@@ -262,7 +266,6 @@ void fl_input_serial_init(uart_num_e uart_num, uart_tx_pin_e tx_pin, uart_rx_pin
 	uart_init(G_INPUT_EXT.serial.uart_num,div,bwpc,UART_PARITY_NONE,UART_STOP_BIT_ONE);
 
 	uart_clr_irq_mask(G_INPUT_EXT.serial.uart_num,UART_ERR_IRQ_MASK|UART_RX_IRQ_MASK | UART_TX_IRQ_MASK | UART_TXDONE_MASK | UART_RXDONE_MASK);
-
 
 	uart_set_tx_dma_config(G_INPUT_EXT.serial.uart_num,G_INPUT_EXT.serial.dma_tx_chn);
 	uart_set_rx_dma_config(G_INPUT_EXT.serial.uart_num,G_INPUT_EXT.serial.dma_rx_chn);
@@ -398,6 +401,7 @@ int _scan_external_input(void) {
  * @return	  	:none
  *
  ***************************************************/
+#ifdef MASTER_CORE
 void fl_ExIO_init(i2c_sda_pin_e _sda, i2c_scl_pin_e _scl, gpio_pin_e _irq_pin) {
 
 #define I2C_CLOCK						(4*100000)//n*100K
@@ -425,6 +429,7 @@ void fl_ExIO_init(i2c_sda_pin_e _sda, i2c_scl_pin_e _scl, gpio_pin_e _irq_pin) {
 	gpio_set_input(G_INPUT_EXT.led.network | G_INPUT_EXT.led.maneta,0);	//disable input
 	gpio_set_level(G_INPUT_EXT.led.network | G_INPUT_EXT.led.maneta,0);
 }
+#endif
 #endif
 /******************************************************************************/
 /******************************************************************************/

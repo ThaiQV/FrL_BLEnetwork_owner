@@ -136,9 +136,9 @@ _attribute_no_inline_ void user_init_normal(void) {
 	//blc_ll_initPowerManagement_module();
 	blt_soft_timer_init();
 	///////////////////// TIME SYSTEM initialization///////////////////
-#ifdef MASTER_CORE
+#if (defined MASTER_CORE | defined POWER_METER_DEVICE)
 	///////////////////// Serial initialization///////////////////
-	fl_input_serial_init(UART1,UART1_TX_PE0,UART1_RX_PE2,115200);
+	fl_input_serial_init(UART1,GPIO_PD0,UART1_RX_PE2,115200);//UART1_TX_PE0
 #endif
 
 	fl_rtc_init();
@@ -150,7 +150,7 @@ _attribute_no_inline_ void user_init_normal(void) {
 //	extern void TBS_History_ClearAll(void);
 //	TBS_History_ClearAll();
 
-//	while()
+//	while(1);
 	////////////////// config adv scan /////////////////////
 	fl_adv_init();
 
