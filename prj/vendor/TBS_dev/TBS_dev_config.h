@@ -38,6 +38,7 @@ void TBS_PowerMeter_TimerIRQ_handler(void);
 void TBS_PowerMeter_RESETbyMaster(u8 _ch1,u8 _ch2,u8 _ch3);
 void TBS_PwMeter_SetThreshod(u16 _chn1,u16 _chn2,u16 _chn3);
 void TBS_PowerMeter_Upload2Master(void);
+void TBS_PwMeter_SerialSetting(u8* _cmd,u8 _len);
 #endif
 
 void tbs_counter_printf(type_debug_t _plog_type,void* _p);

@@ -21,9 +21,9 @@
 #define UART_DATA_LEN    	(FL_TXFIFO_SIZE - 2)   // data max 252
 #else
 #ifdef POWER_METER_DEVICE
-#define FL_RXFIFO_SIZE		64
+#define FL_RXFIFO_SIZE		128
 #define FL_RXFIFO_NUM		8
-#define FL_TXFIFO_SIZE		32
+#define FL_TXFIFO_SIZE		128
 #define FL_TXFIFO_NUM		8
 
 #define UART_DATA_LEN    	(FL_TXFIFO_SIZE - 2)   // data max 252

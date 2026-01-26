@@ -15,15 +15,19 @@
 #include "../FrL_Network/fl_nwk_api.h"
 
 #ifdef POWER_METER_DEVICE
-#include "TBS_power_meter_app/power_meter_app.h"
+#include "TBS_PowerMeter_app/pmt_app.h"
+#define POWER_METER_INIT				pmt_init
+#define	POWER_METER_CMD_PROC			pmt_serial_proc
+#endif
+#ifdef COUNTER_DEVICE
+#include <vendor/TBS_dev/TBS_Counter_app/user_lib.h>
+#define COUNTER_LCD_REMOVE_DISPLAY		ct_remove_nwwk
+#define COUNTER_LCD_PRESS_DISPLAY		ct_add_bt_print
 #endif
 
 #define TBS_DEVICE_STORE_INTERVAL 		2*1010*1001 //5s
 #define TBS_PACKET_INDEX_MAX			12288
-#include <vendor/TBS_dev/TBS_Counter_app/user_lib.h>
 
-#define COUNTER_LCD_REMOVE_DISPLAY		ct_remove_nwwk
-#define COUNTER_LCD_PRESS_DISPLAY		ct_add_bt_print
 
 /******************************************************************************/
 /******************************************************************************/
@@ -439,12 +443,8 @@ void TBS_PowerMeter_init(void){
 	}
 	 fl_tbs_data_t tbs_load = fl_db_tbsprofile_load();
 	 memcpy(G_POWER_METER_PARAMETER, &tbs_load.data[40], sizeof(G_POWER_METER_PARAMETER));
-//	printf("G_POWER_METER_PARAMETER0: %d\n", G_POWER_METER_PARAMETER[0]);
-//	printf("G_POWER_METER_PARAMETER1: %d\n", G_POWER_METER_PARAMETER[1]);
-//	printf("G_POWER_METER_PARAMETER2: %d\n", G_POWER_METER_PARAMETER[2]);
-//	printf("G_POWER_METER_PARAMETER3: %d\n", G_POWER_METER_PARAMETER[3]);
 
-//	power_meter_app_init();
+	 POWER_METER_INIT();
 
 	///Init LED SIGNAL & BUTTONS Excution
 	LED_PAIR_PIN_INIT();
@@ -515,6 +515,10 @@ void TBS_PwMeter_SetThreshod(u16 _chn1,u16 _chn2,u16 _chn3){
 //
 //	ERR(PERI,"Threshold channel:%d-%d-%d\r\n",G_POWER_METER_PARAMETER[0],	G_POWER_METER_PARAMETER[1],	G_POWER_METER_PARAMETER[2]);
 
+}
+
+void TBS_PwMeter_SerialSetting(u8* _cmd,u8 _len){
+	POWER_METER_CMD_PROC(_cmd,_len);
 }
 
 #endif

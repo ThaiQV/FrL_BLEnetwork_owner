@@ -276,8 +276,6 @@ void fl_nwk_slave_displayLCD_Refesh(void){
 }
 #endif
 void fl_nwk_slave_init(void) {
-//	PLOG_Start(ALL);
-//	PLOG_Start(FLA);
 	DEBUG_TURN(NWK_DEBUG_STT);
 //	fl_input_external_init();
 	FL_QUEUE_CLEAR(&G_HANDLE_CONTAINER,PACK_HANDLE_SIZE);
@@ -330,12 +328,6 @@ void fl_nwk_slave_init(void) {
 		G_INFORMATION.profile.run_stt.rst_factory  = 1 ; //has reset factory device
 	}
 #endif
-
-//	if (G_INFORMATION.slaveID == G_INFORMATION.profile.slaveid && G_INFORMATION.slaveID == 0xFF) {
-//		ERR(APP,"Turn on install mode\r\n");
-//		G_INFORMATION.profile.run_stt.join_nwk = 1;
-//		G_INFORMATION.profile.run_stt.rst_factory = 1; //has reset factory device
-//	}
 
 	//todo: TBS Device initialization
 	TBS_Device_Init();

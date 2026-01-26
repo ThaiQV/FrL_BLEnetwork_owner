@@ -172,7 +172,11 @@ static int rx_from_uart_cb(void) //UART data send to Master,we will handler the 
 	u8 data_verify[FL_RXFIFO_SIZE];
 	memset(data_verify,0,sizeof(data_verify));
 	memcpy(data_verify,p + 1,p[0]);
-#ifdef MASTER_CORE
+#if (defined MASTER_CORE | defined POWER_METER_DEVICE)
+	#ifdef POWER_METER_DEVICE
+		extern void TBS_PwMeter_SerialSetting(u8* _cmd,u8 _len);
+		TBS_PwMeter_SerialSetting(data_verify,p[0]);
+	#endif
 	PLOG_Parser_Cmd(data_verify);
 #endif
 	my_fifo_pop(&fl_rx_fifo);

@@ -238,7 +238,12 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 //#endif
 	//OFF ALL LOG
 //	PLOG_Stop(ALL);
-	PLOG_Start(ALL);
+//	PLOG_Start(ALL);
+	PLOG_Stop(ALL);
+//	PLOG_Start(FLA);
+	PLOG_Start(USER);
+//	PLOG_Start(MCU);
+//	PLOG_Start(DRV);
 	if (!deepRetWakeUp) {  //read flash size
 #if (BATT_CHECK_ENABLE)
 	user_battery_power_check();

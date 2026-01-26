@@ -149,8 +149,6 @@ _attribute_no_inline_ void user_init_normal(void) {
 //	fl_db_clearAll();//FOR CLEAN
 //	extern void TBS_History_ClearAll(void);
 //	TBS_History_ClearAll();
-
-//	while(1);
 	////////////////// config adv scan /////////////////////
 	fl_adv_init();
 
