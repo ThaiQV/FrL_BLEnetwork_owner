@@ -362,8 +362,8 @@ float stpm_read_period(stpm_handle_t *handle, uint8_t channel)
 
     uint8_t address = DSP_REG1_Address;
     read_frame(handle, address, handle->read_buffer);
-    printf("%02x%02x%02x%02x%02x\n", handle->read_buffer[0], handle->read_buffer[1],
-    		handle->read_buffer[2], handle->read_buffer[3] , handle->read_buffer[4]);
+//    printf("%02x%02x%02x%02x%02x\n", handle->read_buffer[0], handle->read_buffer[1],
+//    		handle->read_buffer[2], handle->read_buffer[3] , handle->read_buffer[4]);
     float frequency=1.0;
     if (channel == 1)
     {
@@ -1188,6 +1188,34 @@ void stpm32_send_frame(stpm_handle_t *handle, uint8_t read_add, uint8_t write_ad
     handle->delay_us(4);
 }
 
+void stpm_read_calib(stpm_handle_t *handle, uint8_t channel, uint16_t *calib_V, uint16_t *calib_C) {
+	if (!handle)
+		return;
+
+	DSP_CR5_bits_t dsp_cr5;
+	DSP_CR6_bits_t dsp_cr6;
+
+	if (channel == 1) {
+		read_frame(handle,DSP_CR5_Address,handle->read_buffer);
+		dsp_cr5.LSW.LSB = handle->read_buffer[0];
+		dsp_cr5.LSW.MSB = handle->read_buffer[1];
+		dsp_cr5.MSW.LSB = handle->read_buffer[2];
+		dsp_cr5.MSW.MSB = handle->read_buffer[3];
+		LOGA(PERI,"VOLT dsp_cr5: %d\n",dsp_cr5.CHV1);
+
+		*calib_V = dsp_cr5.CHV1;
+
+		read_frame(handle,DSP_CR6_Address,handle->read_buffer);
+		dsp_cr6.LSW.LSB = handle->read_buffer[0];
+		dsp_cr6.LSW.MSB = handle->read_buffer[1];
+		dsp_cr6.MSW.LSB = handle->read_buffer[2];
+		dsp_cr6.MSW.MSB = handle->read_buffer[3];
+		LOGA(PERI,"CURR dsp_cr6: %d\n",dsp_cr6.CHC1);
+
+		*calib_C = dsp_cr6.CHC1;
+	}
+}
+
 void stpm_update_calib(stpm_handle_t *handle, uint8_t channel, uint16_t calib_V, uint16_t calib_C)
 {
     if (!handle) return;
@@ -1202,14 +1230,14 @@ void stpm_update_calib(stpm_handle_t *handle, uint8_t channel, uint16_t calib_V,
         dsp_cr5.LSW.MSB = handle->read_buffer[1];
         dsp_cr5.MSW.LSB = handle->read_buffer[2];
         dsp_cr5.MSW.MSB = handle->read_buffer[3];
-//        printf("dsp_cr5: %08x\n", dsp_cr5);
+        LOGA(PERI,"VOLT dsp_cr5: %d\n", dsp_cr5.CHV1);
 
         read_frame(handle, DSP_CR6_Address, handle->read_buffer);
         dsp_cr6.LSW.LSB = handle->read_buffer[0];
         dsp_cr6.LSW.MSB = handle->read_buffer[1];
         dsp_cr6.MSW.LSB = handle->read_buffer[2];
         dsp_cr6.MSW.MSB = handle->read_buffer[3];
-//        printf("dsp_cr6: %08x\n", dsp_cr6);
+        LOGA(PERI,"CURR dsp_cr6: %d\n", dsp_cr6.CHC1);
 
         dsp_cr5.CHV1 = calib_V;
         dsp_cr6.CHC1 = calib_C;

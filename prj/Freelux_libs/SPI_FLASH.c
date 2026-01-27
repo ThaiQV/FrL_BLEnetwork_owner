@@ -136,11 +136,11 @@ void FLASH_Port_Init(void)
 	PIN_CLEAR(PIN_CLK);
 #else
 	//
-	gpio_function_en(GPIO_PE4|GPIO_PE5|GPIO_PE6);
-	gpio_set_output(GPIO_PE4|GPIO_PE5|GPIO_PE6,1); 		//enable output
-	gpio_set_up_down_res(GPIO_PE4|GPIO_PE5|GPIO_PE6,GPIO_PIN_PULLUP_10K);
-	PIN_SET(GPIO_PE4|GPIO_PE5|GPIO_PE6);
-	delay_ms(10);
+	PERI_SPI_PIN_INIT(GPIO_PE4);
+	PERI_SPI_PIN_INIT(GPIO_PE5);
+	PERI_SPI_PIN_INIT(GPIO_PE6);
+	PERI_SPI_PIN_INIT(GPIO_PB1);
+	delay_ms(100);
 	//
 
 	hspi_pin_config_t config;
