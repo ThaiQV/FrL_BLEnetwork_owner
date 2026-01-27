@@ -63,6 +63,7 @@ void pmt_setcalib(uint8_t ch, float calib_U, float calib_I, float calib_P);
 void pmt_getcalib(uint8_t ch, float *calib_U, float *calib_I, float *calib_P);
 void pmt_setcalibr(uint8_t ch, uint16_t calib_U, uint16_t calib_I, uint16_t calib_P);
 void pmt_getcalibr(uint8_t ch, float *calib_U, float *calib_I, float *calib_P);
+float pmt_read_F(uint8_t ch);
 float pmt_read_U(uint8_t ch);
 float pmt_read_I(uint8_t ch);
 float pmt_read_P(uint8_t ch);

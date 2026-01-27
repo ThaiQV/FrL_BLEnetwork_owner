@@ -320,6 +320,9 @@ void power_meter_app_init(void)
 
         LOGA(PERI,"init 0ke \n");
         //		stpm_reset_energies(handle[0]);
+        float volt,curr;
+        stpm_read_rms_voltage_and_current(pmt_handle[i],1,&volt,&curr);
+        LOGA(PERI,"v:%f,cur:%f,freq:%f\r\n",volt,curr,stpm_read_period(pmt_handle[i],1));
     }
 
     fl_tbs_data_t tbs_load = fl_db_tbsprofile_load();
@@ -544,7 +547,10 @@ void pmt_getcalibr(uint8_t ch, float *calib_U, float *calib_I, float *calib_P)
     *calib_I = dsp_cr6.CHC1;
     *calib_P = 0;
 }
-
+float pmt_read_F(uint8_t ch)
+{
+    return stpm_read_period(pmt_handle[ch-1],1);
+}
 float pmt_read_U(uint8_t ch)
 {
     pmt_data_context_t *ctx = pmt_handle[ch - 1]->context;

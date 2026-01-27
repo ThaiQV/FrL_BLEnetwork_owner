@@ -366,10 +366,11 @@ void TBS_PowerMeter_Button_Exc(void){
 }
 
 void TBS_PowerMeter_RMS_Read(void) {
+
 	float calib_U, calib_I, calib_P;
 	for (u8 chn = 1; chn < 4; chn++) {
 		pmt_getcalib(chn,&calib_U,&calib_I,&calib_P);
-		P_INFO("[%d]Urms(%.3f):%.3f,Irms(%.3f):%.3f,Prms(%.3f):%.3f\r\n",chn,calib_U,pmt_read_U(chn),calib_I,pmt_read_I(chn),calib_P,pmt_read_P(chn));
+		P_INFO("[%d]Freq:%.2f,Urms(%.3f):%.3f,Irms(%.3f):%.3f,Prms(%.3f):%.3f\r\n",chn,pmt_read_F(chn),calib_U,pmt_read_U(chn),calib_I,pmt_read_I(chn),calib_P,pmt_read_P(chn));
 	}
 	P_INFO("==================================\r\n");
 }
