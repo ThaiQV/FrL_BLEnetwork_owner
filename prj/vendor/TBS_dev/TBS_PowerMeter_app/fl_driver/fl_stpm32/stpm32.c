@@ -63,7 +63,7 @@ stpm_handle_t* stpm_create(int reset_pin, int cs_pin, int syn_pin, int fnet) {
     handle->cs_pin = cs_pin;
     handle->syn_pin = syn_pin;
     handle->net_freq = fnet;
-    handle->auto_latch = false;
+    handle->auto_latch = true;
     handle->crc_enabled = true;
 
     for (uint8_t i = 0; i < 3; i++) {
@@ -119,8 +119,8 @@ bool stpm_init(stpm_handle_t *handle) {
 
     uint8_t buff[5];
 	read_frame(handle, DSP_CR1_Address, buff);
-//	printf("%02x%02x%02x%02x\n", buff[0], buff[1], buff[2], buff[3] );
 
+	printf("%02x%02x%02x%02x%02x\n", buff[0], buff[1], buff[2], buff[3] , buff[4]);
     // bool success = init_stpm34(handle);
     return true;
 }
@@ -357,11 +357,13 @@ bool stpm_check_gain(stpm_handle_t *handle, uint8_t channel, uint8_t *buffer) {
 
 float stpm_read_period(stpm_handle_t *handle, uint8_t channel)
 {
-    if (!handle || (channel != 1 && channel != 2)) return 0;
-//    if (!handle->auto_latch) latch(handle);
+    if (!handle || (channel != 1 && channel != 2)) return 0.0;
+    if (!handle->auto_latch) latch(handle);
 
     uint8_t address = DSP_REG1_Address;
     read_frame(handle, address, handle->read_buffer);
+    printf("%02x%02x%02x%02x%02x\n", handle->read_buffer[0], handle->read_buffer[1],
+    		handle->read_buffer[2], handle->read_buffer[3] , handle->read_buffer[4]);
     float frequency=1.0;
     if (channel == 1)
     {
@@ -373,7 +375,7 @@ float stpm_read_period(stpm_handle_t *handle, uint8_t channel)
 
 void stpm_update_energy(stpm_handle_t *handle, uint8_t channel) {
     if (!handle || channel > 2) return;
-//    if (!handle->auto_latch) latch(handle);
+    if (!handle->auto_latch) latch(handle);
 
     int8_t address;
     stpm_energy_t *energy;
@@ -552,7 +554,7 @@ float stpm_read_power_factor(stpm_handle_t *handle, uint8_t channel)
 
 double stpm_read_active_power(stpm_handle_t *handle, uint8_t channel) {
     if (!handle || (channel != 1 && channel != 2)) return 0;
-    // if (!handle->auto_latch) latch(handle);
+     if (!handle->auto_latch) latch(handle);
 
     uint8_t address = (channel == 1) ? PH1_Active_Power_Address : PH2_Active_Power_Address;
     read_frame(handle, address, handle->read_buffer);
@@ -814,7 +816,7 @@ float stpm_read_fundamental_current(stpm_handle_t *handle, uint8_t channel) {
 void stpm_read_rms_voltage_and_current(stpm_handle_t *handle, uint8_t channel,
                                        float *voltage, float *current) {
     if (!handle || (channel != 1 && channel != 2)) return;
-//    if (!handle->auto_latch) latch(handle);
+    if (!handle->auto_latch) latch(handle);
 
     uint8_t address = (channel == 1) ? DSP_REG14_Address : DSP_REG15_Address;
     read_frame(handle, address, handle->read_buffer);
@@ -951,7 +953,7 @@ char* stpm_register_to_str(stpm_handle_t *handle, uint8_t *frame) {
 // Internal helper functions implementation
 
 static inline void latch(stpm_handle_t *handle) {
-    return;
+    //return;
 #ifdef SPI_LATCH
     DSP_CR3_MSW_bits_t dsp_cr3_msw;
     memset(&dsp_cr3_msw, 0, sizeof(dsp_cr3_msw));
@@ -959,11 +961,16 @@ static inline void latch(stpm_handle_t *handle) {
     dsp_cr3_msw.SW_Latch2 = 1;
     send_frame(handle, DSP_CR3_Address, DSP_CR3_Address + 1, dsp_cr3_msw.LSB, dsp_cr3_msw.MSB);
 #else
-    handle->delay_us(4);
+//    handle->delay_us(4);
+//    handle->pin_write(handle->syn_pin, false);
+//    handle->delay_us(4);
+//    handle->pin_write(handle->syn_pin, true);
+//    handle->delay_us(4);
+	handle->pin_write(handle->syn_pin, true);
+	handle->delay_us(4);
     handle->pin_write(handle->syn_pin, false);
     handle->delay_us(4);
     handle->pin_write(handle->syn_pin, true);
-    handle->delay_us(4);
 #endif
 }
 
