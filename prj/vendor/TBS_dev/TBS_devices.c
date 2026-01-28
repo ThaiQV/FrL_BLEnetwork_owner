@@ -18,6 +18,7 @@
 #include "TBS_PowerMeter_app/pmt_app.h"
 #define POWER_METER_INIT				pmt_init
 #define	POWER_METER_CMD_PROC			pmt_serial_proc
+#define POWER_METER_READDATA()			pmt_info(0,0)
 #endif
 #ifdef COUNTER_DEVICE
 #include <vendor/TBS_dev/TBS_Counter_app/user_lib.h>
@@ -302,7 +303,7 @@ void TBS_Counter_Run(void){
 }
 #endif
 #ifdef POWER_METER_DEVICE
-void TBS_PowerMeter_RMS_Read(void);
+//void TBS_PowerMeter_RMS_Read(void);
 
 void TBS_PowerMeter_Button_Exc(void){
 #define PRESS_VALUE  			0
@@ -346,7 +347,8 @@ void TBS_PowerMeter_Button_Exc(void){
 		//short press and release
 		if (press_time < PAIRING_HOLD && press_time > FAST_PRESSnRELEASE) {
 			//ERR(APP,"Fast Press(%d ms)...\r\n",press_time);
-			TBS_PowerMeter_RMS_Read();
+//			TBS_PowerMeter_RMS_Read();
+			POWER_METER_READDATA();
 			//TEST
 //			extern void pmt_update_data_to_rp(void);
 //			pmt_update_data_to_rp();
@@ -369,18 +371,13 @@ void TBS_PowerMeter_Button_Exc(void){
 #undef FACTORY_REBOOTnHOLD
 }
 
-void TBS_PowerMeter_RMS_Read(void) {
-//	float calib_U, calib_I, calib_P;
-//	for (u8 chn = 1; chn < 4; chn++) {
-//		pmt_getcalib(chn,&calib_U,&calib_I,&calib_P);
-//		P_INFO("[%d]Urms(%.3f):%.3f,Irms(%.3f):%.3f,Prms(%.3f):%.3f\r\n",chn,calib_U,pmt_read_U(chn),calib_I,pmt_read_I(chn),calib_P,pmt_read_P(chn));
-//	}
-//	P_INFO("==================================\r\n");
-}
+//void TBS_PowerMeter_RMS_Read(void) {
+//	pmt_info(0,0);
+//}
 
 void TBS_PowerMeter_Upload2Master(void){
-	extern void pmt_update_data_to_rp(void);
-	TBS_PowerMeter_RMS_Read();
+//	extern void pmt_update_data_to_rp(void);
+//	TBS_PowerMeter_RMS_Read();
 	LOG_P(APP,"Upload data to server....\r\n");
 //	pmt_update_data_to_rp();
 }

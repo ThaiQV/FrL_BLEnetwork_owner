@@ -11,6 +11,8 @@
 #ifndef VENDOR_TBS_DEV_TBS_POWERMETER_APP_PMT_APP_H_
 #define VENDOR_TBS_DEV_TBS_POWERMETER_APP_PMT_APP_H_
 
+
+void pmt_info(void *_arg, u8 _size);
 void pmt_init(void);
 void pmt_serial_proc(u8* _cmd,u8 _len);
 
