@@ -548,19 +548,19 @@ float stpm_read_power_factor(stpm_handle_t *handle, uint8_t channel)
 
     int32_t apparent_rms = buffer_0to28(handle->read_buffer);
 
-    float power_factor = (float)(active / apparent_rms);
-    return power_factor;
+    float power_factor = (float)(active / (float)apparent_rms);
+    return fabs(power_factor);
+//	return fabs(stpm_read_active_power(handle,channel)/stpm_read_apparent_rms_power(handle,channel));
 }
 
-double stpm_read_active_power(stpm_handle_t *handle, uint8_t channel) {
+float stpm_read_active_power(stpm_handle_t *handle, uint8_t channel) {
     if (!handle || (channel != 1 && channel != 2)) return 0;
      if (!handle->auto_latch) latch(handle);
 
     uint8_t address = (channel == 1) ? PH1_Active_Power_Address : PH2_Active_Power_Address;
     read_frame(handle, address, handle->read_buffer);
-    int32_t value = buffer_0to28(handle->read_buffer);
 
-    return (double) ((value) / handle->calibration[channel][2]);
+    return fabs(calc_power(buffer_0to28(handle->read_buffer)) *(handle->calibration[channel][0] * handle->calibration[channel][1]));
 }
 
 float stpm_read_fundamental_power(stpm_handle_t *handle, uint8_t channel) {
@@ -585,15 +585,16 @@ float stpm_read_reactive_power(stpm_handle_t *handle, uint8_t channel) {
            handle->calibration[channel][0] * handle->calibration[channel][1];
 }
 
-double stpm_read_apparent_rms_power(stpm_handle_t *handle, uint8_t channel) {
+float stpm_read_apparent_rms_power(stpm_handle_t *handle, uint8_t channel) {
     if (!handle || (channel != 1 && channel != 2)) return 0;
     if (!handle->auto_latch) latch(handle);
 
     uint8_t address = (channel == 1) ? PH1_Apparent_RMS_Power_Address : PH2_Apparent_RMS_Power_Address;
     read_frame(handle, address, handle->read_buffer);
-    int32_t value = buffer_0to28(handle->read_buffer);
+    //int32_t value = buffer_0to28(handle->read_buffer);
 
-    return (double) ((value) / handle->calibration[channel][2]);
+    return fabs((float)calc_power(buffer_0to28(handle->read_buffer)) *(
+            handle->calibration[channel][0] * handle->calibration[channel][1]));
 }
 
 float stpm_read_apparent_vectorial_power(stpm_handle_t *handle, uint8_t channel) {
@@ -815,14 +816,18 @@ float stpm_read_fundamental_current(stpm_handle_t *handle, uint8_t channel) {
 
 void stpm_read_rms_voltage_and_current(stpm_handle_t *handle, uint8_t channel,
                                        float *voltage, float *current) {
-    if (!handle || (channel != 1 && channel != 2)) return;
-    if (!handle->auto_latch) latch(handle);
+//    if (!handle || (channel != 1 && channel != 2)) return;
+//    if (!handle->auto_latch) latch(handle);
+//
+//    uint8_t address = (channel == 1) ? DSP_REG14_Address : DSP_REG15_Address;
+//    read_frame(handle, address, handle->read_buffer);
+//
+//    *voltage = (float) (((float)buffer_0to14(handle->read_buffer)) / (float)handle->calibration[channel][0]);
+//    *current = (float) (((float)buffer_15to32(handle->read_buffer)) /(float)handle->calibration[channel][1]);
 
-    uint8_t address = (channel == 1) ? DSP_REG14_Address : DSP_REG15_Address;
-    read_frame(handle, address, handle->read_buffer);
 
-    *voltage = (float) (((float)buffer_0to14(handle->read_buffer)) / (float)handle->calibration[channel][0]);
-    *current = (float) (((float)buffer_15to32(handle->read_buffer)) /(float)handle->calibration[channel][1]);
+	*voltage = stpm_read_rms_voltage(handle,channel);
+	*current = stpm_read_rms_current(handle,channel);
 }
 
 float stpm_read_rms_voltage(stpm_handle_t *handle, uint8_t channel) {
@@ -832,8 +837,7 @@ float stpm_read_rms_voltage(stpm_handle_t *handle, uint8_t channel) {
     uint8_t address = (channel == 1) ? DSP_REG14_Address : DSP_REG15_Address;
     read_frame(handle, address, handle->read_buffer);
 
-    return calc_volt_u16(buffer_0to14(handle->read_buffer)) *
-           handle->calibration[channel][0];
+    return calc_volt_u16(buffer_0to14(handle->read_buffer)) * handle->calibration[channel][0];
 }
 
 float stpm_read_rms_current(stpm_handle_t *handle, uint8_t channel) {
@@ -843,8 +847,7 @@ float stpm_read_rms_current(stpm_handle_t *handle, uint8_t channel) {
     uint8_t address = (channel == 1) ? DSP_REG14_Address : DSP_REG15_Address;
     read_frame(handle, address, handle->read_buffer);
 
-    return calc_current_u32(buffer_15to32(handle->read_buffer)) *
-           handle->calibration[channel][1];
+    return calc_current_u32(buffer_15to32(handle->read_buffer)) * handle->calibration[channel][1];
 }
 
 void stpm_read_voltage_sag_and_swell_time(stpm_handle_t *handle, uint8_t channel,
@@ -966,11 +969,11 @@ static inline void latch(stpm_handle_t *handle) {
 //    handle->delay_us(4);
 //    handle->pin_write(handle->syn_pin, true);
 //    handle->delay_us(4);
-	handle->pin_write(handle->syn_pin, true);
-	handle->delay_us(4);
-    handle->pin_write(handle->syn_pin, false);
-    handle->delay_us(4);
-    handle->pin_write(handle->syn_pin, true);
+//	handle->pin_write(handle->syn_pin, true);
+//	handle->delay_us(4);
+//    handle->pin_write(handle->syn_pin, false);
+//    handle->delay_us(4);
+//    handle->pin_write(handle->syn_pin, true);
 #endif
 }
 
@@ -1201,7 +1204,7 @@ void stpm_read_calib(stpm_handle_t *handle, uint8_t channel, uint16_t *calib_V, 
 		dsp_cr5.LSW.MSB = handle->read_buffer[1];
 		dsp_cr5.MSW.LSB = handle->read_buffer[2];
 		dsp_cr5.MSW.MSB = handle->read_buffer[3];
-		LOGA(PERI,"VOLT dsp_cr5: %d\n",dsp_cr5.CHV1);
+//		LOGA(PERI,"VOLT dsp_cr5: %d\n",dsp_cr5.CHV1);
 
 		*calib_V = dsp_cr5.CHV1;
 
@@ -1210,7 +1213,7 @@ void stpm_read_calib(stpm_handle_t *handle, uint8_t channel, uint16_t *calib_V, 
 		dsp_cr6.LSW.MSB = handle->read_buffer[1];
 		dsp_cr6.MSW.LSB = handle->read_buffer[2];
 		dsp_cr6.MSW.MSB = handle->read_buffer[3];
-		LOGA(PERI,"CURR dsp_cr6: %d\n",dsp_cr6.CHC1);
+//		LOGA(PERI,"CURR dsp_cr6: %d\n",dsp_cr6.CHC1);
 
 		*calib_C = dsp_cr6.CHC1;
 	}

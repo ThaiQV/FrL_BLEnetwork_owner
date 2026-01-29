@@ -106,10 +106,10 @@ bool stpm_check_energy_ovf(stpm_handle_t *handle, uint8_t channel, char **raw_bu
 void stpm_read_power(stpm_handle_t *handle, uint8_t channel, float *active,
 						float *fundamental, float *reactive, float *apparent);
 float stpm_read_power_factor(stpm_handle_t *handle, uint8_t channel);
-double stpm_read_active_power(stpm_handle_t *handle, uint8_t channel);
+float stpm_read_active_power(stpm_handle_t *handle, uint8_t channel);
 float stpm_read_fundamental_power(stpm_handle_t *handle, uint8_t channel);
 float stpm_read_reactive_power(stpm_handle_t *handle, uint8_t channel);
-double stpm_read_apparent_rms_power(stpm_handle_t *handle, uint8_t channel);
+float stpm_read_apparent_rms_power(stpm_handle_t *handle, uint8_t channel);
 float stpm_read_apparent_vectorial_power(stpm_handle_t *handle, uint8_t channel);
 float stpm_read_momentary_active_power(stpm_handle_t *handle, uint8_t channel);
 float stpm_read_momentary_fundamental_power(stpm_handle_t *handle, uint8_t channel);
