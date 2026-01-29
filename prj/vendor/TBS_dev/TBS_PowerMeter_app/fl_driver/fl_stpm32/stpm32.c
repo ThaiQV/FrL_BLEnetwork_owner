@@ -461,7 +461,7 @@ void stpm_reset_energies(stpm_handle_t *handle) {
     handle->ph2_energy.valid_millis = now;
 }
 
-double stpm_read_active_energy(stpm_handle_t *handle, uint8_t channel) {
+float stpm_read_active_energy(stpm_handle_t *handle, uint8_t channel) {
     if (!handle || channel > 2) return -1.0;
 
     stpm_energy_t *energy;
@@ -473,7 +473,7 @@ double stpm_read_active_energy(stpm_handle_t *handle, uint8_t channel) {
         stpm_update_energy(handle, channel);
     }
 
-    return energy->active;
+    return fabs((float)(energy->active*handle->calibration[channel][2]));
 }
 
 double stpm_read_fundamental_energy(stpm_handle_t *handle, uint8_t channel) {

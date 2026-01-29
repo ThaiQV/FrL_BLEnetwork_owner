@@ -40,8 +40,8 @@ typedef struct {
     int cs_pin;
     int syn_pin;
     int net_freq;
-
     float calibration[3][3];
+
     uint8_t crc_checksum;
     uint8_t address;
     bool auto_latch;
@@ -58,6 +58,8 @@ typedef struct {
     stpm_energy_helper_t total_energy_hp;
     stpm_energy_helper_t ph1_energy_hp;
     stpm_energy_helper_t ph2_energy_hp;
+    ///add automatically calibration
+    float flag_calib;
 
     void * context;
 
@@ -96,7 +98,7 @@ double stpm_read_total_active_energy(stpm_handle_t *handle);
 double stpm_read_total_fundamental_energy(stpm_handle_t *handle);
 double stpm_read_total_reactive_energy(stpm_handle_t *handle);
 double stpm_read_total_apparent_energy(stpm_handle_t *handle);
-double stpm_read_active_energy(stpm_handle_t *handle, uint8_t channel);
+float stpm_read_active_energy(stpm_handle_t *handle, uint8_t channel);
 double stpm_read_fundamental_energy(stpm_handle_t *handle, uint8_t channel);
 double stpm_read_reactive_energy(stpm_handle_t *handle, uint8_t channel);
 double stpm_read_apparent_energy(stpm_handle_t *handle, uint8_t channel);

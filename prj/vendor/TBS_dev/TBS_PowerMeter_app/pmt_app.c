@@ -43,23 +43,67 @@ static stpm_handle_t *PMT_STRUCT[POWERMETER_CHANNEL];
 
 #define PMT_GET_CALIB_V(chnX)			(PMT_STRUCT[chnX]->calibration[1][0])
 #define PMT_GET_CALIB_C(chnX)			(PMT_STRUCT[chnX]->calibration[1][1])
-#define PMT_GET_CALIB_P(chnX)			(PMT_STRUCT[chnX]->calibration[1][2])
+#define PMT_GET_CALIB_E(chnX)			(PMT_STRUCT[chnX]->calibration[1][2])
 
 #define PMT_SET_CALIB_V(chnX,valueV)	(PMT_STRUCT[chnX]->calibration[1][0] = (float)valueV)
 #define PMT_SET_CALIB_C(chnX,valueC)	(PMT_STRUCT[chnX]->calibration[1][1] = (float)valueC)
-#define PMT_SET_CALIB_P(chnX,valueP)	(PMT_STRUCT[chnX]->calibration[1][2] = (float)valueP)
+#define PMT_SET_CALIB_E(chnX,valueE)	(PMT_STRUCT[chnX]->calibration[1][2] = (float)valueE)
 
 #define PMT_CLACH_ALL()					{stpm_latch_reg(PMT_STRUCT[0]);}
 #define PMT_CHECK_CHN(x)				{if(x>POWERMETER_CHANNEL)return;}
 
+
+uint32_t pmt_get_millis(void);
 /******************************************************************************/
 /******************************************************************************/
 /***                           Private definitions                           **/
 /******************************************************************************/
 /******************************************************************************/
+s32 _interval_read_sensor(void){
 
-void pmt_calib_stpm(u8 _chn,bool _set,uint16_t _calib_V, uint16_t _calib_C){
+	PMT_CLACH_ALL();//important
+
+	float period[3], volt[3], curr[3];
+	float power[3], energy[3];
+	float P_factor[3];
+	P_INFO("*********************************************************\r\n");
+	for (u8 chn = 0; chn < POWERMETER_CHANNEL; ++chn) {
+		period[chn] = stpm_read_period(PMT_STRUCT[chn],1);
+		stpm_read_rms_voltage_and_current(PMT_STRUCT[chn],1,&volt[chn],&curr[chn]);
+		power[chn] = 1000.0*stpm_read_active_power(PMT_STRUCT[chn],1);
+		energy[chn] = stpm_read_active_energy(PMT_STRUCT[chn],1);
+		P_factor[chn] = stpm_read_power_factor(PMT_STRUCT[chn],1);
+		P_INFO("[%d]F:%.1f,Vrms:%.3f,Irms:%.3f,P:%.6f,E:%.3f,P(factor):%.3f\r\n",
+				chn,period[chn],volt[chn],curr[chn],power[chn],energy[chn],P_factor[chn]);
+	}
+	P_INFO("*********************************************************\r\n");
+	return 0;
+}
+s32 _auto_calibE(void){
+	u32 delta_millis =0;
+	float e_read=0;
+	float e_last_read=0;
+	float p_read=1;
+	float calib_E=1;
+	PMT_CLACH_ALL();//important
+	for(u8 chn=0;chn<POWERMETER_CHANNEL;chn++){
+		if(PMT_STRUCT[chn]->flag_calib){
+			delta_millis = pmt_get_millis()- PMT_STRUCT[chn]->total_energy.valid_millis;
+			e_last_read = PMT_STRUCT[chn]->total_energy.active;
+			e_read = stpm_read_active_energy(PMT_STRUCT[chn],1);
+			p_read = (e_read-e_last_read)*3600.0/(delta_millis*0.001);
+			calib_E= PMT_STRUCT[chn]->flag_calib/p_read;
+			PMT_SET_CALIB_E(chn,calib_E);
+			P_INFO("Auto calib E(chn %d):Pload:%.2f,Pread:%.2f=>Calib_E:%.3f\r\n",chn+1,PMT_STRUCT[chn]->flag_calib,p_read,PMT_GET_CALIB_E(chn));
+			PMT_STRUCT[chn]->flag_calib=0;
+		}
+	}
+	return -1;
+}
+void pmt_calib_stpm(u8 _chn,bool _set,uint16_t _calib_V, uint16_t _calib_C,uint16_t _calip_E){
+
 	PMT_CHECK_CHN(_chn);
+    LOGA(USER,"[%d]Calib_V:%d,Calib_C:%d,Calib_E:%d\r\n",_chn,_calib_V,  _calib_C, _calip_E);
 
 	if(!_set){
 		u8 numofchn = _chn == 0 ? POWERMETER_CHANNEL : _chn;
@@ -70,7 +114,7 @@ void pmt_calib_stpm(u8 _chn,bool _set,uint16_t _calib_V, uint16_t _calib_C){
 			stpm_read_calib(PMT_STRUCT[chn],1,&calib_V_stpm,&calib_C_stpm);//hw calib in the address => not use
 			calib_V = PMT_GET_CALIB_V(chn); //soft calib
 			calib_C = PMT_GET_CALIB_C(chn); //soft calib
-			P_INFO("[%d]Calib_U:%.3f/%d,Calib_I:%.3f/%d,Calib_P:%.3f\r\n",chn,calib_V,calib_V_stpm,calib_C,calib_C_stpm,PMT_GET_CALIB_P(chn));
+			P_INFO("[%d]Calib_U:%.3f/%d,Calib_I:%.3f/%d,Calib_P:%.3f\r\n",chn,calib_V,calib_V_stpm,calib_C,calib_C_stpm,PMT_GET_CALIB_E(chn));
 		}
 	}else
 	{
@@ -92,8 +136,6 @@ void pmt_calib_stpm(u8 _chn,bool _set,uint16_t _calib_V, uint16_t _calib_C){
 				ERR(PERI,"NULL voltage or current sensors!!!!\r\n");
 				return;
 			}
-			//		stpm_read_calib(PMT_STRUCT[chn_idx],1,&calib_V[0],&calib_C[0]);//hw calib in the address
-
 			if(_calib_V) {
 				backup_calibV = ((float) _calib_V / 100)/volt;
 				//update calib's value
@@ -108,34 +150,25 @@ void pmt_calib_stpm(u8 _chn,bool _set,uint16_t _calib_V, uint16_t _calib_C){
 			}
 			//calculate calibP
 			//P_INFO("[%d]Preal:%.3f,Iread:%.3f=>calibI:%.3f\r\n",chn_idx,((float )_calib_C) / 1000,curr,backup_calibC);
-			PMT_SET_CALIB_P(chn_idx,backup_calibV*backup_calibC);
+			//PMT_SET_CALIB_P(chn_idx,backup_calibV*backup_calibC);
+			if(_calip_E){
+				blt_soft_timer_delete(_interval_read_sensor);
+				//Start automatical calib E
+				stpm_reset_energies(PMT_STRUCT[chn_idx]);
+				PMT_STRUCT[chn_idx]->flag_calib=0.01*_calip_E;
+				blt_soft_timer_restart(_auto_calibE,5*1000*1000); //5s
+			}else{
+				PMT_STRUCT[chn_idx]->flag_calib = 0;
+				blt_soft_timer_delete(_auto_calibE);
+			}
 		}
 	}
 }
-s32 _interval_read_sensor(void){
 
-	PMT_CLACH_ALL();
-
-	float period[3], volt[3], curr[3];
-	float power[3], energy[3];
-	float P_factor[3];
-	P_INFO("*********************************************************\r\n");
-	for (u8 chn = 0; chn < POWERMETER_CHANNEL; ++chn) {
-		period[chn] = stpm_read_period(PMT_STRUCT[chn],1);
-		stpm_read_rms_voltage_and_current(PMT_STRUCT[chn],1,&volt[chn],&curr[chn]);
-		power[chn] = 1000.0*stpm_read_active_power(PMT_STRUCT[chn],1);
-		energy[chn] = stpm_read_active_energy(PMT_STRUCT[chn],1);
-		P_factor[chn] = stpm_read_power_factor(PMT_STRUCT[chn],1);
-		P_INFO("[%d]F:%.1f,Vrms:%.3f,Irms:%.3f,P:%.6f,E:%.3f,P(factor):%.3f\r\n",
-				chn,period[chn],volt[chn],curr[chn],power[chn],energy[chn],P_factor[chn]);
-	}
-	P_INFO("*********************************************************\r\n");
-	return 0;
-}
 
 void pmt_info(void *_arg, u8 _size){
 	double* data = (double*)_arg;
-//    LOGA(USER,"Calib cmd(%d):%.2lf, %.2lf,%.2lf,%.2lf,%.2lf,%.2lf\r\n",_size,args[0],args[1],args[2],args[3],args[4],args[5]);
+
 	if(_size > 0 && data[0] > 0){
 		P_INFO("Start interval read sensors:%d ms\r\n",(u32)data[0]);
 		blt_soft_timer_restart(_interval_read_sensor,data[0]*1000);
@@ -158,21 +191,31 @@ void pmt_info(void *_arg, u8 _size){
 				chn,period[chn],volt[chn],curr[chn],power[chn],energy[chn],P_factor[chn]);
 	}
 	P_INFO("*********************************************************\r\n");
-
+}
+static void pmt_reset_energy(void *_arg, u8 _size) {
+    u8 *args = (u8 *)_arg;  //
+    memset(args+_size,0,6);
+	u8 numofchn = args[0] == 0 ? POWERMETER_CHANNEL : args[0];
+	PMT_CLACH_ALL();
+	for (u8 chn = (args[0] > 0 ? args[0] - 1 : 0); chn < numofchn; ++chn) {
+		LOGA(USER,"[%d]Reset Energy:%.3f\r\n",chn);
+		stpm_reset_energies(PMT_STRUCT[chn]);
+	}
 }
 
 static void pmt_calib(void *_arg, u8 _size) {
     double *args = (double *)_arg;  //
     memset(args+_size,0,6);
-    LOGA(USER,"Calib cmd(%d):%.2lf, %.2lf,%.2lf,%.2lf,%.2lf,%.2lf\r\n",_size,args[0],args[1],args[2],args[3],args[4],args[5]);
+    LOGA(USER,"Calib cmd(%d):%.3lf, %.3lf,%.3lf,%.3lf,%.3lf,%.3lf\r\n",_size,args[0],args[1],args[2],args[3],args[4],args[5]);
 
     if(!_size){
-    	pmt_calib_stpm(0,0,0,0); //get
+    	pmt_calib_stpm(0,0,0,0,0); //get
     }
     else {
-    	pmt_calib_stpm(1,1,100*args[0],1000*args[1]);
-    	pmt_calib_stpm(2,1,100*args[0],1000*args[1]);
-    	pmt_calib_stpm(3,1,100*args[0],1000*args[1]);
+		PMT_CLACH_ALL();//important
+    	pmt_calib_stpm(1,1,100*args[0],1000*args[1],100*args[2]);
+    	pmt_calib_stpm(2,1,100*args[0],1000*args[1],100*args[2]);
+    	pmt_calib_stpm(3,1,100*args[0],1000*args[1],100*args[2]);
     }
 }
 
@@ -276,7 +319,7 @@ void pmt_init(void){
         //add Ki,Ku,Kp
         PMT_SET_CALIB_V(i,1);
         PMT_SET_CALIB_C(i,1);
-        PMT_SET_CALIB_P(i,1);
+        PMT_SET_CALIB_E(i,1);
     }
 
     //Settings chip
@@ -284,6 +327,10 @@ void pmt_init(void){
     stpm_set_current_gain(PMT_STRUCT[0],1,STPM3X_GAIN_2X);
     stpm_set_current_gain(PMT_STRUCT[1],1,STPM3X_GAIN_2X);
     stpm_set_current_gain(PMT_STRUCT[2],1,STPM3X_GAIN_2X);
+    //reset energy
+    stpm_reset_energies(PMT_STRUCT[0]);
+    stpm_reset_energies(PMT_STRUCT[1]);
+    stpm_reset_energies(PMT_STRUCT[2]);
 }
 
 /******************************************************************************/
@@ -299,7 +346,8 @@ typedef struct{
 
 pmt_cmd_t PMT_CMD[] = {
 					{"calib",pmt_calib},
-					{"readinfo",pmt_info}};
+					{"readinfo",pmt_info},
+					{"resetenergy",pmt_reset_energy},};
 
 void pmt_serial_proc(u8* _cmd,u8 _len){
 	char cmd[20];
