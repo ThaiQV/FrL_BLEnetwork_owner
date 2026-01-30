@@ -557,7 +557,7 @@ fl_tbs_data_t fl_db_tbsprofile_init(void){
 		//clear all and write default userdata
 //		flash_erase_sector(ADDR_TBS_PROFILE_START);
 		_db_earse_sector_full(ADDR_TBS_PROFILE_START,TBSPROFILE_SIZE/SECTOR_FLASH_SIZE);
-		memset((u8*)TBS_PROFILE_DEFAULT.data,0,sizeof(TBS_PROFILE_DEFAULT.data));
+		memset((u8*)TBS_PROFILE_DEFAULT.data,1,sizeof(TBS_PROFILE_DEFAULT.data));
 		fl_db_tbsprofile_save(TBS_PROFILE_DEFAULT.data,sizeof(TBS_PROFILE_DEFAULT.data));
 		tbsdata = fl_db_tbsprofile_load();
 	}
