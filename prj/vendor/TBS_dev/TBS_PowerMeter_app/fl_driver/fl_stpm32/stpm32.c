@@ -449,17 +449,44 @@ void stpm_update_energy(stpm_handle_t *handle, uint8_t channel) {
 }
 
 void stpm_reset_energies(stpm_handle_t *handle) {
-    if (!handle) return;
 
-    uint32_t now = handle->get_millis();
-    memset(&handle->total_energy, 0, sizeof(stpm_energy_t));
-    memset(&handle->ph1_energy, 0, sizeof(stpm_energy_t));
-    memset(&handle->ph2_energy, 0, sizeof(stpm_energy_t));
+	if (!handle)
+		return;
 
-    handle->total_energy.valid_millis = now;
-    handle->ph1_energy.valid_millis = now;
-    handle->ph2_energy.valid_millis = now;
+	DSP_CR3_MSW_bits_t dsp_cr3_msw;
+	memset(&dsp_cr3_msw,0,sizeof(dsp_cr3_msw));
+
+	dsp_cr3_msw.SW_Reset = 1;
+
+	if (handle->crc_enabled) {
+		send_frame_crc(handle,DSP_CR3_Address,DSP_CR3_Address + 1,dsp_cr3_msw.LSB,dsp_cr3_msw.MSB);
+	} else {
+		send_frame(handle,DSP_CR3_Address,DSP_CR3_Address + 1,dsp_cr3_msw.LSB,dsp_cr3_msw.MSB);
+	}
+
+	uint32_t now = handle->get_millis();
+	memset(&handle->total_energy,0,sizeof(stpm_energy_t));
+	memset(&handle->ph1_energy,0,sizeof(stpm_energy_t));
+	memset(&handle->ph2_energy,0,sizeof(stpm_energy_t));
+
+	handle->total_energy.valid_millis = now;
+	handle->ph1_energy.valid_millis = now;
+	handle->ph2_energy.valid_millis = now;
+
 }
+//
+//void stpm_reset_energies(stpm_handle_t *handle) {
+//    if (!handle) return;
+//
+//    uint32_t now = handle->get_millis();
+//    memset(&handle->total_energy, 0, sizeof(stpm_energy_t));
+//    memset(&handle->ph1_energy, 0, sizeof(stpm_energy_t));
+//    memset(&handle->ph2_energy, 0, sizeof(stpm_energy_t));
+//
+//    handle->total_energy.valid_millis = now;
+//    handle->ph1_energy.valid_millis = now;
+//    handle->ph2_energy.valid_millis = now;
+//}
 
 float stpm_read_active_energy(stpm_handle_t *handle, uint8_t channel) {
     if (!handle || channel > 2) return -1.0;
