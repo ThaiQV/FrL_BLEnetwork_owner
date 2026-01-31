@@ -96,7 +96,7 @@ static void _pmt_save_calib(void)
 {
     u8 tbs_profile[64] = {0};
     fl_tbs_data_t tbs_load = fl_db_tbsprofile_load();
-    memcpy(tbs_profile, tbs_load.data, 64);
+    memcpy(tbs_profile, tbs_load.data, SIZEU8(tbs_profile));
 
     for (int i = 0; i < POWERMETER_CHANNEL; i++)
     {
@@ -107,7 +107,6 @@ static void _pmt_save_calib(void)
             memcpy(&tbs_profile[base], &f, sizeof(float));
         }
     }
-
     fl_db_tbsprofile_save((u8*)tbs_profile, sizeof(tbs_profile));
 }
 
@@ -128,8 +127,34 @@ static void _pmt_load_calib(void)
        }
    }
 }
+//
+static void _pmt_load_context(void) {
+	fl_tbs_data_t tbs_load = fl_db_tbsprofile_load();
+	u8 slot_memory=SIZEU8(PMT_STRUCT[0]->calibration);
+	float f;
+	u32 wt;
+	for (int i = 0; i < POWERMETER_CHANNEL; i++) {
+		memcpy(&f,&tbs_load.data[slot_memory],sizeof(PMT_CTX[i].e_sum));
+		PMT_CTX[i].e_sum=f;
+		memcpy(&wt,&tbs_load.data[slot_memory+sizeof(PMT_CTX[i].e_sum)],sizeof(PMT_CTX[i].working_time_ms));
+		PMT_CTX[i].working_time_ms=wt;
+		slot_memory+=sizeof(PMT_CTX[i].e_sum)+sizeof(PMT_CTX[i].working_time_ms);
+	}
+}
 
-
+static void _pmt_save_context(void)
+{
+	u8 tbs_profile[128] = { 0 };
+	fl_tbs_data_t tbs_load = fl_db_tbsprofile_load();
+	memcpy(tbs_profile,tbs_load.data,SIZEU8(tbs_profile));
+	u8 slot_memory=SIZEU8(PMT_STRUCT[0]->calibration);
+	for (int i = 0; i < POWERMETER_CHANNEL; i++) {
+		memcpy(&tbs_profile[slot_memory],&PMT_CTX[i].e_sum,sizeof(PMT_CTX[i].e_sum));
+		memcpy(&tbs_profile[slot_memory+sizeof(PMT_CTX[i].e_sum)],&PMT_CTX[i].working_time_ms,sizeof(PMT_CTX[i].working_time_ms));
+		slot_memory+=sizeof(PMT_CTX[i].e_sum)+sizeof(PMT_CTX[i].working_time_ms);
+	}
+	fl_db_tbsprofile_save((u8*) tbs_profile,sizeof(tbs_profile));
+}
 s32 _interval_read_sensor(void){
 	//cancel if automatical calibE running
 	if (PMT_STRUCT[0]->flag_calib || PMT_STRUCT[1]->flag_calib || PMT_STRUCT[2]->flag_calib) {
@@ -157,7 +182,7 @@ s32 _interval_read_sensor(void){
 s32 _auto_calibE(void){
 	u32 delta_millis =0;
 	float e_read=0;
-	float e_last_read=0;
+	//float e_last_read=0;
 	float e_cal=0;
 //	float p_read=1;
 	float calib_E=1;
@@ -167,15 +192,15 @@ s32 _auto_calibE(void){
 		if(PMT_STRUCT[chn]->flag_calib){
 			delta_millis = pmt_get_millis()- PMT_STRUCT[chn]->total_energy.valid_millis;
 
-			e_cal = (stpm_read_active_power(PMT_STRUCT[chn],1) * delta_millis * 0.001)/3600.0;
+			e_cal = (1000.0*stpm_read_active_power(PMT_STRUCT[chn],1) * delta_millis * 0.001)/3600.0;//Wh
 
-			e_last_read = PMT_STRUCT[chn]->flag_calib;
-			e_read = stpm_read_active_energy(PMT_STRUCT[chn],1)-e_last_read;	//kWh
-
+			//e_last_read = 0;//PMT_STRUCT[chn]->flag_calib;
+			//e_read = 1000.0*(stpm_read_active_energy(PMT_STRUCT[chn],1)-e_last_read);	//kWh=>Wh
+			e_read = 1000.0*stpm_read_active_energy(PMT_STRUCT[chn],1);
 			calib_E = e_cal / e_read;
 			PMT_SET_CALIB_E(chn,calib_E);
 
-			P_INFO("Auto calib E(chn %d):Ecal:%.6f,Eread:%.6f=>Calib_E:%.6f\r\n",chn+1,e_cal,e_read,PMT_GET_CALIB_E(chn));
+			P_INFO("Auto calib E(chn %d):delta_t:%d,Ecal:%.6f,Eread:%.6f=>Calib_E:%.6f\r\n",chn+1,delta_millis,e_cal,e_read,PMT_GET_CALIB_E(chn));
 			PMT_STRUCT[chn]->flag_calib=0;
 		}
 	}
@@ -217,6 +242,7 @@ void pmt_calib_stpm(u8 _chn,bool _set,uint16_t _calib_V, uint16_t _calib_C,uint1
 			delay_ms(100); ///delay to stpm refesh new data
 			stpm_read_rms_voltage_and_current(PMT_STRUCT[chn_idx],1,&volt,&curr);
 			PMT_STRUCT[chn_idx]->flag_calib = stpm_read_active_energy(PMT_STRUCT[chn_idx],1);//kWh //1;//0.01*_calip_E;
+
 			if(!volt || !curr){
 				ERR(PERI,"NULL voltage or current sensors!!!!\r\n");
 				return;
@@ -234,19 +260,8 @@ void pmt_calib_stpm(u8 _chn,bool _set,uint16_t _calib_V, uint16_t _calib_C,uint1
 				PMT_SET_CALIB_C(chn_idx, backup_calibC);
 			}
 			//calculate calibE
-			//if(_calip_E)
-//			{
-//				blt_soft_timer_delete(_interval_read_sensor);
-				//Start automatical calib E
-				//stpm_reset_energies(PMT_STRUCT[chn_idx]);
-//				stpm_reset_energies(PMT_STRUCT[chn_idx]);
-//				PMT_SET_CALIB_E(chn_idx,1);
-//				PMT_STRUCT[chn_idx]->flag_calib = stpm_read_active_energy(PMT_STRUCT[chn_idx],1);//kWh //1;//0.01*_calip_E;
-				blt_soft_timer_restart(_auto_calibE,10*1000*1000); //5s
-//			}else{
-//				PMT_STRUCT[chn_idx]->flag_calib = 0;
-//				blt_soft_timer_delete(_auto_calibE);
-//			}
+			stpm_reset_energies(PMT_STRUCT[chn_idx]);
+			blt_soft_timer_restart(_auto_calibE,10*1000*1000); //5s
 		}
 	}
 }
@@ -415,9 +430,15 @@ void pmt_init(void){
     //	Load calib
     _pmt_load_calib();
 	P_INFO("[1]Calib:U:%f,I:%f,E:%f\r\n",PMT_GET_CALIB_V(0),PMT_GET_CALIB_C(0),PMT_GET_CALIB_E(0));
-	P_INFO("[2]Calib:U:%f,I:%f,E:%f\r\n",PMT_GET_CALIB_V(1),PMT_GET_CALIB_C(1),PMT_GET_CALIB_E(2));
+	P_INFO("[2]Calib:U:%f,I:%f,E:%f\r\n",PMT_GET_CALIB_V(1),PMT_GET_CALIB_C(1),PMT_GET_CALIB_E(1));
 	P_INFO("[3]Calib:U:%f,I:%f,E:%f\r\n",PMT_GET_CALIB_V(2),PMT_GET_CALIB_C(2),PMT_GET_CALIB_E(2));
-
+	//Load Context
+	_pmt_load_context();
+	//=>update to stpm
+	for (u8 chn = 0; chn < POWERMETER_CHANNEL; ++chn) {
+		PMT_STRUCT[chn]->ph1_energy.active = PMT_CTX[chn].e_sum / PMT_GET_CALIB_E(chn);
+		P_INFO("[%d]Ectx:%f,Working-time:%d\r\n",chn,PMT_CTX[chn].e_sum,PMT_CTX[chn].working_time_ms);
+	}
 }
 
 /******************************************************************************/
@@ -482,6 +503,7 @@ static uint32_t calc_I(float _curr)
 }
 void pmt_main(void){
 	static u32 sample_timing = 0;
+	static u32 save_context = 0;
 	float curr=0;
 	float volt=0;
 	u32 i_cal =0;
@@ -545,6 +567,11 @@ void pmt_main(void){
 		sample_timing=clock_time();
 		//restart if turn on debug
 		PMT_DEBUG();
+	}
+	//storage context
+	if (clock_time_exceed(save_context,5 * 999 * 1001)) {
+		_pmt_save_context();
+		save_context=clock_time();
 	}
 }
 

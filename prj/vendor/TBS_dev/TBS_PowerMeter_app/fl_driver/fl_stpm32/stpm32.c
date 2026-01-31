@@ -425,7 +425,7 @@ void stpm_update_energy(stpm_handle_t *handle, uint8_t channel) {
                                   &energy->reactive, &energy->apparent};
 
 	for (int i = 0; i < 4; i++) {
-		uint32_t delta = my_energies[i] - energy_helper->old_energy[i];
+		uint32_t delta = my_energies[i]- energy_helper->old_energy[i];//*(i==0?handle->calibration[channel][2]:1)
 		double e = calc_energy(delta);
 
 		uint32_t delta_t = now - energy->valid_millis;
@@ -446,7 +446,7 @@ void stpm_update_energy(stpm_handle_t *handle, uint8_t channel) {
 				e = 0;
 		}
 		if(i==0) LOGA(PERI,"sersors read E:%f\r\n",e);
-		*update_energies[i] += e*((i==0)?(handle->calibration[channel][2]):1);
+		*update_energies[i] += e;
 		energy_helper->old_energy[i] = my_energies[i];
 	}
 
@@ -504,8 +504,8 @@ float stpm_read_active_energy(stpm_handle_t *handle, uint8_t channel) {
     if (handle->get_millis() - energy->valid_millis > ENERGY_UPDATE_MS) {
         stpm_update_energy(handle, channel);
     }
-    //return fabs((float)(energy->active*handle->calibration[channel][2]));
-    return fabs((float)(energy->active));
+    return fabs((float)(energy->active*handle->calibration[channel][2]));
+    //return fabs((float)(energy->active));
 }
 
 double stpm_read_fundamental_energy(stpm_handle_t *handle, uint8_t channel) {
