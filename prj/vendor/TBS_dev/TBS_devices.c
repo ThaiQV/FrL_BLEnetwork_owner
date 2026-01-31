@@ -20,7 +20,7 @@
 #define	POWER_METER_CMD_PROC				pmt_serial_proc
 #define POWER_METER_READDATA()				pmt_info(0,0)
 #define POWER_METER_RST_WORKINGTIME(chnX)	pmt_reset_workingtime(chnX)
-#define POWER_METER_RST_ENERGY(chnX)		pmt_reset_energy((void*)&chnX,0)
+#define POWER_METER_RST_ENERGY(chnX)		pmt_reset_energy((void*)&chnX,1)
 
 #endif
 #ifdef COUNTER_DEVICE

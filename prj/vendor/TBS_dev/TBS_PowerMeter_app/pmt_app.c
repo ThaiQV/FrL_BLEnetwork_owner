@@ -469,9 +469,11 @@ static uint32_t calc_I(float _curr)
 {
     uint32_t result;
 	if (_curr*1000 > 1023) {
+	    _curr = ceilf(_curr*10.0)/10.0;
 		result = (uint32_t)(_curr*10);
 		result |= 0x80000000;         //
 	} else {
+	    _curr = ceilf(_curr*1000.0)/1000.0;
 		result = (uint32_t)(_curr*1000);
 		result &= 0x7FFFFFFF;         //
 	}
