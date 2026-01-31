@@ -443,7 +443,7 @@ fl_slave_settings_t fl_db_slavesettings_init(void){
 		//clear all and write default settings
 //		flash_erase_sector(ADDR_SLAVE_SETTINGS_START);
 		_db_earse_sector_full(ADDR_SLAVE_SETTINGS_START,SLAVESETTINGS_SIZE/SECTOR_FLASH_SIZE);
-		memset(SLAVE_SETTINGS_DEFAULT.setting_arr,0,sizeof(SLAVE_SETTINGS_DEFAULT.setting_arr));
+		memset(SLAVE_SETTINGS_DEFAULT.setting_arr,1,sizeof(SLAVE_SETTINGS_DEFAULT.setting_arr));
 		fl_db_slavesettings_save(SLAVE_SETTINGS_DEFAULT.setting_arr,sizeof(SLAVE_SETTINGS_DEFAULT.setting_arr));
 		settings = fl_db_slavesettings_load();
 	}

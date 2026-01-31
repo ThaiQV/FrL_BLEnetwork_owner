@@ -446,7 +446,7 @@ void stpm_update_energy(stpm_handle_t *handle, uint8_t channel) {
 				e = 0;
 		}
 		if(i==0) LOGA(PERI,"sersors read E:%f\r\n",e);
-		*update_energies[i] += e;
+		*update_energies[i] += e*((i==0)?(handle->calibration[channel][2]):1);
 		energy_helper->old_energy[i] = my_energies[i];
 	}
 
@@ -504,7 +504,8 @@ float stpm_read_active_energy(stpm_handle_t *handle, uint8_t channel) {
     if (handle->get_millis() - energy->valid_millis > ENERGY_UPDATE_MS) {
         stpm_update_energy(handle, channel);
     }
-    return fabs((float)(energy->active*handle->calibration[channel][2]));
+    //return fabs((float)(energy->active*handle->calibration[channel][2]));
+    return fabs((float)(energy->active));
 }
 
 double stpm_read_fundamental_energy(stpm_handle_t *handle, uint8_t channel) {
@@ -580,7 +581,7 @@ float stpm_read_power_factor(stpm_handle_t *handle, uint8_t channel)
     int32_t apparent_rms = buffer_0to28(handle->read_buffer);
 
     float power_factor = (float)(active / (float)apparent_rms);
-    return fabs(power_factor);
+    return fabs(power_factor)>1?1:fabs(power_factor);
 //	return fabs(stpm_read_active_power(handle,channel)/stpm_read_apparent_rms_power(handle,channel));
 }
 

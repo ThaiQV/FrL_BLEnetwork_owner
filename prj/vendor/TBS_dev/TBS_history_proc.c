@@ -74,12 +74,9 @@ typedef struct {
 		u16 current1;       // 10 bits
 		u16 current2;       // 10 bits
 		u16 current3;       // 10 bits
-//        u8 current_type1;   // 1 bit
-        u8 power1_current_type1;			// 7 bits + 1 bit
-//        u8 current_type2;  // 1 bit
-        u8 power2_current_type2;			// 7 bits+ 1 bit
-//        u8 current_type3;  // 1 bit
-        u8 power3_current_type3;			// 7 bits + 1 bit
+        u8 fac_power1_current_type1;			// 7 bits + 1 bit
+        u8 fac_power2_current_type2;			// 7 bits+ 1 bit
+        u8 fac_power3_current_type3;			// 7 bits + 1 bit
         u8 time1;          // 6 bits
         u8 time2;          // 6 bits
         u8 time3;          // 6 bits
@@ -131,9 +128,9 @@ void TBS_history_createSample(void) {
 							.current1 = 11,
 							.current2 = 22,
 							.current3 = 33,
-							.power1 = 220,
-							.power2 = 221,
-							.power3 = 222,
+							.fac_power1 = 220,
+							.fac_power2 = 221,
+							.fac_power3 = 222,
 							.time1 = 51,
 							.time2 = 52,
 							.time3 = 53,

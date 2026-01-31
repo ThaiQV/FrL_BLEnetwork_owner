@@ -147,9 +147,9 @@ typedef struct {
 		u16 current1;       // 10 bits
 		u16 current2;       // 10 bits
 		u16 current3;       // 10 bits
-		u8 power1;          // 8 bits
-		u8 power2;          // 8 bits
-		u8 power3;          // 8 bits
+		u8 fac_power1;      // 8 bits
+		u8 fac_power2;          // 8 bits
+		u8 fac_power3;          // 8 bits
 		u8 time1;           // 6 bits
 		u8 time2;           // 6 bits
 		u8 time3;           // 6 bits
@@ -196,9 +196,9 @@ static inline void tbs_pack_powermeter_data(const tbs_device_powermeter_t *src, 
     WRITE_BITS(src->data.current1, 10);
     WRITE_BITS(src->data.current2, 10);
     WRITE_BITS(src->data.current3, 10);
-    WRITE_BITS(src->data.power1, 8);
-    WRITE_BITS(src->data.power2, 8);
-    WRITE_BITS(src->data.power3, 8);
+    WRITE_BITS(src->data.fac_power1, 8);
+    WRITE_BITS(src->data.fac_power2, 8);
+    WRITE_BITS(src->data.fac_power3, 8);
     WRITE_BITS(src->data.time1, 6);
     WRITE_BITS(src->data.time2, 6);
     WRITE_BITS(src->data.time3, 6);
@@ -242,9 +242,9 @@ static inline void tbs_unpack_powermeter_data(tbs_device_powermeter_t *dst, cons
     READ_BITS(dst->data.current1, 10);
     READ_BITS(dst->data.current2, 10);
     READ_BITS(dst->data.current3, 10);
-    READ_BITS(dst->data.power1, 8);
-    READ_BITS(dst->data.power2, 8);
-    READ_BITS(dst->data.power3, 8);
+    READ_BITS(dst->data.fac_power1, 8);
+    READ_BITS(dst->data.fac_power2, 8);
+    READ_BITS(dst->data.fac_power3, 8);
     READ_BITS(dst->data.time1, 6);
     READ_BITS(dst->data.time2, 6);
     READ_BITS(dst->data.time3, 6);
