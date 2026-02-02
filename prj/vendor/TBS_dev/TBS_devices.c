@@ -477,14 +477,20 @@ void TBS_Device_Flash_Init_n_Reload(void) {
 #ifdef POWER_METER_DEVICE
 
 void TBS_PowerMeter_RESETbyMaster(u8 _ch1,u8 _ch2,u8 _ch3){
-	LOGA(PERI,"Master RESET PWMeter channel:%d-%d-%d\r\n",_ch1,_ch2,_ch3);
+	ERR(PERI,"Master RESET PWMeter channel:%d-%d-%d\r\n",_ch1,_ch2,_ch3);
+	u8 chn_rst = 0;
 	//todo: RESET pwmeter struct
-	if (_ch1)
-		POWER_METER_RST_ENERGY(_ch1);
-	if (_ch2)
-		POWER_METER_RST_ENERGY(_ch2);
-	if (_ch3)
-		POWER_METER_RST_ENERGY(_ch3);
+	if (!_ch1 && !_ch2 && !_ch3) {
+		//rst all channels
+		POWER_METER_RST_ENERGY(chn_rst);
+	} else {
+		if (_ch1)
+			POWER_METER_RST_ENERGY(_ch1);
+		if (_ch2)
+			POWER_METER_RST_ENERGY(_ch1);
+		if (_ch3)
+			POWER_METER_RST_ENERGY(_ch3);
+	}
 }
 
 void TBS_PwMeter_SetThreshod(u16 _chn1,u16 _chn2,u16 _chn3){

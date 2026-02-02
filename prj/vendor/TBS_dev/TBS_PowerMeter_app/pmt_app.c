@@ -47,6 +47,7 @@
 
 typedef struct
 {
+	float i_avg;
 	float e_sum;
 	float p_avg;
 	u32 working_time_ms;
@@ -84,7 +85,7 @@ uint32_t pmt_get_millis(void);
 
 void PMT_LATCH_ALL(void){
 	static u32 last_latch=0;
-	if(clock_time_exceed(last_latch,100*1000)){
+	if(clock_time_exceed(last_latch,50*1000)){
 		stpm_latch_reg(PMT_STRUCT[0]);
 		last_latch=clock_time();
 	}else{
@@ -179,34 +180,47 @@ s32 _interval_read_sensor(void){
 	P_INFO("*********************************************************\r\n");
 	return 0;
 }
-s32 _auto_calibE(void){
-	u32 delta_millis =0;
-	float e_read=0;
+s32 _auto_calibE_Exc(void) {
+	u32 delta_millis = 0;
+	float e_read = 0;
 	//float e_last_read=0;
-	float e_cal=0;
+	float e_cal = 0;
 //	float p_read=1;
-	float calib_E=1;
-	PMT_LATCH_ALL();//important
+	float calib_E = 1;
 
-	for(u8 chn=0;chn<POWERMETER_CHANNEL;chn++){
-		if(PMT_STRUCT[chn]->flag_calib){
-			delta_millis = pmt_get_millis()- PMT_STRUCT[chn]->total_energy.valid_millis;
-
-			e_cal = (1000.0*stpm_read_active_power(PMT_STRUCT[chn],1) * delta_millis * 0.001)/3600.0;//Wh
-
-			//e_last_read = 0;//PMT_STRUCT[chn]->flag_calib;
-			//e_read = 1000.0*(stpm_read_active_energy(PMT_STRUCT[chn],1)-e_last_read);	//kWh=>Wh
-			e_read = 1000.0*stpm_read_active_energy(PMT_STRUCT[chn],1);
-			calib_E = e_cal / e_read;
-			PMT_SET_CALIB_E(chn,calib_E);
-
-			P_INFO("Auto calib E(chn %d):delta_t:%d,Ecal:%.6f,Eread:%.6f=>Calib_E:%.6f\r\n",chn+1,delta_millis,e_cal,e_read,PMT_GET_CALIB_E(chn));
-			PMT_STRUCT[chn]->flag_calib=0;
+	if (PMT_CALIB_RUNNING()) {
+		PMT_LATCH_ALL(); //important
+		for (u8 chn = 0; chn < POWERMETER_CHANNEL; chn++) {
+			if (PMT_STRUCT[chn]->flag_calib) {
+				delta_millis = pmt_get_millis() - PMT_STRUCT[chn]->total_energy.valid_millis;
+				e_cal = (((1000.0 * stpm_read_active_power(PMT_STRUCT[chn],1) + PMT_STRUCT[chn]->flag_calib) / 2) * delta_millis * 0.001) / 3600.0; //Wh
+				e_cal = 0.001 * e_cal; // =>Wh->kWh
+				e_read = stpm_read_active_energy(PMT_STRUCT[chn],1);
+				calib_E = e_cal / e_read;
+				PMT_SET_CALIB_E(chn,calib_E);
+				P_INFO("Auto calib E(chn %d):delta_t:%d,Ecal:%.6f,Eread:%.6f=>Calib_E:%.6f\r\n",chn + 1,delta_millis,e_cal,e_read,
+						PMT_GET_CALIB_E(chn));
+				PMT_STRUCT[chn]->flag_calib = 0;
+			}
 		}
+		_pmt_save_calib();
 	}
-	_pmt_save_calib();
 	return -1;
 }
+s32 _auto_calibE_collectData(void) {
+	if (PMT_CALIB_RUNNING()) {
+		PMT_LATCH_ALL(); //important
+		for (u8 chn = 0; chn < POWERMETER_CHANNEL; chn++) {
+			if (PMT_STRUCT[chn]->flag_calib) {
+				PMT_STRUCT[chn]->flag_calib = 1000.0 * stpm_read_active_power(PMT_STRUCT[chn],1);
+				stpm_reset_energies(PMT_STRUCT[chn]);
+				blt_soft_timer_restart(_auto_calibE_Exc,10 * 1000 * 1000); //1s
+			}
+		}
+	}
+	return -1;
+}
+
 void pmt_calib_stpm(u8 _chn,bool _set,uint16_t _calib_V, uint16_t _calib_C,uint16_t _calip_E){
 
 	PMT_CHECK_CHN(_chn);
@@ -239,9 +253,9 @@ void pmt_calib_stpm(u8 _chn,bool _set,uint16_t _calib_V, uint16_t _calib_C,uint1
 			if(_calib_V) PMT_SET_CALIB_V(chn_idx,1); //set default
 			if(_calib_C) PMT_SET_CALIB_C(chn_idx,1); //set default
 			PMT_SET_CALIB_E(chn_idx,1); //set default
-			delay_ms(100); ///delay to stpm refesh new data
 			stpm_read_rms_voltage_and_current(PMT_STRUCT[chn_idx],1,&volt,&curr);
-			PMT_STRUCT[chn_idx]->flag_calib = stpm_read_active_energy(PMT_STRUCT[chn_idx],1);//kWh //1;//0.01*_calip_E;
+
+//			PMT_STRUCT[chn_idx]->flag_calib = stpm_read_active_energy(PMT_STRUCT[chn_idx],1);//kWh //1;//0.01*_calip_E;
 
 			if(!volt || !curr){
 				ERR(PERI,"NULL voltage or current sensors!!!!\r\n");
@@ -260,8 +274,10 @@ void pmt_calib_stpm(u8 _chn,bool _set,uint16_t _calib_V, uint16_t _calib_C,uint1
 				PMT_SET_CALIB_C(chn_idx, backup_calibC);
 			}
 			//calculate calibE
-			stpm_reset_energies(PMT_STRUCT[chn_idx]);
-			blt_soft_timer_restart(_auto_calibE,10*1000*1000); //5s
+//			delay_ms(100); ///delay to stpm refesh new data
+			PMT_STRUCT[chn_idx]->flag_calib = 1000.0*stpm_read_active_power(PMT_STRUCT[chn_idx],1);
+//			stpm_reset_energies(PMT_STRUCT[chn_idx]);
+			blt_soft_timer_restart(_auto_calibE_collectData,1*1000*1000); //1s
 		}
 	}
 }
@@ -501,6 +517,31 @@ static uint32_t calc_I(float _curr)
 //    P_INFO("I:%ld %s|"PRINTF_BINARY_PATTERN_INT32"\r\n",result&0x7FFFFFFF,((result & 0x80000000)>0)?"A":"mA",PRINTF_BYTE_TO_BINARY_INT32(result));
     return result;
 }
+static u8 calc_FP(u8 _chn) {
+	if(_chn >=POWERMETER_CHANNEL){
+		return 0;
+	}
+	float_t PF_rslt = 1;
+	u16 volt_avg = G_POWER_METER.data.voltage;
+	float cuur_avg = PMT_CTX[_chn].i_avg;
+	float p_avg = p_avg = PMT_CTX[_chn].p_avg;
+
+//	if (_chn == 1) {
+//		cuur_avg = G_POWER_METER.data.current1;
+//	}
+//	if (_chn == 2) {
+//		cuur_avg = G_POWER_METER.data.current2;
+//	}
+//	if (_chn == 3) {
+//		cuur_avg = G_POWER_METER.data.current3;
+//	}
+	//
+	if(volt_avg && cuur_avg && p_avg){
+		PF_rslt = p_avg/((float)volt_avg*cuur_avg);
+	}
+	return 100*PF_rslt;
+}
+
 void pmt_main(void){
 	static u32 sample_timing = 0;
 	static u32 save_context = 0;
@@ -509,8 +550,8 @@ void pmt_main(void){
 	u32 i_cal =0;
 	u8 current_unit = 0;
 	u8 chn_update=0;
-	if(clock_time_exceed(sample_timing,PMT_SAMPLE_TIMING*1000)){
-		if (!PMT_CALIB_RUNNING()) {
+	if (!PMT_CALIB_RUNNING()) {
+		if (clock_time_exceed(sample_timing,PMT_SAMPLE_TIMING * 1000)) {
 			PMT_DEBUG_STOP()
 			;
 			//process payload for packet
@@ -520,58 +561,65 @@ void pmt_main(void){
 			G_POWER_METER.data.voltage = ((u16) volt + G_POWER_METER.data.voltage) / 2;
 			//=========== Chn1
 			chn_update = 0;
-			i_cal = calc_I(curr);
-			G_POWER_METER.data.current1 = ((u16) (i_cal & 0x3FF)+G_POWER_METER.data.current1)/2;
+			PMT_CTX[chn_update].i_avg = (PMT_CTX[chn_update].i_avg  + curr)/2;
+			i_cal = calc_I(PMT_CTX[chn_update].i_avg);
+			G_POWER_METER.data.current1 = ((u16) (i_cal & 0x3FF) + G_POWER_METER.data.current1) / 2;
 			current_unit = ((i_cal >> 31) & 0x1) << 7;
-			G_POWER_METER.data.fac_power1 = (((u8)( 100.0 * stpm_read_power_factor(PMT_STRUCT[chn_update],1)) + (G_POWER_METER.data.fac_power1&0x7F))/2) | current_unit;
-			PMT_CTX[chn_update].p_avg = (PMT_CTX[chn_update].p_avg + 1000.0*stpm_read_active_power(PMT_STRUCT[chn_update],1))/2;
+
+			G_POWER_METER.data.fac_power1 = calc_FP(chn_update) | current_unit;
+					//(((u8) (100.0 * stpm_read_power_factor(PMT_STRUCT[chn_update],1)) + (G_POWER_METER.data.fac_power1 & 0x7F)) / 2) | current_unit;
+
+			PMT_CTX[chn_update].p_avg = (PMT_CTX[chn_update].p_avg + 1000.0 * stpm_read_active_power(PMT_STRUCT[chn_update],1)) / 2;
 			PMT_CTX[chn_update].e_sum = stpm_read_active_energy(PMT_STRUCT[chn_update],1);
 			G_POWER_METER.data.energy1 = (u32) (PMT_CTX[chn_update].e_sum * 10);
 			if ((u16) (1000 * stpm_read_active_power(PMT_STRUCT[chn_update],1)) > PMT_GET_THRESHOLD(chn_update)) {
 				PMT_CTX[chn_update].working_time_ms +=
 						(clock_time() - sample_timing > 0) ? (clock_time() - sample_timing) / SYSTEM_TIMER_TICK_1MS : PMT_SAMPLE_TIMING;
 			}
-			G_POWER_METER.data.time1 = (u8) ceilf((float)PMT_CTX[chn_update].working_time_ms / 1000.0);
+			G_POWER_METER.data.time1 = (u8) ceilf((float) PMT_CTX[chn_update].working_time_ms / 1000.0);
 			//============ Chn 2
 			chn_update = 1;
 			stpm_read_rms_voltage_and_current(PMT_STRUCT[chn_update],1,&volt,&curr);
 			i_cal = calc_I(curr);
-			G_POWER_METER.data.current2 = ((u16) (i_cal & 0x3FF)+G_POWER_METER.data.current2)/2;
+			G_POWER_METER.data.current2 = ((u16) (i_cal & 0x3FF) + G_POWER_METER.data.current2) / 2;
 			current_unit = ((i_cal >> 31) & 0x1) << 7;
-			G_POWER_METER.data.fac_power2 = (((u8)( 100.0 * stpm_read_power_factor(PMT_STRUCT[chn_update],1)) + (G_POWER_METER.data.fac_power2&0x7F))/2) | current_unit;
-			PMT_CTX[chn_update].p_avg = (PMT_CTX[chn_update].p_avg + 1000.0*stpm_read_active_power(PMT_STRUCT[chn_update],1))/2;
+			G_POWER_METER.data.fac_power2 =calc_FP(chn_update) | current_unit;
+					//(((u8) (100.0 * stpm_read_power_factor(PMT_STRUCT[chn_update],1)) + (G_POWER_METER.data.fac_power2 & 0x7F)) / 2) | current_unit;
+			PMT_CTX[chn_update].p_avg = (PMT_CTX[chn_update].p_avg + 1000.0 * stpm_read_active_power(PMT_STRUCT[chn_update],1)) / 2;
 			PMT_CTX[chn_update].e_sum = stpm_read_active_energy(PMT_STRUCT[chn_update],1);
 			G_POWER_METER.data.energy2 = (u32) (PMT_CTX[chn_update].e_sum * 10);
 			if ((u16) (1000 * stpm_read_active_power(PMT_STRUCT[chn_update],1)) > PMT_GET_THRESHOLD(chn_update)) {
 				PMT_CTX[chn_update].working_time_ms +=
 						(clock_time() - sample_timing > 0) ? (clock_time() - sample_timing) / SYSTEM_TIMER_TICK_1MS : PMT_SAMPLE_TIMING;
 			}
-			G_POWER_METER.data.time2 = (u8) ceilf((float)PMT_CTX[chn_update].working_time_ms / 1000.0);
+			G_POWER_METER.data.time2 = (u8) ceilf((float) PMT_CTX[chn_update].working_time_ms / 1000.0);
 			//============ Chn 3
 			chn_update = 2;
 			stpm_read_rms_voltage_and_current(PMT_STRUCT[chn_update],1,&volt,&curr);
 			i_cal = calc_I(curr);
-			G_POWER_METER.data.current3 = ((u16) (i_cal & 0x3FF)+G_POWER_METER.data.current3)/2;
+			G_POWER_METER.data.current3 = ((u16) (i_cal & 0x3FF) + G_POWER_METER.data.current3) / 2;
 			current_unit = ((i_cal >> 31) & 0x1) << 7;
-			G_POWER_METER.data.fac_power3 = (((u8)( 100.0 * stpm_read_power_factor(PMT_STRUCT[chn_update],1)) + (G_POWER_METER.data.fac_power3&0x7F))/2) | current_unit;
-			PMT_CTX[chn_update].p_avg = (PMT_CTX[chn_update].p_avg + 1000.0*stpm_read_active_power(PMT_STRUCT[chn_update],1))/2;
+			G_POWER_METER.data.fac_power3 =calc_FP(chn_update) | current_unit;
+					//(((u8) (100.0 * stpm_read_power_factor(PMT_STRUCT[chn_update],1)) + (G_POWER_METER.data.fac_power3 & 0x7F)) / 2) | current_unit;
+			PMT_CTX[chn_update].p_avg = (PMT_CTX[chn_update].p_avg + 1000.0 * stpm_read_active_power(PMT_STRUCT[chn_update],1)) / 2;
 			PMT_CTX[chn_update].e_sum = stpm_read_active_energy(PMT_STRUCT[chn_update],1);
 			G_POWER_METER.data.energy3 = (u32) (PMT_CTX[chn_update].e_sum * 10);
 			if ((u16) (1000 * stpm_read_active_power(PMT_STRUCT[chn_update],1)) > PMT_GET_THRESHOLD(chn_update)) {
 				PMT_CTX[chn_update].working_time_ms +=
 						(clock_time() - sample_timing > 0) ? (clock_time() - sample_timing) / SYSTEM_TIMER_TICK_1MS : PMT_SAMPLE_TIMING;
 			}
-			G_POWER_METER.data.time3 = (u8) ceilf((float)PMT_CTX[chn_update].working_time_ms / 1000.0);
+			G_POWER_METER.data.time3 = (u8) ceilf((float) PMT_CTX[chn_update].working_time_ms / 1000.0);
 		}
 		//update timing
-		sample_timing=clock_time();
+		sample_timing = clock_time();
 		//restart if turn on debug
 		PMT_DEBUG();
-	}
-	//storage context
-	if (clock_time_exceed(save_context,5 * 999 * 1001)) {
-		_pmt_save_context();
-		save_context=clock_time();
+
+		//storage context
+		if (clock_time_exceed(save_context,5 * 999 * 1001)) {
+			_pmt_save_context();
+			save_context = clock_time();
+		}
 	}
 }
 
