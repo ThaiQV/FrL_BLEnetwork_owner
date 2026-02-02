@@ -1114,7 +1114,7 @@ static inline float calc_power(int32_t value) {
 }
 
 static inline double calc_energy(uint32_t value) {
-    return (double)value * ENERGY_LSB;
+    return fabs((double)value * ENERGY_LSB);
 }
 
 static inline float calc_current_i32(int32_t value) {

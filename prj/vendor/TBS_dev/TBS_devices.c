@@ -68,9 +68,9 @@ void tbs_power_meter_printf(type_debug_t _plog_type,void* _p) {
 	LOGA(_plog_type,"Current1  :%u (%s)\r\n",dev->data.current1 ,((dev->data.fac_power1 >> 7)& 0x1) > 0?"A":"mA");
 	LOGA(_plog_type,"Current2  :%u (%s)\r\n",dev->data.current2 ,((dev->data.fac_power2 >> 7)& 0x1) > 0?"A":"mA");
 	LOGA(_plog_type,"Current3  :%u (%s)\r\n",dev->data.current3 ,((dev->data.fac_power3 >> 7)& 0x1) > 0?"A":"mA");
-	LOGA(_plog_type,"Fac_Power1    :%u\r\n",dev->data.fac_power1);
-	LOGA(_plog_type,"Fac_Power2    :%u\r\n",dev->data.fac_power2);
-	LOGA(_plog_type,"Fac_Power3    :%u\r\n",dev->data.fac_power3);
+	LOGA(_plog_type,"Fac_Power1:%u\r\n",dev->data.fac_power1&0x7F);
+	LOGA(_plog_type,"Fac_Power2:%u\r\n",dev->data.fac_power2&0x7F);
+	LOGA(_plog_type,"Fac_Power3:%u\r\n",dev->data.fac_power3&0x7F);
 	LOGA(_plog_type,"Time1     :%u\r\n",dev->data.time1);
 	LOGA(_plog_type,"Time2     :%u\r\n",dev->data.time2);
 	LOGA(_plog_type,"Time3     :%u\r\n",dev->data.time3);
@@ -375,7 +375,7 @@ void TBS_PowerMeter_Button_Exc(void){
 void TBS_PowerMeter_Upload2Master_RSTWorkingTime(void){
 	LOG_P(APP,"Upload data to server and clear working-time\r\n");
 	//DEBUG
-	POWER_METER_READDATA();
+//	POWER_METER_READDATA();
 	//
 	POWER_METER_RST_WORKINGTIME(0);
 }
@@ -498,6 +498,7 @@ void TBS_PwMeter_SetThreshod(u16 _chn1,u16 _chn2,u16 _chn3){
 	G_POWER_METER_PARAMETER[0]= _chn1?_chn1:G_POWER_METER_PARAMETER[0];
 	G_POWER_METER_PARAMETER[1]= _chn2?_chn2:G_POWER_METER_PARAMETER[1];
 	G_POWER_METER_PARAMETER[2]= _chn3?_chn3:G_POWER_METER_PARAMETER[2];
+
 	P_INFO("G_POWER_METER_PARAMETER0: %d\n", G_POWER_METER_PARAMETER[0]);
 	P_INFO("G_POWER_METER_PARAMETER1: %d\n", G_POWER_METER_PARAMETER[1]);
 	P_INFO("G_POWER_METER_PARAMETER2: %d\n", G_POWER_METER_PARAMETER[2]);
