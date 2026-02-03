@@ -770,7 +770,7 @@ uint8_t get_dfu_version(void)
 
 #define	TIMEOUT_MAX					100000
 #define	RESET_QUEUE_TIMEOUT_MAX		500000
-#define	DFU_UART_BUFF_SIZE			8192
+#define	DFU_UART_BUFF_SIZE			2
 
 #define SEND_BYTE(data)			uart_send_byte(UART1,data)
 #define SEND_BUFF(pdata,len)	uart_send(UART1,pdata,len)

@@ -162,9 +162,9 @@
 	uint8_t get_dfu_version(void);
 
 	/* For UART DFU */
-	void dfu_uart_init(void);
-	void dfu_uart_receive(void);
-	void dfu_uart_process(void);
-	void cmd_process(void);
+//	void dfu_uart_init(void);
+//	void dfu_uart_receive(void);
+//	void dfu_uart_process(void);
+//	void cmd_process(void);
 
 #endif //__DFU_H__

@@ -38,7 +38,7 @@
 #include <task.h>
 #endif
 
-#define WDT_RST_INTERVAL				5011		//ms
+#define WDT_RST_INTERVAL				10011		//ms
 
 /**
  * @brief      uart1 irq code for application
@@ -202,7 +202,7 @@ void proto_task( void *pvParameters );
  * @return      none
  */
 fl_version_t _bootloader = { 1, 1, 0};
-fl_version_t _fw = { 2, 1,1 };
+fl_version_t _fw = { 2, 1,2 };
 fl_version_t _hw = { 1, 0, 1 };
 
 _attribute_ram_code_ int main(void)   //must on ramcode

@@ -57,15 +57,19 @@ void storage_init(void)
 void storage_clean(void)
 {
 	uint32_t i;
+	printf("STORAGE MAP clean...........\r\n");
 
 	// Erase device storage area
 	for(i = 0; i < (DEVICE_STORAGE_SIZE/DEF_UDISK_SECTOR_SIZE);i++)
 	{
 		FLASH_Erase_Sector(EX_FLASH_DEVICE_STORAGE_ADDRESS + i*DEF_UDISK_SECTOR_SIZE);
+		wd_clear();
 	}
+
 	// Reset timestamp map
 	memset(map,0x00,sizeof(map));
 	nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
+
 }
 
 /**

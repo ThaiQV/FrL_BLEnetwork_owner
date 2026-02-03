@@ -338,9 +338,6 @@ void TBS_History_ClearAll(void){
 /******************************************************************************/
 /******************************************************************************/
 void TBS_History_Init(void){
-	//FOR TESTING
-//	nvm_erase();
-//	while(1);
 	//clear G_HISTORY
 	_CLEAR_G_HISTORY();
 //	TBS_history_createSample();

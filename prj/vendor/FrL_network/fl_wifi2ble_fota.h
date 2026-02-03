@@ -20,12 +20,12 @@
 #define DFU_OTA_CRC128_CAL				crc128_calculate
 #define DFU_OTA_FW_PUT					ota_fw_put
 #define DFU_OTA_VERSION_SET(x, y, z)   do {                                            \
-														fw_header_t fw_buf;                        \
-														fw_buf.major = (uint8_t)(x);           \
-														fw_buf.minor = (uint8_t)(y);           \
-														fw_buf.patch = (uint8_t)(z);           \
-														set_current_fw_version(&fw_buf);           \
-													} while(0)
+											fw_header_t fw_buf;                        \
+											fw_buf.major = (uint8_t)(x);           \
+											fw_buf.minor = (uint8_t)(y);           \
+											fw_buf.patch = (uint8_t)(z);           \
+											set_current_fw_version(&fw_buf);           \
+										} while(0)
 //#define DFU_OTA_VERSION_GET()				0//get_current_fw_version
 static inline fw_header_t DFU_OTA_VERSION_GET(void){
 														fw_header_t fw_buf;

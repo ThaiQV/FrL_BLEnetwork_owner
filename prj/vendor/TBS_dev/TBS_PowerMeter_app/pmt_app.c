@@ -72,7 +72,7 @@ extern tbs_device_powermeter_t G_POWER_METER ;
 
 #define PMT_CHECK_CHN(x)				{if(x>POWERMETER_CHANNEL)return;}
 
-#define PMT_SAMPLE_TIMING				300//ms
+#define PMT_SAMPLE_TIMING				100//ms
 
 extern u16 G_POWER_METER_PARAMETER[4];
 
@@ -88,7 +88,7 @@ uint32_t pmt_get_millis(void);
 
 void PMT_LATCH_ALL(void){
 	static u32 last_latch=0;
-	if(clock_time_exceed(last_latch,100*1000)){
+	if(clock_time_exceed(last_latch,80*1000)){
 		stpm_latch_reg(PMT_STRUCT[0]);
 		last_latch=clock_time();
 	}else{
@@ -572,8 +572,10 @@ void pmt_main(void){
 	u8 current_unit = 0;
 	u8 chn_update=0;
 	float p_rms = 0;
+	u32  tick_cnt= 0;
 	if (!PMT_CALIB_RUNNING()) {
 		if (clock_time_exceed(sample_timing,PMT_SAMPLE_TIMING * 1000)) {
+			tick_cnt = clock_time();
 			PMT_DEBUG_STOP()
 			//process payload for packet
 			PMT_LATCH_ALL();
@@ -596,9 +598,9 @@ void pmt_main(void){
 
 			if ((u16) p_rms > PMT_GET_THRESHOLD(chn_update)) {
 				PMT_CTX[chn_update].working_time_ms +=
-						(clock_time() - sample_timing > 0) ? (clock_time() - sample_timing) / SYSTEM_TIMER_TICK_1MS : PMT_SAMPLE_TIMING;
+						(tick_cnt - sample_timing > 0) ? (tick_cnt - sample_timing) / SYSTEM_TIMER_TICK_1MS : PMT_SAMPLE_TIMING;
 			}
-			G_POWER_METER.data.time1 = (u8) ceilf((float)PMT_CTX[chn_update].working_time_ms *1.0/ 1000.0);
+			G_POWER_METER.data.time1 = (u8) roundf((float)PMT_CTX[chn_update].working_time_ms *10.0/ 10000.0);
 			//============ Chn 2
 			chn_update = 1;
 			stpm_read_rms_voltage_and_current(PMT_STRUCT[chn_update],1,&volt,&curr);
@@ -616,9 +618,9 @@ void pmt_main(void){
 			G_POWER_METER.data.energy2 = (u32) (PMT_CTX[chn_update].e_sum * 10);
 			if ((u16) p_rms > PMT_GET_THRESHOLD(chn_update)) {
 				PMT_CTX[chn_update].working_time_ms +=
-						(clock_time() - sample_timing > 0) ? (clock_time() - sample_timing) / SYSTEM_TIMER_TICK_1MS : PMT_SAMPLE_TIMING;
+						(tick_cnt - sample_timing > 0) ? (tick_cnt - sample_timing) / SYSTEM_TIMER_TICK_1MS : PMT_SAMPLE_TIMING;
 			}
-			G_POWER_METER.data.time2 = (u8) ceilf((float)PMT_CTX[chn_update].working_time_ms *1.0/ 1000.0);
+			G_POWER_METER.data.time2 = (u8) roundf((float)PMT_CTX[chn_update].working_time_ms *10.0/ 10000.0);
 			//============ Chn 3
 			chn_update = 2;
 			stpm_read_rms_voltage_and_current(PMT_STRUCT[chn_update],1,&volt,&curr);
@@ -635,12 +637,12 @@ void pmt_main(void){
 			G_POWER_METER.data.energy3 = (u32) (PMT_CTX[chn_update].e_sum * 10);
 			if ((u16) p_rms > PMT_GET_THRESHOLD(chn_update)) {
 				PMT_CTX[chn_update].working_time_ms +=
-						(clock_time() - sample_timing > 0) ? (clock_time() - sample_timing) / SYSTEM_TIMER_TICK_1MS : PMT_SAMPLE_TIMING;
+						(tick_cnt - sample_timing > 0) ? (tick_cnt - sample_timing) / SYSTEM_TIMER_TICK_1MS : PMT_SAMPLE_TIMING;
 			}
-			G_POWER_METER.data.time3 = (u8) ceilf((float)PMT_CTX[chn_update].working_time_ms *1.0/ 1000.0);
+			G_POWER_METER.data.time3 = (u8) roundf((float)PMT_CTX[chn_update].working_time_ms *10.0/ 10000.0);
 
 			//update timing
-			sample_timing = clock_time();
+			sample_timing = tick_cnt;
 			//restart if turn on debug
 			PMT_DEBUG()
 
@@ -648,7 +650,7 @@ void pmt_main(void){
 		//storage context
 		if (clock_time_exceed(save_context,5 * 999 * 1001)) {
 			_pmt_save_context();
-			save_context = clock_time();
+			save_context = tick_cnt;
 		}
 	}
 }

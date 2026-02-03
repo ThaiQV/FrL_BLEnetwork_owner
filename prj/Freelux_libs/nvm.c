@@ -53,6 +53,7 @@ void nvm_erase(void)
 	{
 		FLASH_Erase_Sector(NVM_BASE_ADDRESS + i*NVM_PAGE_SIZE);
 		OS_NVM_LOG("Erase sector: %d\n",i);
+		wd_clear();
 	}
 }
 

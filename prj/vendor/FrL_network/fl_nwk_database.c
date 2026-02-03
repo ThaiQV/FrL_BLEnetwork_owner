@@ -443,7 +443,7 @@ fl_slave_settings_t fl_db_slavesettings_init(void){
 		//clear all and write default settings
 //		flash_erase_sector(ADDR_SLAVE_SETTINGS_START);
 		_db_earse_sector_full(ADDR_SLAVE_SETTINGS_START,SLAVESETTINGS_SIZE/SECTOR_FLASH_SIZE);
-		memset(SLAVE_SETTINGS_DEFAULT.setting_arr,1,sizeof(SLAVE_SETTINGS_DEFAULT.setting_arr));
+		memset(SLAVE_SETTINGS_DEFAULT.setting_arr,0,sizeof(SLAVE_SETTINGS_DEFAULT.setting_arr));
 		fl_db_slavesettings_save(SLAVE_SETTINGS_DEFAULT.setting_arr,sizeof(SLAVE_SETTINGS_DEFAULT.setting_arr));
 		settings = fl_db_slavesettings_load();
 	}
@@ -557,7 +557,7 @@ fl_tbs_data_t fl_db_tbsprofile_init(void){
 		//clear all and write default userdata
 //		flash_erase_sector(ADDR_TBS_PROFILE_START);
 		_db_earse_sector_full(ADDR_TBS_PROFILE_START,TBSPROFILE_SIZE/SECTOR_FLASH_SIZE);
-		memset((u8*)TBS_PROFILE_DEFAULT.data,1,sizeof(TBS_PROFILE_DEFAULT.data));
+		memset((u8*)TBS_PROFILE_DEFAULT.data,0,sizeof(TBS_PROFILE_DEFAULT.data));
 		fl_db_tbsprofile_save(TBS_PROFILE_DEFAULT.data,sizeof(TBS_PROFILE_DEFAULT.data));
 		tbsdata = fl_db_tbsprofile_load();
 	}

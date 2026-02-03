@@ -539,7 +539,7 @@ void FLASH_IC_Check(void)
         Flash_Sector_Count = count / DEF_UDISK_SECTOR_SIZE;
         Flash_Sector_Size = DEF_UDISK_SECTOR_SIZE;
 
-//        LOGA(DRV,"Count: %d, %d, %d\n",count,(uint32_t)Flash_Sector_Count,(uint32_t)Flash_Sector_Size);
+        ERR(DRV,"Count: %d, %d, %d\n",count,(uint32_t)Flash_Sector_Count,(uint32_t)Flash_Sector_Size);
     }
     else
     {
