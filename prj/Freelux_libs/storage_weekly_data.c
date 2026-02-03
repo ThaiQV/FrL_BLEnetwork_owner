@@ -41,7 +41,6 @@ void storage_init(void)
 		nvm_record_write(STORAGE_MAP,(uint8_t*)map,sizeof(map));
 	}
 
-
 	printf("STORAGE MAP: ");
 	for(i=0;i<sizeof(map);i++)
 	{
