@@ -16,7 +16,6 @@
 
 #define TBS_DEVICE_STORE_INTERVAL 		2*1010*1001 //5s
 #define TBS_PACKET_INDEX_MAX			12288
-#include "TBS_dev_app/user_lib.h"
 
 #define COUNTER_LCD_REMOVE_DISPLAY		ct_remove_nwwk
 #define COUNTER_LCD_PRESS_DISPLAY		ct_add_bt_print
