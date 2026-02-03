@@ -138,7 +138,11 @@ _attribute_no_inline_ void user_init_normal(void) {
 	///////////////////// TIME SYSTEM initialization///////////////////
 #if (defined MASTER_CORE | defined POWER_METER_DEVICE)
 	///////////////////// Serial initialization///////////////////
-	fl_input_serial_init(UART1,GPIO_PD0,UART1_RX_PE2,115200);//UART1_TX_PE0
+#ifdef MASTER_CORE
+	fl_input_serial_init(UART1,GPIO_PE0,UART1_RX_PE2,115200);//UART1_TX_PE0
+#else
+	fl_input_serial_init(UART1,GPIO_PD0,UART1_RX_PE2,115200);//UART1_TX_PD0
+#endif
 #endif
 
 	fl_rtc_init();

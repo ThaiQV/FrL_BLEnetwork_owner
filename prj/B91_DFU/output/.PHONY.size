@@ -1,2 +1,2 @@
    text	   code	 rodata	   data	    bss	    dec	    hex	filename
-  21893	  21128	    765	    612	     48	  22553	   5819	B91_DFU.elf
+  24576	  23756	    820	    383	  16512	  41471	   a1ff	B91_DFU.elf

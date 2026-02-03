@@ -26,13 +26,13 @@
 #include "drivers/B91/driver.h"
 #include "drivers/B91/ext_driver/driver_ext.h"
 
-#define write_log32(err_code)   write_sram32(0x00014, err_code)
+#define write_log32(err_code)    write_sram32(0x00014, err_code)
 
 ///**
 // * TBS project define pinout
 // * */
 #ifndef MASTER_CORE
-#define TBS_COUNTER_DEVICE 					1//0: Counter, 1: PowerMeter
+#define TBS_COUNTER_DEVICE 0	//1: Counter, 0: PowerMeter **don't change tab format of the #define
 #if TBS_COUNTER_DEVICE
 #define COUNTER_DEVICE
 #else
@@ -41,7 +41,7 @@
 #else
 #endif
 
-#define TBS_GATEWAY_DEVICE  // uncomment if build for the master
+//#define TBS_GATEWAY_DEVICE    // uncomment if build for the master
 
 #if MASTER_CORE
 #ifndef TBS_GATEWAY_DEVICE

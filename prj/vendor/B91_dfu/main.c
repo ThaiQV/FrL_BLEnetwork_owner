@@ -128,8 +128,8 @@ void stimer_irq_handler(void) {
  * @param[in]	none
  * @return      none
  */
-fl_version_t _bootloader = { 1, 0, 1 };
-fl_version_t _fw = { 0, 0, 0 };
+fl_version_t _bootloader = { 1, 0, 4 };
+fl_version_t _fw = { 1, 0, 0 };
 fl_version_t _hw = { 0, 0, 0 };
 
 uint8_t buff[20] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
@@ -177,8 +177,9 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 	}
 	else
 	{
-		dfu_uart_init();
-		LOG_P(APP,"DFU\n");
+//		dfu_uart_init();
+		P_INFO("DFU..........\n");
+		firmware_check();
 
 		irq_enable();
 		while(1)

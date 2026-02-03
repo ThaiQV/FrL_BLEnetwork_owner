@@ -139,7 +139,7 @@ void FLASH_Port_Init(void)
 	PERI_SPI_PIN_INIT(GPIO_PE4);
 	PERI_SPI_PIN_INIT(GPIO_PE5);
 	PERI_SPI_PIN_INIT(GPIO_PE6);
-	PERI_SPI_PIN_INIT(GPIO_PB1);
+	PERI_SPI_PIN_INIT(GPIO_PB1);//
 	delay_ms(100);
 	//
 
@@ -163,7 +163,7 @@ void FLASH_Port_Init(void)
 	PIN_SET(PIN_WP);
 #endif
 
-//	printf("FLASH_Port_Init\r\n");
+	printf("FLASH_Port_Init\r\n");
 }
 
 /*********************************************************************

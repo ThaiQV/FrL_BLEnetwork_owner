@@ -289,7 +289,7 @@ void fl_wifi2ble_fota_init(void){
 //	LOGA(INF_FILE,"FOTA Initilization(%d.%d.%d)!!!\r\n",DFU_OTA_VERSION_GET().major,DFU_OTA_VERSION_GET().minor,DFU_OTA_VERSION_GET().patch);
 #ifdef MASTER_CORE
 	//set interval
-	fl_wifi2ble_Fota_Interval_set(100);
+	fl_wifi2ble_Fota_Interval_set(110);
 #endif
 }
 
