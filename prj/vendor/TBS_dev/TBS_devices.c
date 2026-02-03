@@ -371,7 +371,7 @@ void TBS_PowerMeter_Button_Exc(void){
 #undef FACTORY_REBOOTnHOLD
 }
 
-//
+
 void TBS_PowerMeter_Upload2Master_RSTWorkingTime(void){
 	LOG_P(APP,"Upload data to server and clear working-time\r\n");
 	//DEBUG

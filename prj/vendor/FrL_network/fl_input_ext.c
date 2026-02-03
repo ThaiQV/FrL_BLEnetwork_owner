@@ -445,7 +445,7 @@ void fl_input_external_init(void) {
 //init POLLING Container
 	InitPOLLING();
 #ifndef MASTER_CORE //use to test
-	fl_ExIO_init(I2C_GPIO_SDA_E2,I2C_GPIO_SCL_E0,GPIO_PD0);
+//	fl_ExIO_init(I2C_GPIO_SDA_E2,I2C_GPIO_SCL_E0,GPIO_PD0);
 //	//	//register function callback
 	fl_exIO_t GPIO_IN;
 	s8 regis=0;

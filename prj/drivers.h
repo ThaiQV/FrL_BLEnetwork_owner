@@ -32,7 +32,7 @@
 // * TBS project define pinout
 // * */
 #ifndef MASTER_CORE
-#define TBS_COUNTER_DEVICE 1 			//0: Counter, 1: PowerMeter
+#define TBS_COUNTER_DEVICE 					0//0: Counter, 1: PowerMeter
 #if TBS_COUNTER_DEVICE
 #define COUNTER_DEVICE
 #else
@@ -41,7 +41,7 @@
 #else
 #endif
 
-#define TBS_GATEWAY_DEVICE  // uncomment if build for the master
+//#define TBS_GATEWAY_DEVICE  // uncomment if build for the master
 
 #if MASTER_CORE
 #ifndef TBS_GATEWAY_DEVICE
@@ -60,7 +60,7 @@
 
 #if (defined MASTER_CORE | defined COUNTER_DEVICE | (!defined DFU_POWER_METER_DEVICE & !defined POWER_METER_DEVICE))
 #define HSPI_CS							GPIO_PB0
-#define HSPI_IO							GPIO_PB1
+#define HSPI_WP							GPIO_PB1
 #else
 	#ifdef POWER_METER_DEVICE
 		#define HSPI_WP							GPIO_PD2

@@ -225,25 +225,7 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 #endif
 
 	PLOG_DEVICE_PROFILE(_bootloader,_fw,_hw);
-//#ifdef MASTER_CORE
-//	P_INFO("Startup from FOTA");
-//	u8 wait=0;
-//	extern void delay_ms(unsigned int millisec);
-//	while(wait<10){
-//		P_INFO(".");
-//		delay_ms(400);
-//		wait++;
-//	}
-//	P_INFO("ok\r\n");
-//#endif
-	//OFF ALL LOG
-//	PLOG_Stop(ALL);
-//	PLOG_Start(ALL);
 	PLOG_Stop(ALL);
-//	PLOG_Start(FLA);
-//	PLOG_Start(USER);
-//	PLOG_Start(MCU);
-//	PLOG_Start(DRV);
 	if (!deepRetWakeUp) {  //read flash size
 #if (BATT_CHECK_ENABLE)
 	user_battery_power_check();
