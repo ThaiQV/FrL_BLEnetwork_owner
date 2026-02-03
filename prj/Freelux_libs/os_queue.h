@@ -39,4 +39,5 @@ uint16_t queue_available_data(queue_t *queue);
 queue_ret_t queue_put(queue_t *queue, uint8_t *p_data, uint16_t len);
 queue_ret_t queue_get(queue_t *queue, uint8_t *p_data, uint16_t len);
 uint8_t queue_peek(queue_t *queue);
+uint8_t* queue_get_fifo(queue_t *queue);
 #endif

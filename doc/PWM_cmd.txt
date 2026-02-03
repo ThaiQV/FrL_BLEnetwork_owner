@@ -1,0 +1,16 @@
+START: read all #    //  doc 3 u, i, p, ch
+START: read ch1 #
+START: read ch2 #
+START: read ch3 #
+START: read calib ch1 #     // dọc value calib
+START: read calib ch2 #
+START: read calib ch3 #
+START: set ch1 calib_u calib_i calib_p #    // set value calib ch1
+START: set ch2 calib_u calib_i calib_p #    // set value calib ch2
+START: set ch1 calib_u calib_i calib_p #    // set value calib ch3
+START: info ch1 #		// doc info ch1
+START: info ch2 #
+START: info ch3 #
+
+
+

@@ -3,9 +3,7 @@ setlocal enabledelayedexpansion
 
 echo "*************** start of post build *****************"
 echo "[MERGE] Bootloader and App ...."
-
 set NAME="Unknown"
-
 findstr /C:"//#define TBS_GATEWAY_DEVICE" ..\drivers.h >nul
 if %errorlevel%==1 (
     set NAME="Gateway"

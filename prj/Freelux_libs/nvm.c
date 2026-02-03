@@ -17,6 +17,7 @@
 
 /* Variables */
 uint32_t nvm_current_pos = 0;
+uint8_t nv_inited = 0;
 /* Functions */
 
 /**
@@ -26,6 +27,9 @@ uint32_t nvm_current_pos = 0;
 */
 void nvm_init(void)
 {
+	if(nv_inited){
+		//return;
+	}
 	/* put your init for nvm here */
 	/* SPI flash init */
     FLASH_Port_Init();
@@ -33,6 +37,7 @@ void nvm_init(void)
     FLASH_IC_Check();
     /* Init record */
     nvm_record_init();
+    nv_inited=1;
 }
 
 /**

@@ -206,6 +206,7 @@ static int fl_controller_event_callback(u32 h, u8 *p, int n) {
 				incomming_data.length = pa->len + 1; //add rssi byte
 				//memcpy(incomming_data.data_arr,pa->data,incomming_data.length);
 //				incomming_data.data_arr[0] = pa->data[0];
+
 //				s8 rssi = (s8) pa->data[pa->len];
 //				if(rssi > -45){
 //					P_INFO_HEX(pa->data,pa->len+1,"%s(%d):","PACK",pa->len+1);

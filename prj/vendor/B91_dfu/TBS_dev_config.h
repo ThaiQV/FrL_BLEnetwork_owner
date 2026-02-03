@@ -11,6 +11,6 @@
 #ifndef TBS_DEV_CONFIG_H_
 #define TBS_DEV_CONFIG_H_
 
-#define COUNTER_DEVICE
+#define POWER_METER_DEVICE
 
 #endif /* TBS_DEV_CONFIG_H_ */

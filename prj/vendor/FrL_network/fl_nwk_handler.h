@@ -147,9 +147,9 @@ typedef struct {
 		u16 current1;       // 10 bits
 		u16 current2;       // 10 bits
 		u16 current3;       // 10 bits
-		u8 power1;          // 8 bits
-		u8 power2;          // 8 bits
-		u8 power3;          // 8 bits
+		u8 fac_power1;      // 8 bits
+		u8 fac_power2;          // 8 bits
+		u8 fac_power3;          // 8 bits
 		u8 time1;           // 6 bits
 		u8 time2;           // 6 bits
 		u8 time3;           // 6 bits
@@ -196,9 +196,9 @@ static inline void tbs_pack_powermeter_data(const tbs_device_powermeter_t *src, 
     WRITE_BITS(src->data.current1, 10);
     WRITE_BITS(src->data.current2, 10);
     WRITE_BITS(src->data.current3, 10);
-    WRITE_BITS(src->data.power1, 8);
-    WRITE_BITS(src->data.power2, 8);
-    WRITE_BITS(src->data.power3, 8);
+    WRITE_BITS(src->data.fac_power1, 8);
+    WRITE_BITS(src->data.fac_power2, 8);
+    WRITE_BITS(src->data.fac_power3, 8);
     WRITE_BITS(src->data.time1, 6);
     WRITE_BITS(src->data.time2, 6);
     WRITE_BITS(src->data.time3, 6);
@@ -242,9 +242,9 @@ static inline void tbs_unpack_powermeter_data(tbs_device_powermeter_t *dst, cons
     READ_BITS(dst->data.current1, 10);
     READ_BITS(dst->data.current2, 10);
     READ_BITS(dst->data.current3, 10);
-    READ_BITS(dst->data.power1, 8);
-    READ_BITS(dst->data.power2, 8);
-    READ_BITS(dst->data.power3, 8);
+    READ_BITS(dst->data.fac_power1, 8);
+    READ_BITS(dst->data.fac_power2, 8);
+    READ_BITS(dst->data.fac_power3, 8);
     READ_BITS(dst->data.time1, 6);
     READ_BITS(dst->data.time2, 6);
     READ_BITS(dst->data.time3, 6);
@@ -254,7 +254,6 @@ static inline void tbs_unpack_powermeter_data(tbs_device_powermeter_t *dst, cons
 
     #undef READ_BITS
 }
-
 
 
 //For POWER-METER DEVICEs
@@ -280,7 +279,10 @@ typedef struct {
         u8 power2;         // 7 bits
         u8 current_type3;  // 1 bit
         u8 power3;         // 7 bits
+<<<<<<< HEAD
+=======
 
+>>>>>>> 25519f49f5d5c2b1ebfb897622c1dc0a55accdde
         u8 time1;          // 6 bits
         u8 time2;          // 6 bits
         u8 time3;          // 6 bits
@@ -459,10 +461,10 @@ inline u8 fl_crc8(u8* _pdata, u8 _len) {
 	return (u8) (crc % 256);
 }
 
-#define DEBUG_TURN(x) do { \
+#define DEBUG_TURN(x) /*do { \
 							if (x) { PLOG_Start(ALL); } \
 							else   { PLOG_Stop(ALL);  }\
-						} while(0)
+						} while(0)*/
 static inline uint32_t swap_endian32(uint32_t val) {
     return ((val >> 24) & 0x000000FF) |
            ((val >> 8)  & 0x0000FF00) |

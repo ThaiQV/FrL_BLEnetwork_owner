@@ -17,11 +17,12 @@
 #ifdef PMT_DEBUG_UART
 #define PMT_LOGA(...)  print_uart(__VA_ARGS__)
 #else
-#define PMT_LOGA(...)  printf(__VA_ARGS__)
+//#define PMT_LOGA(...)  LOGA(PERI,__VA_ARGS__)
 #endif
 typedef struct {
     float voltage;              //  (V)
     float current;              //  (A)
+    float frequency;
     float power_factor;
     double active_power;         // (W)
     float reactive_power;       // (VAR)
@@ -31,9 +32,9 @@ typedef struct {
     float iT;
     float uT;
     float pT;
-    uint32_t time;
+    uint64_t time;
     uint32_t timems;              //
-    uint32_t timestamp;         // (ms)
+    uint64_t timestamp;         // (ms)
 } measurement_data_t;
 
 typedef struct {
@@ -57,11 +58,12 @@ typedef struct
 void power_meter_app_init(void);
 void power_meter_app_loop(void);
 void power_meter_app_read(void);
-
+void pmt_clear_energy(u8 chn);
 void pmt_setcalib(uint8_t ch, float calib_U, float calib_I, float calib_P);
 void pmt_getcalib(uint8_t ch, float *calib_U, float *calib_I, float *calib_P);
 void pmt_setcalibr(uint8_t ch, uint16_t calib_U, uint16_t calib_I, uint16_t calib_P);
 void pmt_getcalibr(uint8_t ch, float *calib_U, float *calib_I, float *calib_P);
+float pmt_read_F(uint8_t ch);
 float pmt_read_U(uint8_t ch);
 float pmt_read_I(uint8_t ch);
 float pmt_read_P(uint8_t ch);
