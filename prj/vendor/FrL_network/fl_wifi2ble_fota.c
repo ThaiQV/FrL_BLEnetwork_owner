@@ -280,11 +280,13 @@ void fl_wifi2ble_fota_ContainerClear(void){
 /******************************************************************************/
 /******************************************************************************/
 void fl_wifi2ble_fota_init(void){
+	extern fl_version_t _fw ;
+	LOG_P(FLA,"OTA init.......\r\n");
 	fl_wifi2ble_fota_ContainerClear();
 	DFU_OTA_INIT();
 	//change version
-	DFU_OTA_VERISON_SET(68);
-	LOG_P(INF_FILE,"FOTA Initilization!!!\r\n");
+	DFU_OTA_VERSION_SET(_fw.major,_fw.minor,_fw.patch);
+//	LOGA(INF_FILE,"FOTA Initilization(%d.%d.%d)!!!\r\n",DFU_OTA_VERSION_GET().major,DFU_OTA_VERSION_GET().minor,DFU_OTA_VERSION_GET().patch);
 #ifdef MASTER_CORE
 	//set interval
 	fl_wifi2ble_Fota_Interval_set(100);

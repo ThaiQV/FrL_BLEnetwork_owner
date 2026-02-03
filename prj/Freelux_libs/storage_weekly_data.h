@@ -7,6 +7,7 @@
 #define DEVICE_STORAGE_SIZE		0x80000
 #define SECOND_PER_WEEK			604800
 #define MAP_LENGTH				16
+#define STORAGE_INDEX_MAX		12288
 
 /***** Structures *****/
 

@@ -245,12 +245,12 @@ int fl_nwk_slave_nwkRemove(void){
 void fl_nwk_slave_displayLCD_Refesh(void){
 #ifndef HW_SAMPLE_TEST
 	//display version
-	extern fl_version_t _fw;
+//	extern fl_version_t _fw;
 	extern fl_version_t _hw;
 	char version_c[16];
 	memset((u8*)version_c,0,SIZEU8(version_c));
 	//_fw.patch = DFU_OTA_VERISON_GET();
-	sprintf(version_c,"FW :%d.%d.%d (%d)", _fw.major,_fw.minor,_fw.patch,DFU_OTA_VERISON_GET());
+	sprintf(version_c,"FW :%d.%d.%d", DFU_OTA_VERSION_GET().major,DFU_OTA_VERSION_GET().minor,DFU_OTA_VERSION_GET().patch);
 	Counter_LCD_ENDCALL_Display(1,version_c);
 	memset((u8*)version_c,0,SIZEU8(version_c));
 	sprintf(version_c,"HW :%d.%d.%d", _hw.major,_hw.minor,_hw.patch );
@@ -276,8 +276,6 @@ void fl_nwk_slave_displayLCD_Refesh(void){
 }
 #endif
 void fl_nwk_slave_init(void) {
-//	PLOG_Start(ALL);
-//	PLOG_Start(FLA);
 	DEBUG_TURN(NWK_DEBUG_STT);
 //	fl_input_external_init();
 	FL_QUEUE_CLEAR(&G_HANDLE_CONTAINER,PACK_HANDLE_SIZE);
@@ -331,6 +329,9 @@ void fl_nwk_slave_init(void) {
 	}
 #endif
 
+	//todo: TBS Device initialization
+	TBS_Device_Init();
+
 	blt_soft_timer_add(_nwk_slave_backup,2*1020*999);
 	//Interval checking network
 //	fl_nwk_slave_reconnectNstoragedata();
@@ -340,8 +341,6 @@ void fl_nwk_slave_init(void) {
 //	blt_soft_timer_add(&_slave_reconnect,2*1000*1000);
 	blt_soft_timer_add(&_informMaster,5*1000*1000);
 	G_INFORMATION.active = false;
-	//todo: TBS Device initialization
-	TBS_Device_Init();
 	//test random send req slave
 //	TEST_slave_sendREQ();
 
@@ -742,8 +741,10 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 					if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
 						u8 ok[2] = { 'o', 'k' };
 						memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
-						packet.frame.payload[0]= DFU_OTA_VERISON_GET();//test version
-						memcpy(packet.frame.payload+1,ok,SIZEU8(ok));
+						packet.frame.payload[0]= DFU_OTA_VERSION_GET().major;//dfu version get
+						packet.frame.payload[1]= DFU_OTA_VERSION_GET().minor;//dfu version get
+						packet.frame.payload[2]= DFU_OTA_VERSION_GET().patch;//dfu version get
+						memcpy(packet.frame.payload+3,ok,SIZEU8(ok));
 						//change endpoint to node source
 						packet.frame.endpoint.master = FL_FROM_SLAVE;
 						//add repeat_cnt
@@ -764,8 +765,10 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 					if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
 						u8 ok[2] = { 'o', 'k' };
 						memset(packet.frame.payload,0,SIZEU8(packet.frame.payload));
-						packet.frame.payload[0]= DFU_OTA_VERISON_GET();//test version
-						memcpy(packet.frame.payload+1,ok,SIZEU8(ok));
+						packet.frame.payload[0]= DFU_OTA_VERSION_GET().major;//dfu version get
+						packet.frame.payload[1]= DFU_OTA_VERSION_GET().minor;//dfu version get
+						packet.frame.payload[2]= DFU_OTA_VERSION_GET().patch;//dfu version get
+						memcpy(packet.frame.payload+3,ok,SIZEU8(ok));
 						//change endpoint to node source
 						packet.frame.endpoint.master = FL_FROM_SLAVE;
 						//add repeat_cnt
@@ -1142,7 +1145,6 @@ int _slave_reconnect(void){
 	*/
 	return 0;
 }
-
 int _interval_report(void) {
 #ifdef COUNTER_DEVICE
 	fl_nwk_slave_displayLCD_Refesh();
@@ -1156,15 +1158,13 @@ int _interval_report(void) {
 #ifdef COUNTER_DEVICE
 				fl_api_slave_req(NWK_HDR_55,(u8*) &G_COUNTER_DEV.data,SIZEU8(G_COUNTER_DEV.data),0,0,1);//NWK_HDR_11_REACTIVE
 #else //POWERMETER
-				// u8 _payload[SIZEU8(tbs_device_powermeter_t)];
-				// tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) G_INFORMATION.data;
-				// tbs_pack_powermeter_data(pwmeter_data,_payload);
-				// u8 indx_data = SIZEU8(pwmeter_data->type) + SIZEU8(pwmeter_data->mac) + SIZEU8(pwmeter_data->timetamp);
-				// fl_api_slave_req(NWK_HDR_55,&_payload[indx_data],SIZEU8(pwmeter_data->data),0,0,1);
+				 u8 _payload[SIZEU8(tbs_device_powermeter_t)];
+				 tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) G_INFORMATION.data;
+				 tbs_pack_powermeter_data(pwmeter_data,_payload);
+				 u8 indx_data = SIZEU8(pwmeter_data->type) + SIZEU8(pwmeter_data->mac) + SIZEU8(pwmeter_data->timetamp);
+				 fl_api_slave_req(NWK_HDR_55,&_payload[indx_data],SIZEU8(pwmeter_data->data),0,0,1);
+				 TBS_PowerMeter_Upload2Master_RSTWorkingTime();
 #endif
-				//increase index if using NWK_HDR_11_REACTIVE
-				//TBS_Device_Index_manage();
-//				P_INFO("Auto update (%d s) - indx:%d\r\n",INTERVAL_REPORT_TIME*1000*1000 + offset_spread,G_COUNTER_DEV.data.index-1);
 				return INTERVAL_REPORT_TIME*1000*1000 + offset_spread;
 			}
 		}

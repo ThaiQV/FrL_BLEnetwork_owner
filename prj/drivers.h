@@ -41,7 +41,7 @@
 #else
 #endif
 
-//#define TBS_GATEWAY_DEVICE  // uncomment if build for the master
+#define TBS_GATEWAY_DEVICE  // uncomment if build for the master
 
 #if MASTER_CORE
 #ifndef TBS_GATEWAY_DEVICE
@@ -58,16 +58,18 @@
 #define HSPI_MISO						GPIO_PB2
 #define HSPI_MOSI						GPIO_PB3
 
-#if (defined MASTER_CORE | defined COUNTER_DEVICE | !defined DFU_POWER_METER_DEVICE)
-	#define HSPI_CS							GPIO_PB0
-	#define HSPI_IO							GPIO_PB1
+#if (defined MASTER_CORE | defined COUNTER_DEVICE | (!defined DFU_POWER_METER_DEVICE & !defined POWER_METER_DEVICE))
+#define HSPI_CS							GPIO_PB0
+#define HSPI_WP							GPIO_PB1
 #else
 	#ifdef POWER_METER_DEVICE
-		#define HSPI_IO							GPIO_PB1
+		#define HSPI_WP							GPIO_PD2
+		#define HSPI_SYNC						GPIO_PB1
 		#define HSPI_CS							GPIO_PE7
 		#define HSPI_CS_POWER_METER_STPM1		GPIO_PE6
 		#define HSPI_CS_POWER_METER_STPM2		GPIO_PE5
 		#define HSPI_CS_POWER_METER_STPM3		GPIO_PE4
+
 	#endif
 #endif
 
@@ -93,6 +95,12 @@
 												gpio_set_output(DEBUG_INFO_TX_PIN, 1);								\
 												gpio_set_up_down_res(DEBUG_INFO_TX_PIN, GPIO_PIN_PULLUP_1M);		\
 												gpio_set_high_level(DEBUG_INFO_TX_PIN);								\
+											}while(0)
+#define PERI_SPI_PIN_INIT(pin)				do{														\
+												gpio_function_en(pin);								\
+												gpio_set_output(pin, 1);							\
+												gpio_set_up_down_res(pin, GPIO_PIN_UP_DOWN_FLOAT);	\
+												gpio_set_high_level(pin);							\
 											}while(0)
 #endif
 

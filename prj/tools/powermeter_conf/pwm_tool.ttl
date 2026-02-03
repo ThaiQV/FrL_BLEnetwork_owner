@@ -1,0 +1,66 @@
+;===========================================================
+; Tera Term Macro (TTL)
+; Calibration macro with echo and sprintf formatting
+;===========================================================
+
+; Enable local echo
+setecho 1
+
+; Show listbox with two options
+strdim listbox_string_array 2
+listbox_string_array[0] = 'calip U'
+listbox_string_array[1] = 'calip I'
+
+x = 0
+y = 0
+position = 5       ; center of the display
+offset_x = 200
+offset_y = 100
+setdlgpos x y position offset_x offset_y
+
+listbox 'Select calibration type:' 'Calibration' listbox_string_array
+calip_type = result + 1
+
+; If user selected "calip U"
+if calip_type == 1 then
+    inputbox 'Enter value for channel 1:' 'Channel 1'
+    val1 = inputstr
+
+    inputbox 'Enter value for channel 2:' 'Channel 2'
+    val2 = inputstr
+
+    inputbox 'Enter value for channel 3:' 'Channel 3'
+    val3 = inputstr
+
+    ; Build formatted string using sprintf
+    sprintf 'calip %s %s %s' val1 val2 val3
+
+    ; Send command
+    sendln inputstr
+
+    messagebox 'Calibration U command sent successfully!' 'Info'
+endif
+
+; If user selected "calip I"
+if calip_type == 2 then
+    inputbox 'Enter value for channel 1:' 'Channel 1'
+    val1 = inputstr
+
+    inputbox 'Enter value for channel 2:' 'Channel 2'
+    val2 = inputstr
+
+    inputbox 'Enter value for channel 3:' 'Channel 3'
+    val3 = inputstr
+
+    ; Build formatted string using sprintf
+    sprintf 'calip %s %s %s' val1 val2 val3
+
+    ; Send command
+    sendln inputstr
+
+    messagebox 'Calibration I command sent successfully!' 'Info'
+endif
+
+; Disable echo after finish
+setecho 0
+end

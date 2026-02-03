@@ -22,13 +22,10 @@ typedef enum{
 	#ifndef HW_SAMPLE_TEST
 		#define OTA_ENABLE
 	#endif
-	#ifdef COUNTER_DEVICE
-		#define COUNTER_LCD_MESS_MAX				10
-	#else
-
-	#endif
+	#define COUNTER_LCD_MESS_MAX				10
 #else
-//#define MASTER_BLOCK_MAC_SLAVE
+	#define OTA_ENABLE
+	//#define MASTER_BLOCK_MAC_SLAVE
 #endif
 #ifdef COUNTER_DEVICE
 void Counter_LCD_RemoveDisplay(void);
@@ -40,7 +37,10 @@ void Counter_LCD_ENDCALL_Display(u8 _row,char* _mess);
 void TBS_PowerMeter_TimerIRQ_handler(void);
 void TBS_PowerMeter_RESETbyMaster(u8 _ch1,u8 _ch2,u8 _ch3);
 void TBS_PwMeter_SetThreshod(u16 _chn1,u16 _chn2,u16 _chn3);
+void TBS_PowerMeter_Upload2Master_RSTWorkingTime(void);
+void TBS_PwMeter_SerialSetting(u8* _cmd,u8 _len);
 #endif
+
 void tbs_counter_printf(type_debug_t _plog_type,void* _p);
 void tbs_power_meter_printf(type_debug_t _plog_type,void* _p);
 void TBS_Device_Init(void);
@@ -52,4 +52,5 @@ void TBS_History_ClearAll(void);
 s8 TBS_History_Get(u16 _from, u16 _to) ;
 void TBS_History_Init(void);
 void TBS_History_Proc(void);
+
 #endif /* VENDOR_FRL_NETWORK_TBS_DEV_CONFIG_H_ */
