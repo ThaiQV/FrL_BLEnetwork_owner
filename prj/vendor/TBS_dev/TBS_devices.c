@@ -480,16 +480,13 @@ void TBS_PowerMeter_RESETbyMaster(u8 _ch1,u8 _ch2,u8 _ch3){
 	ERR(PERI,"Master RESET PWMeter channel:%d-%d-%d\r\n",_ch1,_ch2,_ch3);
 	u8 chn_rst = 0;
 	//todo: RESET pwmeter struct
-	if (!_ch1 && !_ch2 && !_ch3) {
+	if (_ch1 && _ch2 && _ch3) {
 		//rst all channels
 		POWER_METER_RST_ENERGY(chn_rst);
 	} else {
-		if (_ch1)
-			POWER_METER_RST_ENERGY(_ch1);
-		if (_ch2)
-			POWER_METER_RST_ENERGY(_ch1);
-		if (_ch3)
-			POWER_METER_RST_ENERGY(_ch3);
+		if (_ch1){chn_rst=1;POWER_METER_RST_ENERGY(chn_rst);}
+		if (_ch2){chn_rst=2;POWER_METER_RST_ENERGY(chn_rst);}
+		if (_ch3){chn_rst=3;POWER_METER_RST_ENERGY(chn_rst);}
 	}
 }
 

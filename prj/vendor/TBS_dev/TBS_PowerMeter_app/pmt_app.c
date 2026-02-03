@@ -72,13 +72,13 @@ extern tbs_device_powermeter_t G_POWER_METER ;
 
 #define PMT_CHECK_CHN(x)				{if(x>POWERMETER_CHANNEL)return;}
 
-#define PMT_SAMPLE_TIMING				100//100ms
+#define PMT_SAMPLE_TIMING				300//ms
 
 extern u16 G_POWER_METER_PARAMETER[4];
 
 #define PMT_GET_THRESHOLD(chnX)			(u16)(G_POWER_METER_PARAMETER[chnX])
-#define PMT_PF_AVG(chnX)				(((chnX==1)?G_POWER_METER.data.fac_power1:(chnX==2)?G_POWER_METER.data.fac_power2:G_POWER_METER.data.fac_power3)&0x7F)
 
+#define PMT_PF_AVG(chnX)				(((chnX==1)?G_POWER_METER.data.fac_power1:(chnX==2)?G_POWER_METER.data.fac_power2:G_POWER_METER.data.fac_power3)&0x7F)
 uint32_t pmt_get_millis(void);
 /******************************************************************************/
 /******************************************************************************/
@@ -326,6 +326,7 @@ void pmt_reset_energy(void *_arg, u8 _size) {
 	PMT_LATCH_ALL();
 	for (u8 chn = (args[0] > 0 ? args[0] - 1 : 0); chn < numofchn; ++chn) {
 		ERR(USER,"[%d]Reset Energy:%.3f\r\n",chn,PMT_STRUCT[chn]->ph1_energy.active);
+		PMT_CTX[chn].e_last_stored=0;
 		stpm_reset_energies(PMT_STRUCT[chn]);
 	    stpm_set_current_gain(PMT_STRUCT[chn],1,STPM32_GAIN);
 	}
@@ -578,14 +579,13 @@ void pmt_main(void){
 			PMT_LATCH_ALL();
 			G_POWER_METER.data.frequency = stpm_read_period(PMT_STRUCT[0],1);
 			stpm_read_rms_voltage_and_current(PMT_STRUCT[0],1,&volt,&curr);
-//			G_POWER_METER.data.voltage = ((u16) volt + G_POWER_METER.data.voltage) / 2;
 			//=========== Chn1
 			chn_update = 0;
 			PMT_CTX[chn_update].u_avg = (volt+PMT_CTX[chn_update].u_avg)/2;
 			G_POWER_METER.data.voltage = (u16)PMT_CTX[chn_update].u_avg;
 			PMT_CTX[chn_update].i_avg = (PMT_CTX[chn_update].i_avg + curr) / 2;
 			i_cal = calc_I(PMT_CTX[chn_update].i_avg);
-			G_POWER_METER.data.current1 = ((u16) (i_cal & 0x3FF) + G_POWER_METER.data.current1) / 2;
+			G_POWER_METER.data.current1 = (u16) (i_cal & 0x3FF);
 			current_unit = ((i_cal >> 31) & 0x1) << 7;
 			p_rms = 1000.0 * stpm_read_active_power(PMT_STRUCT[chn_update],1);
 			PMT_CTX[chn_update].p_avg = (PMT_CTX[chn_update].p_avg + p_rms) / 2;
@@ -598,14 +598,14 @@ void pmt_main(void){
 				PMT_CTX[chn_update].working_time_ms +=
 						(clock_time() - sample_timing > 0) ? (clock_time() - sample_timing) / SYSTEM_TIMER_TICK_1MS : PMT_SAMPLE_TIMING;
 			}
-			G_POWER_METER.data.time1 = (u8) (PMT_CTX[chn_update].working_time_ms / 1000);
+			G_POWER_METER.data.time1 = (u8) ceilf((float)PMT_CTX[chn_update].working_time_ms *1.0/ 1000.0);
 			//============ Chn 2
 			chn_update = 1;
 			stpm_read_rms_voltage_and_current(PMT_STRUCT[chn_update],1,&volt,&curr);
 			PMT_CTX[chn_update].u_avg = (volt+PMT_CTX[chn_update].u_avg)/2;
 			PMT_CTX[chn_update].i_avg = (PMT_CTX[chn_update].i_avg + curr) / 2;
 			i_cal = calc_I(PMT_CTX[chn_update].i_avg);
-			G_POWER_METER.data.current2 = ((u16) (i_cal & 0x3FF) + G_POWER_METER.data.current2) / 2;
+			G_POWER_METER.data.current2 = (u16) (i_cal & 0x3FF) ;
 			current_unit = ((i_cal >> 31) & 0x1) << 7;
 			p_rms = 1000.0 * stpm_read_active_power(PMT_STRUCT[chn_update],1);
 			PMT_CTX[chn_update].p_avg = (PMT_CTX[chn_update].p_avg + p_rms) / 2;
@@ -618,14 +618,14 @@ void pmt_main(void){
 				PMT_CTX[chn_update].working_time_ms +=
 						(clock_time() - sample_timing > 0) ? (clock_time() - sample_timing) / SYSTEM_TIMER_TICK_1MS : PMT_SAMPLE_TIMING;
 			}
-			G_POWER_METER.data.time2 = (u8) (PMT_CTX[chn_update].working_time_ms / 1000);
+			G_POWER_METER.data.time2 = (u8) ceilf((float)PMT_CTX[chn_update].working_time_ms *1.0/ 1000.0);
 			//============ Chn 3
 			chn_update = 2;
 			stpm_read_rms_voltage_and_current(PMT_STRUCT[chn_update],1,&volt,&curr);
 			PMT_CTX[chn_update].u_avg = (volt+PMT_CTX[chn_update].u_avg)/2;
 			PMT_CTX[chn_update].i_avg = (PMT_CTX[chn_update].i_avg + curr) / 2;
 			i_cal = calc_I(PMT_CTX[chn_update].i_avg);
-			G_POWER_METER.data.current3 = ((u16) (i_cal & 0x3FF) + G_POWER_METER.data.current3) / 2;
+			G_POWER_METER.data.current3 = (u16) (i_cal & 0x3FF);
 			current_unit = ((i_cal >> 31) & 0x1) << 7;
 			p_rms = 1000.0 * stpm_read_active_power(PMT_STRUCT[chn_update],1);
 			PMT_CTX[chn_update].p_avg = (PMT_CTX[chn_update].p_avg + p_rms) / 2;
@@ -637,7 +637,7 @@ void pmt_main(void){
 				PMT_CTX[chn_update].working_time_ms +=
 						(clock_time() - sample_timing > 0) ? (clock_time() - sample_timing) / SYSTEM_TIMER_TICK_1MS : PMT_SAMPLE_TIMING;
 			}
-			G_POWER_METER.data.time3 = (u8) (PMT_CTX[chn_update].working_time_ms / 1000);
+			G_POWER_METER.data.time3 = (u8) ceilf((float)PMT_CTX[chn_update].working_time_ms *1.0/ 1000.0);
 
 			//update timing
 			sample_timing = clock_time();
