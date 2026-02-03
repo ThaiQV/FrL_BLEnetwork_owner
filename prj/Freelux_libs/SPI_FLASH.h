@@ -26,7 +26,7 @@
 /******************************************************************************/
 /* SPI Pins */
 #define PIN_CS		HSPI_CS //GPIO_PE7 GPIO_PB0
-#define PIN_WP		HSPI_WP
+#define PIN_WP		HSPI_IO
 #define PIN_MISO	HSPI_MISO
 #define PIN_MOSI	HSPI_MOSI
 #define PIN_CLK		HSPI_CLK
