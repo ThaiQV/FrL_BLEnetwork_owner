@@ -138,7 +138,7 @@ s8 RegisterPOLLING(fl_exIO_t _io) {
 void fl_serial_buffer_ClearAll(void){
 	ERR(APP,"UART <ERR> => Clear ALL\r\n");
 	memset(fl_tx_fifo_b,0,sizeof(fl_tx_fifo_b));
-	memset(fl_tx_fifo_b,0,sizeof(fl_tx_fifo_b));
+	memset(fl_rx_fifo_b,0,sizeof(fl_rx_fifo_b));
 }
 
 static void fl_serial_AddLenIn1st(u8 *parr, u8 _size) {
@@ -194,7 +194,7 @@ static int tx_to_uart_cb(void) {
 	if (p && !FLAG_uart_dma_send) {
 		memset(FL_TXDATA.data,0,sizeof(FL_TXDATA.data));
 		FL_TXDATA.len = (unsigned int) p[0];
-		if(FL_TXDATA.len>=sizeof(FL_TXDATA.data)){
+		if (FL_TXDATA.len >= sizeof(FL_TXDATA.data)) {
 			ERR(MCU,"UART SEND OVERLOAD (%d)!!!\r\n",FL_TXDATA.len);
 			FL_TXDATA.len = 5;
 		}
@@ -202,7 +202,7 @@ static int tx_to_uart_cb(void) {
 		if (uart_send_dma(G_INPUT_EXT.serial.uart_num,(u8 *) (&FL_TXDATA.data),FL_TXDATA.len)) {
 			my_fifo_pop(&fl_tx_fifo);
 			FLAG_uart_dma_send = 1;
-//			LOGA(DRV,"lenData:%d\r\n",FL_TXDATA.len);
+			//			LOGA(DRV,"lenData:%d\r\n",FL_TXDATA.len);
 			P_PRINTFHEX_A(DRV,FL_TXDATA.data,FL_TXDATA.len,"%s(%d):","Tx",FL_TXDATA.len);
 		}
 	}
@@ -238,11 +238,11 @@ void fl_input_serial_rec(void) {
 		u8* cur_addr = fl_rx_fifo.p + (fl_rx_fifo.wptr & (fl_rx_fifo.num - 1)) * fl_rx_fifo.size;
 		uart_receive_dma(G_INPUT_EXT.serial.uart_num,(unsigned char *)cur_addr,(unsigned int) fl_rx_fifo.size);
 		uart_clr_irq_status(G_INPUT_EXT.serial.uart_num,UART_CLR_RX);
-		fl_serial_buffer_ClearAll();
+//		fl_serial_buffer_ClearAll();
 		return;
 	}
 	u8* w = fl_rx_fifo.p + (fl_rx_fifo.wptr & (fl_rx_fifo.num - 1)) * fl_rx_fifo.size;
-	LOGA(DRV,"DMA Len:%d\r\n",data_len);
+//	LOGA(DRV,"DMA Len:%d\r\n",data_len);
 	fl_serial_AddLenIn1st(w,(u8) data_len);
 	uart_clr_irq_status(G_INPUT_EXT.serial.uart_num,UART_CLR_RX);
 	if (w[0] != 0) {

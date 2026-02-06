@@ -360,7 +360,6 @@ void PAIRING_REQUEST(u8* _pdata, RspFunc rspfnc) {
 	if (rspfnc != 0) {
 		rspfnc(_pdata);
 	}
-
 }
 
 void TIMETAMP_REQUEST(u8* _pdata, RspFunc rspfnc) {
