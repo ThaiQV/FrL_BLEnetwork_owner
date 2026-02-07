@@ -954,7 +954,8 @@ int fl_master_ProccesRSP_cbk(void) {
 				u8 slave_id = packet.frame.slaveID;
 				u8 node_indx = fl_master_SlaveID_find(slave_id);
 				if (node_indx != -1) {
-					if (packet.frame.endpoint.master == FL_FROM_SLAVE_ACK) {
+					if (packet.frame.endpoint.master == FL_FROM_SLAVE_ACK)
+					{
 					//send to WIFI the previous data
 //					fl_ble2wifi_EVENT_SEND(G_NODE_LIST.sla_info[node_indx].mac);
 //					G_NODE_LIST.sla_info[node_indx].active = true;

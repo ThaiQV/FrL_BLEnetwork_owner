@@ -32,7 +32,7 @@
 // * TBS project define pinout
 // * */
 #ifndef MASTER_CORE
-#define TBS_COUNTER_DEVICE 0	//1: Counter, 0: PowerMeter **don't change tab format of the #define
+#define TBS_COUNTER_DEVICE 1	//1: Counter, 0: PowerMeter **don't change tab format of the #define
 #if TBS_COUNTER_DEVICE
 #define COUNTER_DEVICE
 #else
@@ -63,13 +63,12 @@
 #define HSPI_WP							GPIO_PB1
 #else
 	#ifdef POWER_METER_DEVICE
-		#define HSPI_WP							GPIO_PD2
+		#define HSPI_WP							GPIO_PC0
 		#define HSPI_SYNC						GPIO_PB1
 		#define HSPI_CS							GPIO_PE7
 		#define HSPI_CS_POWER_METER_STPM1		GPIO_PE6
 		#define HSPI_CS_POWER_METER_STPM2		GPIO_PE5
 		#define HSPI_CS_POWER_METER_STPM3		GPIO_PE4
-
 	#endif
 #endif
 
@@ -96,11 +95,10 @@
 												gpio_set_up_down_res(DEBUG_INFO_TX_PIN, GPIO_PIN_PULLUP_1M);		\
 												gpio_set_high_level(DEBUG_INFO_TX_PIN);								\
 											}while(0)
+#endif
 #define PERI_SPI_PIN_INIT(pin)				do{														\
 												gpio_function_en(pin);								\
 												gpio_set_output(pin, 1);							\
 												gpio_set_up_down_res(pin, GPIO_PIN_UP_DOWN_FLOAT);	\
 												gpio_set_high_level(pin);							\
 											}while(0)
-#endif
-

@@ -1162,6 +1162,8 @@ int _interval_report(void) {
 				 tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) G_INFORMATION.data;
 				 tbs_pack_powermeter_data(pwmeter_data,_payload);
 				 u8 indx_data = SIZEU8(pwmeter_data->type) + SIZEU8(pwmeter_data->mac) + SIZEU8(pwmeter_data->timetamp);
+				 //Sync timetamp with local-time
+//				 SYNC_ORIGIN_MASTER(pwmeter_data->timetamp,0);
 				 fl_api_slave_req(NWK_HDR_55,&_payload[indx_data],SIZEU8(pwmeter_data->data),0,0,1);
 				 TBS_PowerMeter_Upload2Master_RSTWorkingTime();
 #endif

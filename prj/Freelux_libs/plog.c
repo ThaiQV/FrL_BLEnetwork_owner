@@ -199,14 +199,18 @@ void PLOG_Start(type_debug_t _type) {
  * @return	  	none.
  */
 void PLOG_DEVICE_PROFILE(fl_version_t _bootloader, fl_version_t _fw,fl_version_t _hw) {
+#define P_INFO_FW(fmt,...)	{_COLOR(USER);printf(fmt,##__VA_ARGS__);TERMINAL_FONT_BLACK();}
+
 	const char device_info[] = "\n*****************************************\n"
 			"*** FreeLux @2025 - RnD Team		*\n"
 			"*** BOOTLOADER : %d.%d.%d			*\n"
 			"*** FIRMWARE   : %d.%d.%d			*\n"
 			"*** HARDWARE   : %d.%d.%d			*\n"
 			"*****************************************\n";
-	P_INFO(device_info, _bootloader.major, _bootloader.minor, _bootloader.patch,
+	P_INFO_FW(device_info, _bootloader.major, _bootloader.minor, _bootloader.patch,
 			_fw.major, _fw.minor, _fw.patch, _hw.major, _hw.minor, _hw.patch);
+
+#undef P_INFO_FW
 }
 /****************************************************************************************************
  * @brief 		platform initialization function

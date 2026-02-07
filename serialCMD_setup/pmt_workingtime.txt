@@ -1,0 +1,693 @@
+[0;37m[0]F:49,Uavg:206.559,Iavg:1.539,Pavg:317.676666,E:0.120271,PFavg:103,WT:57833
+[1;30m[0;37m[1]F:49,Uavg:206.636,Iavg:1.539,Pavg:317.725952,E:0.120415,PFavg:103,WT:57833
+[1;30m[0;37m[2]F:49,Uavg:206.660,Iavg:1.540,Pavg:317.791931,E:0.120585,PFavg:103,WT:57833
+[1;30m[1;31m[ERR][pmt_app.c] pmt_reset_energy(328):[0]Reset Energy:4.139
+[1;30m[1;31m[ERR][pmt_app.c] pmt_reset_energy(328):[1]Reset Energy:-4.199
+[1;30m[1;31m[ERR][pmt_app.c] pmt_reset_energy(328):[2]Reset Energy:-4.194
+[1;30m[0;37m[0]F:50,Uavg:206.910,Iavg:1.541,Pavg:317.248291,E:0.002744,PFavg:102,WT:57887
+[1;30m[0;37m[1]F:50,Uavg:206.921,Iavg:1.541,Pavg:317.348663,E:0.002747,PFavg:102,WT:57887
+[1;30m[0;37m[2]F:50,Uavg:206.923,Iavg:1.541,Pavg:317.449982,E:0.002752,PFavg:102,WT:57887
+[1;30m[0;37m[0]F:50,Uavg:207.249,Iavg:1.543,Pavg:318.613892,E:0.007485,PFavg:103,WT:57612
+[1;30m[0;37m[1]F:50,Uavg:207.256,Iavg:1.543,Pavg:318.538147,E:0.007493,PFavg:103,WT:57612
+[1;30m[0;37m[2]F:50,Uavg:207.279,Iavg:1.544,Pavg:318.701904,E:0.007505,PFavg:102,WT:57612
+[1;30m[0;37m[0]F:50,Uavg:206.966,Iavg:1.541,Pavg:317.755005,E:0.012214,PFavg:102,WT:57718
+[1;30m[0;37m[1]F:50,Uavg:207.005,Iavg:1.541,Pavg:317.786133,E:0.012227,PFavg:102,WT:57718
+[1;30m[0;37m[2]F:50,Uavg:207.030,Iavg:1.542,Pavg:318.016510,E:0.012246,PFavg:102,WT:57718
+[1;30m[0;37m[0]F:50,Uavg:207.605,Iavg:1.546,Pavg:322.444031,E:0.016984,PFavg:104,WT:57830
+[1;30m[0;37m[1]F:50,Uavg:207.625,Iavg:1.546,Pavg:322.330383,E:0.017002,PFavg:104,WT:57830
+[1;30m[0;37m[2]F:50,Uavg:207.649,Iavg:1.546,Pavg:322.417236,E:0.017028,PFavg:104,WT:57830
+[1;30m[0;37m
+*****************************************
+*** FreeLux @2025 - RnD Team		*
+*** BOOTLOADER : 1.0.4			*
+*** FIRMWARE   : 1.0.0			*
+*** HARDWARE   : 0.0.0			*
+*****************************************
+[1;30m[0;37mDFU..........
+[1;30mFLASH_Port_Init
+[0;37m
+*****************************************
+*** FreeLux @2025 - RnD Team		*
+*** BOOTLOADER : 1.1.0			*
+*** FIRMWARE   : 2.1.2			*
+*** HARDWARE   : 1.0.1			*
+*****************************************
+[1;30mFLASH_Port_Init
+[1;31m[ERR][SPI_FLASH.c] FLASH_IC_Check(542):Count: 8388608, 2048, 4096
+[1;30mOTA MAP: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+[0;37m** Freelux network SLAVE Init 
+[1;30m[0;37m** MAC     :9B746B775FD8
+[1;30m[0;37m** DevType:1
+[1;30m[0;37m** SlaveID: 30
+[1;30m[0;37m** grpID  :3
+[1;30m[0;37m** memID  :6
+[1;30m[0;37m** JoinNWK:0
+[1;30m[0;37m** RstFac :0
+[1;30m[0;37m** MAC GW :CCDE8177
+[1;30m[0;37m** Channel:10,11,12
+[1;30m[0;37mThreshold channel:1-1-1
+[1;30ma0000004e3
+a0000004e3
+a0000004e3
+[0;37m[1]Calib:U:0.691795,I:0.004795,E:0.002964
+[1;30m[0;37m[2]Calib:U:0.686959,I:0.004761,E:0.002925
+[1;30m[0;37m[3]Calib:U:0.686639,I:0.004770,E:0.002933
+[1;30m[0;37m[0]Ectx:0.017390,Working-time:4859
+[1;30m[0;37m[1]Ectx:0.017409,Working-time:4859
+[1;30m[0;37m[2]Ectx:0.017436,Working-time:4859
+[1;30mFLASH_Port_Init
+[1;31m[ERR][SPI_FLASH.c] FLASH_IC_Check(542):Count: 8388608, 2048, 4096
+[1;30mSTORAGE MAP: 0 1 1 1 0 20 8 40 10 0 0 0 0 0 0 80 
+[0;37m[ 28]0xEDF59C775FD8
+[1;30m[0;37m[ 29]0x2E8D34775FD8
+[1;30m[0;37m[ 30]0x9B746B775FD8
+[1;30m[1;31m[ERR][fl_nwk_slave_handler.c] fl_nwk_slave_process(1228):Device -> Online
+[1;30m[0;37m[  0]0xAF19B9775FD8
+[1;30m[0;37m[  1]0xF7FC48775FD8
+[1;30m[0;37m[  2]0x1740B9775FD8
+[1;30m[0;37m[  3]0xE2DB21775FD8
+[1;30m[0;37m[ 28]0xEDF59C775FD8
+[1;30m[0;37m[ 29]0x2E8D34775FD8
+[1;30m[0;37m[ 30]0x9B746B775FD8
+[1;30m[0;37m[  0]0xAF19B9775FD8
+[1;30m[0;37m[  1]0xF7FC48775FD8
+[1;30m[0;37m[  2]0x1740B9775FD8
+[1;30m[0;37m[  3]0xE2DB21775FD8
+[1;30m[0;37m[  4]0x0D3E8E775FD8
+[1;30m[0;37m[  5]0x7E8AF2775FD8
+[1;30m[0;37m[  6]0x1CDBF8775FD8
+[1;30m[0;37m[  7]0x168B83775FD8
+[1;30m[0;37m[ 28]0xEDF59C775FD8
+[1;30m[0;37m[ 29]0x2E8D34775FD8
+[1;30m[0;37m[ 30]0x9B746B775FD8
+[1;30m[0;37m[  0]0xAF19B9775FD8
+[1;30m[0;37m[  1]0xF7FC48775FD8
+[1;30m[0;37m[  2]0x1740B9775FD8
+[1;30m[0;37m[  3]0xE2DB21775FD8
+[1;30m[0;37m[  4]0x0D3E8E775FD8
+[1;30m[0;37m[  5]0x7E8AF2775FD8
+[1;30m[0;37m[  6]0x1CDBF8775FD8
+[1;30m[0;37m[  7]0x168B83775FD8
+[1;30m[0;37m[  8]0x1D7B8F775FD8
+[1;30m[0;37m[  9]0xF51C5A775FD8
+[1;30m[0;37m[ 10]0xB8100B775FD8
+[1;30m[0;37m[ 11]0x812B4A775FD8
+[1;30m[0;37m[ 28]0xEDF59C775FD8
+[1;30m[0;37m[ 29]0x2E8D34775FD8
+[1;30m[0;37m[ 30]0x9B746B775FD8
+[1;30m[0;37m[  0]0xAF19B9775FD8
+[1;30m[0;37m[  1]0xF7FC48775FD8
+[1;30m[0;37m[  2]0x1740B9775FD8
+[1;30m[0;37m[  3]0xE2DB21775FD8
+[1;30m[0;37m[  4]0x0D3E8E775FD8
+[1;30m[0;37m[  5]0x7E8AF2775FD8
+[1;30m[0;37m[  6]0x1CDBF8775FD8
+[1;30m[0;37m[  7]0x168B83775FD8
+[1;30m[0;37m[  8]0x1D7B8F775FD8
+[1;30m[0;37m[  9]0xF51C5A775FD8
+[1;30m[0;37m[ 10]0xB8100B775FD8
+[1;30m[0;37m[ 11]0x812B4A775FD8
+[1;30m[0;37m[ 12]0xCB29F2775FD8
+[1;30m[0;37m[ 13]0xA6BF33775FD8
+[1;30m[0;37m[ 14]0x97E4A7775FD8
+[1;30m[0;37m[ 15]0xCBE0E8775FD8
+[1;30m[0;37m[ 28]0xEDF59C775FD8
+[1;30m[0;37m[ 29]0x2E8D34775FD8
+[1;30m[0;37m[ 30]0x9B746B775FD8
+[1;30m[0;37m[  0]0xAF19B9775FD8
+[1;30m[0;37m[  1]0xF7FC48775FD8
+[1;30m[0;37m[  2]0x1740B9775FD8
+[1;30m[0;37m[  3]0xE2DB21775FD8
+[1;30m[0;37m[  4]0x0D3E8E775FD8
+[1;30m[0;37m[  5]0x7E8AF2775FD8
+[1;30m[0;37m[  6]0x1CDBF8775FD8
+[1;30m[0;37m[  7]0x168B83775FD8
+[1;30m[0;37m[  8]0x1D7B8F775FD8
+[1;30m[0;37m[  9]0xF51C5A775FD8
+[1;30m[0;37m[ 10]0xB8100B775FD8
+[1;30m[0;37m[ 11]0x812B4A775FD8
+[1;30m[0;37m[ 12]0xCB29F2775FD8
+[1;30m[0;37m[ 13]0xA6BF33775FD8
+[1;30m[0;37m[ 14]0x97E4A7775FD8
+[1;30m[0;37m[ 15]0xCBE0E8775FD8
+[1;30m[0;37m[ 20]0x231D54775FD8
+[1;30m[0;37m[ 21]0x7BE5EC775FD8
+[1;30m[0;37m[ 22]0xB0AD89775FD8
+[1;30m[0;37m[ 23]0x73EE03775FD8
+[1;30m[0;37m[ 28]0xEDF59C775FD8
+[1;30m[0;37m[ 29]0x2E8D34775FD8
+[1;30m[0;37m[ 30]0x9B746B775FD8
+[1;30m[0;37m[  0]0xAF19B9775FD8
+[1;30m[0;37m[  1]0xF7FC48775FD8
+[1;30m[0;37m[  2]0x1740B9775FD8
+[1;30m[0;37m[  3]0xE2DB21775FD8
+[1;30m[0;37m[  4]0x0D3E8E775FD8
+[1;30m[0;37m[  5]0x7E8AF2775FD8
+[1;30m[0;37m[  6]0x1CDBF8775FD8
+[1;30m[0;37m[  7]0x168B83775FD8
+[1;30m[0;37m[  8]0x1D7B8F775FD8
+[1;30m[0;37m[  9]0xF51C5A775FD8
+[1;30m[0;37m[ 10]0xB8100B775FD8
+[1;30m[0;37m[ 11]0x812B4A775FD8
+[1;30m[0;37m[ 12]0xCB29F2775FD8
+[1;30m[0;37m[ 13]0xA6BF33775FD8
+[1;30m[0;37m[ 14]0x97E4A7775FD8
+[1;30m[0;37m[ 15]0xCBE0E8775FD8
+[1;30m[0;37m[ 16]0xC2FDD6775FD8
+[1;30m[0;37m[ 17]0xCC2E64775FD8
+[1;30m[0;37m[ 18]0x803948775FD8
+[1;30m[0;37m[ 19]0x035B1B775FD8
+[1;30m[0;37m[ 20]0x231D54775FD8
+[1;30m[0;37m[ 21]0x7BE5EC775FD8
+[1;30m[0;37m[ 22]0xB0AD89775FD8
+[1;30m[0;37m[ 23]0x73EE03775FD8
+[1;30m[0;37m[ 28]0xEDF59C775FD8
+[1;30m[0;37m[ 29]0x2E8D34775FD8
+[1;30m[0;37m[ 30]0x9B746B775FD8
+[1;30m[0;37m[  0]0xAF19B9775FD8
+[1;30m[0;37m[  1]0xF7FC48775FD8
+[1;30m[0;37m[  2]0x1740B9775FD8
+[1;30m[0;37m[  3]0xE2DB21775FD8
+[1;30m[0;37m[  4]0x0D3E8E775FD8
+[1;30m[0;37m[  5]0x7E8AF2775FD8
+[1;30m[0;37m[  6]0x1CDBF8775FD8
+[1;30m[0;37m[  7]0x168B83775FD8
+[1;30m[0;37m[  8]0x1D7B8F775FD8
+[1;30m[0;37m[  9]0xF51C5A775FD8
+[1;30m[0;37m[ 10]0xB8100B775FD8
+[1;30m[0;37m[ 11]0x812B4A775FD8
+[1;30m[0;37m[ 12]0xCB29F2775FD8
+[1;30m[0;37m[ 13]0xA6BF33775FD8
+[1;30m[0;37m[ 14]0x97E4A7775FD8
+[1;30m[0;37m[ 15]0xCBE0E8775FD8
+[1;30m[0;37m[ 16]0xC2FDD6775FD8
+[1;30m[0;37m[ 17]0xCC2E64775FD8
+[1;30m[0;37m[ 18]0x803948775FD8
+[1;30m[0;37m[ 19]0x035B1B775FD8
+[1;30m[0;37m[ 20]0x231D54775FD8
+[1;30m[0;37m[ 21]0x7BE5EC775FD8
+[1;30m[0;37m[ 22]0xB0AD89775FD8
+[1;30m[0;37m[ 23]0x73EE03775FD8
+[1;30m[0;37m[ 24]0xC36638775FD8
+[1;30m[0;37m[ 25]0x85CFD6775FD8
+[1;30m[0;37m[ 26]0xF29B59775FD8
+[1;30m[0;37m[ 27]0x22DA61775FD8
+[1;30m[0;37m[ 28]0xEDF59C775FD8
+[1;30m[0;37m[ 29]0x2E8D34775FD8
+[1;30m[0;37m[ 30]0x9B746B775FD8
+[1;30m[1;31m[ERR][fl_sys_datetime.c] fl_rtc_sync(129):Synchronize system time (spread:398)!!!
+[1;30m[1;31m[ERR][fl_sys_datetime.c] fl_rtc_sync(140):Sync:2026/02/07-03:20:02 -> 2026/02/07-03:26:40
+[1;30m[0;37m[0]F:49,Uavg:207.791,Iavg:1.547,Pavg:320.193237,E:0.019759,PFavg:103,WT:34500
+[1;30m[0;37m[1]F:49,Uavg:207.803,Iavg:1.547,Pavg:320.466003,E:0.019780,PFavg:103,WT:34500
+[1;30m[0;37m[2]F:49,Uavg:207.833,Iavg:1.548,Pavg:320.567261,E:0.019811,PFavg:103,WT:34500
+[1;30m[0;37m[0]F:50,Uavg:206.140,Iavg:1.536,Pavg:315.684631,E:0.024425,PFavg:102,WT:58883
+[1;30m[0;37m[1]F:50,Uavg:206.235,Iavg:1.536,Pavg:315.770935,E:0.024450,PFavg:102,WT:58883
+[1;30m[0;37m[2]F:50,Uavg:206.303,Iavg:1.537,Pavg:315.969421,E:0.024490,PFavg:102,WT:58883
+[1;30m[0;37m[0]F:50,Uavg:206.456,Iavg:1.538,Pavg:316.985535,E:0.029134,PFavg:102,WT:59843
+[1;30m[0;37m[1]F:50,Uavg:206.541,Iavg:1.539,Pavg:317.240295,E:0.029163,PFavg:102,WT:59843
+[1;30m[0;37m[2]F:50,Uavg:206.591,Iavg:1.539,Pavg:317.352264,E:0.029211,PFavg:102,WT:59843
+[1;30m[0;37m[0]F:50,Uavg:206.737,Iavg:1.540,Pavg:319.862549,E:0.033864,PFavg:103,WT:59811
+[1;30m[0;37m[1]F:50,Uavg:206.729,Iavg:1.539,Pavg:320.038666,E:0.033898,PFavg:103,WT:59811
+[1;30m[0;37m[2]F:50,Uavg:206.758,Iavg:1.540,Pavg:320.038879,E:0.033955,PFavg:103,WT:59811
+[1;30m[0;37m[0]F:65,Uavg:0.758,Iavg:0.005,Pavg:0.000863,E:0.038237,PFavg:60,WT:55678
+[1;30m[0;37m[1]F:65,Uavg:0.247,Iavg:0.005,Pavg:0.000317,E:0.038275,PFavg:23,WT:55678
+[1;30m[0;37m[2]F:65,Uavg:0.146,Iavg:0.005,Pavg:0.000304,E:0.038339,PFavg:30,WT:55678
+[1;30m[0;37m
+*****************************************
+*** FreeLux @2025 - RnD Team		*
+*** BOOTLOADER : 1.0.4			*
+*** FIRMWARE   : 1.0.0			*
+*** HARDWARE   : 0.0.0			*
+*****************************************
+[1;30m[0;37mDFU..........
+[1;30mFLASH_Port_Init
+[0;37m
+*****************************************
+*** FreeLux @2025 - RnD Team		*
+*** BOOTLOADER : 1.1.0			*
+*** FIRMWARE   : 2.1.2			*
+*** HARDWARE   : 1.0.1			*
+*****************************************
+[1;30mFLASH_Port_Init
+[1;31m[ERR][SPI_FLASH.c] FLASH_IC_Check(542):Count: 8388608, 2048, 4096
+[1;30mOTA MAP: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+[0;37m** Freelux network SLAVE Init 
+[1;30m[0;37m** MAC     :9B746B775FD8
+[1;30m[0;37m** DevType:1
+[1;30m[0;37m** SlaveID: 30
+[1;30m[0;37m** grpID  :3
+[1;30m[0;37m** memID  :6
+[1;30m[0;37m** JoinNWK:0
+[1;30m[0;37m** RstFac :0
+[1;30m[0;37m** MAC GW :CCDE8177
+[1;30m[0;37m** Channel:10,11,12
+[1;30m[0;37mThreshold channel:1-1-1
+[1;30m8000000000
+8000000000
+8000000000
+[0;37m[1]Calib:U:0.691795,I:0.004795,E:0.002964
+[1;30m[0;37m[2]Calib:U:0.686959,I:0.004761,E:0.002925
+[1;30m[0;37m[3]Calib:U:0.686639,I:0.004770,E:0.002933
+[1;30m[0;37m[0]Ectx:0.038237,Working-time:0
+[1;30m[0;37m[1]Ectx:0.038275,Working-time:0
+[1;30m[0;37m[2]Ectx:0.038339,Working-time:0
+[1;30mFLASH_Port_Init
+[1;31m[ERR][SPI_FLASH.c] FLASH_IC_Check(542):Count: 8388608, 2048, 4096
+[1;30mSTORAGE MAP: 0 1 1 1 0 20 8 40 10 0 0 0 0 0 0 80 
+[0;37m
+*****************************************
+*** FreeLux @2025 - RnD Team		*
+*** BOOTLOADER : 1.0.4			*
+*** FIRMWARE   : 1.0.0			*
+*** HARDWARE   : 0.0.0			*
+*****************************************
+[1;30m[0;37mDFU..........
+[1;30mFLASH_Port_Init
+[0;37m
+*****************************************
+*** FreeLux @2025 - RnD Team		*
+*** BOOTLOADER : 1.1.0			*
+*** FIRMWARE   : 2.1.2			*
+*** HARDWARE   : 1.0.1			*
+*****************************************
+[1;30mFLASH_Port_Init
+[1;31m[ERR][SPI_FLASH.c] FLASH_IC_Check(542):Count: 8388608, 2048, 4096
+[1;30mOTA MAP: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+[0;37m** Freelux network SLAVE Init 
+[1;30m[0;37m** MAC     :9B746B775FD8
+[1;30m[0;37m** DevType:1
+[1;30m[0;37m** SlaveID: 30
+[1;30m[0;37m** grpID  :3
+[1;30m[0;37m** memID  :6
+[1;30m[0;37m** JoinNWK:0
+[1;30m[0;37m** RstFac :0
+[1;30m[0;37m** MAC GW :CCDE8177
+[1;30m[0;37m** Channel:10,11,12
+[1;30m[0;37mThreshold channel:1-1-1
+[1;30m8000000000
+8000000000
+8000000000
+[0;37m[1]Calib:U:0.691795,I:0.004795,E:0.002964
+[1;30m[0;37m[2]Calib:U:0.686959,I:0.004761,E:0.002925
+[1;30m[0;37m[3]Calib:U:0.686639,I:0.004770,E:0.002933
+[1;30m[0;37m[0]Ectx:0.038237,Working-time:0
+[1;30m[0;37m[1]Ectx:0.038275,Working-time:0
+[1;30m[0;37m[2]Ectx:0.038339,Working-time:0
+[1;30mFLASH_Port_Init
+[1;31m[ERR][SPI_FLASH.c] FLASH_IC_Check(542):Count: 8388608, 2048, 4096
+[1;30mSTORAGE MAP: 0 1 1 1 0 20 8 40 10 0 0 0 0 0 0 80 
+[0;37m
+*****************************************
+*** FreeLux @2025 - RnD Team		*
+*** BOOTLOADER : 1.0.4			*
+*** FIRMWARE   : 1.0.0			*
+*** HARDWARE   : 0.0.0			*
+*****************************************
+[1;30m[0;37mDFU..........
+[1;30mFLASH_Port_Init
+[0;37m
+*****************************************
+*** FreeLux @2025 - RnD Team		*
+*** BOOTLOADER : 1.1.0			*
+*** FIRMWARE   : 2.1.2			*
+*** HARDWARE   : 1.0.1			*
+*****************************************
+[1;30m SH_Por?-?[???[0;31m[ERR][CPI_FLASH.c] FLASH_IC_Check(542):Count: 8388608, 2048, 4096
+[1;30mOTA MAP: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+[0;37m** Freelux network SLAVE Init 
+[1;30m[0;37m** MAC     :9B746B775FD8
+[1;30m[0;37m** DevType:1
+[1;30m[0;37m** SlaveID: 30
+[1;30m[0;37m** grpID  :3
+[1;30m[0;37m** memID  :6
+[1;30m[0;37m** JoinNWK:0
+[1;30m[0;37m** RstFac :0
+[1;30m[0;37m** MAC GW :CCDE8177
+[1;30m[0;37m** Channel:10,11,12
+[1;30m[0;37mThreshold channel:1-1-1
+[1;30m8000000000
+8000000000
+8000000000
+[0;37m[1]Calib:U:0.691795,I:0.004795,E:0.002964
+[1;30m[0;37m[2]Calib:U:0.686959,I:0.004761,E:0.002925
+[1;30m[0;37m[3]Calib:U:0.686639,I:0.004770,E:0.002933
+[1;30m[0;37m[0]Ectx:0.038237,Working-time:0
+[1;30m[0;37m[1]Ectx:0.038275,Working-time:0
+[1;30m[0;37m[2]Ectx:0.038339,Working-time:0
+[1;30mFLASH_Port_Init
+[1;31m[ERR][SPI_FLASH.c] FLASH_IC_Check(542):Count: 8388608, 2048, 4096
+[1;30mSTORAGE MAP: 0 1 1 1 0 20 8 40 10 0 0 0 0 0 0 80 
+[0;37m
+*****************************************
+*** FreeLux @2025 - RnD Team		*
+*** BOOTLOADER : 1.0.4			*
+*** FIRMWARE   : 1.0.0			*
+*** HARDWARE   : 0.0.0			*
+*****************************************
+[1;30m[0;37mDFU..........
+[1;30mFLASH_Port_Init
+[0;37m
+*****************************************
+*** FreeLux @2025 - RnD Team		*
+*** BOOTLOADER : 1.1.0			*
+*** FIRMWARE   : 2.1.2			*
+*** HARDWARE   : 1.0.1			*
+*****************************************
+[1;30mFLASH_Port_Init
+[1;31m[ERR][SPI_FLASH.c] FLASH_IC_Check(542):Count: 8388608, 2048, 4096
+[1;30mOTA MAP: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+[0;37m** Freelux network SLAVE Init 
+[1;30m[0;37m** MAC     :9B746B775FD8
+[1;30m[0;37m** DevType:1
+[1;30m[0;37m** SlaveID: 30
+[1;30m[0;37m** grpID  :3
+[1;30m[0;37m** memID  :6
+[1;30m[0;37m** JoinNWK:0
+[1;30m[0;37m** RstFac :0
+[1;30m[0;37m** MAC GW :CCDE8177
+[1;30m[0;37m** Channel:10,11,12
+[1;30m[0;37mThreshold channel:1-1-1
+[1;30m8000000000
+8000000000
+8000000000
+[0;37m[1]Calib:U:0.691795,I:0.004795,E:0.002964
+[1;30m[0;37m[2]Calib:U:0.686959,I:0.004761,E:0.002925
+[1;30m[0;37m[3]Calib:U:0.686639,I:0.004770,E:0.002933
+[1;30m[0;37m[0]Ectx:0.038237,Working-time:0
+[1;30m[0;37m[1]Ectx:0.038275,Working-time:0
+[1;30m[0;37m[2]Ectx:0.038339,Working-time:0
+[1;30mFLASH_Port_Init
+[1;31m[ERR][SPI_FLASH.c] FLASH_IC_Check(542):Count: 8388608, 2048, 4096
+[1;30mSTORAGE MAP: 0 1 1 1 0 20 8 40 10 0 0 0 0 0 0 80 
+[0;37m
+*****************************************
+*** FreeLux @2025 - RnD Team		*
+*** BOOTLOADER : 1.0.4			*
+*** FIRMWARE   : 1.0.0			*
+*** HARDWARE   : 0.0.0			*
+*****************************************
+[1;30m[0;37mDFU..........
+[1;30mFLASH_Port_Init
+[0;37m
+*****************************************
+*** FreeLux @2025 - RnD Team		*
+*** BOOTLOADER : 1.1.0			*
+*** FIRMWARE   : 2.1.2			*
+*** HARDWARE   : 1.0.1			*
+*****************************************
+[1;30mFLASH_Port_Init
+[1;31m[ERR][SPI_FLASH.c] FLASH_IC_Check(542):Count: 8388608, 2048, 4096
+[1;30mOTA MAP: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+[0;37m** Freelux network SLAVE Init 
+[1;30m[0;37m** MAC     :9B746B775FD8
+[1;30m[0;37m** DevType:1
+[1;30m[0;37m** SlaveID: 30
+[1;30m[0;37m** grpID  :3
+[1;30m[0;37m** memID  :6
+[1;30m[0;37m** JoinNWK:0
+[1;30m[0;37m** RstFac :0
+[1;30m[0;37m** MAC GW :CCDE8177
+[1;30m[0;37m** Channel:10,11,12
+[1;30m[0;37mThreshold channel:1-1-1
+[1;30m8000000000
+8000000000
+8000000000
+[0;37m[1]Calib:U:0.691795,I:0.004795,E:0.002964
+[1;30m[0;37m[2]Calib:U:0.686959,I:0.004761,E:0.002925
+[1;30m[0;37m[3]Calib:U:0.686639,I:0.004770,E:0.002933
+[1;30m[0;37m[0]Ectx:0.038237,Working-time:0
+[1;30m[0;37m[1]Ectx:0.038275,Working-time:0
+[1;30m[0;37m[2]Ectx:0.038339,Working-time:0
+[1;30mFLASH_Port_Init
+[1;31m[ERR][SPI_FLASH.c] FLASH_IC_Check(542):Count: 8388608, 2048, 4096
+[1;30mSTORAGE MAP: 0 1 1 1 0 20 8 40 10 0 0 0 0 0 0 80 
+[0;37m
+*??  ?@`????     ?   ? ?  ??? ?G         ?  ?? ? ?? ?  ?          ?  ????  ?   ? ?? ?????   ?? ??( ??2?}??????? ? ?       ?           ????   ???#? ? ??_?<b?   ??r???? ?    ??0? ??d     ? ?? @ ? ??  ??  ? 8            ?        ?    ?     ??   ?8?  ?G??@ p??  ?   ?????????? ?  t?G?g ?                      ??  ? ? ?? ?   ?          
+*****************************************
+*** FreeLux @2025 - RnD Team		*
+*** BOOTLOADER : 1.1.0			*
+*** FIRMWARE   : 2.1.2			*
+*** HARDWARE   : 1.0.1			*
+*****************************************
+FLASH_Port_Init
+OTA MAP: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff 
+8000000000
+8000000000
+8000000000
+FLASH_Port_Init
+STORAGE MAP: ef ff 0 0 0 0 0 0 10 0 0 0 0 0 0 80 
+
+*****************************************
+*** FreeLux @2025 - RnD Team		*
+*** BOOTLOADER : 1.1.0			*
+*** FIRMWARE   : 2.1.2			*
+*** HARDWARE   : 1.0.1			*
+*****************************************
+FLASH_Port_Init
+OTA MAP: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff 
+8000000000
+8000000000
+8000000000
+FLASH_Port_Init
+STORAGE MAP: ef ff 0 0 0 0 0 0 10 0 0 0 0 0 0 80 
+
+*****************************************
+*** FreeLux @2025 - RnD Team		*
+*** BOOTLOADER : 1.1.0			*
+*** FIRMWARE   : 2.1.2			*
+*** HARDWARE   : 1.0.1			*
+*****************************************
+FLASH_Port_Init
+OTA MAP: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff 
+8000000000
+8000000000
+8000000000
+FLASH_Port_Init
+STORAGE MAP: ef ff 0 0 0 0 0 0 10 0 0 0 0 0 0 80 
+
+*****************************************
+*** FreeLux @2025 - RnD Team		*
+*** BOOTLOADER : 1.1.0			*
+*** FIRMWARE   : 2.1.2			*
+*** HARDWARE   : 1.0.1			*
+*****************************************
+FLASH_Port_Init
+OTA MAP: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff 
+8000000000
+8000000000
+8000000000
+FLASH_Port_Init
+STORAGE MAP: ef ff 0 0 0 0 0 0 10 0 0 0 0 0 0 80 
+
+*****************************************
+*** FreeLux @2025 - RnD Team		*
+*** BOOTLOADER : 1.1.0			*
+*** FIRMWARE   : 2.1.2			*
+*** HARDWARE   : 1.0.1			*
+*****************************************
+FLASH_Port_Init
+OTA MAP: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff 
+8000000000
+8000000000
+8000000000
+FLASH_Port_Init
+STORAGE MAP: ef ff 0 0 0 0 0 0 10 0 0 0 0 0 0 80 
+
+*****************************************
+*** FreeLux @2025 - RnD Team		*
+*** BOOTLOADER : 1.1.0			*
+*** FIRMWARE   : 2.1.2			*
+*** HARDWARE   : 1.0.1			*
+*****************************************
+FLASH_Port_Init
+OTA MAP: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff 
+8000000000
+8000000000
+8000000000
+FLASH_Port_Init
+STORAGE MAP: ef ff 0 0 0 0 0?0 10?????
+*****************************************
+*** FreeLux @2025 - RnD Team		*
+*** BOOTLOADER : 1.1.0			*
+*** FIRMWARE   : 2.1.2			*
+*** HARDWARE   : 1.0.1			*
+*****************************************
+FLASH_Port_Init
+OTA MAP: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff 
+8000000000
+8000000000
+8000000000
+FLASH_Port_Init
+STORAGE MAP: ef ff 0 0 0 0 0 0 10 0 0 0 0 0 0 80 
+
+*****************************************
+*** FreeLux @2025 - RnD Team		*
+*** BOOTLOADER : 1.1.0			*
+*** FIRMWARE   : 2.1.2			*
+*** HARDWARE   : 1.0.1			*
+*****************************************
+FLASH_Port_Init
+OTA MAP: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff 
+8000000000
+8000000000
+8000000000
+FLASH_Port_Init
+STORAGE MAP: ef ff 0 0 0 0 0 0 10 0 0 0 0 0 0 80 
+
+*****************************************
+*** FreeLux @2025 - RnD Team		*
+*** BOOTLOADER : 1.1.0			*
+*** FIRMWARE   : 2.1.2			*
+*** HARDWARE   : 1.0.1			*
+*****************************************
+FLASH_Port_Init
+OTA MAP: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff 
+8000000000
+8000000000
+8000000000
+FLASH_Port_Init
+STORAGE MAP: ef ff 0 0 0 0 0 0 10 0 0 0 0 0 0 80 
+
+*****************************************
+*** FreeLux @2025 - RnD Team		*
+*** BOOTLOADER : 1.1.0			*
+*** FIRMWARE   : 2.1.2			*
+*** HARDWARE   : 1.0.1			*
+*****************************************
+FLASH_Port_Init
+OTA MAP: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff 
+8000000000
+8000000000
+8000000000
+FLASH_Port_Init
+STORAGE MAP: ef ff 0 0 0 0 0 0 10 0 0 0 0 0 0 80 
+
+*****************************************
+*** FreeLux @2025 - RnD Team		*
+*** BOOTLOADER : 1.1.0			*
+*** FIRMWARE   : 2.1.2			*
+*** HARDWARE   : 1.0.1			*
+*****************************************
+FLASH_Port_Init
+OTA MAP: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff 
+8000000000
+8000000000
+8000000000
+FLASH_Port_Init
+STORAGE MAP: ef ff 0 0 0 0 0 0 10 0 0 0 0 0 0 80 
+
+*****************************************
+*** FreeLux @2025 - RnD Team		*
+*** BOOTLOADER : 1.1.0			*
+*** FIRMWARE   : 2.1.2			*
+*** HARDWARE   : 1.0.1			*
+*****************************************
+FLASH_Port_Init
+OTA MAP: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff 
+ffffffffff
+ffffffffff
+ffffffffff
+FLASH_Port_Init
+[0;37m
+*****************************************
+*** FreeLux @2025 - RnD Team		*
+*** BOOTLOADER : 1.0.4			*
+*** FIRMWARE   : 1.0.0			*
+*** HARDWARE   : 0.0.0			*
+*****************************************
+[1;30m[0;37mDFU..........
+[1;30mFLASH_Port_Init
+[0;37m
+*****************************************
+*** FreeLux @2025 - RnD Team		*
+*** BOOTLOADER : 1.1.0			*
+*** FIRMWARE   : 2.1.2			*
+*** HARDWARE   : 1.0.1			*
+*****************************************
+[1;30mFLASH_Port_Init
+[1;31m[ERR][SPI_FLASH.c] FLASH_IC_Check(542):Count: 8388608, 2048, 4096
+[1;30mOTA MAP: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff 
+[0;37m** Freelux network SLAVE Init 
+[1;30m[0;37m** MAC     :CBE0E8775FD8
+[1;30m[0;37m** DevType:1
+[1;30m[0;37m** SlaveID: 15
+[1;30m[0;37m** grpID  :1
+[1;30m[0;37m** memID  :7
+[1;30m[0;37m** JoinNWK:0
+[1;30m[0;37m** RstFac :0
+[1;30m[0;37m** MAC GW :CCDE8177
+[1;30m[0;37m** Channel:10,11,12
+[1;30m[0;37mThreshold channel:10-5-4
+[1;30ma0000004e3
+a0000004e3
+a0000004e3
+[0;37m[1]Calib:U:0.690680,I:0.007136,E:0.004442
+[1;30m[0;37m[2]Calib:U:0.689980,I:0.007106,E:0.004429
+[1;30m[0;37m[3]Calib:U:0.690767,I:0.007174,E:0.004480
+[1;30m[0;37m[0]Ectx:0.123016,Working-time:54008
+[1;30m[0;37m[1]Ectx:0.123159,Working-time:54008
+[1;30m[0;37m[2]Ectx:0.123877,Working-time:54008
+[1;30mFLASH_Port_Init
+[1;31m[ERR][SPI_FLASH.c] FLASH_IC_Check(542):Count: 8388608, 2048, 4096
+[1;30mSTORAGE MAP: ef ff 0 0 0 0 0 0 10 0 0 0 0 0 0 80 
+[1;31m[ERR][fl_sys_datetime.c] fl_rtc_sync(129):Synchronize system time (spread:386)!!!
+[1;30m[1;31m[ERR][fl_sys_datetime.c] fl_rtc_sync(140):Sync:2026/02/07-03:26:45 -> 2026/02/07-03:33:11
+[1;30m[1;31m[ERR][fl_nwk_slave_handler.c] fl_nwk_slave_process(1228):Device -> Online
+[1;30m[0;37m[0]F:65,Uavg:2.428,Iavg:0.008,Pavg:0.003394,E:0.123016,PFavg:0,WT:54008
+[1;30m[0;37m[1]F:65,Uavg:0.215,Iavg:0.008,Pavg:0.000021,E:0.123159,PFavg:20,WT:54008
+[1;30m[0;37m[2]F:65,Uavg:0.123,Iavg:0.008,Pavg:0.000068,E:0.123877,PFavg:0,WT:54008
+[1;30m[0;37m
+*****************************************
+*** FreeLux @2025 - RnD Team		*
+*** BOOTLOADER : 1.0.4			*
+*** FIRMWARE   : 1.0.0			*
+*** HARDWARE   : 0.0.0			*
+*****************************************
+[1;30m[0;37mDFU..........
+[1;30mFLASH_Port_Init
+[0;37m
+*****************************************
+*** FreeLux @2025 - RnD Team		*
+*** BOOTLOADER : 1.1.0			*
+*** FIRMWARE   : 2.1.2			*
+*** HARDWARE   : 1.0.1			*
+*****************************************
+[1;30mFLASH_Port_Init
+[1;31m[ERR][SPI_FLASH.c] FLASH_IC_Check(542):Count: 8388608, 2048, 4096
+[1;30mOTA MAP: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff 
+[0;37m** Freelux network SLAVE Init 
+[1;30m[0;37m** MAC     :CBE0E8775FD8
+[1;30m[0;37m** DevType:1
+[1;30m[0;37m** SlaveID: 15
+[1;30m[0;37m** grpID  :1
+[1;30m[0;37m** memID  :7
+[1;30m[0;37m** JoinNWK:0
+[1;30m[0;37m** RstFac :0
+[1;30m[0;37m** MAC GW :CCDE8177
+[1;30m[0;37m** Channel:10,11,12
+[1;30m[0;37mThreshold channel:10-5-4
+[1;30m8000000000
+8000000000
+8000000000
+[0;37m[1]Calib:U:0.690680,I:0.007136,E:0.004442
+[1;30m[0;37m[2]Calib:U:0.689980,I:0.007106,E:0.004429
+[1;30m[0;37m[3]Calib:U:0.690767,I:0.007174,E:0.004480
+[1;30m[0;37m[0]Ectx:0.123016,Working-time:54008
+[1;30m[0;37m[1]Ectx:0.123159,Working-time:54008
+[1;30m[0;37m[2]Ectx:0.123877,Working-time:54008
+[1;30mFLASH_Port_Init
+[1;31m[ERR][SPI_FLASH.c] FLASH_IC_Check(542):Count: 8388608, 2048, 4096
+?gf???R????66?f>?3??????10 0 0 0 0 0 0 80 
+[0;37m
+*****************************************
+*** FreeLux @2025 - RnD Team		*
+*** BOOTLOADER : 1.0.4			*
+*** FIRMWARE   : 1.0.0			*
+*** HARDWARE   : 0.0.0	9?_??????????[0;37m
+*****************************************
+*** FreeLux @2025 - RnD Team		*
+*** BOOTLOADER : 1.1.0			*
+*** FIRMWARE   : 2.1.2			*
+*** HARDWARE   : 1.0.1			*
+*****************************************
+[1;30m ?

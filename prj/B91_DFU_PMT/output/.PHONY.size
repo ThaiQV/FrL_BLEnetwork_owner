@@ -1,2 +1,2 @@
    text	   code	 rodata	   data	    bss	    dec	    hex	filename
-  24576	  23756	    820	    390	  16512	  41478	   a206	B91_DFU_PMT.elf
+  24384	  23564	    820	    390	    128	  24902	   6146	B91_DFU_PMT.elf
