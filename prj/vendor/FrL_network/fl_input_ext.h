@@ -15,8 +15,8 @@
 #ifdef MASTER_CORE
 #define FL_RXFIFO_SIZE		128
 #define FL_RXFIFO_NUM		256
-#define FL_TXFIFO_SIZE		128
-#define FL_TXFIFO_NUM		256
+#define FL_TXFIFO_SIZE		64
+#define FL_TXFIFO_NUM		512
 
 #define UART_DATA_LEN    	(FL_TXFIFO_SIZE - 2)   // data max 252
 #else
