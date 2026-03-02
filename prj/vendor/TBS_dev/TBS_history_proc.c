@@ -104,7 +104,12 @@ tbs_history_t G_HISTORY_CONTAINER[NUM_HISTORY];
 /***                           Private definitions                           **/
 /******************************************************************************/
 /******************************************************************************/
+#ifdef COUNTER_DEVICE
 #define DATA_HISTORY_SIZE 			22//SIZEU8(G_HISTORY_CONTAINER[0].data)
+#endif
+#ifdef POWER_METER_DEVICE
+#define DATA_HISTORY_SIZE 			25//SIZEU8(G_HISTORY_CONTAINER[0].data)
+#endif
 
 //EXAMPLE DATABASE
 u8 sample_history_database[NUM_HISTORY][DATA_HISTORY_SIZE];
@@ -199,21 +204,22 @@ fl_pack_t tbs_history_create_pack(u8* _data) {
 	packet.frame.timetamp[2] = U32_BYTE2(data_dev->timetamp);
 	packet.frame.timetamp[3] = U32_BYTE3(data_dev->timetamp);
 #else
-//	tbs_history_powermeter_t *data_dev = (tbs_history_powermeter_t*)_data;
-	tbs_device_powermeter_t data_dev;
-	memcpy(data_dev.mac,fl_nwk_mySlaveMac,SIZEU8(data_dev.mac));
-	memcpy((u8*)&data_dev + SIZEU8(data_dev.mac),_data,SIZEU8(tbs_device_powermeter_t)-SIZEU8(data_dev.mac));
-	P_PRINTFHEX_A(INF,data_dev,SIZEU8(tbs_device_powermeter_t)-SIZEU8(data_dev.mac),"HIS PACK:");
-	u8 packed_data[POWER_METER_BITSIZE];
-	tbs_pack_powermeter_data(&data_dev,packed_data);
-	u8 indx_data = SIZEU8(data_dev.type) + SIZEU8(data_dev.mac) + SIZEU8(data_dev.timetamp);
+	tbs_history_powermeter_t *data_dev = (tbs_history_powermeter_t*)_data;
+//	tbs_device_powermeter_t data_dev;
+//	memcpy(data_dev.mac,fl_nwk_mySlaveMac,SIZEU8(data_dev.mac));
+
+//	memcpy((u8*)&data_dev + SIZEU8(data_dev.mac),_data,DATA_HISTORY_SIZE);
+	P_PRINTFHEX_A(INF,_data,DATA_HISTORY_SIZE,"HIS PACK:");
+	//u8 packed_data[POWER_METER_BITSIZE];
+	//tbs_pack_powermeter_data(&data_dev,packed_data);
+	//u8 indx_data = SIZEU8(data_dev.type) + SIZEU8(data_dev.mac) + SIZEU8(data_dev.timetamp);
 	//payload
 	memset(packet.frame.payload,0xFF,SIZEU8(packet.frame.payload));
-	memcpy(packet.frame.payload,&packed_data[indx_data],SIZEU8(packet.frame.payload));
-	packet.frame.timetamp[0] = U32_BYTE0(data_dev.timetamp);
-	packet.frame.timetamp[1] = U32_BYTE1(data_dev.timetamp);
-	packet.frame.timetamp[2] = U32_BYTE2(data_dev.timetamp);
-	packet.frame.timetamp[3] = U32_BYTE3(data_dev.timetamp);
+	memcpy(packet.frame.payload,(u8*)&data_dev->data,DATA_HISTORY_SIZE);
+	packet.frame.timetamp[0] = U32_BYTE0(data_dev->timetamp);
+	packet.frame.timetamp[1] = U32_BYTE1(data_dev->timetamp);
+	packet.frame.timetamp[2] = U32_BYTE2(data_dev->timetamp);
+	packet.frame.timetamp[3] = U32_BYTE3(data_dev->timetamp);
 #endif
 	packet.frame.hdr = NWK_HDR_A5_HIS;
 
@@ -292,7 +298,7 @@ void TBS_History_LoadFromFlash(void){
 		}
 	}
 }
-/*
+
 void TBS_History_StoreToFlash(u8* _data_struct){
 #ifdef COUNTER_DEVICE
 	tbs_history_counter_t his_dev;
@@ -301,18 +307,19 @@ void TBS_History_StoreToFlash(u8* _data_struct){
 	P_PRINTFHEX_A(FLA,his_dev,DATA_HISTORY_SIZE,"STORE|[%d]%d:",his_dev.data.index,his_dev.timetamp);
 #endif
 #ifdef POWER_METER_DEVICE
+	extern tbs_device_powermeter_t G_POWER_METER;
 	u8 his_dev[DATA_HISTORY_SIZE];
-	u8 data_packed[POWER_METER_BITSIZE];
-	tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) &_data_struct;
-	tbs_pack_powermeter_data(pwmeter_data,data_packed);
-	u8 indx_data = SIZEU8(pwmeter_data->mac);
+	u8 data_packed[SIZEU8(tbs_device_powermeter_t)];
+	tbs_device_powermeter_t pwmeter_data = G_POWER_METER;
+	tbs_pack_powermeter_data(&pwmeter_data,data_packed);
+	u8 indx_data = 6;//SIZEU8(pwmeter_data->mac);
 	memcpy((u8*)&his_dev,&data_packed[indx_data],DATA_HISTORY_SIZE);
-	P_PRINTFHEX_A(FLA,his_dev,DATA_HISTORY_SIZE,"STORE|[%d]%d:",pwmeter_data->data.index,pwmeter_data->timetamp);
+	P_PRINTFHEX_A(FLA,his_dev,DATA_HISTORY_SIZE,"STORE|[%d]%d:",pwmeter_data.data.index,pwmeter_data.timetamp);
 #endif
 	tbs_history_store((u8*)&his_dev,DATA_HISTORY_SIZE);
 }
-*/
 
+/*
 void TBS_History_StoreToFlash(u8* _data_struct){
 #ifdef COUNTER_DEVICE
 	tbs_history_counter_t his_dev;
@@ -327,7 +334,7 @@ void TBS_History_StoreToFlash(u8* _data_struct){
 
 	P_PRINTFHEX_A(FLA,his_dev,DATA_HISTORY_SIZE,"STORE|[%d]%d:",his_dev.data.index,his_dev.timetamp);
 }
-
+*/
 
 void TBS_History_ClearAll(void){
 	tbs_history_cleanAll();

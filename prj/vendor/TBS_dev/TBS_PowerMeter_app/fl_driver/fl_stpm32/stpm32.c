@@ -433,7 +433,7 @@ void stpm_update_energy(stpm_handle_t *handle, uint8_t channel) {
 
 		// Check for positive energy change
 		if (delta < (uint32_t) 2147483648) {
-			if(i==0) LOGA(PERI,"sersors read p:%f(noise:%f,max_pw:%f)\r\n",p,NOISE_POWER,MAX_POWER);
+//			if(i==0) LOGA(PERI,"sersors read p:%f(noise:%f,max_pw:%f)\r\n",p,NOISE_POWER,MAX_POWER);
 			if (p < NOISE_POWER || p > MAX_POWER)
 				e = 0;
 		} else {
@@ -441,11 +441,11 @@ void stpm_update_energy(stpm_handle_t *handle, uint8_t channel) {
 			delta = energy_helper->old_energy[i] - my_energies[i];
 			e = -1.0 * calc_energy(delta);
 			p = e * 1000.0 * 3600.0 / (double) delta_t;
-			if(i==0) LOGA(PERI,"sersors read p:%f(noise:%f,max_pw:%f)\r\n",p,-2*NOISE_POWER,-MAX_POWER);
+//			if(i==0) LOGA(PERI,"sersors read p:%f(noise:%f,max_pw:%f)\r\n",p,-2*NOISE_POWER,-MAX_POWER);
 			if (p > -2 * NOISE_POWER || p < -MAX_POWER)
 				e = 0;
 		}
-		if(i==0) LOGA(PERI,"sersors read E:%f\r\n",e);
+//		if(i==0) LOGA(PERI,"sersors read E:%f\r\n",e);
 		*update_energies[i] += e;
 		energy_helper->old_energy[i] = my_energies[i];
 	}
