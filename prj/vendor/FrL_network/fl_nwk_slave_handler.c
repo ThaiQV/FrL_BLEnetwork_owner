@@ -123,11 +123,11 @@ void fl_nwk_LedSignal_init(void) {
 #endif
 }
 void fl_nwk_LedSignal_run(void){
-#ifdef COUNTER_DEVICE
-#ifndef HW_SAMPLE_TEST
+//#ifdef COUNTER_DEVICE
+//#ifndef HW_SAMPLE_TEST
 	gpio_toggle(GPIO_PA6);
-#endif
-#endif
+//#endif
+//#endif
 }
 
 u8 fl_nwk_mySlaveID(void){

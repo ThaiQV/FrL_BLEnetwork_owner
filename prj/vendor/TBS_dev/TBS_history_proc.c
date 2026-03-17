@@ -348,7 +348,9 @@ void TBS_History_Init(void){
 	//clear G_HISTORY
 	_CLEAR_G_HISTORY();
 //	TBS_history_createSample();
+	P_INFO("Storage History flash init....\r\n");
 	tbs_history_flash_init();
+	P_INFO("Storage History flash init->ok\r\n");
 }
 
 void TBS_History_Proc(void){
