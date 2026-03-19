@@ -77,7 +77,35 @@ typedef struct {
 	u8 fw_type;
 	u8 begin;
 	u8 end;
+	uint8_t crc128[CRC128_LENGTH];
 } fl_ble2wif_fota_info_t;
+//
+//static inline uint16_t fl_fota_crc16_update(uint16_t crc_curr, uint8_t *data, u8 len) {
+//    for (size_t i = 0; i < len; i++) {
+//    	crc_curr ^= data[i];
+//        for (int j = 0; j < 8; j++) {
+//            if (crc_curr & 1)
+//            	crc_curr = (crc_curr >> 1) ^ 0xA001; // polynomial
+//            else
+//            	crc_curr >>= 1;
+//        }
+//    }
+//    return crc_curr;
+//}
+ /**
+ * @brief: calculate crc128 for check sum of OTA FW
+ * @param: see below
+ * @retval: None
+ */
+static inline void fl_fota_crc128_init(u8 *g_crc128, u8 _size){
+	memset(g_crc128,0xFF,_size);
+}
+static inline void fl_fota_crc128_calculate(u8 *g_crc128,uint8_t *pdata) {
+	uint8_t i;
+	for (i = 0; i < CRC128_LENGTH; i++) {
+		g_crc128[i] = (g_crc128[i] ^ pdata[i]);
+	}
+}
 
 u16 FL_NWK_FOTA_IsReady(void);
 s16 fl_wifi2ble_fota_find(fl_pack_t *_pack_rec);

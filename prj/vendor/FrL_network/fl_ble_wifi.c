@@ -679,8 +679,9 @@ void RSTFACTORY_RESPONSE(u8* _pdata){}
 /******************************************************************************/
 /******************************************************************************/
 u8 data_fw[22];
-fl_ble2wif_fota_info_t FOTA_INFO;
 
+fl_ble2wif_fota_info_t FOTA_INFO;
+u16 crc_total;
 u8 Is_FOTA_RUNNING(void){
 	return FOTA_INFO.begin;
 }
@@ -715,6 +716,8 @@ void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 				if (data_fw[0] == FOTA_PACKET_BEGIN){
 					rslt = fl_wifi2ble_fota_system_begin(data_fw,SIZEU8(data_fw));
 					if (rslt != -1) {
+//						memset(FOTA_INFO.crc128,0xFF,sizeof(FOTA_INFO.crc128));
+						fl_fota_crc128_init(FOTA_INFO.crc128,sizeof(FOTA_INFO.crc128));
 						FOTA_INFO.begin++;
 						P_INFO_HEX(data_fw,SIZEU8(data_fw),"%d|->(%d)FOTA BEGIN:",FOTA_INFO.begin,rslt);
 						FOTA_INFO.fw_size = MAKE_U32(0,data_fw[5],data_fw[4],data_fw[3]);
@@ -727,6 +730,9 @@ void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 						FOTA_INFO.version=data_fw[2];
 						FOTA_INFO.fw_type=data_fw[1];
 						FOTA_INFO.body++;
+//						crc_total = fl_fota_crc16_update(crc_total,&data_fw[3],SIZEU8(data_fw)-3);
+						fl_fota_crc128_calculate(FOTA_INFO.crc128,&data_fw[3+3]);
+
 						P_INFO("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
 						P_INFO("[T%d,v%d]Downloading:%d/%d (%d)(%d)",FOTA_INFO.fw_type,FOTA_INFO.version,FOTA_INFO.body*OTA_PACKET_LENGTH,FOTA_INFO.fw_size,FOTA_INFO.body,FL_NWK_FOTA_IsReady());
 					}
@@ -736,6 +742,7 @@ void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 					if(rslt != -1){
 						FOTA_INFO.end++;
 						P_INFO_HEX(data_fw,SIZEU8(data_fw),"\r%d|->(%d)FOTA END:",FOTA_INFO.end,rslt);
+						P_INFO_HEX(FOTA_INFO.crc128,SIZEU8(FOTA_INFO.crc128),"CRC:");
 						FOTA_INFO.end=0;
 						FOTA_INFO.begin=0;
 						FOTA_INFO.body=0;

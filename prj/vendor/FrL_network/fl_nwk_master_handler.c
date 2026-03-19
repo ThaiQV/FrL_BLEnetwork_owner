@@ -57,7 +57,7 @@ volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into endpoint byte (dbg :1
 volatile u8 NWK_REPEAT_MODE = 0; // 1: level | 0 : non-level
 volatile u8 NWK_REPEAT_LEVEL = 3;
 
-fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_NODETALBE_UPDATE,NWK_HDR_REMOVE,NWK_HDR_MASTER_CMD,NWK_HDR_FOTA,NWK_HDR_A5_HIS, NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_22_PING}; // register cmdid REQ
+fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_23_NOTIFY,NWK_HDR_NODETALBE_UPDATE,NWK_HDR_REMOVE,NWK_HDR_MASTER_CMD,NWK_HDR_FOTA,NWK_HDR_A5_HIS, NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_22_PING}; // register cmdid REQ
 
 #define NWK_HDR_REQ_SIZE (sizeof(G_NWK_HDR_REQLIST)/sizeof(G_NWK_HDR_REQLIST[0]))
 
@@ -938,6 +938,22 @@ int fl_master_ProccesRSP_cbk(void) {
 						memcpy(seq_timetamp,packet.frame.timetamp,SIZEU8(packet.frame.timetamp));
 						seq_timetamp[SIZEU8(packet.frame.timetamp)] = packet.frame.milltamp;
 						fl_adv_sendFIFO_add(fl_master_packet_RSP_TimetampREQ_build(NWK_HDR_22_PING,slave_id,seq_timetamp));
+					}
+				} else {
+					ERR(INF,"ID not foud:%02X\r\n",slave_id);
+					return -1;
+				}
+			}
+			break;
+
+			case NWK_HDR_23_NOTIFY: {
+				u8 slave_id = packet.frame.slaveID;
+				u8 node_indx = fl_master_SlaveID_find(slave_id);
+				if (node_indx != -1) {
+					u8 crc = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
+					if(crc == packet.frame.crc8){
+						//P_INFO("[FOTA]SlaveID(%d):ver(%d),type(%d),rec(%d)\r\n",slave_id,packet.frame.payload[0],packet.frame.payload[1],MAKE_U16(packet.frame.payload[3],packet.frame.payload[2]));
+						P_INFO_HEX(packet.frame.payload+2,16,"[FOTA]SlaveID(%d):REC(%d)CRC128:",slave_id,MAKE_U16(packet.frame.payload[1],packet.frame.payload[0]));
 					}
 				} else {
 					ERR(INF,"ID not foud:%02X\r\n",slave_id);

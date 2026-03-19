@@ -10,7 +10,7 @@ ELF Header:
   Version:                           0x1
   Entry point address:               0x20000000
   Start of program headers:          52 (bytes into file)
-  Start of section headers:          166436 (bytes into file)
+  Start of section headers:          166420 (bytes into file)
   Flags:                             0x3, RVC, single-float ABI
   Size of this header:               52 (bytes)
   Size of program headers:           32 (bytes)
@@ -32,19 +32,19 @@ Section Headers:
   [ 8] .data             PROGBITS        00080000 009000 000034 00  WA  0   0  4
   [ 9] .sbss             NOBITS          00080038 009034 00004c 00  WA  0   0  8
   [10] .bss              NOBITS          00080084 009034 000034 00  WA  0   0  4
-  [11] .debug_info       PROGBITS        00000000 009034 00b058 00      0   0  1
-  [12] .debug_abbrev     PROGBITS        00000000 01408c 000bdf 00      0   0  1
-  [13] .debug_loc        PROGBITS        00000000 014c6b 004de1 00      0   0  1
-  [14] .debug_aranges    PROGBITS        00000000 019a50 000498 00      0   0  8
-  [15] .debug_ranges     PROGBITS        00000000 019ee8 001420 00      0   0  8
-  [16] .debug_line       PROGBITS        00000000 01b308 0052a6 00      0   0  1
-  [17] .debug_str        PROGBITS        00000000 0205ae 004903 01  MS  0   0  1
-  [18] .comment          PROGBITS        00000000 024eb1 000037 01  MS  0   0  1
-  [19] .riscv.attributes RISCV_ATTRIBUTE 00000000 024ee8 00003b 00      0   0  1
-  [20] .debug_frame      PROGBITS        00000000 024f24 00143c 00      0   0  4
-  [21] .symtab           SYMTAB          00000000 026360 001470 10     22 188  4
-  [22] .strtab           STRTAB          00000000 0277d0 001159 00      0   0  1
-  [23] .shstrtab         STRTAB          00000000 028929 0000f9 00      0   0  1
+  [11] .debug_info       PROGBITS        00000000 009034 00b048 00      0   0  1
+  [12] .debug_abbrev     PROGBITS        00000000 01407c 000bdd 00      0   0  1
+  [13] .debug_loc        PROGBITS        00000000 014c59 004de1 00      0   0  1
+  [14] .debug_aranges    PROGBITS        00000000 019a40 000498 00      0   0  8
+  [15] .debug_ranges     PROGBITS        00000000 019ed8 001420 00      0   0  8
+  [16] .debug_line       PROGBITS        00000000 01b2f8 0052a6 00      0   0  1
+  [17] .debug_str        PROGBITS        00000000 02059e 004903 01  MS  0   0  1
+  [18] .comment          PROGBITS        00000000 024ea1 000037 01  MS  0   0  1
+  [19] .riscv.attributes RISCV_ATTRIBUTE 00000000 024ed8 00003b 00      0   0  1
+  [20] .debug_frame      PROGBITS        00000000 024f14 00143c 00      0   0  4
+  [21] .symtab           SYMTAB          00000000 026350 001470 10     22 188  4
+  [22] .strtab           STRTAB          00000000 0277c0 001159 00      0   0  1
+  [23] .shstrtab         STRTAB          00000000 028919 0000f9 00      0   0  1
 Key to Flags:
   W (write), A (alloc), X (execute), M (merge), S (strings), I (info),
   L (link order), O (extra OS processing required), G (group), T (TLS),
@@ -60,7 +60,7 @@ Program Headers:
   LOAD           0x002300 0x00000300 0x20000438 0x02d02 0x02d02 R E 0x1000
   LOAD           0x005140 0x20003140 0x20003140 0x02f78 0x02f78 R E 0x1000
   LOAD           0x009000 0x00080000 0x200060b8 0x00034 0x000b8 RW  0x1000
-  RISCV_ATTRIBUT 0x024ee8 0x00000000 0x00000000 0x0003b 0x00000 R   0x1
+  RISCV_ATTRIBUT 0x024ed8 0x00000000 0x00000000 0x0003b 0x00000 R   0x1
 
  Section to Segment mapping:
   Segment Sections...
@@ -228,8 +228,8 @@ Symbol table '.symtab' contains 327 entries:
    146: 000002a0     1 OBJECT  LOCAL  DEFAULT    3 F_SENDING_STATE
    147: 000002a1     1 OBJECT  LOCAL  DEFAULT    3 FLAG_uart_dma_send
    148: 000002a2     1 OBJECT  LOCAL  DEFAULT    3 g_plic_preempt_en
-   149: 20005dc0    11 OBJECT  LOCAL  DEFAULT    6 __FUNCTION__.10310
-   150: 20005dcc    17 OBJECT  LOCAL  DEFAULT    6 __FUNCTION__.13214
+   149: 20005dc0    11 OBJECT  LOCAL  DEFAULT    6 __FUNCTION__.10331
+   150: 20005dcc    17 OBJECT  LOCAL  DEFAULT    6 __FUNCTION__.13235
    151: 00080038     4 OBJECT  LOCAL  DEFAULT    9 crc
    152: 0008003c     2 OBJECT  LOCAL  DEFAULT    9 dfu_uart_queue_fifo
    153: 00080040     8 OBJECT  LOCAL  DEFAULT    9 doubleword

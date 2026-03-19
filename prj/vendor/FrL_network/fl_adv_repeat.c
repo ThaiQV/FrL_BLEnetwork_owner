@@ -56,7 +56,7 @@ fl_pack_t fl_repeat_packet_build(fl_pack_t _pack) {
 	pack_built.length = SIZEU8(packet.bytes) - 1; //skip rssi
 	memcpy(pack_built.data_arr,packet.bytes,pack_built.length);
 
-	LOGA(ZIG_GP,"%s :%d,TTL: %d/%d,Mode: %d\r\n",(packet.frame.endpoint.master == FL_FROM_SLAVE)?"SlaveID":"Master",
+	LOGA(API,"%s :%d,TTL: %d/%d,Mode: %d\r\n",(packet.frame.endpoint.master == FL_FROM_SLAVE)?"SlaveID":"Master",
 			packet.frame.slaveID,packet.frame.endpoint.repeat_cnt,packet.frame.endpoint.rep_settings,
 			packet.frame.endpoint.repeat_mode);
 
@@ -96,7 +96,7 @@ int fl_repeat_send_cbk(void) {
 /******************************************************************************/
 /******************************************************************************/
 void fl_repeater_init(void) {
-	LOG_P(ZIG_GP,"Repeater init -> ok\r\n");
+	LOG_P(API,"Repeater init -> ok\r\n");
 	FL_QUEUE_CLEAR(&G_REPEAT_CONTAINER,PACK_REPEAT_SIZE);
 }
 
@@ -107,7 +107,7 @@ void fl_repeat_run(fl_pack_t *_pack_repeat) {
 		u8 repeat_mode_non_level = (data_parsed.endpoint.repeat_mode == 0)?1:0;
 		if (FL_QUEUE_FIND(&G_REPEAT_CONTAINER,_pack_repeat,_pack_repeat->length - (1 + repeat_mode_non_level)/*skip rssi*/) == -1) { // + repeat_cnt :if repeat_mode is non-level
 			if (FL_QUEUE_ADD(&G_REPEAT_CONTAINER,_pack_repeat) < 0) {
-				ERR(ZIG_GP,"Err <QUEUE ADD> - G_REPEAT_CONTAINER!!\r\n");
+				ERR(API,"Err <QUEUE ADD> - G_REPEAT_CONTAINER!!\r\n");
 			} else {
 //			s8 rssi = _pack_repeat->data_arr[_pack_repeat->length - 1];
 //			LOGA(ZIG_GP,"QUEUE REPEAT ADD (len:%d|RSSI:%d): (%d)%d-%d\r\n",_pack_repeat->length,rssi,G_REPEAT_CONTAINER.count,
@@ -116,6 +116,6 @@ void fl_repeat_run(fl_pack_t *_pack_repeat) {
 			}
 		}
 	} else {
-		LOG_P(ZIG_GP,"Packet has repeated!!!\r\n");
+		LOG_P(API,"Packet has repeated!!!\r\n");
 	}
 }
