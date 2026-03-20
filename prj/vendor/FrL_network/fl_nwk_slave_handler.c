@@ -1058,13 +1058,16 @@ s16 fl_slave_fota_proc(void) {
 			LOGA(ZIG_GP,"FW type :%d\r\n",FOTA_SLAVE_INFO.fw_type);
 			LOGA(ZIG_GP,"Received:%d/%d\r\n",numoffw,(u16)ceil((double)FOTA_SLAVE_INFO.fw_size/16));
 			P_PRINTFHEX_A(ZIG_GP,FOTA_SLAVE_INFO.crc128,SIZEU8(FOTA_SLAVE_INFO.crc128),"CRC16   :\r\n");
-			//generate report to master
-			u8 packet_fota_rpt[16];
-//			packet_fota_rpt[0] = FOTA_SLAVE_INFO.version;
-//			packet_fota_rpt[1] = FOTA_SLAVE_INFO.fw_type;
-			memcpy(packet_fota_rpt,(u8*)&numoffw,SIZEU8(numoffw));
-			memcpy(packet_fota_rpt+SIZEU8(numoffw),FOTA_SLAVE_INFO.crc128,SIZEU8(FOTA_SLAVE_INFO.crc128));
-			fl_api_slave_req(NWK_HDR_23_NOTIFY,packet_fota_rpt,SIZEU8(packet_fota_rpt),0,0,0);
+			/**/
+			if(FOTA_SLAVE_INFO.fw_type == G_INFORMATION.dev_type){
+				//generate report to master
+				u8 packet_fota_rpt[22];
+	//			packet_fota_rpt[0] = FOTA_SLAVE_INFO.version;
+	//			packet_fota_rpt[1] = FOTA_SLAVE_INFO.fw_type;
+				memcpy(packet_fota_rpt,(u8*)&numoffw,SIZEU8(numoffw));
+				memcpy(packet_fota_rpt+SIZEU8(numoffw),FOTA_SLAVE_INFO.crc128,SIZEU8(FOTA_SLAVE_INFO.crc128));
+				fl_api_slave_req(NWK_HDR_23_NOTIFY,packet_fota_rpt,SIZEU8(packet_fota_rpt),0,0,0);
+				}
 			///Clear All
 			memset((u8*)&FOTA_SLAVE_INFO,0xFF,sizeof(fl_fota_t));
 		}

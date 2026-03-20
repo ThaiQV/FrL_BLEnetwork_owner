@@ -78,20 +78,8 @@ typedef struct {
 	u8 begin;
 	u8 end;
 	uint8_t crc128[CRC128_LENGTH];
-} fl_ble2wif_fota_info_t;
-//
-//static inline uint16_t fl_fota_crc16_update(uint16_t crc_curr, uint8_t *data, u8 len) {
-//    for (size_t i = 0; i < len; i++) {
-//    	crc_curr ^= data[i];
-//        for (int j = 0; j < 8; j++) {
-//            if (crc_curr & 1)
-//            	crc_curr = (crc_curr >> 1) ^ 0xA001; // polynomial
-//            else
-//            	crc_curr >>= 1;
-//        }
-//    }
-//    return crc_curr;
-//}
+} fl_ble2wifi_fota_info_t;
+
  /**
  * @brief: calculate crc128 for check sum of OTA FW
  * @param: see below

@@ -337,6 +337,10 @@ void TBS_PowerMeter_Button_Exc(void){
 			ERR(APP,"Factory default......(%d,%d)\r\n",press_time,rst_flag);
 			fl_db_clearAll();
 			TBS_History_ClearAll();
+			//
+			extern void nvm_erase(void);
+			nvm_erase();
+			//
 			sys_reboot();
 		} else {
 			if (press_time >= PAIRING_HOLD) {

@@ -202,7 +202,7 @@ void proto_task( void *pvParameters );
  * @return      none
  */
 fl_version_t _bootloader = { 1, 1, 0};
-fl_version_t _fw = { 2, 1,8 };
+fl_version_t _fw = { 2, 1,7 };
 fl_version_t _hw = { 1, 0, 1 };
 
 _attribute_ram_code_ int main(void)   //must on ramcode
@@ -216,6 +216,9 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 	int deepRetWakeUp = pm_is_MCU_deepRetentionWakeup();  //MCU deep retention wakeUp
 
 	CCLK_16M_HCLK_16M_PCLK_16M;
+
+	//while(1);
+
 
 	rf_drv_ble_init();
 
