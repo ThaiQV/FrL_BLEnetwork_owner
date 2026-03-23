@@ -1283,9 +1283,22 @@ int _interval_report(void) {
 				 tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) G_INFORMATION.data;
 				 tbs_pack_powermeter_data(pwmeter_data,_payload);
 				 u8 indx_data = SIZEU8(pwmeter_data->type) + SIZEU8(pwmeter_data->mac) + SIZEU8(pwmeter_data->timetamp);
-				 //Sync timetamp with local-time
-//				 SYNC_ORIGIN_MASTER(pwmeter_data->timetamp,0);
+				 //GET lastsendig
+				 u32 lastsnd_tmp = TBS_PowerMeter_LastSND_get();
+				 s32 scale_wt = pwmeter_data->timetamp-lastsnd_tmp;
+				 P_INFO("LastSND :%d=>DeltaT:%d\r\n",lastsnd_tmp,pwmeter_data->timetamp-lastsnd_tmp);
+				 //scale working-time
+				 if(scale_wt > pwmeter_data->data.time1){
+					 pwmeter_data->data.time1 = scale_wt;
+				 }
+				 if(scale_wt > pwmeter_data->data.time2){
+					 pwmeter_data->data.time2 = scale_wt;
+				 }
+				 if (scale_wt > pwmeter_data->data.time3) {
+					pwmeter_data->data.time3 = scale_wt;
+				 }
 				 fl_api_slave_req(NWK_HDR_55,&_payload[indx_data],SIZEU8(pwmeter_data->data),0,0,1);
+				 TBS_PowerMeter_LastSND_update(pwmeter_data->timetamp);
 				 TBS_PowerMeter_Upload2Master_RSTWorkingTime();
 #endif
 				return INTERVAL_REPORT_TIME*1000*1000 + offset_spread;

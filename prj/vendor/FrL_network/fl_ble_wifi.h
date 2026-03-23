@@ -17,7 +17,7 @@ typedef enum{
 	//todo something
 
 }fl_wifi2ble_exc_e;
-void FOTA_CURRENTINFO_GET(u8 *ver_,u8 *type_ , u32 *numofpack_ , u32 *fwsize_, u8 *crc128_);
+void FOTA_CURRENTINFO_GET(u8 *ver_,u8 *type_ , u32 *numofpack_ , u32 *fwsize_, u8 *crc128_,u8* fw_crc128_);
 u8 Is_FOTA_RUNNING(void);
 void fl_ble_wifi_proc(u8* _pdata) ;
 void fl_ble2wifi_HISTORY_SEND(u8* mac,u8* timetamp,u8* _data);

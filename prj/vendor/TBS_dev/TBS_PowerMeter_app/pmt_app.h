@@ -11,6 +11,8 @@
 #ifndef VENDOR_TBS_DEV_TBS_POWERMETER_APP_PMT_APP_H_
 #define VENDOR_TBS_DEV_TBS_POWERMETER_APP_PMT_APP_H_
 
+u32 pmt_lasttime_sending_get(void);
+void pmt_lasttime_sending_update(u32 _timetamp);
 void pmt_reset_energy(void *_arg, u8 _size);
 void pmt_reset_workingtime(u8 _chn);
 void pmt_info(void *_arg, u8 _size);

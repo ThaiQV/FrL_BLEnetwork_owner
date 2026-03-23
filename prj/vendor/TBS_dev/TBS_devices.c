@@ -25,6 +25,8 @@
 #define POWER_METER_READDATA()				pmt_info(0,0)
 #define POWER_METER_RST_WORKINGTIME(chnX)	pmt_reset_workingtime(chnX)
 #define POWER_METER_RST_ENERGY(chnX)		pmt_reset_energy((void*)&chnX,1)
+#define POWER_METER_LASTSND_UPDATE(tmp)		pmt_lasttime_sending_update(tmp)
+#define POWER_METER_LASTSND_GET()			pmt_lasttime_sending_get()
 #endif
 
 #ifdef COUNTER_DEVICE
@@ -379,12 +381,16 @@ void TBS_PowerMeter_Button_Exc(void){
 #undef FACTORY_REBOOTnHOLD
 }
 
+u32 TBS_PowerMeter_LastSND_get(void){
+	return POWER_METER_LASTSND_GET();
+}
+
+void TBS_PowerMeter_LastSND_update(u32 _last_tmp){
+	POWER_METER_LASTSND_UPDATE(_last_tmp);
+}
 
 void TBS_PowerMeter_Upload2Master_RSTWorkingTime(void){
 	LOG_P(APP,"Upload data to server and clear working-time\r\n");
-	//DEBUG
-//	POWER_METER_READDATA();
-	//
 	POWER_METER_RST_WORKINGTIME(0);
 }
 

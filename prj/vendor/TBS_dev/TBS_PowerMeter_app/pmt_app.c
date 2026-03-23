@@ -54,6 +54,8 @@ typedef struct
 	float i_avg;
 	float u_avg;
 	u32 numofcount_avg;
+	//last sending
+	u32 lastsending_timetamp;
 } pmt_data_context_t;
 
 static stpm_handle_t *PMT_STRUCT[POWERMETER_CHANNEL];
@@ -79,12 +81,14 @@ extern u16 G_POWER_METER_PARAMETER[4];
 #define PMT_GET_THRESHOLD(chnX)			(u16)(G_POWER_METER_PARAMETER[chnX])
 
 #define PMT_PF_AVG(chnX)				(((chnX==1)?G_POWER_METER.data.fac_power1:(chnX==2)?G_POWER_METER.data.fac_power2:G_POWER_METER.data.fac_power3)&0x7F)
-uint32_t pmt_get_millis(void);
+
+
 /******************************************************************************/
 /******************************************************************************/
 /***                           Private definitions                           **/
 /******************************************************************************/
 /******************************************************************************/
+uint32_t pmt_get_millis(void);
 
 void PMT_LATCH_ALL(void){
 	static u32 last_latch=0;
@@ -145,6 +149,10 @@ static void _pmt_load_context(void) {
 		PMT_CTX[i].working_time_ms=wt;
 		slot_memory+=sizeof(PMT_CTX[i].e_sum)+sizeof(PMT_CTX[i].working_time_ms);
 	}
+	//load last sending
+	u32 tmp_buff;
+	memcpy(&tmp_buff,&tbs_load.data[slot_memory],sizeof(PMT_CTX[0].lastsending_timetamp));
+	PMT_CTX[0].lastsending_timetamp=tmp_buff;
 }
 
 static void _pmt_save_context(void)
@@ -158,8 +166,12 @@ static void _pmt_save_context(void)
 		memcpy(&tbs_profile[slot_memory+sizeof(PMT_CTX[i].e_sum)],&PMT_CTX[i].working_time_ms,sizeof(PMT_CTX[i].working_time_ms));
 		slot_memory+=sizeof(PMT_CTX[i].e_sum)+sizeof(PMT_CTX[i].working_time_ms);
 	}
+	//stored last sending
+	memcpy(&tbs_profile[slot_memory],&PMT_CTX[0].lastsending_timetamp,SIZEU8(PMT_CTX[0].lastsending_timetamp));
+
 	fl_db_tbsprofile_save((u8*) tbs_profile,sizeof(tbs_profile));
 }
+
 s32 _interval_read_sensor(void){
 	//cancel if automatical calibE running
 	if (PMT_STRUCT[0]->flag_calib || PMT_STRUCT[1]->flag_calib || PMT_STRUCT[2]->flag_calib) {
@@ -521,6 +533,16 @@ void pmt_reset_workingtime(u8 _chn) {
 		PMT_CTX[chn].working_time_ms=0;
 	}
 }
+
+u32 pmt_lasttime_sending_get(void){
+	return PMT_CTX[0].lastsending_timetamp;
+}
+
+void pmt_lasttime_sending_update(u32 _timetamp){
+	PMT_CTX[0].lastsending_timetamp = _timetamp;
+	_pmt_save_context();
+}
+
 /******************************************************************************/
 /******************************************************************************/
 /***                      Processing functions 					             **/

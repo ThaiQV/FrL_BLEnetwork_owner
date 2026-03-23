@@ -856,7 +856,7 @@ static void _master_updateDB_for_Node(u8 node_indx ,fl_data_frame_u *packet)  {
 	}
 	if (G_NODE_LIST.sla_info[node_indx].dev_type == TBS_POWERMETER) {
 		memcpy(&G_NODE_LIST.sla_info[node_indx].data[size_mac + 5],&packet->frame.payload[0],SIZEU8(packet->frame.payload));
-		//for test
+		//for testing
 		tbs_device_powermeter_t received;
 		tbs_unpack_powermeter_data(&received,G_NODE_LIST.sla_info[node_indx].data);
 		tbs_power_meter_printf(INF,(void*) &received);
@@ -956,11 +956,12 @@ int fl_master_ProccesRSP_cbk(void) {
 						u8 fw_type;
 						u32 fw_size;
 						u32 fw_nuomofpack;
-						u8 fw_crc128[16];
+						u8 packet_fwcrc[16];
+						u8 fwcrc[16];
 						u16 slave_rec = MAKE_U16(packet.frame.payload[1],packet.frame.payload[0]);
-						FOTA_CURRENTINFO_GET(&fw_ver,&fw_type,&fw_nuomofpack,&fw_size,fw_crc128);
-//						P_INFO_HEX(fw_crc128,SIZEU8(fw_crc128),"[FOTA]Ver(%d),Type(%d),Size(%d):",fw_ver,fw_type,fw_size);
-						P_INFO_HEX(packet.frame.payload+2,SIZEU8(fw_crc128),"[FOTA]SlaveID(%d):REC(%d)CRC128:",slave_id,slave_rec);
+						FOTA_CURRENTINFO_GET(&fw_ver,&fw_type,&fw_nuomofpack,&fw_size,packet_fwcrc,fwcrc);
+//						P_INFO_HEX(packet_fwcrc,SIZEU8(packet_fwcrc),"[FOTA]Ver(%d),Type(%d),Size(%d):",fw_ver,fw_type,fw_size);
+						P_INFO_HEX(packet.frame.payload+2,SIZEU8(packet_fwcrc),"[FOTA]SlaveID(%d):REC(%d)CRC128:",slave_id,slave_rec);
 						//send to debugging topic
 						u8 mqtt_payload[128];
 						memset(mqtt_payload,0,SIZEU8(mqtt_payload));
@@ -973,27 +974,28 @@ int fl_master_ProccesRSP_cbk(void) {
 //						        "Crc:%02X%02X%02X%02X%02X%02X%02X%02X=>%s",
 //						        sla_mac[2], sla_mac[3], sla_mac[4], sla_mac[5],
 //								fw_type,fw_ver, fw_size,slave_rec,fw_nuomofpack,
-//						        fw_crc128[0], fw_crc128[1], fw_crc128[2], fw_crc128[3],
-//						        fw_crc128[4], fw_crc128[5], fw_crc128[6], fw_crc128[7],
-//								(memcmp(fw_crc128,packet.frame.payload+2,SIZEU8(fw_crc128))?"ERR":"OK")
+//						        packet_fwcrc[0], packet_fwcrc[1], packet_fwcrc[2], packet_fwcrc[3],
+//						        packet_fwcrc[4], packet_fwcrc[5], packet_fwcrc[6], packet_fwcrc[7],
+//								(memcmp(packet_fwcrc,packet.frame.payload+2,SIZEU8(packet_fwcrc))?"ERR":"OK")
 //						);
 						sprintf((char*)mqtt_payload,
 						        "{"
-						        "\"mac\":\"%02X%02X%02X%02X\","
+						        "\"mac\":\"%02X:%02X:%02X:%02X:%02X:%02X\","
 						        "\"type\":%d,"
 						        "\"ver\":%d,"
 						        "\"size\":%d,"
 						        "\"rec\":\"%d/%d\","
 						        "\"crc\":\"%02X%02X%02X%02X%02X%02X%02X%02X\","
-						        "\"status\":\"%s\""
+						        "\"results\":ble(\"%s\"),bin\"%s\"),"
 						        "}",
-						        sla_mac[0], sla_mac[1], sla_mac[2], sla_mac[3],
+						        sla_mac[0], sla_mac[1], sla_mac[2], sla_mac[3], sla_mac[4], sla_mac[5],
 						        fw_type, fw_ver, fw_size, slave_rec, fw_nuomofpack,
 								packet.frame.payload[2],packet.frame.payload[3],packet.frame.payload[4],packet.frame.payload[5],
 								packet.frame.payload[6],packet.frame.payload[7],packet.frame.payload[8],packet.frame.payload[9],
-//						        fw_crc128[0], fw_crc128[1], fw_crc128[2], fw_crc128[3],
-//						        fw_crc128[4], fw_crc128[5], fw_crc128[6], fw_crc128[7],
-						        (memcmp(fw_crc128, packet.frame.payload+2, SIZEU8(fw_crc128)) ? "ERR" : "OK")
+//						        packet_fwcrc[0], packet_fwcrc[1], packet_fwcrc[2], packet_fwcrc[3],
+//						        packet_fwcrc[4], packet_fwcrc[5], packet_fwcrc[6], packet_fwcrc[7],
+						        (memcmp(packet_fwcrc, packet.frame.payload+2, SIZEU8(packet_fwcrc)) ? "ERR" : "OK"),
+								(memcmp(fwcrc, packet.frame.payload+2, SIZEU8(fwcrc)) ? "ERR" : "OK")
 						);
 						fl_ble2wifi_DEBUG2MQTT(mqtt_payload,strlen((char*)mqtt_payload));
 					}

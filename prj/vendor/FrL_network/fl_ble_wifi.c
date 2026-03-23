@@ -682,11 +682,12 @@ u8 data_fw[22];
 
 fl_ble2wifi_fota_info_t FOTA_INFO;
 
-void FOTA_CURRENTINFO_GET(u8 *ver_,u8 *type_ , u32 *numofpack_,u32 *fwsize_, u8 *crc128_){
+void FOTA_CURRENTINFO_GET(u8 *ver_,u8 *type_ , u32 *numofpack_,u32 *fwsize_, u8 *crc128_,u8 *fw_crc128_){
 	*ver_ = FOTA_INFO.version;
 	*type_ = FOTA_INFO.fw_type;
 	*fwsize_ = FOTA_INFO.fw_size;
 	*numofpack_ = FOTA_INFO.body;
+	memcpy(fw_crc128_, FOTA_INFO.fw_crc128, CRC128_LENGTH);
 	memcpy(crc128_, FOTA_INFO.crc128, CRC128_LENGTH);
 }
 
@@ -749,6 +750,8 @@ void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 						FOTA_INFO.end++;
 						P_INFO_HEX(data_fw,SIZEU8(data_fw),"\r%d|->(%d)FOTA END:",FOTA_INFO.end,rslt);
 						P_INFO_HEX(FOTA_INFO.crc128,SIZEU8(FOTA_INFO.crc128),"CRC:");
+						memcpy(FOTA_INFO.fw_crc128,SIZEU8(FOTA_INFO.fw_crc128),&data_fw[6]);
+						P_INFO_HEX(FOTA_INFO.fw_crc128,SIZEU8(FOTA_INFO.fw_crc128),"FW_CRC:");
 						FOTA_INFO.end=0;
 						FOTA_INFO.begin=0;
 //						FOTA_INFO.body=0;

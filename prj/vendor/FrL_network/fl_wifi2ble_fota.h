@@ -78,6 +78,7 @@ typedef struct {
 	u8 begin;
 	u8 end;
 	uint8_t crc128[CRC128_LENGTH];
+	uint8_t fw_crc128[CRC128_LENGTH]; //crc into the endpacket fota
 } fl_ble2wifi_fota_info_t;
 
  /**
