@@ -241,7 +241,7 @@ fl_db_master_profile_t fl_db_masterprofile_load(void) {
 	return entry;
 }
 
-void fl_db_generate_private_key(u8 *private_key_out) {
+void fl_db_generate_private_key(u8 *private_key_out,u8 *chn_out) {
     u32 timestamp = clock_time();  //
     u32 rand_val = trng_rand();    //
     u8 mac[6];
@@ -249,6 +249,10 @@ void fl_db_generate_private_key(u8 *private_key_out) {
     memcpy(mac,blc_ll_get_macAddrPublic(),6);
     for (int i = 0; i < 16; i++) {
         private_key_out[i] = mac[i % 6] ^ ((timestamp >> (i % 4) * 8) & 0xFF) ^ ((rand_val >> (i % 4) * 8) & 0xFF);
+    }
+    //generate channels
+    for(u8 cn = 0;cn <3;cn++){
+    	chn_out[cn] = (u8)(trng_rand() %(36-10+1)+10);
     }
 }
 /***************************************************
@@ -287,7 +291,7 @@ fl_db_master_profile_t fl_db_masterprofile_init(void) {
 		//clear all and write default profiles
 //		flash_erase_sector(ADDR_MASTER_PROFILE_START);
 		_db_earse_sector_full(ADDR_MASTER_PROFILE_START,MASTERPROFILE_SIZE/SECTOR_FLASH_SIZE);
-		fl_db_generate_private_key(MASTER_PROFILE_DEFAULT.nwk.private_key);
+		fl_db_generate_private_key(MASTER_PROFILE_DEFAULT.nwk.private_key,profile.nwk.chn);
 		fl_db_masterprofile_save(MASTER_PROFILE_DEFAULT);
 		profile = fl_db_masterprofile_load();
 	}

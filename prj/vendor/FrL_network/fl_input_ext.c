@@ -188,28 +188,55 @@ static int rx_from_uart_cb(void) //UART data send to Master,we will handler the 
  * @param[in]	none
  * @return      0 is ok
  */
+//static int tx_to_uart_cb(void) {
+//	u8 *p = my_fifo_get(&fl_tx_fifo);
+//	//FLAG_uart_dma_send=0;
+//	if (p && !FLAG_uart_dma_send) {
+//		memset(FL_TXDATA.data,0,sizeof(FL_TXDATA.data));
+//		FL_TXDATA.len = (unsigned int) p[0];
+//		if (FL_TXDATA.len >= sizeof(FL_TXDATA.data)) {
+//			ERR(MCU,"UART SEND OVERLOAD (%d)!!!\r\n",FL_TXDATA.len);
+//			FL_TXDATA.len = 5;
+//		}
+//		memcpy(&FL_TXDATA.data,&p[1],FL_TXDATA.len);
+//		if (uart_send_dma(G_INPUT_EXT.serial.uart_num,(u8 *) (&FL_TXDATA.data),FL_TXDATA.len)) {
+//			my_fifo_pop(&fl_tx_fifo);
+//			FLAG_uart_dma_send = 1;
+//			//			LOGA(DRV,"lenData:%d\r\n",FL_TXDATA.len);
+//			P_PRINTFHEX_A(DRV,FL_TXDATA.data,FL_TXDATA.len,"%s(%d):","Tx",FL_TXDATA.len);
+//		}
+//	}
+//	return 0;
+//}
+
 static int tx_to_uart_cb(void) {
-	u8 *p = my_fifo_get(&fl_tx_fifo);
-	//FLAG_uart_dma_send=0;
-	if (p && !FLAG_uart_dma_send) {
-		memset(FL_TXDATA.data,0,sizeof(FL_TXDATA.data));
-		FL_TXDATA.len = (unsigned int) p[0];
-		if (FL_TXDATA.len >= sizeof(FL_TXDATA.data)) {
-			ERR(MCU,"UART SEND OVERLOAD (%d)!!!\r\n",FL_TXDATA.len);
-			FL_TXDATA.len = 5;
-		}
-		memcpy(&FL_TXDATA.data,&p[1],FL_TXDATA.len);
-		if (uart_send_dma(G_INPUT_EXT.serial.uart_num,(u8 *) (&FL_TXDATA.data),FL_TXDATA.len)) {
+    u8 *p;
+    unsigned int total_len = 0;
+    memset(FL_TXDATA.data, 0, sizeof(FL_TXDATA.data));
+	if(!FLAG_uart_dma_send){
+		while ((p = my_fifo_get(&fl_tx_fifo)) != 0) {
+			unsigned int len = (unsigned int)p[0];
+			if (len > sizeof(FL_TXDATA.data) - total_len) {
+				ERR(MCU, "UART SEND OVERLOAD (%d)!!!\r\n", len);
+				break;
+			}
+			memcpy(&FL_TXDATA.data[total_len], &p[1], len);
+			total_len += len;
 			my_fifo_pop(&fl_tx_fifo);
-			FLAG_uart_dma_send = 1;
-			//			LOGA(DRV,"lenData:%d\r\n",FL_TXDATA.len);
-			P_PRINTFHEX_A(DRV,FL_TXDATA.data,FL_TXDATA.len,"%s(%d):","Tx",FL_TXDATA.len);
+			*p=0;
+		}
+		if (total_len > 0 ) {
+			FL_TXDATA.len = total_len;
+			while(FLAG_uart_dma_send){};
+			if (uart_send_dma(G_INPUT_EXT.serial.uart_num,(u8 *)FL_TXDATA.data,FL_TXDATA.len)) {
+				FLAG_uart_dma_send = 1;
+				//P_INFO_HEX(FL_TXDATA.data, FL_TXDATA.len,"%s(%d):", "Tx", FL_TXDATA.len);
+			}
 		}
 	}
-	return 0;
+    return 0;
 }
-
-/**
+/*
  * @brief		this function is used to process tx uart data.
  * @param[in]
  * @param[in]

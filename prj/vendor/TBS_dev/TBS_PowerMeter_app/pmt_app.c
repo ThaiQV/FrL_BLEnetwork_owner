@@ -153,6 +153,9 @@ static void _pmt_load_context(void) {
 	u32 tmp_buff;
 	memcpy(&tmp_buff,&tbs_load.data[slot_memory],sizeof(PMT_CTX[0].lastsending_timetamp));
 	PMT_CTX[0].lastsending_timetamp=tmp_buff;
+	if(PMT_CTX[0].lastsending_timetamp < 1735693261 || PMT_CTX[0].lastsending_timetamp > 2208992461){
+		PMT_CTX[0].lastsending_timetamp = fl_rtc_get();
+	}
 }
 
 static void _pmt_save_context(void)

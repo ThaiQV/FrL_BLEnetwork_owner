@@ -130,7 +130,7 @@ void FOTA_INTERVAL_REQUEST(u8* _pdata, RspFunc rspfnc){};
 void FOTA_INTERVAL_RESPONSE(u8* _pdata){};
 
 fl_wifiprotocol_proc_t G_WIFI_CON[] = {
-			{ { GF_CMD_PING_REQUEST, PING_REQ }, { GF_CMD_PAIRING_RESPONSE, PING_RSP } }, //ping
+			{ { GF_CMD_PING_REQUEST, PING_REQ }, { GF_CMD_PING_RESPONSE, PING_RSP } }, //ping
 			{ { GF_CMD_REPORT_REQUEST, REPORT_REQUEST }, { GF_CMD_REPORT_RESPONSE, REPORT_RESPONSE } },
 			{ { GF_CMD_GET_LIST_REQUEST, GETLIST_REQUEST },{GF_CMD_GET_LIST_RESPONSE, GETLIST_RESPONSE } },
 			{ { GF_CMD_PAIRING_REQUEST, PAIRING_REQUEST }, {GF_CMD_PAIRING_RESPONSE, PAIRING_RESPONSE } },
@@ -254,10 +254,12 @@ void REPORT_RESPONSE(u8* _pdata) {
 		for (u8 var = 0; var < G_NODE_LIST.slot_inused && G_NODE_LIST.slot_inused != 0xFF; ++var) {
 //			LOGA(MCU,"Devtype:%d\r\n",G_NODE_LIST.sla_info[var].dev_type);
 			//addnew: only send offline nodes bcs the online nodes has automatically sent yet
-			if (G_NODE_LIST.sla_info[var].active == false && G_NODE_LIST.sla_info[var].dev_type != 0xFF
+			if (G_NODE_LIST.sla_info[var].active == false && (G_NODE_LIST.sla_info[var].dev_type==TBS_COUNTER || G_NODE_LIST.sla_info[var].dev_type==TBS_POWERMETER)
+					/*(G_NODE_LIST.sla_info[var].dev_type != 0xFF)*/
 					&& !IS_MAC_INVALID(G_NODE_LIST.sla_info[var].mac,0)&& !IS_MAC_INVALID(G_NODE_LIST.sla_info[var].mac,0xFF)) {
 //				P_INFO_HEX(G_NODE_LIST.sla_info[var].mac,6,"[%d]Mac:",G_NODE_LIST.sla_info[var].slaveID);
-				_getnsend_data_report(var,G_WIFI_CON[_wf_CMD_find(data->cmd)].rsp.cmd);
+				//_getnsend_data_report(var,G_WIFI_CON[_wf_CMD_find(data->cmd)].rsp.cmd);
+				_getnsend_data_report(var,GF_CMD_REPORT_RESPONSE);
 			}
 		}
 	} else {
@@ -296,9 +298,9 @@ void GETLIST_REQUEST(u8* _pdata, RspFunc rspfnc) {
 }
 void GETLIST_RESPONSE(u8* _pdata) {
 	extern fl_slaves_list_t G_NODE_LIST;
-	fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[1];
+//	fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[1];
 	fl_datawifi2ble_t wfdata;
-	wfdata.cmd = G_WIFI_CON[_wf_CMD_find(data->cmd)].rsp.cmd;
+	wfdata.cmd = GF_CMD_GET_LIST_RESPONSE;//G_WIFI_CON[_wf_CMD_find(data->cmd)].rsp.cmd;
 	//u8 payload[BLE_WIFI_MAXLEN];
 	//memset(payload,0xFF,SIZEU8(payload));
 //	fl_nwk_master_StatusNodesRefesh();
@@ -318,10 +320,12 @@ void GETLIST_RESPONSE(u8* _pdata) {
 	}
 
 	for (u8 var = 0; var < G_NODE_LIST.slot_inused && G_NODE_LIST.slot_inused != 0xFF; ++var) {
-		if(G_NODE_LIST.sla_info[var].dev_type == 0xFF || IS_MAC_INVALID(G_NODE_LIST.sla_info[var].mac,0) || IS_MAC_INVALID(G_NODE_LIST.sla_info[var].mac,0xFF)){
+		if(/*G_NODE_LIST.sla_info[var].dev_type == 0xFF*/
+				(G_NODE_LIST.sla_info[var].dev_type !=TBS_COUNTER && G_NODE_LIST.sla_info[var].dev_type !=TBS_POWERMETER)
+				|| IS_MAC_INVALID(G_NODE_LIST.sla_info[var].mac,0) || IS_MAC_INVALID(G_NODE_LIST.sla_info[var].mac,0xFF)){
 			continue;
 		}
-		wfdata.cmd = G_WIFI_CON[_wf_CMD_find(data->cmd)].rsp.cmd;
+		wfdata.cmd = GF_CMD_GET_LIST_RESPONSE;//G_WIFI_CON[_wf_CMD_find(data->cmd)].rsp.cmd;
 		wfdata.data[payload_len] = numofslave;
 		memcpy(&wfdata.data[++payload_len],G_NODE_LIST.sla_info[var].mac,SIZEU8(G_NODE_LIST.sla_info[var].mac));
 		payload_len+=SIZEU8(G_NODE_LIST.sla_info[var].mac);
@@ -664,6 +668,8 @@ void RSTFACTORY_REQUEST(u8* _pdata, RspFunc rspfnc){
 	ERR(APP,"Clear and reset factory.....\r\n");
 	fl_db_clearAll();
 //	delay_ms(1000);
+	extern void nvm_erase(void);
+	nvm_erase();
 	sys_reboot();
 	return;
 	//don'ts send rsp
@@ -694,6 +700,7 @@ void FOTA_CURRENTINFO_GET(u8 *ver_,u8 *type_ , u32 *numofpack_,u32 *fwsize_, u8 
 u8 Is_FOTA_RUNNING(void){
 	return FOTA_INFO.begin;
 }
+
 void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 	extern fl_slaves_list_t G_NODE_LIST;
 	fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[1];
@@ -708,6 +715,8 @@ void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 		return;
 	}
 	//callback fnc rsp
+	u32 addr = 0;
+	u16 indx =0;
 	if (rspfnc != 0) {
 		fl_datawifi2ble_t wfdata;
 		wfdata.cmd = G_WIFI_CON[_wf_CMD_find(GF_CMD_FOTA_REQUEST)].rsp.cmd;
@@ -719,11 +728,40 @@ void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 			if (data_fw[1] == FOTA_DEV_MASTER) {
 				//DFU put to flash
 				wfdata.data[0] = DFU_OTA_FW_PUT(data_fw,data->crc8);
-			} else {
+				//TESTING
+				if (data_fw[0] == FOTA_PACKET_BEGIN){
+					fl_fota_crc128_init(FOTA_INFO.crc128,sizeof(FOTA_INFO.crc128));
+					memset(FOTA_INFO.ota_map,0,SIZEU8(FOTA_INFO.ota_map));
+					FOTA_INFO.body = 0;
+					FOTA_INFO.fw_size = MAKE_U32(0,data_fw[5],data_fw[4],data_fw[3]);
+				}
+				else if (data_fw[0] == FOTA_PACKET_DATA) {
+					addr = MAKE_U32(0,data_fw[5],data_fw[4],data_fw[3]);
+					indx = (addr) / 16;
+					if (GET_BIT_InARRAY(FOTA_INFO.ota_map,SIZEU8(FOTA_INFO.ota_map),indx) == 0) {
+						SET_BIT_InARRAY(FOTA_INFO.ota_map,SIZEU8(FOTA_INFO.ota_map),indx);
+						fl_fota_crc128_calculate(FOTA_INFO.crc128,&data_fw[3 + 3]);
+						FOTA_INFO.body++;
+						P_INFO("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
+						P_INFO("[T%d,v%d]Downloading:%d/%d (%d)",FOTA_INFO.fw_type,FOTA_INFO.version,FOTA_INFO.body*OTA_PACKET_LENGTH,
+								FOTA_INFO.fw_size,FOTA_INFO.body);
+					}
+				}
+				else if(data_fw[0] == FOTA_PACKET_END){
+					P_INFO_HEX(data_fw,SIZEU8(data_fw),"\r%d|->(%d)FOTA END:",FOTA_INFO.end,rslt);
+					P_INFO_HEX(FOTA_INFO.crc128,SIZEU8(FOTA_INFO.crc128),"CRC:");
+					u16 numoffw=0;
+					for (u16 var = 0; var < (u16) ceil((double) FOTA_INFO.fw_size / 16); ++var) {
+						numoffw += GET_BIT_InARRAY(FOTA_INFO.ota_map,SIZEU8(FOTA_INFO.ota_map),var);
+					}
+					P_INFO("Rec MAP:%d/%d\r\n",numoffw,(u16)ceil((double)FOTA_INFO.fw_size/16));
+				}
+			}
+			//SLAVEs
+			else {
 				if (data_fw[0] == FOTA_PACKET_BEGIN){
 					rslt = fl_wifi2ble_fota_system_begin(data_fw,SIZEU8(data_fw));
 					if (rslt != -1) {
-//						memset(FOTA_INFO.crc128,0xFF,sizeof(FOTA_INFO.crc128));
 						fl_fota_crc128_init(FOTA_INFO.crc128,sizeof(FOTA_INFO.crc128));
 						FOTA_INFO.begin++;
 						P_INFO_HEX(data_fw,SIZEU8(data_fw),"%d|->(%d)FOTA BEGIN:",FOTA_INFO.begin,rslt);
@@ -731,17 +769,23 @@ void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 						FOTA_INFO.version = 0;
 						FOTA_INFO.body = 0;
 //						FOTA_INFO.rtt = fl_rtc_get();
+						memset(FOTA_INFO.ota_map,0,SIZEU8(FOTA_INFO.ota_map));
 					}
 				}
 				else if (data_fw[0] == FOTA_PACKET_DATA) {
 					rslt = fl_wifi2ble_fota_system_data(data_fw,SIZEU8(data_fw));
 					if (rslt != -1 ) {
 						FOTA_INFO.version=data_fw[2];
-						FOTA_INFO.fw_type=data_fw[1];
-						FOTA_INFO.body++;
-						fl_fota_crc128_calculate(FOTA_INFO.crc128,&data_fw[3+3]);
-						P_INFO("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
-						P_INFO("[T%d,v%d]Downloading:%d/%d (%d)(%d)",FOTA_INFO.fw_type,FOTA_INFO.version,FOTA_INFO.body*OTA_PACKET_LENGTH,FOTA_INFO.fw_size,FOTA_INFO.body,FL_NWK_FOTA_IsReady());
+						FOTA_INFO.fw_type=data_fw[1];																	///
+						addr = MAKE_U32(0,data_fw[5],data_fw[4],data_fw[3]);
+						indx = (addr)/16;
+						if(GET_BIT_InARRAY(FOTA_INFO.ota_map,SIZEU8(FOTA_INFO.ota_map),indx) == 0){
+							SET_BIT_InARRAY(FOTA_INFO.ota_map,SIZEU8(FOTA_INFO.ota_map),indx);
+							fl_fota_crc128_calculate(FOTA_INFO.crc128,&data_fw[3+3]);
+//							P_INFO("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
+//							P_INFO("[T%d,v%d]Downloading:%d/%d (%d)(%d)",FOTA_INFO.fw_type,FOTA_INFO.version,FOTA_INFO.body*OTA_PACKET_LENGTH,FOTA_INFO.fw_size,FOTA_INFO.body,FL_NWK_FOTA_IsReady());
+							FOTA_INFO.body++;
+						}
 					}
 				}
 				else if(data_fw[0] == FOTA_PACKET_END){
@@ -750,11 +794,17 @@ void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 						FOTA_INFO.end++;
 						P_INFO_HEX(data_fw,SIZEU8(data_fw),"\r%d|->(%d)FOTA END:",FOTA_INFO.end,rslt);
 						P_INFO_HEX(FOTA_INFO.crc128,SIZEU8(FOTA_INFO.crc128),"CRC:");
-						memcpy(FOTA_INFO.fw_crc128,SIZEU8(FOTA_INFO.fw_crc128),&data_fw[6]);
+						memcpy(FOTA_INFO.fw_crc128,&data_fw[6],SIZEU8(FOTA_INFO.fw_crc128));
 						P_INFO_HEX(FOTA_INFO.fw_crc128,SIZEU8(FOTA_INFO.fw_crc128),"FW_CRC:");
 						FOTA_INFO.end=0;
 						FOTA_INFO.begin=0;
 //						FOTA_INFO.body=0;
+						///
+						u16 numoffw=0;
+						for (u16 var = 0; var < (u16)ceil((double)FOTA_INFO.fw_size/16); ++var) {
+							numoffw += GET_BIT_InARRAY(FOTA_INFO.ota_map,SIZEU8(FOTA_INFO.ota_map),var);
+						}
+						P_INFO("Received:%d/%d\r\n",numoffw,(u16)ceil((double)FOTA_INFO.fw_size/16));
 					}
 				}
 				//convert return
@@ -777,7 +827,9 @@ void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 		//memcpy(&wfdata.data[1],&data_fw[0],6);
 		wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
 		u8 payload_len = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
-//		P_INFO_HEX(data_fw,SIZEU8(data_fw),"WIFI2BLE[%d](%d):",data_fw[0],wfdata.data[0]);
+//		if(data_fw[0] == FOTA_PACKET_END){
+//			P_INFO_HEX(data_fw,SIZEU8(data_fw),"WIFI2BLE[%d](%d):",data_fw[0],wfdata.data[0]);
+//		}
 		fl_ble_send_wifi((u8*) &wfdata,payload_len);
 	}
 }

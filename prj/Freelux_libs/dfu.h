@@ -151,6 +151,7 @@
 	void firmware_check(void);
 
 	/* For OTA */
+	void disorder_data(uint8_t *p);
 	void ota_init(void);
 	uint8_t ota_packet_crc(uint8_t *pdata);
 	ota_ret_t ota_fw_put(uint8_t *pdata, uint8_t crc);

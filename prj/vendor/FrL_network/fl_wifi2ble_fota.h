@@ -26,12 +26,14 @@
 											fw_buf.patch = (uint8_t)(z);           \
 											set_current_fw_version(&fw_buf);           \
 										} while(0)
+
 //#define DFU_OTA_VERSION_GET()				0//get_current_fw_version
 static inline fw_header_t DFU_OTA_VERSION_GET(void){
 														fw_header_t fw_buf;
 														get_current_fw_version(&fw_buf);
 														return fw_buf;
 													}
+
 #else
 #define DFU_OTA_INIT()         			((void)0)
 #define DFU_OTA_CRC128_INIT   			((void)0)
@@ -79,6 +81,8 @@ typedef struct {
 	u8 end;
 	uint8_t crc128[CRC128_LENGTH];
 	uint8_t fw_crc128[CRC128_LENGTH]; //crc into the endpacket fota
+	//
+	u8 ota_map[1920]; //Max 240kbs
 } fl_ble2wifi_fota_info_t;
 
  /**
@@ -91,8 +95,12 @@ static inline void fl_fota_crc128_init(u8 *g_crc128, u8 _size){
 }
 static inline void fl_fota_crc128_calculate(u8 *g_crc128,uint8_t *pdata) {
 	uint8_t i;
+	u8 data_diorder[CRC128_LENGTH];
+	memcpy(data_diorder,pdata,sizeof(data_diorder));
+	disorder_data(data_diorder);
+
 	for (i = 0; i < CRC128_LENGTH; i++) {
-		g_crc128[i] = (g_crc128[i] ^ pdata[i]);
+		g_crc128[i] = (g_crc128[i] ^ data_diorder[i]);
 	}
 }
 

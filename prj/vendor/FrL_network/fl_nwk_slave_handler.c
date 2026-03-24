@@ -1023,6 +1023,7 @@ s16 fl_slave_fota_proc(void) {
 			rslt_ota = DFU_OTA_FW_PUT(packet.payload,crc);
 			if(packet.payload[0] == FOTA_PACKET_BEGIN){
 				P_INFO("FOTA-BEGIN....(%d)\r\n",rslt_ota);
+				memset((u8*)&FOTA_SLAVE_INFO,0,sizeof(fl_fota_t));
 				fl_fota_crc128_init(FOTA_SLAVE_INFO.crc128,SIZEU8(FOTA_SLAVE_INFO.crc128));
 			}
 			if (OTA_RET_OK != rslt_ota) {
@@ -1067,9 +1068,9 @@ s16 fl_slave_fota_proc(void) {
 				memcpy(packet_fota_rpt,(u8*)&numoffw,SIZEU8(numoffw));
 				memcpy(packet_fota_rpt+SIZEU8(numoffw),FOTA_SLAVE_INFO.crc128,SIZEU8(FOTA_SLAVE_INFO.crc128));
 				fl_api_slave_req(NWK_HDR_23_NOTIFY,packet_fota_rpt,SIZEU8(packet_fota_rpt),0,0,0);
-				}
+			}
 			///Clear All
-			memset((u8*)&FOTA_SLAVE_INFO,0xFF,sizeof(fl_fota_t));
+			memset((u8*)&FOTA_SLAVE_INFO,0,sizeof(fl_fota_t));
 		}
 		//add send repeat
 		fl_wifi2ble_fota_fwpush(&fota_pack,packet.payload[0]);

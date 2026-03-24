@@ -279,6 +279,7 @@ void fl_wifi2ble_fota_ContainerClear(void){
 /***                      Processing functions 					             **/
 /******************************************************************************/
 /******************************************************************************/
+
 void fl_wifi2ble_fota_init(void){
 	extern fl_version_t _fw ;
 	LOG_P(FLA,"OTA init.......\r\n");

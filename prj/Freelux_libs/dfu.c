@@ -1,7 +1,7 @@
 #include "dfu.h"
 
 /* Definition */
-//#define DFU_DEBUG
+#define DFU_DEBUG
 #ifdef DFU_DEBUG
 #define DFU_PRINTF(...)	LOGA(APP,__VA_ARGS__);
 #else
@@ -566,6 +566,10 @@ ota_ret_t ota_fw_put(uint8_t *pdata, uint8_t crc)
 				memset(ota_map,0xFF,sizeof(ota_map));
 				nvm_record_write(OTA_MEMORY_MAP,(uint8_t*)ota_map,sizeof(ota_map));
 
+				DFU_PRINTF("OTA End\n");
+				return OTA_RET_OK;
+			}
+			else if(packet_header.state == OTA_FW_STATE_COMPLETE) {
 				DFU_PRINTF("OTA End\n");
 				return OTA_RET_OK;
 			}
