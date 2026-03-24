@@ -569,6 +569,10 @@ ota_ret_t ota_fw_put(uint8_t *pdata, uint8_t crc)
 				DFU_PRINTF("OTA End\n");
 				return OTA_RET_OK;
 			}
+			else if(packet_header.state == OTA_FW_STATE_COMPLETE)
+			{
+				return OTA_RET_OK;
+			}
 		}
 		else if(packet_type == OTA_PACKET_DATA)
 		{

@@ -152,37 +152,37 @@
 000070ac A BIN_SIZE
 00080000 d FmDebug	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/plog.c:44
 00080000 D _DATA_VMA_START
-00080004 d baudrate	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:788
+00080004 d baudrate	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:792
 00080008 d g_pm_early_wakeup_time_us	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/lib/src/pm.c:61
 00080010 d g_pm_r_delay_cycle	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/lib/src/pm.c:76
-00080014 d program_address	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:785
+00080014 d program_address	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:789
 00080018 d sys_clk	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/clock.c:46
-00080020 d timeout_jump	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:784
+00080020 d timeout_jump	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:788
 00080024 d uart_rx_dma_config	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/uart.c:74
 0008002c d uart_tx_dma_config	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/uart.c:44
 00080034 D _DATA_VMA_END
 00080038 S _BSS_VMA_START
-00080038 s crc	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:786
-00080040 s doubleword	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:787
-00080048 s enter_bootloader	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:783
+00080038 s crc	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:790
+00080040 s doubleword	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:791
+00080048 s enter_bootloader	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:787
 0008004c s g_chip_version	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/lib/src/sys.c:39
 00080050 s g_pm_status_info	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/lib/src/pm.c:44
-00080054 s len	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:786
+00080054 s len	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:790
 00080058 s mcause	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../common/plic_isr.c:34
 0008005c s mepc	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../common/plic_isr.c:35
-00080060 s page	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:786
+00080060 s page	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:790
 00080064 s uart_dma_rev_size	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/uart.c:109
 0008006c s uart_dma_rx_chn	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/uart.c:108
 00080070 s uart_tx_byte_index	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/uart.c:273
 00080074 s __vprintf_buf
 00080078 s __vprintf_buf_len
 0008007c S __printf_count
-00080080 b cmd	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:782
+00080080 b cmd	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:786
 00080094 b crc128	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:16
-000800a4 b dfu_uart_queue	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:778
-000800b4 b dfu_uart_queue_fifo	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:779
+000800a4 b dfu_uart_queue	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:782
+000800b4 b dfu_uart_queue_fifo	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:783
 00080800 D __global_pointer$
-000820b4 b uart_rx_addr	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:780
+000820b4 b uart_rx_addr	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:784
 000840b8 B _BSS_VMA_END
 000840b8 B _end
 000a0000 A _STACK_TOP
@@ -224,8 +224,8 @@
 200045c0 t uart_is_prime	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/uart.c:691
 20004654 t pwm_kick_32k_pad.constprop.2	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/ext_driver/ext_pm.c:134
 200046bc t blc_readFlashSize_autoConfigCustomFlashSector	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../vendor/common/blt_common.c:40
-20004720 t response_ack	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:879
-20004750 t program_array	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:1011
+20004720 t response_ack	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:883
+20004750 t program_array	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:1015
 20004780 t writeSPIByte	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/SPI_FLASH.c:26
 20004818 t W25XXX_Read	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/SPI_FLASH.c:336
 20004884 t FLASH_ReadStatusReg	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/SPI_FLASH.c:251
@@ -237,7 +237,7 @@
 20004bd0 t cpu_wakeup_no_deepretn_back_init	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/ext_driver/ext_pm.c:252
 20004d78 t gpio_set_up_down_res	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/gpio.c:372
 20004e10 t gpio_input_en	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/gpio.c:65
-20004eb8 t uart1_init.constprop.16	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:790
+20004eb8 t uart1_init.constprop.16	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:794
 20005204 t hspi_set_pin_mux.part.0
 2000537c t jump_to_application	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:26
 20005414 t flash_unlock_mid146085	/cygdrive/e/All_projects/TELINK/TBS/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/flash/flash_mid146085.c:101
