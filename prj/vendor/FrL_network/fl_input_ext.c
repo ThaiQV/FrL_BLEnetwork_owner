@@ -81,18 +81,18 @@ fl_exIO_t G_IN_POLLING[10];
 
 typedef struct {
 	unsigned int len; // data max 252
-	unsigned char data[UART_DATA_LEN];
-}fl_uart_data_t;
+	unsigned char data[FL_TXFIFO_SIZE * FL_TXFIFO_NUM];
+}__attribute__((packed)) fl_uart_data_t;
 
-u8 fl_rx_fifo_b[FL_RXFIFO_SIZE * FL_RXFIFO_NUM] = {0};
-my_fifo_t fl_rx_fifo = {FL_RXFIFO_SIZE, FL_RXFIFO_NUM, 0, 0, fl_rx_fifo_b,};
+_attribute_data_retention_ u8 fl_rx_fifo_b[FL_RXFIFO_SIZE * FL_RXFIFO_NUM] = {0};
+_attribute_data_retention_ my_fifo_t fl_rx_fifo = {FL_RXFIFO_SIZE, FL_RXFIFO_NUM, 0, 0, fl_rx_fifo_b,};
 
-u8 fl_tx_fifo_b[FL_TXFIFO_SIZE * FL_TXFIFO_NUM] = {0};
-my_fifo_t fl_tx_fifo = {FL_TXFIFO_SIZE, FL_TXFIFO_NUM, 0, 0, fl_tx_fifo_b,};
+_attribute_data_retention_ u8 fl_tx_fifo_b[FL_TXFIFO_SIZE * FL_TXFIFO_NUM] = {0};
+_attribute_data_retention_ my_fifo_t fl_tx_fifo = {FL_TXFIFO_SIZE, FL_TXFIFO_NUM, 0, 0, fl_tx_fifo_b,};
 
 volatile unsigned char FLAG_uart_dma_send = 0;
 
-fl_uart_data_t FL_TXDATA; //T_txdata_buf
+_attribute_data_retention_  fl_uart_data_t FL_TXDATA; //T_txdata_buf
 
 #endif
 /******************************************************************************/
@@ -139,6 +139,8 @@ void fl_serial_buffer_ClearAll(void){
 	ERR(APP,"UART <ERR> => Clear ALL\r\n");
 	memset(fl_tx_fifo_b,0,sizeof(fl_tx_fifo_b));
 	memset(fl_rx_fifo_b,0,sizeof(fl_rx_fifo_b));
+	my_fifo_init(&fl_rx_fifo,fl_rx_fifo.size,fl_rx_fifo.num,fl_rx_fifo_b);
+	my_fifo_init(&fl_tx_fifo,fl_tx_fifo.size,fl_tx_fifo.num,fl_tx_fifo_b);
 }
 
 static void fl_serial_AddLenIn1st(u8 *parr, u8 _size) {
@@ -188,69 +190,83 @@ static int rx_from_uart_cb(void) //UART data send to Master,we will handler the 
  * @param[in]	none
  * @return      0 is ok
  */
-//static int tx_to_uart_cb(void) {
-//	u8 *p = my_fifo_get(&fl_tx_fifo);
-//	//FLAG_uart_dma_send=0;
-//	if (p && !FLAG_uart_dma_send) {
-//		memset(FL_TXDATA.data,0,sizeof(FL_TXDATA.data));
-//		FL_TXDATA.len = (unsigned int) p[0];
-//		if (FL_TXDATA.len >= sizeof(FL_TXDATA.data)) {
-//			ERR(MCU,"UART SEND OVERLOAD (%d)!!!\r\n",FL_TXDATA.len);
-//			FL_TXDATA.len = 5;
-//		}
-//		memcpy(&FL_TXDATA.data,&p[1],FL_TXDATA.len);
-//		if (uart_send_dma(G_INPUT_EXT.serial.uart_num,(u8 *) (&FL_TXDATA.data),FL_TXDATA.len)) {
-//			my_fifo_pop(&fl_tx_fifo);
-//			FLAG_uart_dma_send = 1;
-//			//			LOGA(DRV,"lenData:%d\r\n",FL_TXDATA.len);
-//			P_PRINTFHEX_A(DRV,FL_TXDATA.data,FL_TXDATA.len,"%s(%d):","Tx",FL_TXDATA.len);
-//		}
-//	}
-//	return 0;
-//}
-
 static int tx_to_uart_cb(void) {
-    u8 *p;
-    unsigned int total_len = 0;
-    memset(FL_TXDATA.data, 0, sizeof(FL_TXDATA.data));
-	if(!FLAG_uart_dma_send){
-		while ((p = my_fifo_get(&fl_tx_fifo)) != 0) {
-			unsigned int len = (unsigned int)p[0];
-			if (len > sizeof(FL_TXDATA.data) - total_len) {
-				ERR(MCU, "UART SEND OVERLOAD (%d)!!!\r\n", len);
-				break;
-			}
-			memcpy(&FL_TXDATA.data[total_len], &p[1], len);
-			total_len += len;
-			my_fifo_pop(&fl_tx_fifo);
-			*p=0;
+	//FLAG_uart_dma_send=0;
+	while(FLAG_uart_dma_send){};
+	u8 *p = my_fifo_get(&fl_tx_fifo);
+	if (p && !FLAG_uart_dma_send) {
+		memset(FL_TXDATA.data,0,sizeof(FL_TXDATA.data));
+		FL_TXDATA.len = (unsigned int) p[0];
+		if (FL_TXDATA.len >= sizeof(FL_TXDATA.data)) {
+			ERR(MCU,"UART SEND OVERLOAD (%d)!!!\r\n",FL_TXDATA.len);
+			FL_TXDATA.len = 5;
 		}
-		if (total_len > 0 ) {
-			FL_TXDATA.len = total_len;
-			while(FLAG_uart_dma_send){};
-			if (uart_send_dma(G_INPUT_EXT.serial.uart_num,(u8 *)FL_TXDATA.data,FL_TXDATA.len)) {
-				FLAG_uart_dma_send = 1;
-				//P_INFO_HEX(FL_TXDATA.data, FL_TXDATA.len,"%s(%d):", "Tx", FL_TXDATA.len);
-			}
+		memcpy(&FL_TXDATA.data,&p[1],FL_TXDATA.len);
+		if (uart_send_dma(G_INPUT_EXT.serial.uart_num,(u8 *) (&FL_TXDATA.data),FL_TXDATA.len)) {
+			my_fifo_pop(&fl_tx_fifo);
+			FLAG_uart_dma_send = 1;
+			//			LOGA(DRV,"lenData:%d\r\n",FL_TXDATA.len);
+			P_PRINTFHEX_A(DRV,FL_TXDATA.data,FL_TXDATA.len,"%s(%d):","Tx",FL_TXDATA.len);
 		}
 	}
-    return 0;
+	return 0;
 }
+//
+//static int tx_to_uart_cb(void) {
+//    u8 *p = NULL;
+//    unsigned int total_len = 0;
+//    memset(FL_TXDATA.data, 0xFF, sizeof(FL_TXDATA.data));
+//    while(FLAG_uart_dma_send){};
+//	if(!FLAG_uart_dma_send){
+//		while ((p = my_fifo_get(&fl_tx_fifo)) != 0) {
+//			u8 len = *p;
+////			P_INFO("TX len: %d\r\n",len);
+//			if (len > sizeof(FL_TXDATA.data) - total_len) {
+//				ERR(MCU, "UART SEND OVERLOAD (%d)!!!\r\n", len);
+//				break;
+//			}
+//			if(len > 2){
+//				memcpy(&FL_TXDATA.data[total_len], p+1, len);
+//				total_len += len;
+//			}
+//			my_fifo_pop(&fl_tx_fifo);
+//			*p=0;
+//		}
+//		if (total_len > 0 ) {
+//			FL_TXDATA.len = total_len;
+//			while(FLAG_uart_dma_send){};
+//			if (uart_send_dma(G_INPUT_EXT.serial.uart_num,(u8 *)FL_TXDATA.data,FL_TXDATA.len)) {
+//				FLAG_uart_dma_send = 1;
+////				P_INFO_HEX(FL_TXDATA.data, FL_TXDATA.len,"%s(%d):", "Tx", FL_TXDATA.len);
+//			}
+//		}
+//		//clear
+//		my_fifo_init(&fl_tx_fifo,fl_tx_fifo.size,fl_tx_fifo.num,fl_tx_fifo.p);
+//		memset(fl_tx_fifo.p,0,sizeof(fl_tx_fifo.p));
+//		return 0;
+//	}
+//	else return -1;
+//}
+
 /*
  * @brief		this function is used to process tx uart data.
  * @param[in]
  * @param[in]
  * @return      0 is ok
  */
+
 int fl_serial_send(u8* _data, u8 _len) {
 	u8 *p = my_fifo_wptr(&fl_tx_fifo);
-	if (!p || _len >= UART_DATA_LEN) {
+	if (p == NULL || fl_tx_fifo.size < _len) {
+		ERR(APP,"Serial Add <Err> !! \r\n");
+		P_INFO_HEX(_data,_len,"Serial ERR:");
 		return -1;
 	}
 //	u8 data_verify[UART_DATA_LEN];
 //	memset(data_verify,0,sizeof(data_verify));
-	p[0] = _len;
-	memcpy(&p[1],_data,_len);
+	*p = _len;
+	memcpy(p+1,_data,_len);
+//	P_INFO_HEX(p,*p+1,"SeriaAdd(%d):",_len);
 	my_fifo_next(&fl_tx_fifo);
 	return 0;
 }
@@ -312,6 +328,9 @@ void fl_input_serial_init(uart_num_e uart_num, uart_tx_pin_e tx_pin, uart_rx_pin
 	if (G_INPUT_EXT.serial.uart_num == UART1)
 	irq_src = IRQ18_UART1;
 	plic_interrupt_enable(irq_src);
+
+	my_fifo_init(&fl_rx_fifo,fl_rx_fifo.size,fl_rx_fifo.num,fl_rx_fifo_b);
+	my_fifo_init(&fl_tx_fifo,fl_tx_fifo.size,fl_tx_fifo.num,fl_tx_fifo_b);
 
 	u8 *uart_rx_addr = (fl_rx_fifo_b + (fl_rx_fifo.wptr & (fl_rx_fifo.num - 1)) * fl_rx_fifo.size);
 	uart_receive_dma(G_INPUT_EXT.serial.uart_num,(unsigned char *) uart_rx_addr,(unsigned int) fl_rx_fifo.size);

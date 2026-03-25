@@ -156,13 +156,11 @@ u8 _wf_CMD_find(fl_wifi_cmd_e _cmdid) {
 	}
 	return 0xFF;
 }
-
 /******************************************************************************/
 /******************************************************************************/
 /***                      Processing functions 					             **/
 /******************************************************************************/
 /******************************************************************************/
-
 static void _getnsend_data_report(u8 var, u8 rspcmd) {
 	extern fl_slaves_list_t G_NODE_LIST;
 	//for COUTER DEVICEs
@@ -174,12 +172,16 @@ static void _getnsend_data_report(u8 var, u8 rspcmd) {
 	memset(payload,0xFF,SIZEU8(payload));
 	fl_datawifi2ble_t wfdata;
 	if (G_NODE_LIST.sla_info[var].dev_type == TBS_COUNTER) {
+
 		tbs_device_counter_t *counter_data = (tbs_device_counter_t*) G_NODE_LIST.sla_info[var].data;
 		memcpy(counter_data->mac,G_NODE_LIST.sla_info[var].mac,6);
+
 		wfdata.cmd = rspcmd;
 		wfdata.len_data = SIZEU8(tbs_device_counter_t)+ 1; //+ status
 		wfdata.data[0] = G_NODE_LIST.sla_info[var].active;
-		memcpy(&wfdata.data[1],(u8*)counter_data,wfdata.len_data);
+
+		memcpy(&wfdata.data[1],(u8*)G_NODE_LIST.sla_info[var].data,wfdata.len_data);
+
 		wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
 		u8 len_payload = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
 		memcpy(payload,(u8*) &wfdata,len_payload);
@@ -196,7 +198,9 @@ static void _getnsend_data_report(u8 var, u8 rspcmd) {
 			wfdata.cmd = rspcmd;
 			wfdata.len_data = (POWER_METER_BITSIZE-1) + 1;//+ status
 			wfdata.data[0]=G_NODE_LIST.sla_info[var].active;
+
 			memcpy(&wfdata.data[1],G_NODE_LIST.sla_info[var].data,wfdata.len_data);
+
 			wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
 			u8 len_payload = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
 			memcpy(payload,(u8*) &wfdata,len_payload);

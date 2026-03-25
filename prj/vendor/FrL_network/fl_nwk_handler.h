@@ -148,8 +148,8 @@ typedef struct {
 		u16 current2;       // 10 bits
 		u16 current3;       // 10 bits
 		u8 fac_power1;      // 8 bits
-		u8 fac_power2;          // 8 bits
-		u8 fac_power3;          // 8 bits
+		u8 fac_power2;      // 8 bits
+		u8 fac_power3;      // 8 bits
 		u8 time1;           // 6 bits
 		u8 time2;           // 6 bits
 		u8 time3;           // 6 bits
