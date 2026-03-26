@@ -737,6 +737,7 @@ void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 					fl_fota_crc128_init(FOTA_INFO.crc128,sizeof(FOTA_INFO.crc128));
 					memset(FOTA_INFO.ota_map,0,SIZEU8(FOTA_INFO.ota_map));
 					FOTA_INFO.body = 0;
+					FOTA_INFO.end = 0;
 					FOTA_INFO.fw_size = MAKE_U32(0,data_fw[5],data_fw[4],data_fw[3]);
 				}
 				else if (data_fw[0] == FOTA_PACKET_DATA) {
@@ -786,8 +787,8 @@ void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 						if(GET_BIT_InARRAY(FOTA_INFO.ota_map,SIZEU8(FOTA_INFO.ota_map),indx) == 0){
 							SET_BIT_InARRAY(FOTA_INFO.ota_map,SIZEU8(FOTA_INFO.ota_map),indx);
 							fl_fota_crc128_calculate(FOTA_INFO.crc128,&data_fw[3+3]);
-//							P_INFO("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
-//							P_INFO("[T%d,v%d]Downloading:%d/%d (%d)(%d)",FOTA_INFO.fw_type,FOTA_INFO.version,FOTA_INFO.body*OTA_PACKET_LENGTH,FOTA_INFO.fw_size,FOTA_INFO.body,FL_NWK_FOTA_IsReady());
+							P_INFO("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
+							P_INFO("[T%d,v%d]Downloading:%d/%d (%d)(%d)",FOTA_INFO.fw_type,FOTA_INFO.version,FOTA_INFO.body*OTA_PACKET_LENGTH,FOTA_INFO.fw_size,FOTA_INFO.body,FL_NWK_FOTA_IsReady());
 							FOTA_INFO.body++;
 						}
 					}
@@ -800,7 +801,6 @@ void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 						P_INFO_HEX(FOTA_INFO.crc128,SIZEU8(FOTA_INFO.crc128),"CRC:");
 						memcpy(FOTA_INFO.fw_crc128,&data_fw[6],SIZEU8(FOTA_INFO.fw_crc128));
 						P_INFO_HEX(FOTA_INFO.fw_crc128,SIZEU8(FOTA_INFO.fw_crc128),"FW_CRC:");
-						FOTA_INFO.end=0;
 						FOTA_INFO.begin=0;
 //						FOTA_INFO.body=0;
 						///
@@ -822,19 +822,31 @@ void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 					wfdata.data[0] = 0;
 //					P_INFO_HEX(data->data,data->len_data,"FW:");
 				}
+				///cheat code ENDPACKET
+				if(data_fw[0] == FOTA_PACKET_END && FOTA_INFO.end > 2){
+					wfdata.data[0] = 0;
+				}
 			}
+			wfdata.len_data = 1;//+6 //<OK/ERR> 1 byte + 1B packet type + 1B device type + 1B version+3Bs size/address
+			//memcpy(&wfdata.data[1],&data_fw[0],6);
+			wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
+			u8 payload_len = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
+	//		if(data_fw[0] == FOTA_PACKET_END){
+	//			P_INFO_HEX(data_fw,SIZEU8(data_fw),"WIFI2BLE[%d](%d):",data_fw[0],wfdata.data[0]);
+	//		}
+			fl_ble_send_wifi((u8*) &wfdata,payload_len);
 		} else {
 			ERR(MCU,"FOTA ERR >> Format packet\r\n");
 			return;
 		}
-		wfdata.len_data = 1;//+6 //<OK/ERR> 1 byte + 1B packet type + 1B device type + 1B version+3Bs size/address
-		//memcpy(&wfdata.data[1],&data_fw[0],6);
-		wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
-		u8 payload_len = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
-//		if(data_fw[0] == FOTA_PACKET_END){
-//			P_INFO_HEX(data_fw,SIZEU8(data_fw),"WIFI2BLE[%d](%d):",data_fw[0],wfdata.data[0]);
-//		}
-		fl_ble_send_wifi((u8*) &wfdata,payload_len);
+//		wfdata.len_data = 1;//+6 //<OK/ERR> 1 byte + 1B packet type + 1B device type + 1B version+3Bs size/address
+//		//memcpy(&wfdata.data[1],&data_fw[0],6);
+//		wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
+//		u8 payload_len = wfdata.len_data + SIZEU8(wfdata.cmd) + SIZEU8(wfdata.crc8) + SIZEU8(wfdata.len_data);
+////		if(data_fw[0] == FOTA_PACKET_END){
+////			P_INFO_HEX(data_fw,SIZEU8(data_fw),"WIFI2BLE[%d](%d):",data_fw[0],wfdata.data[0]);
+////		}
+//		fl_ble_send_wifi((u8*) &wfdata,payload_len);
 	}
 }
 

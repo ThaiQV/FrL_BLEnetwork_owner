@@ -197,7 +197,7 @@ s16 fl_wifi2ble_fota_fwpush(u8 *_fw, u8 _len,fl_fota_pack_type_e _pack_type) {
 int fl_wifi2ble_fota_system_end(u8 *_payload_end, u8 _len) {
 	int rslt = -1;
 	//if (G_FOTA.slot_sent == G_FW_QUEUE_SENDING.count && G_FOTA.slot_avaible == 0)
-	if (G_FW_QUEUE_SENDING.count ==0){
+	if (G_FW_QUEUE_SENDING.count == 0){
 		rslt = fl_wifi2ble_fota_fwpush(_payload_end,_len,FOTA_PACKET_END);
 	}
 	//todo: get rsp of the slave and recheck missing packet
@@ -290,7 +290,7 @@ void fl_wifi2ble_fota_init(void){
 //	LOGA(INF_FILE,"FOTA Initilization(%d.%d.%d)!!!\r\n",DFU_OTA_VERSION_GET().major,DFU_OTA_VERSION_GET().minor,DFU_OTA_VERSION_GET().patch);
 #ifdef MASTER_CORE
 	//set interval
-	fl_wifi2ble_Fota_Interval_set(120);
+	fl_wifi2ble_Fota_Interval_set(80);
 #endif
 }
 

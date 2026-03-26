@@ -129,13 +129,7 @@ void fl_nwk_LedSignal_run(void){
 //#endif
 //#endif
 }
-//u8 fl_crc8(u8* _pdata, u8 _len) {
-//	u8 crc = 0;
-//	for (u8 i = 0; i < _len; i++) {
-//		crc += _pdata[i];
-//	}
-//	return (u8) (crc % 256);
-//}
+
 u8 fl_nwk_mySlaveID(void){
 	return G_INFORMATION.slaveID;
 }
@@ -782,6 +776,8 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 						packet.frame.endpoint.master = FL_FROM_SLAVE;
 						//add repeat_cnt
 						packet.frame.endpoint.repeat_cnt = NWK_REPEAT_LEVEL;
+						//Linking LED
+
 					} else {
 						//Non-rsp
 						packet_built.length = 0;

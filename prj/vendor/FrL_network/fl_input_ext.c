@@ -84,15 +84,15 @@ typedef struct {
 	unsigned char data[FL_TXFIFO_SIZE * FL_TXFIFO_NUM];
 }__attribute__((packed)) fl_uart_data_t;
 
-_attribute_data_retention_ u8 fl_rx_fifo_b[FL_RXFIFO_SIZE * FL_RXFIFO_NUM] = {0};
-_attribute_data_retention_ my_fifo_t fl_rx_fifo = {FL_RXFIFO_SIZE, FL_RXFIFO_NUM, 0, 0, fl_rx_fifo_b,};
+u8 fl_rx_fifo_b[FL_RXFIFO_SIZE * FL_RXFIFO_NUM] = { 0 };
+my_fifo_t fl_rx_fifo = { FL_RXFIFO_SIZE, FL_RXFIFO_NUM, 0, 0, fl_rx_fifo_b, };
 
-_attribute_data_retention_ u8 fl_tx_fifo_b[FL_TXFIFO_SIZE * FL_TXFIFO_NUM] = {0};
-_attribute_data_retention_ my_fifo_t fl_tx_fifo = {FL_TXFIFO_SIZE, FL_TXFIFO_NUM, 0, 0, fl_tx_fifo_b,};
+u8 fl_tx_fifo_b[FL_TXFIFO_SIZE * FL_TXFIFO_NUM] = { 0 };
+my_fifo_t fl_tx_fifo = { FL_TXFIFO_SIZE, FL_TXFIFO_NUM, 0, 0, fl_tx_fifo_b, };
 
 volatile unsigned char FLAG_uart_dma_send = 0;
 
-_attribute_data_retention_  fl_uart_data_t FL_TXDATA; //T_txdata_buf
+fl_uart_data_t FL_TXDATA; //T_txdata_buf
 
 #endif
 /******************************************************************************/
@@ -192,7 +192,7 @@ static int rx_from_uart_cb(void) //UART data send to Master,we will handler the 
  */
 static int tx_to_uart_cb(void) {
 	//FLAG_uart_dma_send=0;
-	while(FLAG_uart_dma_send){};
+//	while(FLAG_uart_dma_send){};
 	u8 *p = my_fifo_get(&fl_tx_fifo);
 	if (p && !FLAG_uart_dma_send) {
 		memset(FL_TXDATA.data,0,sizeof(FL_TXDATA.data));
@@ -211,6 +211,7 @@ static int tx_to_uart_cb(void) {
 	}
 	return 0;
 }
+
 //
 //static int tx_to_uart_cb(void) {
 //    u8 *p = NULL;
@@ -281,7 +282,8 @@ void fl_input_serial_rec(void) {
 		u8* cur_addr = fl_rx_fifo.p + (fl_rx_fifo.wptr & (fl_rx_fifo.num - 1)) * fl_rx_fifo.size;
 		uart_receive_dma(G_INPUT_EXT.serial.uart_num,(unsigned char *)cur_addr,(unsigned int) fl_rx_fifo.size);
 		uart_clr_irq_status(G_INPUT_EXT.serial.uart_num,UART_CLR_RX);
-//		fl_serial_buffer_ClearAll();
+		fl_serial_buffer_ClearAll();
+		uart_clr_irq_status(UART1,UART_CLR_RX);
 		return;
 	}
 	u8* w = fl_rx_fifo.p + (fl_rx_fifo.wptr & (fl_rx_fifo.num - 1)) * fl_rx_fifo.size;

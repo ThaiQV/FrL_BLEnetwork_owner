@@ -64,7 +64,7 @@ void uart1_recieve_irq(void) {
 //		ERR(APP,"RX DONE\r\n");
 //	}
 	if (irq_flags & UART_RXBUF_IRQ_STATUS) {
-//		ERR(APP,"RX FIFO FULL\r\n");
+		ERR(APP,"RX FIFO FULL\r\n");
 		fl_input_serial_rec();
 		uart_clr_irq_status(UART1, UART_CLR_RX);
 		uart_clr_irq_mask(UART1,UART_RXBUF_IRQ_STATUS);
@@ -207,6 +207,7 @@ fl_version_t _hw = { 1, 0, 1 };
 
 _attribute_ram_code_ int main(void)   //must on ramcode
 {
+
 	DBG_CHN0_LOW;
 	blc_pm_select_internal_32k_crystal();
 
