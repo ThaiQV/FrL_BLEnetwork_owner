@@ -100,7 +100,7 @@ void my_fifo_init (my_fifo_t *f, int s, u8 n, u8 *p)
 
 u8* my_fifo_wptr (my_fifo_t *f)
 {
-	if (((f->wptr - f->rptr) & 255) < f->num)
+	if (((f->wptr - f->rptr) & 255) < f->num - 1)  //FL modify
 	{
 		return f->p + (f->wptr & (f->num-1)) * f->size;
 	}

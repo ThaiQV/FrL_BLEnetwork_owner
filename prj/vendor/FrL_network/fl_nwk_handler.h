@@ -41,6 +41,8 @@ typedef enum {
 	// slave -> req -> master -> rsp
 	NWK_HDR_11_REACTIVE = 0x11, 				//inform to master
 	NWK_HDR_22_PING = 0x22, 					//master ping to slave
+	// slave update somethings to master
+	NWK_HDR_23_NOTIFY = 0x23,
 	/*Frl protocols*/
 	NWK_HDR_55 = 0x55, 							// REQ from slave
 	NWK_HDR_A5_HIS=0xA5, 						//history
@@ -59,8 +61,6 @@ typedef enum {
 	NWK_HDR_ASSIGN = 0xFC,						//Use to assign SlaveID to slave
 	NWK_HDR_HEARTBEAT = 0xFD,
 	NWK_HDR_COLLECT = 0xFE, 					//Use to collect slave (master and slaves)
-
-
 }__attribute__((packed)) fl_hdr_nwk_type_e;
 
 typedef struct {
@@ -148,8 +148,8 @@ typedef struct {
 		u16 current2;       // 10 bits
 		u16 current3;       // 10 bits
 		u8 fac_power1;      // 8 bits
-		u8 fac_power2;          // 8 bits
-		u8 fac_power3;          // 8 bits
+		u8 fac_power2;      // 8 bits
+		u8 fac_power3;      // 8 bits
 		u8 time1;           // 6 bits
 		u8 time2;           // 6 bits
 		u8 time3;           // 6 bits
@@ -453,7 +453,7 @@ typedef struct {
  *
  * @return	  	crc output.
  ********************************************************************************/
-inline u8 fl_crc8(u8* _pdata, u8 _len) {
+static inline u8 fl_crc8(u8* _pdata, u8 _len) {
 	u8 crc = 0;
 	for (u8 i = 0; i < _len; i++) {
 		crc += _pdata[i];

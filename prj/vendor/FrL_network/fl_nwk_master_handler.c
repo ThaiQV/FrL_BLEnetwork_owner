@@ -57,7 +57,7 @@ volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into endpoint byte (dbg :1
 volatile u8 NWK_REPEAT_MODE = 0; // 1: level | 0 : non-level
 volatile u8 NWK_REPEAT_LEVEL = 3;
 
-fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_NODETALBE_UPDATE,NWK_HDR_REMOVE,NWK_HDR_MASTER_CMD,NWK_HDR_FOTA,NWK_HDR_A5_HIS, NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_22_PING}; // register cmdid REQ
+fl_hdr_nwk_type_e G_NWK_HDR_REQLIST[] = {NWK_HDR_23_NOTIFY,NWK_HDR_NODETALBE_UPDATE,NWK_HDR_REMOVE,NWK_HDR_MASTER_CMD,NWK_HDR_FOTA,NWK_HDR_A5_HIS, NWK_HDR_F6_SENDMESS,NWK_HDR_F7_RSTPWMETER,NWK_HDR_F8_PWMETER_SET,NWK_HDR_22_PING}; // register cmdid REQ
 
 #define NWK_HDR_REQ_SIZE (sizeof(G_NWK_HDR_REQLIST)/sizeof(G_NWK_HDR_REQLIST[0]))
 
@@ -856,7 +856,7 @@ static void _master_updateDB_for_Node(u8 node_indx ,fl_data_frame_u *packet)  {
 	}
 	if (G_NODE_LIST.sla_info[node_indx].dev_type == TBS_POWERMETER) {
 		memcpy(&G_NODE_LIST.sla_info[node_indx].data[size_mac + 5],&packet->frame.payload[0],SIZEU8(packet->frame.payload));
-		//for test
+		//for testing
 		tbs_device_powermeter_t received;
 		tbs_unpack_powermeter_data(&received,G_NODE_LIST.sla_info[node_indx].data);
 		tbs_power_meter_printf(INF,(void*) &received);
@@ -938,6 +938,64 @@ int fl_master_ProccesRSP_cbk(void) {
 						memcpy(seq_timetamp,packet.frame.timetamp,SIZEU8(packet.frame.timetamp));
 						seq_timetamp[SIZEU8(packet.frame.timetamp)] = packet.frame.milltamp;
 						fl_adv_sendFIFO_add(fl_master_packet_RSP_TimetampREQ_build(NWK_HDR_22_PING,slave_id,seq_timetamp));
+					}
+				} else {
+					ERR(INF,"ID not foud:%02X\r\n",slave_id);
+					return -1;
+				}
+			}
+			break;
+
+			case NWK_HDR_23_NOTIFY: {
+				u8 slave_id = packet.frame.slaveID;
+				u8 node_indx = fl_master_SlaveID_find(slave_id);
+				if (node_indx != -1) {
+					u8 crc = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
+					if(crc == packet.frame.crc8){
+						u8 fw_ver;
+						u8 fw_type;
+						u32 fw_size;
+						u32 fw_nuomofpack;
+						u8 packet_fwcrc[16];
+						u8 fwcrc[16];
+						u16 slave_rec = MAKE_U16(packet.frame.payload[1],packet.frame.payload[0]);
+						FOTA_CURRENTINFO_GET(&fw_ver,&fw_type,&fw_nuomofpack,&fw_size,packet_fwcrc,fwcrc);
+//						P_INFO_HEX(packet_fwcrc,SIZEU8(packet_fwcrc),"[FOTA]Ver(%d),Type(%d),Size(%d):",fw_ver,fw_type,fw_size);
+						P_INFO_HEX(packet.frame.payload+2,SIZEU8(packet_fwcrc),"[FOTA]SlaveID(%d):REC(%d)CRC128:",slave_id,slave_rec);
+						//send to debugging topic
+						u8 mqtt_payload[128];
+						memset(mqtt_payload,0,SIZEU8(mqtt_payload));
+						u8 sla_mac[6];
+						fl_master_SlaveMAC_get(slave_id,sla_mac);
+
+//						sprintf((char*)mqtt_payload,
+//						        "Mac:%02X%02X%02X%02X\n"
+//						        "Type:%d,Ver:%d,Size:%d,Rec:%d/%d\n"
+//						        "Crc:%02X%02X%02X%02X%02X%02X%02X%02X=>%s",
+//						        sla_mac[2], sla_mac[3], sla_mac[4], sla_mac[5],
+//								fw_type,fw_ver, fw_size,slave_rec,fw_nuomofpack,
+//						        packet_fwcrc[0], packet_fwcrc[1], packet_fwcrc[2], packet_fwcrc[3],
+//						        packet_fwcrc[4], packet_fwcrc[5], packet_fwcrc[6], packet_fwcrc[7],
+//								(memcmp(packet_fwcrc,packet.frame.payload+2,SIZEU8(packet_fwcrc))?"ERR":"OK")
+//						);
+						snprintf((char*)mqtt_payload,sizeof(mqtt_payload),
+						        "{"
+						        "\"mac\":\"%02X%02X%02X%02X\","
+						        "\"type\":%d,"
+						        "\"ver\":%d,"
+						        "\"size\":%d,"
+						        "\"rec\":\"%d/%d\","
+						        /*"\"crc\":\"%02X%02X%02X%02X\","*/
+						        "\"results\":{\"ble\":\"%s\",\"bin\":\"%s\"}"
+						        "}",
+						        sla_mac[0], sla_mac[1], sla_mac[2], sla_mac[3],
+						        fw_type, fw_ver, fw_size, slave_rec, fw_nuomofpack,
+//						        packet.frame.payload[6], packet.frame.payload[7],
+//						        packet.frame.payload[8], packet.frame.payload[9],
+						        (memcmp(packet_fwcrc, packet.frame.payload+2, SIZEU8(packet_fwcrc)) ? "Err" : "OK"),
+						        (memcmp(fwcrc, packet.frame.payload+2, SIZEU8(fwcrc)) ? "Err" : "OK")
+						);
+						fl_ble2wifi_DEBUG2MQTT(mqtt_payload,strlen((char*)mqtt_payload));
 					}
 				} else {
 					ERR(INF,"ID not foud:%02X\r\n",slave_id);

@@ -1,7 +1,7 @@
 #include "dfu.h"
 
 /* Definition */
-//#define DFU_DEBUG
+#define DFU_DEBUG
 #ifdef DFU_DEBUG
 #define DFU_PRINTF(...)	LOGA(APP,__VA_ARGS__);
 #else
@@ -504,6 +504,7 @@ uint8_t ota_packet_crc(uint8_t *pdata)
 * -------------------------------------------------------------------------
 * @retval: ota_ret_t
 */
+
 ota_ret_t ota_fw_put(uint8_t *pdata, uint8_t crc)
 {
 	ota_packet_type_t	packet_type;
@@ -527,13 +528,12 @@ ota_ret_t ota_fw_put(uint8_t *pdata, uint8_t crc)
 			packet_header.version = pdata[2];
 			packet_header.size = (uint32_t)pdata[3] + (uint32_t)(pdata[4] << 8) + (uint32_t)(pdata[5] << 16);
 			memcpy((uint8_t*)packet_header.signature,(uint8_t*)&pdata[6],OTA_PACKET_LENGTH);
-			ota_packet_header_set(&packet_header);
-			DFU_PRINTF("OTA Begin\n");
+			printf("OTA Begin:%d\n",ota_packet_header_set(&packet_header));
 			return OTA_RET_OK;
 		}
 		else if(packet_type == OTA_PACKET_END)
 		{
-			ota_packet_header_get(&packet_header);
+			u8 rt = ota_packet_header_get(&packet_header);
 			if((packet_header.state == OTA_FW_STATE_EMPTY) || (packet_header.state == OTA_FW_STATE_WRITING))
 			{
 				packet_header.state = OTA_FW_STATE_COMPLETE;
@@ -569,6 +569,10 @@ ota_ret_t ota_fw_put(uint8_t *pdata, uint8_t crc)
 				DFU_PRINTF("OTA End\n");
 				return OTA_RET_OK;
 			}
+			else if(packet_header.state == OTA_FW_STATE_COMPLETE) {
+				DFU_PRINTF("OTA End\n");
+				return OTA_RET_OK;
+			}
 		}
 		else if(packet_type == OTA_PACKET_DATA)
 		{
@@ -576,7 +580,7 @@ ota_ret_t ota_fw_put(uint8_t *pdata, uint8_t crc)
 			version		= pdata[2];
 			memory_addr	= (uint32_t)pdata[3] + (uint32_t)(pdata[4] << 8) + (uint32_t)(pdata[5] << 16);
 
-			ota_packet_header_get(&packet_header);
+			u8 rt_data = ota_packet_header_get(&packet_header);
 			if((packet_header.state == OTA_FW_STATE_EMPTY) || (packet_header.state == OTA_FW_STATE_WRITING))
 			{
 				if((device_type == packet_header.type) && (version == packet_header.version))
@@ -601,14 +605,20 @@ ota_ret_t ota_fw_put(uint8_t *pdata, uint8_t crc)
 						}
 					}
 					memory_addr = OTA_FW_ADDRESS + memory_addr;
-					if(ota_packet_crc(pdata) != crc)
-					{
-						return OTA_RET_ERROR;
-					}
+//					if(ota_packet_crc(pdata) != crc)
+//					{
+//						return OTA_RET_ERROR;
+//					}
 					W25XXX_WR_Block((uint8_t*)&pdata[6],memory_addr,OTA_PACKET_LENGTH);
 	//				DFU_PRINTF("Write addr: %x\n",memory_addr);
 					return OTA_RET_OK;
 				}
+				else{
+					printf("[%d]packet_header.type = %d,packet_header.state = %d\r\n",rt_data,packet_header.state,packet_header.version);
+				}
+			}
+			else{
+				printf("[%d]packet_header.state = %d\r\n",rt_data,packet_header.state);
 			}
 		}
 	}
@@ -900,6 +910,7 @@ static void response_ack(cmt_t ack)
 */
 void dfu_uart_process(void)
 {
+	extern void cmd_process(void);
 	uint32_t		len = 0;
 //	uint8_t			buff[DFU_UART_BUFF_SIZE];
 //	static uint32_t	buff_cnt = 0;

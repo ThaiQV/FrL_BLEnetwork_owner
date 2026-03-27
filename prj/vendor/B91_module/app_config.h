@@ -151,13 +151,6 @@ typedef struct{
     unsigned int len; // data max 252
     unsigned char data[UART_DATA_LEN];
 }uart_data_t;
-
-
-
-
-
-
-
 ///////////////////////////////////// ATT  HANDLER define ///////////////////////////////////////
 typedef enum
 {

@@ -64,7 +64,7 @@ void uart1_recieve_irq(void) {
 //		ERR(APP,"RX DONE\r\n");
 //	}
 	if (irq_flags & UART_RXBUF_IRQ_STATUS) {
-//		ERR(APP,"RX FIFO FULL\r\n");
+		ERR(APP,"RX FIFO FULL\r\n");
 		fl_input_serial_rec();
 		uart_clr_irq_status(UART1, UART_CLR_RX);
 		uart_clr_irq_mask(UART1,UART_RXBUF_IRQ_STATUS);
@@ -202,11 +202,12 @@ void proto_task( void *pvParameters );
  * @return      none
  */
 fl_version_t _bootloader = { 1, 1, 0};
-fl_version_t _fw = { 2, 1,7 };
+fl_version_t _fw = { 2, 1,12};
 fl_version_t _hw = { 1, 0, 1 };
 
 _attribute_ram_code_ int main(void)   //must on ramcode
 {
+
 	DBG_CHN0_LOW;
 	blc_pm_select_internal_32k_crystal();
 
@@ -223,9 +224,10 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 #if (UART_PRINT_DEBUG_ENABLE)
 	DEBUG_TX_PIN_INIT();
 #endif
-
 	PLOG_DEVICE_PROFILE(_bootloader,_fw,_hw);
+
 	PLOG_Stop(ALL);
+//	PLOG_Start(ZIG_GP);
 	if (!deepRetWakeUp) {  //read flash size
 #if (BATT_CHECK_ENABLE)
 	user_battery_power_check();
@@ -271,6 +273,7 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 		vTaskStartScheduler();
 	}
 #else
+
 	irq_enable();
 	/// wdt init
 	wd_set_interval_ms(WDT_RST_INTERVAL);
