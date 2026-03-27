@@ -676,7 +676,7 @@ void RSTFACTORY_REQUEST(u8* _pdata, RspFunc rspfnc){
 	nvm_erase();
 	sys_reboot();
 	return;
-	//don'ts send rsp
+	//don't send rsp
 	if (rspfnc != 0) {
 		return;
 	}
