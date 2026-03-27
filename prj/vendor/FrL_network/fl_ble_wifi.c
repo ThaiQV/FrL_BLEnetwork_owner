@@ -741,6 +741,8 @@ void FOTA_REQUEST(u8* _pdata, RspFunc rspfnc) {
 					FOTA_INFO.fw_size = MAKE_U32(0,data_fw[5],data_fw[4],data_fw[3]);
 				}
 				else if (data_fw[0] == FOTA_PACKET_DATA) {
+					FOTA_INFO.version=data_fw[2];
+					FOTA_INFO.fw_type=data_fw[1];
 					addr = MAKE_U32(0,data_fw[5],data_fw[4],data_fw[3]);
 					indx = (addr) / 16;
 					if (GET_BIT_InARRAY(FOTA_INFO.ota_map,SIZEU8(FOTA_INFO.ota_map),indx) == 0) {

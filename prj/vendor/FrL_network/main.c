@@ -47,7 +47,7 @@
  */
 void uart1_recieve_irq(void) {
 #if (defined MASTER_CORE | defined POWER_METER_DEVICE)
-	extern unsigned char FLAG_uart_dma_send;
+	extern volatile unsigned char FLAG_uart_dma_send;
 	unsigned int irq_flags = uart_get_irq_status(UART1,0xFFFFFFFF);
 //	char bit_flag[9]; // 8 bit + 1 end
 //	for (int i = 7; i >= 0; i--) {
@@ -70,6 +70,11 @@ void uart1_recieve_irq(void) {
 		uart_clr_irq_mask(UART1,UART_RXBUF_IRQ_STATUS);
 //		FLAG_uart_dma_send = 0;
 	}
+	if(irq_flags & UART_TXBUF_IRQ_STATUS){
+//		ERR(APP,"TX FIFO FULL\r\n");
+		FLAG_uart_dma_send = 0;
+		uart_clr_tx_done(UART1);
+	}
 	if (uart_get_irq_status(UART1,UART_TXDONE)) {
 		FLAG_uart_dma_send = 0;
 		uart_clr_tx_done(UART1);
@@ -84,7 +89,7 @@ void uart1_recieve_irq(void) {
 	if(uart_get_irq_status(UART1,UART_RX_ERR)){
 		ERR(APP,"UART FAIL !!\r\n");
 		uart_clr_irq_status(UART1,UART_CLR_RX);
-		uart_clr_tx_done(UART1);
+//		uart_clr_tx_done(UART1);
 //		FLAG_uart_dma_send = 0;
 		fl_serial_buffer_ClearAll();
 	}
@@ -202,7 +207,7 @@ void proto_task( void *pvParameters );
  * @return      none
  */
 fl_version_t _bootloader = { 1, 1, 0};
-fl_version_t _fw = { 2, 1,12};
+fl_version_t _fw = { 2, 1,13};
 fl_version_t _hw = { 1, 0, 1 };
 
 _attribute_ram_code_ int main(void)   //must on ramcode

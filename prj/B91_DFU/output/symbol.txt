@@ -152,36 +152,36 @@
 00006e0c A BIN_SIZE
 00080000 d FmDebug	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/plog.c:44
 00080000 D _DATA_VMA_START
-00080004 d baudrate	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:794
+00080004 d baudrate	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:798
 00080008 d g_pm_early_wakeup_time_us	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/lib/src/pm.c:61
 00080010 d g_pm_r_delay_cycle	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/lib/src/pm.c:76
-00080014 d program_address	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:791
+00080014 d program_address	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:795
 00080018 d sys_clk	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/clock.c:46
-00080020 d timeout_jump	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:790
+00080020 d timeout_jump	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:794
 00080024 d uart_rx_dma_config	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/uart.c:74
 0008002c d uart_tx_dma_config	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/uart.c:44
 00080034 D _DATA_VMA_END
 00080038 S _BSS_VMA_START
-00080038 s crc	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:792
-0008003c s dfu_uart_queue_fifo	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:785
-00080040 s doubleword	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:793
-00080048 s enter_bootloader	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:789
+00080038 s crc	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:796
+0008003c s dfu_uart_queue_fifo	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:789
+00080040 s doubleword	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:797
+00080048 s enter_bootloader	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:793
 0008004c s g_chip_version	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/lib/src/sys.c:39
 00080050 s g_pm_status_info	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/lib/src/pm.c:44
-00080054 s len	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:792
+00080054 s len	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:796
 00080058 s mcause	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../common/plic_isr.c:34
 0008005c s mepc	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../common/plic_isr.c:35
-00080060 s page	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:792
+00080060 s page	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:796
 00080064 s uart_dma_rev_size	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/uart.c:109
 0008006c s uart_dma_rx_chn	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/uart.c:108
-00080070 s uart_rx_addr	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:786
+00080070 s uart_rx_addr	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:790
 00080074 s uart_tx_byte_index	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/uart.c:273
 00080078 s __vprintf_buf
 0008007c s __vprintf_buf_len
 00080080 S __printf_count
-00080084 b cmd	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:788
+00080084 b cmd	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:792
 00080098 b crc128	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:16
-000800a8 b dfu_uart_queue	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:784
+000800a8 b dfu_uart_queue	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:788
 000800b8 B _BSS_VMA_END
 000800b8 B _end
 00080800 D __global_pointer$
@@ -224,8 +224,8 @@
 200033b8 t uart_is_prime	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/uart.c:691
 2000344c t pwm_kick_32k_pad.constprop.2	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/ext_driver/ext_pm.c:134
 200034b4 t blc_readFlashSize_autoConfigCustomFlashSector	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../vendor/common/blt_common.c:40
-20003518 t response_ack	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:885
-20003548 t program_array	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:1018
+20003518 t response_ack	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:889
+20003548 t program_array	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:1022
 20003578 t writeSPIByte	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/SPI_FLASH.c:26
 20003610 t W25XXX_Read	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/SPI_FLASH.c:345
 2000367c t FLASH_ReadStatusReg	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/SPI_FLASH.c:260
@@ -240,10 +240,10 @@
 20003cb0 t hspi_set_pin_mux.part.0
 20003e28 t jump_to_application	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:26
 20003ec0 t flash_unlock_mid146085	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../drivers/B91/flash/flash_mid146085.c:101
-20003f1c t dfu_uart_receive	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:849
+20003f1c t dfu_uart_receive	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:853
 20004010 t fw_copy	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:121
 200047c0 t firmware_check	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:335
-20005200 t dfu_uart_process	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:907
+20005200 t dfu_uart_process	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../Freelux_libs/dfu.c:911
 2000593c T _write	/cygdrive/d/Job/Freelux/Working/TBS_Monitoring/FrL_BLEnetwork_owner/prj/B91_DFU/../application/print/printf.c:98
 20005988 T memcmp
 200059d8 T memcpy
@@ -288,12 +288,12 @@
 20006744 T __riscv_restore_1	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:485
 20006744 T __riscv_restore_2	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:485
 20006744 T __riscv_restore_3	/cygdrive/d/Jenkins/workspace/build-system-3/source-packages/gcc-7.4.0-riscv-bsp-v5_1_0-branch/libgcc/config/riscv/save-restore.S:485
-200067a4 r __FUNCTION__.10114
-200067b8 r __FUNCTION__.10389
-200067d0 r __FUNCTION__.10471
-200067e0 r __FUNCTION__.10836
-200067ec r __FUNCTION__.10898
-2000680c r __FUNCTION__.13235
+200067a4 r __FUNCTION__.10116
+200067b8 r __FUNCTION__.10391
+200067d0 r __FUNCTION__.10473
+200067e0 r __FUNCTION__.10853
+200067ec r __FUNCTION__.10915
+2000680c r __FUNCTION__.13237
 20006ca8 R __digits
-20006cc0 r __FUNCTION__.10170
+20006cc0 r __FUNCTION__.10172
 20006dd8 A _DATA_LMA_START

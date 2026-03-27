@@ -194,7 +194,7 @@ static int tx_to_uart_cb(void) {
 	//FLAG_uart_dma_send=0;
 //	while(FLAG_uart_dma_send){};
 	u8 *p = my_fifo_get(&fl_tx_fifo);
-	if (p && !FLAG_uart_dma_send) {
+	if (p /*&& !FLAG_uart_dma_send*/) {
 		memset(FL_TXDATA.data,0,sizeof(FL_TXDATA.data));
 		FL_TXDATA.len = (unsigned int) p[0];
 		if (FL_TXDATA.len >= sizeof(FL_TXDATA.data)) {
@@ -203,8 +203,8 @@ static int tx_to_uart_cb(void) {
 		}
 		memcpy(&FL_TXDATA.data,&p[1],FL_TXDATA.len);
 		if (uart_send_dma(G_INPUT_EXT.serial.uart_num,(u8 *) (&FL_TXDATA.data),FL_TXDATA.len)) {
-			my_fifo_pop(&fl_tx_fifo);
 			FLAG_uart_dma_send = 1;
+			my_fifo_pop(&fl_tx_fifo);
 			//			LOGA(DRV,"lenData:%d\r\n",FL_TXDATA.len);
 			P_PRINTFHEX_A(DRV,FL_TXDATA.data,FL_TXDATA.len,"%s(%d):","Tx",FL_TXDATA.len);
 		}
