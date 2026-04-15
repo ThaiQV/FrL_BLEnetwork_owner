@@ -207,7 +207,7 @@ void proto_task( void *pvParameters );
  * @return      none
  */
 fl_version_t _bootloader = { 1, 1, 0};
-fl_version_t _fw = { 2, 1,13};
+fl_version_t _fw = { 2, 1,14};
 fl_version_t _hw = { 1, 0, 1 };
 
 _attribute_ram_code_ int main(void)   //must on ramcode
@@ -232,7 +232,7 @@ _attribute_ram_code_ int main(void)   //must on ramcode
 	PLOG_DEVICE_PROFILE(_bootloader,_fw,_hw);
 
 	PLOG_Stop(ALL);
-//	PLOG_Start(ZIG_GP);
+//	PLOG_Start(ALL);
 	if (!deepRetWakeUp) {  //read flash size
 #if (BATT_CHECK_ENABLE)
 	user_battery_power_check();

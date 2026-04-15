@@ -340,8 +340,8 @@ void TBS_PowerMeter_Button_Exc(void){
 			fl_db_clearAll();
 			TBS_History_ClearAll();
 			//
-			extern void nvm_erase(void);
-			nvm_erase();
+//			extern void nvm_erase(void);
+//			nvm_erase();
 			//
 			sys_reboot();
 		} else {

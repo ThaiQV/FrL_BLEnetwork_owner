@@ -48,6 +48,11 @@ _attribute_data_retention_ own_addr_type_t app_own_address_type = OWN_ADDRESS_PU
  *
  ***************************************************/
 int app_system_time_sync(void) {
+
+	/*CHECKING RTC SYSTEM*/
+//	LOGA(APP,"SYSTICK:%d\r\n",clock_get_32k_tick()/32768);
+
+
 	//SYNCHRONIZATION TIME
 	datetime_t cur_dt;
 	u32 cur_timetamp = fl_rtc_get();
