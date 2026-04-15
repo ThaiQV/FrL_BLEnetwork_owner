@@ -434,19 +434,23 @@ void stpm_update_energy(stpm_handle_t *handle, uint8_t channel) {
 		// Check for positive energy change
 		if (delta < (uint32_t) 2147483648) {
 //			if(i==0) LOGA(PERI,"sersors read p:%f(noise:%f,max_pw:%f)\r\n",p,NOISE_POWER,MAX_POWER);
-			if (p < NOISE_POWER || p > MAX_POWER)
+			if (p < NOISE_POWER || p > MAX_POWER) {
+//				ERR(PERI,"PMT Noise:%.8f\r\n",p);
 				e = 0;
+			}
 		} else {
 			// Handle negative energy (wrap-around)
 			delta = energy_helper->old_energy[i] - my_energies[i];
 			e = -1.0 * calc_energy(delta);
 			p = e * 1000.0 * 3600.0 / (double) delta_t;
 //			if(i==0) LOGA(PERI,"sersors read p:%f(noise:%f,max_pw:%f)\r\n",p,-2*NOISE_POWER,-MAX_POWER);
-			if (p > -2 * NOISE_POWER || p < -MAX_POWER)
+			if (p > -2 * NOISE_POWER || p < -MAX_POWER) {
+//				ERR(PERI,"PMT Noise:%.8f\r\n",p);
 				e = 0;
+			}
 		}
 //		if(i==0) LOGA(PERI,"sersors read E:%f\r\n",e);
-		*update_energies[i] += e;
+		*update_energies[i] = *update_energies[i] + (ceil(e*10000.0)/10000.0);
 		energy_helper->old_energy[i] = my_energies[i];
 	}
 
@@ -504,8 +508,8 @@ float stpm_read_active_energy(stpm_handle_t *handle, uint8_t channel) {
     if (handle->get_millis() - energy->valid_millis > ENERGY_UPDATE_MS) {
         stpm_update_energy(handle, channel);
     }
-    return fabs((float)(energy->active*handle->calibration[channel][2]));
-    //return fabs((float)(energy->active));
+//    return fabs((float)(energy->active*handle->calibration[channel][2]));
+    return ceil(fabs((float)(energy->active*handle->calibration[channel][2]))*10000.0)/10000.0;
 }
 
 double stpm_read_fundamental_energy(stpm_handle_t *handle, uint8_t channel) {
@@ -857,6 +861,9 @@ void stpm_read_rms_voltage_and_current(stpm_handle_t *handle, uint8_t channel,
 //    *voltage = (float) (((float)buffer_0to14(handle->read_buffer)) / (float)handle->calibration[channel][0]);
 //    *current = (float) (((float)buffer_15to32(handle->read_buffer)) /(float)handle->calibration[channel][1]);
 
+
+//	*voltage = roundf((float)stpm_read_rms_voltage(handle,channel)*10.0)/10.0;
+//	*current = roundf((float)stpm_read_rms_current(handle,channel)*10.0)/10.0;
 
 	*voltage = stpm_read_rms_voltage(handle,channel);
 	*current = stpm_read_rms_current(handle,channel);

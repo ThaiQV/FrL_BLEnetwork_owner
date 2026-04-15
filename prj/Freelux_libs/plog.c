@@ -212,14 +212,7 @@ void PLOG_DEVICE_PROFILE(fl_version_t _bootloader, fl_version_t _fw,fl_version_t
 
 #undef P_INFO_FW
 }
-/****************************************************************************************************
- * @brief 		platform initialization function
- *
- * @param[in] 	none
- *
- * @return	  	1: startup with ram retention;
- *             	0: no ram retention.
- */
+
 void PLOG_HELP(void) {
 	_help(HELP, 0);
 }

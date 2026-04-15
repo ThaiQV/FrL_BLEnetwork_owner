@@ -936,19 +936,6 @@ void fl_ble2wifi_HISTORY_SEND(u8* mac,u8* timetamp,u8* _data){
 	fl_ble_send_wifi(payload,len_payload);
 }
 void fl_ble2wifi_EVENT_SEND(u8* _slave_mac){
-//	fl_datawifi2ble_t wfdata;
-//	wfdata.cmd = GF_CMD_REPORT_REQUEST;
-//	memset(wfdata.data,0,SIZEU8(wfdata.data));
-//	memcpy(wfdata.data,_slave_mac,6);
-//	wfdata.len_data = 6 + 4 + 4; // mac + timetamp_begin + timetamp_end
-//	wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
-//	LOGA(MCU,"Ext-Call:0x%02X%02X%02X%02X%02X%02X\r\n",wfdata.data[0],wfdata.data[1],wfdata.data[2],wfdata.data[3],wfdata.data[4],wfdata.data[5]);
-//	u8 cmd_data[30];
-//	memset(cmd_data,0,SIZEU8(cmd_data));
-//	cmd_data[0] = wfdata.len_data + SIZEU8(wfdata.cmd)+SIZEU8(wfdata.crc8)+SIZEU8(wfdata.len_data);
-//	memcpy(&cmd_data[1],(u8*)&wfdata,cmd_data[0]);
-//	REPORT_RESPONSE(cmd_data);
-//
 	u8 slave_idx = fl_master_SlaveID_get(_slave_mac);
 	_getnsend_data_report(slave_idx,GF_CMD_REPORT_RESPONSE);
 }

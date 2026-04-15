@@ -1268,7 +1268,7 @@ int _interval_report(void) {
 	fl_nwk_slave_displayLCD_Refesh();
 #endif
 	int offset_spread = (fl_rtc_getWithMilliStep().milstep - WIFI_ORIGINAL_GETALL.milstep)*10;
-#define INTERVAL_REPORT_TIME (55 - FL_SLAVEID_MEMID(G_INFORMATION.slaveID))
+#define INTERVAL_REPORT_TIME  60 // (55 - FL_SLAVEID_MEMID(G_INFORMATION.slaveID))
 	extern const u32 ORIGINAL_TIME_TRUST;
 	if (IsJoinedNetwork()) {
 		if (WIFI_ORIGINAL_GETALL.timetamp < fl_rtc_get() && WIFI_ORIGINAL_GETALL.timetamp > ORIGINAL_TIME_TRUST) {

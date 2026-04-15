@@ -44,6 +44,7 @@
 #define STPM32_GAIN					STPM3X_GAIN_2X
 
 #define POWERMETER_CHANNEL			3
+#define POWERMETER_CALIB_UNIT		10000.0 //
 
 typedef struct
 {
@@ -81,6 +82,7 @@ extern u16 G_POWER_METER_PARAMETER[4];
 #define PMT_GET_THRESHOLD(chnX)			(u16)(G_POWER_METER_PARAMETER[chnX])
 
 #define PMT_PF_AVG(chnX)				(((chnX==1)?G_POWER_METER.data.fac_power1:(chnX==2)?G_POWER_METER.data.fac_power2:G_POWER_METER.data.fac_power3)&0x7F)
+#define PMT_CURR_PACK(chnX)				((chnX==1)?G_POWER_METER.data.current1:(chnX==2)?G_POWER_METER.data.current2:G_POWER_METER.data.current3)
 
 
 /******************************************************************************/
@@ -212,7 +214,7 @@ s32 _auto_calibE_Exc(void) {
 		for (u8 chn = 0; chn < POWERMETER_CHANNEL; chn++) {
 			if (PMT_STRUCT[chn]->flag_calib) {
 				delta_millis = pmt_get_millis() - PMT_STRUCT[chn]->total_energy.valid_millis;
-				e_cal = (((1000.0 * stpm_read_active_power(PMT_STRUCT[chn],1) + PMT_STRUCT[chn]->flag_calib) / 2) * delta_millis * 0.001) / 3600.0; //Wh
+				e_cal = (((POWERMETER_CALIB_UNIT * stpm_read_active_power(PMT_STRUCT[chn],1) + PMT_STRUCT[chn]->flag_calib) / 2) * delta_millis * (1/POWERMETER_CALIB_UNIT)) / 3600.0; //Wh
 				e_cal = 0.001 * e_cal; // =>Wh->kWh
 				e_read = stpm_read_active_energy(PMT_STRUCT[chn],1);
 				calib_E = e_cal / e_read;
@@ -231,9 +233,10 @@ s32 _auto_calibE_collectData(void) {
 		PMT_LATCH_ALL(); //important
 		for (u8 chn = 0; chn < POWERMETER_CHANNEL; chn++) {
 			if (PMT_STRUCT[chn]->flag_calib) {
-				PMT_STRUCT[chn]->flag_calib = 1000.0 * stpm_read_active_power(PMT_STRUCT[chn],1);
+				PMT_STRUCT[chn]->flag_calib = POWERMETER_CALIB_UNIT * stpm_read_active_power(PMT_STRUCT[chn],1);
+				PMT_STRUCT[chn]->flag_calib = PMT_STRUCT[chn]->flag_calib == 0?0.1:PMT_STRUCT[chn]->flag_calib;
 				stpm_reset_energies(PMT_STRUCT[chn]);
-				blt_soft_timer_restart(_auto_calibE_Exc,10 * 1000 * 1000); //1s
+				blt_soft_timer_restart(_auto_calibE_Exc,10 * 1000 * 1000); //10s
 			}
 		}
 	}
@@ -294,8 +297,9 @@ void pmt_calib_stpm(u8 _chn,bool _set,uint16_t _calib_V, uint16_t _calib_C,uint1
 			}
 			//calculate calibE
 //			delay_ms(100); ///delay to stpm refesh new data
-			PMT_STRUCT[chn_idx]->flag_calib = 1000.0*stpm_read_active_power(PMT_STRUCT[chn_idx],1);
+			PMT_STRUCT[chn_idx]->flag_calib = POWERMETER_CALIB_UNIT*stpm_read_active_power(PMT_STRUCT[chn_idx],1);
 //			stpm_reset_energies(PMT_STRUCT[chn_idx]);
+			PMT_STRUCT[chn_idx]->flag_calib = PMT_STRUCT[chn_idx]->flag_calib == 0?0.1:PMT_STRUCT[chn_idx]->flag_calib;
 			blt_soft_timer_restart(_auto_calibE_collectData,1*1000*1000); //1s
 		}
 	}
@@ -525,11 +529,11 @@ void pmt_reset_workingtime(u8 _chn) {
 	u8 numofchn = _chn == 0 ? POWERMETER_CHANNEL : _chn;
 	for (u8 chn = (_chn > 0 ? _chn - 1 : 0); chn < numofchn; ++chn) {
 		//debug
-		P_INFO("[%d]F:%d,Uavg:%.3f,Iavg:%.3f,Pavg:%.6f,E:%.6f,PFavg:%d,WT:%d\r\n",chn,
-						G_POWER_METER.data.frequency,PMT_CTX[chn].u_avg,
-						PMT_CTX[chn].i_avg,
+		P_INFO("[%d]F:%d,Uavg:%.1f(%d),Iavg:%.3f(%d),Pavg:%.2f,E:%.4f,PFavg:%d,WT:%d\r\n",chn,
+						G_POWER_METER.data.frequency,PMT_CTX[chn].u_avg,G_POWER_METER.data.voltage,
+						PMT_CTX[chn].i_avg,PMT_CURR_PACK(chn+1),
 						PMT_CTX[chn].p_avg,PMT_CTX[chn].e_sum,
-						PMT_PF_AVG(chn) & 0x7F,
+						PMT_PF_AVG(chn+1) & 0x7F,
 						PMT_CTX[chn].working_time_ms);
 		//
 		LOGA(APP,"[%d]Reset Working-time:%d ms\r\n",chn,PMT_CTX[chn].working_time_ms);
@@ -610,7 +614,7 @@ void pmt_main(void){
 			//=========== Chn1
 			chn_update = 0;
 			PMT_CTX[chn_update].u_avg = (volt+PMT_CTX[chn_update].u_avg)/2;
-			G_POWER_METER.data.voltage = (u16)PMT_CTX[chn_update].u_avg;
+			G_POWER_METER.data.voltage = (u16)(roundf((float)PMT_CTX[chn_update].u_avg));
 			PMT_CTX[chn_update].i_avg = (PMT_CTX[chn_update].i_avg + curr) / 2;
 			i_cal = calc_I(PMT_CTX[chn_update].i_avg);
 			G_POWER_METER.data.current1 = (u16) (i_cal & 0x3FF);
@@ -620,7 +624,7 @@ void pmt_main(void){
 			G_POWER_METER.data.fac_power1 = calc_FP(chn_update) | current_unit;
 			//(((u8) (100.0 * stpm_read_power_factor(PMT_STRUCT[chn_update],1)) + (G_POWER_METER.data.fac_power1 & 0x7F)) / 2) | current_unit;
 			PMT_CTX[chn_update].e_sum = PMT_CTX[chn_update].e_last_stored + stpm_read_active_energy(PMT_STRUCT[chn_update],1);
-			G_POWER_METER.data.energy1 = (u32) (PMT_CTX[chn_update].e_sum * 10);
+			G_POWER_METER.data.energy1 = (u32) (PMT_CTX[chn_update].e_sum * 10);//*10 format of the TBS
 
 			if ((u16) roundf((float)p_rms *10.0/10.0)> PMT_GET_THRESHOLD(chn_update)) {
 				PMT_CTX[chn_update].working_time_ms +=

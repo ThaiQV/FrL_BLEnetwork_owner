@@ -32,7 +32,7 @@
 // * TBS project define pinout
 // * */
 #ifndef MASTER_CORE
-#define TBS_COUNTER_DEVICE 1	//1: Counter, 0: PowerMeter **don't change tab format of the #define
+#define TBS_COUNTER_DEVICE 0	//1: Counter, 0: PowerMeter **don't change tab format of the #define
 #if TBS_COUNTER_DEVICE
 #define COUNTER_DEVICE
 #else
@@ -40,11 +40,11 @@
 #endif
 #else
 #endif
-#define TBS_GATEWAY_DEVICE    // uncomment if build for the master
+//#define TBS_GATEWAY_DEVICE    // uncomment if build for the master
 
 #if MASTER_CORE
 #ifndef TBS_GATEWAY_DEVICE
-    #error "Please uncomment #define TBS_GATEWAY_DEVICE"
+//    #error "Please uncomment #define TBS_GATEWAY_DEVICE"
 #endif
 #else
 #ifdef TBS_GATEWAY_DEVICE
