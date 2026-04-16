@@ -374,58 +374,58 @@ float stpm_read_period(stpm_handle_t *handle, uint8_t channel)
 }
 
 void stpm_update_energy(stpm_handle_t *handle, uint8_t channel) {
-    if (!handle || channel > 2) return;
-    if (!handle->auto_latch) latch(handle);
+	if (!handle || channel > 2)
+		return;
+	if (!handle->auto_latch)
+		latch(handle);
 
-    int8_t address;
-    stpm_energy_t *energy;
-    stpm_energy_helper_t *energy_helper;
+	int8_t address;
+	stpm_energy_t *energy;
+	stpm_energy_helper_t *energy_helper;
 
-    if (channel == 0) {
-        address = Total_Active_Energy_Address;
-        energy = &handle->total_energy;
-        energy_helper = &handle->total_energy_hp;
-    } else if (channel == 1) {
-        address = PH1_Active_Energy_Address;
-        energy = &handle->ph1_energy;
-        energy_helper = &handle->ph1_energy_hp;
-    } else {
-        address = PH2_Active_Energy_Address;
-        energy = &handle->ph2_energy;
-        energy_helper = &handle->ph2_energy_hp;
-    }
+	if (channel == 0) {
+		address = Total_Active_Energy_Address;
+		energy = &handle->total_energy;
+		energy_helper = &handle->total_energy_hp;
+	} else if (channel == 1) {
+		address = PH1_Active_Energy_Address;
+		energy = &handle->ph1_energy;
+		energy_helper = &handle->ph1_energy_hp;
+	} else {
+		address = PH2_Active_Energy_Address;
+		energy = &handle->ph2_energy;
+		energy_helper = &handle->ph2_energy_hp;
+	}
 
-    uint32_t my_energies[4] = {0};
+	uint32_t my_energies[4] = { 0 };
 
-    handle->spi_begin_transaction();
-    handle->pin_write(handle->cs_pin, false);
-    handle->spi_transfer(address);
-    handle->spi_transfer(0xff);
-    handle->spi_transfer(0xff);
-    handle->spi_transfer(0xff);
-    handle->pin_write(handle->cs_pin, true);
-    handle->delay_us(4);
-    handle->pin_write(handle->cs_pin, false);
+	handle->spi_begin_transaction();
+	handle->pin_write(handle->cs_pin,false);
+	handle->spi_transfer(address);
+	handle->spi_transfer(0xff);
+	handle->spi_transfer(0xff);
+	handle->spi_transfer(0xff);
+	handle->pin_write(handle->cs_pin,true);
+	handle->delay_us(4);
+	handle->pin_write(handle->cs_pin,false);
 
-    // Read 4 consecutive energy registers (Active, Fundamental, Reactive, Apparent)
-    for (int i = 0; i < 4; i++) {
-        handle->read_buffer[0] = handle->spi_transfer(0xff);
-        handle->read_buffer[1] = handle->spi_transfer(0xff);
-        handle->read_buffer[2] = handle->spi_transfer(0xff);
-        handle->read_buffer[3] = handle->spi_transfer(0xff);
-        my_energies[i] = (((handle->read_buffer[3] << 24) | (handle->read_buffer[2] << 16)) |
-                         (handle->read_buffer[1] << 8)) | handle->read_buffer[0];
-    }
+	// Read 4 consecutive energy registers (Active, Fundamental, Reactive, Apparent)
+	for (int i = 0; i < 4; i++) {
+		handle->read_buffer[0] = handle->spi_transfer(0xff);
+		handle->read_buffer[1] = handle->spi_transfer(0xff);
+		handle->read_buffer[2] = handle->spi_transfer(0xff);
+		handle->read_buffer[3] = handle->spi_transfer(0xff);
+		my_energies[i] = (((handle->read_buffer[3] << 24) | (handle->read_buffer[2] << 16)) | (handle->read_buffer[1] << 8)) | handle->read_buffer[0];
+	}
 
-    handle->pin_write(handle->cs_pin, true);
-    handle->spi_end_transaction();
+	handle->pin_write(handle->cs_pin,true);
+	handle->spi_end_transaction();
 
-    uint32_t now = handle->get_millis();
-    double *update_energies[4] = {&energy->active, &energy->fundamental,
-                                  &energy->reactive, &energy->apparent};
+	uint32_t now = handle->get_millis();
+	double *update_energies[4] = { &energy->active, &energy->fundamental, &energy->reactive, &energy->apparent };
 
 	for (int i = 0; i < 4; i++) {
-		uint32_t delta = my_energies[i]- energy_helper->old_energy[i];//*(i==0?handle->calibration[channel][2]:1)
+		uint32_t delta = my_energies[i] - energy_helper->old_energy[i];  //*(i==0?handle->calibration[channel][2]:1)
 		double e = calc_energy(delta);
 
 		uint32_t delta_t = now - energy->valid_millis;
@@ -433,9 +433,9 @@ void stpm_update_energy(stpm_handle_t *handle, uint8_t channel) {
 
 		// Check for positive energy change
 		if (delta < (uint32_t) 2147483648) {
-//			if(i==0) LOGA(PERI,"sersors read p:%f(noise:%f,max_pw:%f)\r\n",p,NOISE_POWER,MAX_POWER);
+			//			if(i==0) LOGA(PERI,"sersors read p:%f(noise:%f,max_pw:%f)\r\n",p,NOISE_POWER,MAX_POWER);
 			if (p < NOISE_POWER || p > MAX_POWER) {
-//				ERR(PERI,"PMT Noise:%.8f\r\n",p);
+				//				ERR(PERI,"PMT Noise:%.8f\r\n",p);
 				e = 0;
 			}
 		} else {
@@ -443,18 +443,18 @@ void stpm_update_energy(stpm_handle_t *handle, uint8_t channel) {
 			delta = energy_helper->old_energy[i] - my_energies[i];
 			e = -1.0 * calc_energy(delta);
 			p = e * 1000.0 * 3600.0 / (double) delta_t;
-//			if(i==0) LOGA(PERI,"sersors read p:%f(noise:%f,max_pw:%f)\r\n",p,-2*NOISE_POWER,-MAX_POWER);
+			//			if(i==0) LOGA(PERI,"sersors read p:%f(noise:%f,max_pw:%f)\r\n",p,-2*NOISE_POWER,-MAX_POWER);
 			if (p > -2 * NOISE_POWER || p < -MAX_POWER) {
-//				ERR(PERI,"PMT Noise:%.8f\r\n",p);
+				//				ERR(PERI,"PMT Noise:%.8f\r\n",p);
 				e = 0;
 			}
 		}
-//		if(i==0) LOGA(PERI,"sersors read E:%f\r\n",e);
-		*update_energies[i] = *update_energies[i] + (ceil(e*10000.0)/10000.0);
+		//		if(i==0) LOGA(PERI,"sersors read E:%f\r\n",e);
+		*update_energies[i] = *update_energies[i] + (ceil(e * 10000.0) / 10000.0);
 		energy_helper->old_energy[i] = my_energies[i];
 	}
 
-    energy->valid_millis = now;
+	energy->valid_millis = now;
 }
 
 void stpm_reset_energies(stpm_handle_t *handle) {
@@ -509,7 +509,7 @@ float stpm_read_active_energy(stpm_handle_t *handle, uint8_t channel) {
         stpm_update_energy(handle, channel);
     }
 //    return fabs((float)(energy->active*handle->calibration[channel][2]));
-    return ceil(fabs((float)(energy->active*handle->calibration[channel][2]))*10000.0)/10000.0;
+    return roundf(fabs((float)(energy->active*handle->calibration[channel][2]))*10000.0)/10000.0;
 }
 
 double stpm_read_fundamental_energy(stpm_handle_t *handle, uint8_t channel) {
