@@ -932,7 +932,7 @@ typedef struct {
 /*========================================================================*/
 
 // Energy and power calculation constants
-#define ENERGY_UPDATE_MS        100
+#define ENERGY_UPDATE_MS        1*1000 //s
 #define NOISE_POWER             0.1
 #define MAX_POWER               4000.0
 #define ENERGY_LSB              0.00000000886162
