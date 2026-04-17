@@ -28,6 +28,9 @@
 #define QUEUE_SENDING_SIZE 				64 	//=> main container sending packed
 #define QUEUE_HISTORY_SENDING_SIZE 		512
 /* Management QUEUE NETWORK SIZE*/
+#define HB_RTC_SYNCH_INPACK				(7) //see into the heartbeat_build
+
+#define QUEUES_PROCESSOR_MAX(var_cnt,max)		{if(var_cnt > max)break;else var_cnt++;}
 
 typedef enum{
 	FL_FROM_MASTER = 0,

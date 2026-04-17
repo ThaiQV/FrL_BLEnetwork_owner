@@ -54,8 +54,8 @@ void FL_QUEUE_CLEAR(fl_data_container_t *pCont, u16 _size) {
  * @return 1 if empty; 0 otherwise.
  */
 u16 FL_QUEUE_ISEMPTY(fl_data_container_t *pcontainer) {
-	return (pcontainer->head_index == pcontainer->tail_index);
-	//return (pcontainer->count == 0);
+//	return (pcontainer->head_index == pcontainer->tail_index);
+	return (pcontainer->count == 0);
 }
 /**
  * Returns whether a queue container is full.
@@ -90,6 +90,7 @@ s16 FL_QUEUE_ADD(fl_data_container_t *pCont, fl_pack_t *pdata) {
  * @param data A pointer to the location at which the data should be placed.
  * @return 1 if data was returned; 0 otherwise.
  */
+
 s16 FL_QUEUE_GET(fl_data_container_t *pCont, fl_pack_t *pdata) {
 	if (FL_QUEUE_ISEMPTY(pCont)) {
 		/* No items */

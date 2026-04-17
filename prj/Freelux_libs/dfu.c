@@ -1,7 +1,7 @@
 #include "dfu.h"
 
 /* Definition */
-#define DFU_DEBUG
+//#define DFU_DEBUG
 #ifdef DFU_DEBUG
 #define DFU_PRINTF(...)	LOGA(APP,__VA_ARGS__);
 #else
@@ -533,7 +533,8 @@ ota_ret_t ota_fw_put(uint8_t *pdata, uint8_t crc)
 		}
 		else if(packet_type == OTA_PACKET_END)
 		{
-			u8 rt = ota_packet_header_get(&packet_header);
+//			u8 rt =
+			ota_packet_header_get(&packet_header);
 			if((packet_header.state == OTA_FW_STATE_EMPTY) || (packet_header.state == OTA_FW_STATE_WRITING))
 			{
 				packet_header.state = OTA_FW_STATE_COMPLETE;

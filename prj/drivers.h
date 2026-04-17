@@ -40,7 +40,7 @@
 #endif
 #else
 #endif
-//#define TBS_GATEWAY_DEVICE    // uncomment if build for the master
+#define TBS_GATEWAY_DEVICE    // uncomment if build for the master
 
 #if MASTER_CORE
 #ifndef TBS_GATEWAY_DEVICE

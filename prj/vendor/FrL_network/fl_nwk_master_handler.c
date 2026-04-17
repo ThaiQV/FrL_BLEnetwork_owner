@@ -266,6 +266,9 @@ fl_pack_t fl_master_packet_heartbeat_build(void) {
 	//timestamp for the end of fota
 	packet.frame.payload[6] = F_EXTITFOTA_TIME;
 
+	//Synchronization RTC Master
+	memcpy(&packet.frame.payload[HB_RTC_SYNCH_INPACK],(u8*)fl_rtc_get(),SIZEU8(u32));
+
 	//crc
 	packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
 
