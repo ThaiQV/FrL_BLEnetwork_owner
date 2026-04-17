@@ -378,6 +378,7 @@ s16 fl_wifi2ble_fota_proc(void) {
 s16 fl_wifi2ble_fota_run(void) {
 	extern volatile u8 F_SENDING_STATE;
 	fl_pack_t his_data_in_queue;
+	u8 max_process = 0;
 	if (!F_SENDING_STATE) {
 #ifdef MASTER_CORE
 		IsFOTA_Run();
@@ -413,6 +414,8 @@ s16 fl_wifi2ble_fota_run(void) {
 			}
 			G_FW_QUEUE_SENDING.head_index = (G_FW_QUEUE_SENDING.head_index + 1) & G_FW_QUEUE_SENDING.mask;
 			if(head == G_FW_QUEUE_SENDING.head_index) break;
+			///
+			QUEUES_PROCESSOR_MAX(max_process,8);
 		}
 //#else
 //		IsFOTA_Run();

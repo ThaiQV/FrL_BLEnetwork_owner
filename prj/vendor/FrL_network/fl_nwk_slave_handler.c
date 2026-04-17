@@ -354,10 +354,10 @@ void fl_nwk_slave_init(void) {
  *
  ***************************************************/
 void _nwk_slave_syncFromPack(fl_dataframe_format_t *packet){
-	u32 master_timetamp; //, slave_timetamp;
+//	u32 master_timetamp; //, slave_timetamp;
 	//Synchronize time master
-	master_timetamp = MAKE_U32(packet->timetamp[3],packet->timetamp[2],packet->timetamp[1],packet->timetamp[0]);
-//	datetime_t cur_dt;
+//	master_timetamp = MAKE_U32(packet->timetamp[3],packet->timetamp[2],packet->timetamp[1],packet->timetamp[0]);
+	datetime_t cur_dt;
 //	fl_rtc_timestamp_to_datetime(master_timetamp,&cur_dt);
 //	P_INFO("(%d)MASTER-TIME:%02d/%02d/%02d - %02d:%02d:%02d\r\n",packet->endpoint.dbg,cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,
 //			cur_dt.second);
@@ -365,10 +365,13 @@ void _nwk_slave_syncFromPack(fl_dataframe_format_t *packet){
 //	P_INFO("ORIGINAL_GETALL:%02d/%02d/%02d - %02d:%02d:%02d\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second);
 //
 //	u32 cur_timetamp = fl_rtc_get();
-//	fl_rtc_timestamp_to_datetime(cur_timetamp,&cur_dt);
-//	P_INFO("SYSTIME:%02d/%02d/%02d - %02d:%02d:%02d\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second);
+//	fl_rtc_timestamp_to_datetime(master_timetamp,&cur_dt);
+//	P_INFO("RTC TimeT:%02d/%02d/%02d - %02d:%02d:%02d\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second);
+	u32 rtc_synch = MAKE_U32(packet->payload[HB_RTC_SYNCH_INPACK+3],packet->payload[HB_RTC_SYNCH_INPACK+2],packet->payload[HB_RTC_SYNCH_INPACK+1],packet->payload[HB_RTC_SYNCH_INPACK]);
+	fl_rtc_timestamp_to_datetime(rtc_synch,&cur_dt);
+//	P_INFO("RTC Synch:%02d/%02d/%02d - %02d:%02d:%02d\r\n",cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,cur_dt.second);
 
-	fl_rtc_sync(master_timetamp);
+	fl_rtc_sync(rtc_synch);
 	//Synchronize debug log
 	NWK_DEBUG_STT = packet->endpoint.dbg;
 	DEBUG_TURN(NWK_DEBUG_STT);
@@ -377,7 +380,8 @@ void _nwk_slave_syncFromPack(fl_dataframe_format_t *packet){
 	//add repeat_cnt
 	NWK_REPEAT_LEVEL = packet->endpoint.rep_settings;
 
-	SYNC_ORIGIN_MASTER(master_timetamp,packet->milltamp);
+//	SYNC_ORIGIN_MASTER(master_timetamp,packet->milltamp);
+	SYNC_ORIGIN_MASTER(rtc_synch,packet->milltamp);
 	LOGA(INF,"ORIGINAL MASTER-TIME:%d\r\n",ORIGINAL_MASTER_TIME.milstep);
 
 //	G_INFORMATION.active = true;
@@ -999,6 +1003,7 @@ s16 fl_slave_fota_proc(void) {
 	extern u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
 	fl_pack_t fota_pack;
 	fl_dataframe_format_t packet;
+	u8 max_process = 0;
 	while (FL_QUEUE_GET(&G_FW_QUEUE_REC,&fota_pack) != -1) {
 		if (!fl_packet_parse(fota_pack,&packet)) {
 			ERR(ZIG_GP,"Packet parse fail!!!\r\n");
@@ -1070,6 +1075,9 @@ s16 fl_slave_fota_proc(void) {
 		}
 		//add send repeat
 		fl_wifi2ble_fota_fwpush(&fota_pack,packet.payload[0]);
+
+		///
+		QUEUES_PROCESSOR_MAX(max_process,8);
 	}
 	return -1;
 }

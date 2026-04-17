@@ -398,13 +398,14 @@ int fl_adv_sendFIFO_add(fl_pack_t _pack) {
 	ERR(BLE,"Err <QUEUE ALREADY ADV SENDING>!!\r\n");
 	return -1;
 }
+
 u16 FL_NWK_HISTORY_IsReady(void){
 	return G_QUEUE_HISTORY_SENDING.count;
 }
 u8 fl_adv_sendFIFO_History_run(void) {
 	fl_pack_t his_data_in_queue;
 	if (!F_SENDING_STATE) {
-		if (FL_QUEUE_GET(&G_QUEUE_HISTORY_SENDING,&his_data_in_queue)>-1) {
+		if (FL_QUEUE_GET(&G_QUEUE_HISTORY_SENDING,&his_data_in_queue)>-1 ) {
 			fl_adv_send(his_data_in_queue.data_arr,his_data_in_queue.length,G_ADV_SETTINGS.adv_duration);
 		}
 	}
@@ -549,10 +550,10 @@ u8 fl_adv_sendFIFO_run(void) {
 					return inused_slot;
 				}
 			}
-			fl_adv_send(data_in_queue.data_arr,data_in_queue.length,G_ADV_SETTINGS.adv_duration);
+//			fl_adv_send(data_in_queue.data_arr,data_in_queue.length,G_ADV_SETTINGS.adv_duration);
 			/*Processor HB packet*/
 			fl_data_frame_u check_heartbeat;
-			memcpy(check_heartbeat.bytes,data_in_queue.data_arr,data_in_queue.length);
+			memcpy(check_heartbeat.bytes,data_in_queue.data_arr,data_in_queue.length>SIZEU8(check_heartbeat.bytes)?SIZEU8(check_heartbeat.bytes):data_in_queue.length);
 #ifndef	MASTER_CORE //for slave
 			//Clear HB packer REPEATER
 			if (check_heartbeat.frame.hdr == NWK_HDR_HEARTBEAT) {
@@ -579,8 +580,24 @@ u8 fl_adv_sendFIFO_run(void) {
 					LOGA(INF_FILE,"EX_QUEUEs Ready:%d/%d\r\n",FL_NWK_FOTA_IsReady(),FL_NWK_NODELIST_TABLE_IsReady());
 					G_QUEUE_SENDING.data[indx_head_cur].length = 0;
 				}
+				//Update realtime hb sending
+				u32 synch_rtc = fl_rtc_get();
+//				memcpy(&check_heartbeat.frame.payload[HB_RTC_SYNCH_INPACK],(u8*)synch_rtc,SIZEU8(u32));
+				check_heartbeat.frame.payload[HB_RTC_SYNCH_INPACK] = U32_BYTE0(synch_rtc);
+				check_heartbeat.frame.payload[HB_RTC_SYNCH_INPACK+1] = U32_BYTE1(synch_rtc);
+				check_heartbeat.frame.payload[HB_RTC_SYNCH_INPACK+2] = U32_BYTE2(synch_rtc);
+				check_heartbeat.frame.payload[HB_RTC_SYNCH_INPACK+3] = U32_BYTE3(synch_rtc);
+
+				check_heartbeat.frame.crc8 = fl_crc8(check_heartbeat.frame.payload,SIZEU8(check_heartbeat.frame.payload));
+//				data_in_queue.length = SIZEU8(check_heartbeat.bytes);
+//				memcpy(data_in_queue.data_arr,check_heartbeat.bytes,data_in_queue.length);
+				fl_adv_send(check_heartbeat.bytes,SIZEU8(check_heartbeat.bytes),G_ADV_SETTINGS.adv_duration);
+				return inused_slot;
 			}
+
 #endif
+			/**/
+			fl_adv_send(data_in_queue.data_arr,data_in_queue.length,G_ADV_SETTINGS.adv_duration);
 			return inused_slot;
 
 		}
