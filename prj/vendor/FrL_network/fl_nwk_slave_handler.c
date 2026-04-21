@@ -354,7 +354,7 @@ void fl_nwk_slave_init(void) {
  *
  ***************************************************/
 void _nwk_slave_syncFromPack(fl_dataframe_format_t *packet){
-//	u32 master_timetamp; //, slave_timetamp;
+	u32 master_timetamp; //, slave_timetamp;
 	//Synchronize time master
 //	master_timetamp = MAKE_U32(packet->timetamp[3],packet->timetamp[2],packet->timetamp[1],packet->timetamp[0]);
 	datetime_t cur_dt;
@@ -1286,7 +1286,6 @@ int _interval_report(void) {
 #else //POWERMETER
 				 u8 _payload[SIZEU8(tbs_device_powermeter_t)];
 				 tbs_device_powermeter_t *pwmeter_data = (tbs_device_powermeter_t*) G_INFORMATION.data;
-				 tbs_pack_powermeter_data(pwmeter_data,_payload);
 				 u8 indx_data = SIZEU8(pwmeter_data->type) + SIZEU8(pwmeter_data->mac) + SIZEU8(pwmeter_data->timetamp);
 				 //GET lastsendig
 				 u32 lastsnd_tmp = TBS_PowerMeter_LastSND_get();
@@ -1302,6 +1301,8 @@ int _interval_report(void) {
 				 if (scale_wt > pwmeter_data->data.time3) {
 					pwmeter_data->data.time3 = scale_wt;
 				 }
+
+				 tbs_pack_powermeter_data(pwmeter_data,_payload);
 				 fl_api_slave_req(NWK_HDR_55,&_payload[indx_data],SIZEU8(pwmeter_data->data),0,0,1);
 				 TBS_PowerMeter_LastSND_update(pwmeter_data->timetamp);
 				 TBS_PowerMeter_Upload2Master_RSTWorkingTime();

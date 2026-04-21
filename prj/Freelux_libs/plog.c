@@ -191,6 +191,15 @@ void PLOG_Start(type_debug_t _type) {
 	_set_plog(_type, "on");
 }
 
+void PLOG_DATE_DDMMYY(char const *date, char *date_out) {
+    int month, day, year;
+    static const char month_names[] = "JanFebMarAprMayJunJulAugSepOctNovDec";
+    sscanf(date, "%s %d %d", date_out, &day, &year);
+    month = (strstr(month_names, date_out)-month_names)/3+1;
+    year=year-2000;
+    sprintf(date_out, "%02d%02d%02d",  day,month,year);
+}
+
 /****************************************************************************************************
  * @brief 		Display the device's profile function
  *
@@ -199,18 +208,18 @@ void PLOG_Start(type_debug_t _type) {
  * @return	  	none.
  */
 void PLOG_DEVICE_PROFILE(fl_version_t _bootloader, fl_version_t _fw,fl_version_t _hw) {
-#define P_INFO_FW(fmt,...)	{_COLOR(USER);printf(fmt,##__VA_ARGS__);TERMINAL_FONT_BLACK();}
-
 	const char device_info[] = "\n*****************************************\n"
 			"*** FreeLux @2025 - RnD Team		*\n"
 			"*** BOOTLOADER : %d.%d.%d			*\n"
-			"*** FIRMWARE   : %d.%d.%d			*\n"
+			"*** FIRMWARE   : %d.%d.%d.%s           *\n"
 			"*** HARDWARE   : %d.%d.%d			*\n"
+			"*** %s - %s              *\n"
 			"*****************************************\n";
-	P_INFO_FW(device_info, _bootloader.major, _bootloader.minor, _bootloader.patch,
-			_fw.major, _fw.minor, _fw.patch, _hw.major, _hw.minor, _hw.patch);
-
-#undef P_INFO_FW
+	char date_ddmmyy[6];
+	PLOG_DATE_DDMMYY(__DATE__,date_ddmmyy);
+	P_INFO(device_info, _bootloader.major, _bootloader.minor, _bootloader.patch,
+			_fw.major, _fw.minor, _fw.patch,date_ddmmyy, _hw.major, _hw.minor, _hw.patch,
+			__DATE__,__TIME__);
 }
 
 void PLOG_HELP(void) {
