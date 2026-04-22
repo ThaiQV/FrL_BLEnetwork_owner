@@ -41,6 +41,7 @@ extern fl_adv_settings_t G_ADV_SETTINGS;
 #define GETALL_TIMEOUT_1_NODE		(G_ADV_SETTINGS.adv_duration)//ms
 #define GETALL_NUMOF1TIMES			8
 u8 GETINFO_FLAG_EVENTTEST = 0;
+u8 G_SAMPLE_TIMING = 55;
 typedef struct {
 	fl_nodeinnetwork_t* id[GETINFO_1_TIMES_MAX];
 	u8 num_retrieved; // number of slaves retrieved out
@@ -419,6 +420,7 @@ void CMD_TEST(u8* _data) {
 	u8 fota_test[4] = {'f','o','t','a'};
 	u8 fota_interval_set[12] = {'f','o','t','a','i','n','t','e','r','v','a','l'};
 	u8 max_node_test[8] = {'n','o','d','e','s','i','z','e'};
+	u8 sample_timing_test[7] = {'n','e','t','w','o','r','k'};
 
 	char cmd[10];
 	int para[3];
@@ -460,8 +462,20 @@ void CMD_TEST(u8* _data) {
 				extern u8 MAX_NODES_SETTING;
 				if (para[0] > 100)
 					MAX_NODES_SETTING = 100;
-				MAX_NODES_SETTING = para[0];
+				else MAX_NODES_SETTING = para[0];
 				sprintf((char*) mqtt_rp,"Set MAX_NODEs:%d",MAX_NODES_SETTING);
+				fl_ble2wifi_DEBUG2MQTT(mqtt_rp,strlen((char*) mqtt_rp));
+				P_INFO("%s\r\n",mqtt_rp);
+			}
+		}
+		//SAMPLE_TIMING => config period for testing
+		if (plog_IndexOf((u8*) cmd,sample_timing_test,SIZEU8(sample_timing_test),SIZEU8(cmd)) != -1) {
+			if (rslt == 2) {
+				extern u8 G_SAMPLE_TIMING;
+				if (para[0] > 55 || para[0] < 15)
+					G_SAMPLE_TIMING = 55;
+				else G_SAMPLE_TIMING = para[0];
+				sprintf((char*) mqtt_rp,"Set G_SAMPLE_TIMING:%d",G_SAMPLE_TIMING);
 				fl_ble2wifi_DEBUG2MQTT(mqtt_rp,strlen((char*) mqtt_rp));
 				P_INFO("%s\r\n",mqtt_rp);
 			}

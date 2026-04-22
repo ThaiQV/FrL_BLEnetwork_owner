@@ -38,7 +38,7 @@ fl_slave_profiles_t SLAVE_PROFILE_DEFAULT = {
 											.magic= SLAVE_PROFILE_MAGIC,
 											.run_stt.rst_factory = 0,
 											.run_stt.join_nwk = 0,
-											.nwk = {.chn = {37,38,39}},
+											.nwk = {.chn = {36,36,36}},
 											};
 fl_slave_settings_t SLAVE_SETTINGS_DEFAULT = {
 											.magic= SLAVE_SETTINGS_MAGIC,
@@ -241,6 +241,30 @@ fl_db_master_profile_t fl_db_masterprofile_load(void) {
 	return entry;
 }
 
+static void _generate_channels(u8 *chn_out, u8 mac[6]) {
+    u8 exclude[] = {0,10,11,12,36,37,38,39};
+    int exclude_count = sizeof(exclude)/sizeof(exclude[0]);
+
+    u8 valid[40];
+    int idx = 0;
+    for(u8 ch=0; ch<40; ch++){
+        bool skip = false;
+        for(int i=0;i<exclude_count;i++){
+            if(ch == exclude[i]) { skip = true; break; }
+        }
+        if(!skip) valid[idx++] = ch;
+    }
+
+    u32 seed = clock_time();
+    for(int i=0;i<6;i++) seed ^= mac[i] << (i*4);
+
+    for(int i=0;i<3;i++){
+        int r = trng_rand() % idx;
+        chn_out[i] = valid[r];
+        valid[r] = valid[--idx];
+    }
+}
+
 void fl_db_generate_private_key(u8 *private_key_out,u8 *chn_out) {
     u32 timestamp = clock_time();  //
     u32 rand_val = trng_rand();    //
@@ -251,9 +275,10 @@ void fl_db_generate_private_key(u8 *private_key_out,u8 *chn_out) {
         private_key_out[i] = mac[i % 6] ^ ((timestamp >> (i % 4) * 8) & 0xFF) ^ ((rand_val >> (i % 4) * 8) & 0xFF);
     }
     //generate channels
-    for(u8 cn = 0;cn <3;cn++){
-    	chn_out[cn] = (u8)(trng_rand() %(36-10+1)+10);
-    }
+//    for(u8 cn = 0;cn <3;cn++){
+//    	chn_out[cn] = (u8)(trng_rand() %(36-10+1)+10);
+//    }
+    _generate_channels(chn_out,mac);
 }
 /***************************************************
  * @brief 		:store profile into the flash
@@ -291,17 +316,17 @@ fl_db_master_profile_t fl_db_masterprofile_init(void) {
 		//clear all and write default profiles
 //		flash_erase_sector(ADDR_MASTER_PROFILE_START);
 		_db_earse_sector_full(ADDR_MASTER_PROFILE_START,MASTERPROFILE_SIZE/SECTOR_FLASH_SIZE);
-		fl_db_generate_private_key(MASTER_PROFILE_DEFAULT.nwk.private_key,profile.nwk.chn);
+		fl_db_generate_private_key(MASTER_PROFILE_DEFAULT.nwk.private_key,MASTER_PROFILE_DEFAULT.nwk.chn);
 		fl_db_masterprofile_save(MASTER_PROFILE_DEFAULT);
 		profile = fl_db_masterprofile_load();
 	}
-	//for debugging
-	LOGA(FLA,"Private_key:0x%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X\r\n",
+	//
+	P_INFO("Private_key:0x%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X\r\n",
 			profile.nwk.private_key[0],profile.nwk.private_key[1],profile.nwk.private_key[2],profile.nwk.private_key[3],
 			profile.nwk.private_key[4],profile.nwk.private_key[5],profile.nwk.private_key[6],profile.nwk.private_key[7],
 			profile.nwk.private_key[8],profile.nwk.private_key[9],profile.nwk.private_key[10],profile.nwk.private_key[11],
 			profile.nwk.private_key[12]);
-	LOGA(FLA,"NWK channel:%d |%d |%d \r\n",profile.nwk.chn[0],profile.nwk.chn[1],profile.nwk.chn[2]);
+	P_INFO("NWK channel:%d |%d |%d \r\n",profile.nwk.chn[0],profile.nwk.chn[1],profile.nwk.chn[2]);
 	return profile;
 }
 #endif

@@ -29,6 +29,7 @@
 #define QUEUE_HISTORY_SENDING_SIZE 		512
 /* Management QUEUE NETWORK SIZE*/
 #define HB_RTC_SYNCH_INPACK				(7) //see into the heartbeat_build
+#define HB_SAMPLING_TIME_INPACK			(HB_RTC_SYNCH_INPACK + sizeof(u32)) //see into the heartbeat_build
 
 #define QUEUES_PROCESSOR_MAX(var_cnt,max)		{if(var_cnt > max)break;else var_cnt++;}
 

@@ -36,6 +36,8 @@ extern volatile fl_timetamp_withstep_t WIFI_ORIGINAL_GETALL;
 												ORIGINAL_MASTER_TIME.milstep = y;\
 											}while(0) //Sync original time-master req
 u8 GETINFO_FLAG_EVENTTEST = 0;
+u8 G_SAMPLE_TIMING = 55;
+
 #define JOIN_NETWORK_TIME 			60*1012 			//ms
 #define RECHECKING_NETWOK_TIME 		20*1021 		    //ms
 #define RECONNECT_TIME				63*1000*1020		//s
@@ -98,6 +100,7 @@ tbs_device_powermeter_t G_POWER_METER;
 volatile u8 NWK_DEBUG_STT = 0; // it will be assigned into end-point byte (dbg :1bit)
 volatile u8 NWK_REPEAT_MODE = 0; // 1: level | 0 : non-level
 volatile u8  NWK_REPEAT_LEVEL = 3;
+
 /******************************************************************************/
 /******************************************************************************/
 /***                           Private definitions                           **/
@@ -354,7 +357,7 @@ void fl_nwk_slave_init(void) {
  *
  ***************************************************/
 void _nwk_slave_syncFromPack(fl_dataframe_format_t *packet){
-	u32 master_timetamp; //, slave_timetamp;
+//	u32 master_timetamp; //, slave_timetamp;
 	//Synchronize time master
 //	master_timetamp = MAKE_U32(packet->timetamp[3],packet->timetamp[2],packet->timetamp[1],packet->timetamp[0]);
 	datetime_t cur_dt;
@@ -582,7 +585,8 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 	LOGA(INF,"(%d|%x)HDR_REQ ID: %02X - ACK:%d\r\n",IsJoinedNetwork(),G_INFORMATION.slaveID,packet.frame.hdr,packet.frame.endpoint.master);
 
 	switch ((fl_hdr_nwk_type_e) packet.frame.hdr) {
-		case NWK_HDR_HEARTBEAT:
+		case NWK_HDR_HEARTBEAT:{
+
 			_nwk_slave_syncFromPack(&packet.frame);
 			GETINFO_FLAG_EVENTTEST = packet.frame.payload[0];
 //			memcpy((u8*)WIFI_ORIGINAL_GETALL.timetamp,&packet.frame.payload[1],4);
@@ -590,6 +594,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 			WIFI_ORIGINAL_GETALL.milstep = packet.frame.payload[5];
 			LOGA(INF,"WIFI_ORIGINAL_GETALL :%d (%d) \r\n",WIFI_ORIGINAL_GETALL.timetamp,WIFI_ORIGINAL_GETALL.milstep);
 			F_EXTITFOTA_TIME = packet.frame.payload[6];
+			G_SAMPLE_TIMING = packet.frame.payload[HB_SAMPLING_TIME_INPACK];
 			////
 			if (packet.frame.endpoint.master == FL_FROM_MASTER_ACK) {
 				//Process rsp
@@ -605,6 +610,7 @@ fl_pack_t fl_rsp_slave_packet_build(fl_pack_t _pack) {
 				packet_built.length = 0;
 				return packet_built;
 			}
+		}
 		break;
 		case NWK_HDR_F5_INFO: {
 //			_nwk_slave_syncFromPack(&packet.frame);
@@ -1276,7 +1282,7 @@ int _interval_report(void) {
 	fl_nwk_slave_displayLCD_Refesh();
 #endif
 	int offset_spread = (fl_rtc_getWithMilliStep().milstep - WIFI_ORIGINAL_GETALL.milstep)*10;
-#define INTERVAL_REPORT_TIME  (56 - FL_SLAVEID_MEMID(G_INFORMATION.slaveID))
+#define INTERVAL_REPORT_TIME  (G_SAMPLE_TIMING - FL_SLAVEID_MEMID(G_INFORMATION.slaveID))
 	extern const u32 ORIGINAL_TIME_TRUST;
 	if (IsJoinedNetwork()) {
 		if (WIFI_ORIGINAL_GETALL.timetamp < fl_rtc_get() && WIFI_ORIGINAL_GETALL.timetamp > ORIGINAL_TIME_TRUST) {

@@ -22,7 +22,7 @@
 typedef void (*fl_rsp_callback_fnc)(void*, void*);
 
 #define QUEUE_RSP_SLOT_MAX			16
-#define QUEUQ_REQcRSP_INTERVAL  	21*1021 //ms
+#define QUEUQ_REQcRSP_INTERVAL  	10*1021 //ms
 
 #define RAND(min, max)				((rand() % ((max) - (min) + 1)) + (min))
 #define RAND_INT(min, max)  		((rand() % ((min) + (max) + 1)) - (min))
@@ -298,6 +298,14 @@ typedef struct {
 	} req_payload;
 	fl_pack_t *p_REQ[QUEUE_RSP_SLOT_MAX];
 }__attribute__((packed)) fl_rsp_container_t;
+
+typedef struct {
+	u8 mac[6];
+	u8 slaveID;
+	u32 timelife;
+	bool active;
+	tbs_dev_type_e dev_type;
+}__attribute__((packed)) fl_nodenwk_info_t;
 
 #ifdef MASTER_CORE
 typedef struct {

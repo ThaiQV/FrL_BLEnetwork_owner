@@ -41,12 +41,12 @@ extern _attribute_data_retention_ volatile fl_timetamp_withstep_t ORIGINAL_MASTE
 fl_pack_t g_handle_master_array[PACK_HANDLE_MASTER_SIZE];
 fl_data_container_t G_HANDLE_MASTER_CONTAINER = {.data = g_handle_master_array, .head_index = 0, .tail_index = 0, .mask = PACK_HANDLE_MASTER_SIZE - 1, .count = 0 };
 
-u8 MAX_NODES_SETTING = 100;
+u8 MAX_NODES_SETTING = 50;
 
 extern fl_node_data_t G_NODELIST_TABLE[MAX_NODES];
 fl_slaves_list_t G_NODE_LIST = { .slot_inused = 0xFF };
 //fl_slaves_list_t G_OFFLINE_LIST = { .slot_inused = 0xFF };
-fl_master_config_t G_MASTER_INFO = { .nwk = { .chn = { 37, 39, 39 }, .collect_chn = { 37, 38, 39 } } };
+fl_master_config_t G_MASTER_INFO = { .nwk = { .chn = { 36, 36, 36 }, .collect_chn = { 36, 36, 36 } } };
 
 volatile u8 MASTER_INSTALL_STATE = 0;
 //Period of the heartbeat
@@ -228,6 +228,7 @@ fl_pack_t fl_master_packet_heartbeat_build(void) {
 	extern volatile fl_timetamp_withstep_t WIFI_ORIGINAL_GETALL;
 	extern u8 GETINFO_FLAG_EVENTTEST;
 	extern u8 F_EXTITFOTA_TIME;
+	extern u8 G_SAMPLE_TIMING;
 	fl_pack_t packet_built;
 	fl_data_frame_u packet;
 	memset(packet.bytes,0,SIZEU8(packet.bytes));
@@ -269,6 +270,7 @@ fl_pack_t fl_master_packet_heartbeat_build(void) {
 	//Synchronization RTC Master
 	memcpy(&packet.frame.payload[HB_RTC_SYNCH_INPACK],(u8*)fl_rtc_get(),SIZEU8(u32));
 
+	packet.frame.payload[HB_SAMPLING_TIME_INPACK] = G_SAMPLE_TIMING;
 	//crc
 	packet.frame.crc8 = fl_crc8(packet.frame.payload,SIZEU8(packet.frame.payload));
 
@@ -819,7 +821,7 @@ int _nwk_master_backup(void) {
 void fl_nwk_master_StatusNodesRefesh(void) {
 	for (u8 i = 0; i < G_NODE_LIST.slot_inused && G_NODE_LIST.slot_inused != 0xFF; i++) {
 		if(G_NODE_LIST.sla_info[i].dev_type != 0xFF && !IS_MAC_INVALID(G_NODE_LIST.sla_info[i].mac,0)&&!IS_MAC_INVALID(G_NODE_LIST.sla_info[i].mac,0xFF)){
-			G_NODE_LIST.sla_info[i].active = (fl_rtc_get() - G_NODE_LIST.sla_info[i].timelife <= 40) ? 1 : 0;
+			G_NODE_LIST.sla_info[i].active = (fl_rtc_get() - G_NODE_LIST.sla_info[i].timelife <= 45) ? TRUE : FALSE;
 		}else{
 			G_NODE_LIST.sla_info[i].dev_type = 0xFF;
 		}

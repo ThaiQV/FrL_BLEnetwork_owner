@@ -212,7 +212,6 @@ fl_version_t _hw = { 1, 0, 1 };
 
 _attribute_ram_code_ int main(void)   //must on ramcode
 {
-
 	DBG_CHN0_LOW;
 	blc_pm_select_internal_32k_crystal();
 
