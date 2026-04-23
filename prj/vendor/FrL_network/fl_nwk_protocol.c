@@ -102,6 +102,7 @@ void CMD_GETSLALIST(u8* _data);
 void CMD_GETINFOSLAVE(u8* _data);
 void CMD_GETADVSETTING(u8* _data);
 void CMD_GETALLNODES(u8* _data);
+void CMD_GETNETINFO(u8* _data);
 
 fl_cmdlines_t G_CMDSET[] = { { { 'u', 't', 'c' }, 3, CMD_SETUTC }, 			// p set utc yymmddhhmmss
 		{ { 'i', 'n', 's', 't', 'a', 'l', 'l' }, 7, CMD_INSTALLMODE },		// p install on/off
@@ -117,12 +118,13 @@ fl_cmdlines_t G_CMDSET[] = { { { 'u', 't', 'c' }, 3, CMD_SETUTC }, 			// p set u
 		{ { 'c','m','d'  }, 3, CMD_SETTING_SLAVE },							// p set cmd <type> <parameter1> <parameter2> ...
 		};
 
-fl_cmdlines_t G_CMDGET[] = { { { 's', 'l', 'a', 'l', 'i', 's', 't' }, 7, CMD_GETSLALIST },	// p get list
+fl_cmdlines_t G_CMDGET[] = {
+		{ { 's', 'l', 'a', 'l', 'i', 's', 't' }, 7, CMD_GETSLALIST },	// p get list
 		{ { 'i', 'n', 'f', 'o' }, 4, CMD_GETINFOSLAVE },									// p get <id8> <id8> .... : max = 16 id
 		{ { 'a', 'd', 'v', 'c', 'o', 'n', 'f', 'i', 'g' }, 9, CMD_GETADVSETTING },			// p get scan : use to get scanner adv settings
-		{ { 'a', 'l', 'l' }, 3, CMD_GETALLNODES },							//p get all <timeout>: @Important cmd for running Frl Network
+		{ { 't','r','a','f','f','i','c'}, 7, CMD_GETNETINFO },								//p get netinfo :get network information (Rx Packets)
+		{ { 'a', 'l', 'l' }, 3, CMD_GETALLNODES },											//p get all <timeout>: @Important cmd for running Frl Network
 		};
-
 
 //static u8 FIRST_PROTOCOL_START = 0;
 #endif
@@ -412,10 +414,23 @@ void CMD_HEARTBEAT(u8* _data) {
 	}
 	ERR(DRV,"ERR HeartBeat Period (%d):%d\r\n",rslt,period_hb);
 }
+/**TESTING NETWORK **/
+u32 PRE_TRAFFIC = 0;
+int _networkTesting_Cbk(void){
+	extern fl_nodenwk_info_t G_NODENWK_INFO[MAX_NODES];
+	CMD_GETNETINFO((u8*)"traffic");
+	G_SAMPLE_TIMING = 55;
+	PRE_TRAFFIC = (clock_get_32k_tick() / 32000);
+	for (u8 idx = 0; idx < MAX_NODES; idx++) {
+		G_NODENWK_INFO[idx].RxPacket = 0;
+	}
+	return -1;
+}
 
 void CMD_TEST(u8* _data) {
 	extern void TEST_virtual_fw(u32 _fwsize);
 	extern u8 GETINFO_FLAG_EVENTTEST;
+	extern fl_nodenwk_info_t G_NODENWK_INFO[MAX_NODES];
 	u8 slave_event[5] = {'e','v','e','n','t'};
 	u8 fota_test[4] = {'f','o','t','a'};
 	u8 fota_interval_set[12] = {'f','o','t','a','i','n','t','e','r','v','a','l'};
@@ -460,8 +475,8 @@ void CMD_TEST(u8* _data) {
 		if (plog_IndexOf((u8*) cmd,max_node_test,SIZEU8(max_node_test),SIZEU8(cmd)) != -1) {
 			if (rslt == 2) {
 				extern u8 MAX_NODES_SETTING;
-				if (para[0] > 100)
-					MAX_NODES_SETTING = 100;
+				if (para[0] > MAX_NODES)
+					MAX_NODES_SETTING = MAX_NODES;
 				else MAX_NODES_SETTING = para[0];
 				sprintf((char*) mqtt_rp,"Set MAX_NODEs:%d",MAX_NODES_SETTING);
 				fl_ble2wifi_DEBUG2MQTT(mqtt_rp,strlen((char*) mqtt_rp));
@@ -471,17 +486,29 @@ void CMD_TEST(u8* _data) {
 		//SAMPLE_TIMING => config period for testing
 		if (plog_IndexOf((u8*) cmd,sample_timing_test,SIZEU8(sample_timing_test),SIZEU8(cmd)) != -1) {
 			if (rslt == 2) {
+				const u8 packet_sample = 10;
 				extern u8 G_SAMPLE_TIMING;
-				if (para[0] > 55 || para[0] < 15)
-					G_SAMPLE_TIMING = 55;
-				else G_SAMPLE_TIMING = para[0];
-				sprintf((char*) mqtt_rp,"Set G_SAMPLE_TIMING:%d",G_SAMPLE_TIMING);
+				if( blt_soft_timer_find(&_networkTesting_Cbk) == -1){
+					PRE_TRAFFIC = (clock_get_32k_tick() / 32000);
+					if (para[0] > 55 || para[0] < 15)
+						G_SAMPLE_TIMING = 55;
+					else
+						G_SAMPLE_TIMING = para[0];
+					for(u8 idx = 0;idx < MAX_NODES;idx++){
+						G_NODENWK_INFO[idx].RxPacket=0;
+					}
+					blt_soft_timer_restart(_networkTesting_Cbk,packet_sample*G_SAMPLE_TIMING*1003*1000);
+					sprintf((char*) mqtt_rp,"Set G_SAMPLE_TIMING:%d => Period Testing:%d s",G_SAMPLE_TIMING,packet_sample*G_SAMPLE_TIMING);
+				}else{
+					sprintf((char*) mqtt_rp,"Network testing is running...(%d s)",packet_sample*G_SAMPLE_TIMING);
+				}
 				fl_ble2wifi_DEBUG2MQTT(mqtt_rp,strlen((char*) mqtt_rp));
 				P_INFO("%s\r\n",mqtt_rp);
 			}
 		}
 	}
 }
+
 void CMD_SETTING_SLAVE(u8* _data) {
 	char mac_str[13];
 	char cmd[22];
@@ -857,6 +884,45 @@ void CMD_GETALLNODES(u8* _data) {
 		blt_soft_timer_restart(&_GETALLNODES,11*999);
 	}
 }
+void CMD_GETNETINFO(u8* _data) {
+    extern fl_nodenwk_info_t G_NODENWK_INFO[MAX_NODES];
+    u8 mqtt_payload[128];
+    u8 sla_mac[4];
+    char para[12];
+    int rslt = sscanf((char*) _data,"traffic %11s",para);
+
+    for (u8 id = 0; id < MAX_NODES; id++) {
+        int time_window = (((clock_get_32k_tick() / 32000) - PRE_TRAFFIC)/ G_SAMPLE_TIMING) ;
+        if (time_window < 1) time_window = 0;
+
+        bool condition = false;
+        if(rslt == 1) {
+            if(plog_IndexOf((u8*)"bad",(u8*)para,3,strlen(para)) != -1) {
+                // bad: RxPacket < 0.5 * time_window
+                condition = (G_NODENWK_INFO[id].RxPacket < 0.5 * time_window);
+            } else if(plog_IndexOf((u8*)"ok",(u8*)para,2,strlen(para)) != -1) {
+                // ok: RxPacket > 0.5 * time_window
+                condition = (G_NODENWK_INFO[id].RxPacket >= 0.5 * time_window);
+            }
+        }else{
+        	condition = true;
+        }
+
+        if (condition && !IS_MAC_INVALID(G_NODENWK_INFO[id].mac,0xFF) && !IS_MAC_INVALID(G_NODENWK_INFO[id].mac,0)) {
+            memset(mqtt_payload,0,sizeof(mqtt_payload));
+            memcpy(sla_mac,G_NODENWK_INFO[id].mac,sizeof(sla_mac));
+
+            snprintf((char*) mqtt_payload,sizeof(mqtt_payload),
+                     "{\"mac\":\"%02X%02X%02X%02X\",\"packets\":\"%d/%d\",\"period\":%d,\"signal\":\"%s\"}",
+                     sla_mac[0],sla_mac[1],sla_mac[2],sla_mac[3],
+                     G_NODENWK_INFO[id].RxPacket,time_window,G_SAMPLE_TIMING,
+					 G_NODENWK_INFO[id].RxPacket >= 0.5 * time_window?"ok":"bad");
+
+            fl_ble2wifi_DEBUG2MQTT(mqtt_payload,strlen((char*) mqtt_payload));
+        }
+    }
+}
+
 
 void CMD_GETINFOSLAVE(u8* _data) {
 //	extern fl_adv_settings_t G_ADV_SETTINGS ;

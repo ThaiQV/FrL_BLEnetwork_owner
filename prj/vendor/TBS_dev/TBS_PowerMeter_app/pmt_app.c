@@ -642,7 +642,10 @@ void pmt_main(void){
 			G_POWER_METER.data.current1 = (u16) (i_cal & 0x3FF);
 			current_unit = ((i_cal >> 31) & 0x1) << 7;
 			p_rms = 1000.0 * stpm_read_active_power(PMT_STRUCT[chn_update],1);
-			PMT_CTX[chn_update].p_avg = (PMT_CTX[chn_update].p_avg + p_rms) / 2;
+//			PMT_CTX[chn_update].p_avg = (PMT_CTX[chn_update].p_avg + p_rms) / 2;
+
+			PMT_CTX[chn_update].p_avg = p_rms;
+
 			G_POWER_METER.data.fac_power1 = calc_FP(chn_update) | current_unit;
 			//(((u8) (100.0 * stpm_read_power_factor(PMT_STRUCT[chn_update],1)) + (G_POWER_METER.data.fac_power1 & 0x7F)) / 2) | current_unit;
 //			PMT_CTX[chn_update].e_sum = PMT_CTX[chn_update].e_last_stored + stpm_read_active_energy(PMT_STRUCT[chn_update],1);
@@ -665,7 +668,10 @@ void pmt_main(void){
 			G_POWER_METER.data.current2 = (u16) (i_cal & 0x3FF) ;
 			current_unit = ((i_cal >> 31) & 0x1) << 7;
 			p_rms = 1000.0 * stpm_read_active_power(PMT_STRUCT[chn_update],1);
-			PMT_CTX[chn_update].p_avg = (PMT_CTX[chn_update].p_avg + p_rms) / 2;
+
+//			PMT_CTX[chn_update].p_avg = (PMT_CTX[chn_update].p_avg + p_rms) / 2;
+			PMT_CTX[chn_update].p_avg = p_rms;
+
 			G_POWER_METER.data.fac_power2 = calc_FP(chn_update) | current_unit;
 			//(((u8) (100.0 * stpm_read_power_factor(PMT_STRUCT[chn_update],1)) + (G_POWER_METER.data.fac_power2 & 0x7F)) / 2) | current_unit;
 
@@ -687,7 +693,10 @@ void pmt_main(void){
 			G_POWER_METER.data.current3 = (u16) (i_cal & 0x3FF);
 			current_unit = ((i_cal >> 31) & 0x1) << 7;
 			p_rms = 1000.0 * stpm_read_active_power(PMT_STRUCT[chn_update],1);
-			PMT_CTX[chn_update].p_avg = (PMT_CTX[chn_update].p_avg + p_rms) / 2;
+//			PMT_CTX[chn_update].p_avg = (PMT_CTX[chn_update].p_avg + p_rms) / 2;
+
+			PMT_CTX[chn_update].p_avg = p_rms;
+
 			G_POWER_METER.data.fac_power3 = calc_FP(chn_update) | current_unit;
 			//(((u8) (100.0 * stpm_read_power_factor(PMT_STRUCT[chn_update],1)) + (G_POWER_METER.data.fac_power3 & 0x7F)) / 2) | current_unit;
 //			PMT_CTX[chn_update].e_sum = PMT_CTX[chn_update].e_last_stored + stpm_read_active_energy(PMT_STRUCT[chn_update],1);

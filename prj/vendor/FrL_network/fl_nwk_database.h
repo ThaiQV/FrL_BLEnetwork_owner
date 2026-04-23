@@ -56,7 +56,7 @@ typedef struct {
 }__attribute__((packed)) fl_node_data_t;
 
 //#define NODELIST_SLAVE_MAX				200
-#define MAX_NODES							110
+#define MAX_NODES							100
 #ifdef MASTER_CORE
 /******************** NODE LIST ********************/
 

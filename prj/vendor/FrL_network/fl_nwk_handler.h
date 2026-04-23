@@ -302,9 +302,9 @@ typedef struct {
 typedef struct {
 	u8 mac[6];
 	u8 slaveID;
-	u32 timelife;
-	bool active;
 	tbs_dev_type_e dev_type;
+	u16 TxPacket;
+	u16 RxPacket;
 }__attribute__((packed)) fl_nodenwk_info_t;
 
 #ifdef MASTER_CORE

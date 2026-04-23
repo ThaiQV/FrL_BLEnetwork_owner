@@ -47,6 +47,8 @@ extern fl_node_data_t G_NODELIST_TABLE[MAX_NODES];
 fl_slaves_list_t G_NODE_LIST = { .slot_inused = 0xFF };
 //fl_slaves_list_t G_OFFLINE_LIST = { .slot_inused = 0xFF };
 fl_master_config_t G_MASTER_INFO = { .nwk = { .chn = { 36, 36, 36 }, .collect_chn = { 36, 36, 36 } } };
+/** Collect routing and network status **/
+fl_nodenwk_info_t G_NODENWK_INFO[MAX_NODES];
 
 volatile u8 MASTER_INSTALL_STATE = 0;
 //Period of the heartbeat
@@ -822,6 +824,10 @@ void fl_nwk_master_StatusNodesRefesh(void) {
 	for (u8 i = 0; i < G_NODE_LIST.slot_inused && G_NODE_LIST.slot_inused != 0xFF; i++) {
 		if(G_NODE_LIST.sla_info[i].dev_type != 0xFF && !IS_MAC_INVALID(G_NODE_LIST.sla_info[i].mac,0)&&!IS_MAC_INVALID(G_NODE_LIST.sla_info[i].mac,0xFF)){
 			G_NODE_LIST.sla_info[i].active = (fl_rtc_get() - G_NODE_LIST.sla_info[i].timelife <= 45) ? TRUE : FALSE;
+			//Update node nwk status
+			G_NODENWK_INFO[i].slaveID = G_NODE_LIST.sla_info[i].slaveID;
+			memcpy(G_NODENWK_INFO[i].mac,G_NODE_LIST.sla_info[i].mac,SIZEU8(G_NODE_LIST.sla_info[i].mac));
+			G_NODENWK_INFO[i].dev_type = G_NODE_LIST.sla_info[i].dev_type;
 		}else{
 			G_NODE_LIST.sla_info[i].dev_type = 0xFF;
 		}
@@ -886,6 +892,11 @@ int fl_master_ProccesRSP_cbk(void) {
 		LOGA(INF,"TT inpack:%lld\r\n",seq_timetamp);
 		//Todo:Process RSP with API REQ registered
 		fl_queue_REQcRSP_ScanRec(data_in_queue);
+
+		//Collect trafic of the slaves
+
+//		u8 nodenwk_indx = fl_master_SlaveID_find(packet.frame.slaveID);
+//		if(nodenwk_indx != -1)G_NODENWK_INFO[nodenwk_indx].RxPacket +=1;
 
 		switch ((fl_hdr_nwk_type_e) packet.frame.hdr) {
 			case NWK_HDR_HEARTBEAT: {
@@ -1019,7 +1030,6 @@ int fl_master_ProccesRSP_cbk(void) {
 				if (node_indx != -1) {
 					if (packet.frame.endpoint.master == FL_FROM_SLAVE_ACK)
 					{
-
 //					fl_ble2wifi_EVENT_SEND(G_NODE_LIST.sla_info[node_indx].mac);
 //					G_NODE_LIST.sla_info[node_indx].active = true;
 //					G_NODE_LIST.sla_info[node_indx].timelife = (clock_time() - G_NODE_LIST.sla_info[node_indx].timelife);
@@ -1035,6 +1045,8 @@ int fl_master_ProccesRSP_cbk(void) {
 						fl_adv_sendFIFO_add(fl_master_packet_RSP_55_build(slave_id,seq_timetamp_arr));
 						//send to WIFI
 						fl_ble2wifi_EVENT_SEND(G_NODE_LIST.sla_info[node_indx].mac);
+						//Update traffic
+						G_NODENWK_INFO[node_indx].RxPacket +=1;
 					}
 				} else {
 					ERR(INF,"ID not foud:%02X\r\n",slave_id);
@@ -1117,7 +1129,7 @@ int fl_master_ProccesRSP_cbk(void) {
 /******************************************************************************/
 void fl_nwk_master_init(void) {
 	extern volatile fl_timetamp_withstep_t WIFI_ORIGINAL_GETALL;
-	LOG_P(INF,"Freelux network MASTER init -> ok\r\n");
+	P_INFO("Freelux network MASTER init(max:%d) -> ok\r\n",MAX_NODES_SETTING);
 	FL_QUEUE_CLEAR(&G_HANDLE_MASTER_CONTAINER,PACK_HANDLE_MASTER_SIZE);
 	//todo: load database into the flash
 	fl_nwk_master_nodelist_init();

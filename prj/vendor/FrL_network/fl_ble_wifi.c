@@ -951,10 +951,12 @@ void fl_ble2wifi_send_FOTA_BROADCAST_RSP(u8 *_rslt,u8 _size){
 }
 void fl_ble2wifi_DEBUG2MQTT(u8* _payload,u8 _size){
 	fl_datawifi2ble_t wfdata;
+	u8 size_payload = (_size>SIZEU8(wfdata.data)?SIZEU8(wfdata.data):_size);
 	wfdata.cmd = GF_CMD_DEBUG_RESPONSE;
 	memset(wfdata.data,0,SIZEU8(wfdata.data));
-	memcpy(wfdata.data,_payload,_size);
-	wfdata.len_data = _size;
+
+	memcpy(wfdata.data,_payload,size_payload);
+	wfdata.len_data = size_payload;
 	wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
 	P_PRINTFHEX_A(MCU,wfdata,wfdata.len_data+3,"DEBUG MQTT(%d):",wfdata.len_data+3);
 	fl_ble_send_wifi((u8*)&wfdata,wfdata.len_data+3);//len_data + id_cmd + crc
