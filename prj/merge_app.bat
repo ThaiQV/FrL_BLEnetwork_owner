@@ -27,14 +27,17 @@ set SREC=..\tools\srec\srec_cat.exe
 if /I %NAME%=="Gateway" (
 	set BOOT=..\output/B91_DFU.bin
     set APP=..\output/FrL_Network_Master.bin
+    set DEVICETYPE=2
     riscv32-elf-objcopy -S -O binary FrL_Network_Master.elf  ..\output/TBS_Gateway_ota.bin
 ) else if /I %NAME%=="Counter" (
 	set BOOT=..\output/B91_DFU.bin
     set APP=..\output/FrL_Network.bin
+    set DEVICETYPE=0
     riscv32-elf-objcopy -S -O binary FrL_Network.elf  ..\output/TBS_Counter_ota.bin
 ) else if /I %NAME%=="PowerMeter" (
 	set BOOT=..\output/B91_DFU_PMT.bin
     set APP=..\output/FrL_Network.bin
+    set DEVICETYPE=1
     riscv32-elf-objcopy -S -O binary FrL_Network.elf  ..\output/TBS_PowerMeter_ota.bin
 )
 
@@ -46,5 +49,16 @@ set OUT=..\output/TBS_%NAME%.bin
         -o %OUT% -binary
 
 echo "[MERGE] FW: %OUT%"
+
+:: create ota file config.txt
+(
+	echo file: %FILE%
+	echo output: %OUTPUT%
+	echo device type: %DEVICETYPE%
+	echo version: 108
+) > ..\output\config.txt
+
+echo "[INFO] config.txt created"
+
 echo "**************** end of post build ******************"
 endlocal

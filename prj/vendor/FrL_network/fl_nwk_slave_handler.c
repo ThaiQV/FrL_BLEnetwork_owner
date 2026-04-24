@@ -1005,7 +1005,7 @@ typedef struct{
 fl_fota_t FOTA_SLAVE_INFO;
 
 s16 fl_slave_fota_proc(void) {
-	PLOG_Start(ZIG_GP);
+//	PLOG_Start(ZIG_GP);
 	extern u8 fl_packet_parse(fl_pack_t _pack, fl_dataframe_format_t *rslt);
 	fl_pack_t fota_pack;
 	fl_dataframe_format_t packet;
