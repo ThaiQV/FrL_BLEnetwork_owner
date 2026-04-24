@@ -71,6 +71,8 @@ typedef enum {
 	GF_CMD_FOTA_RESPONSE = 0xA0,
 	GF_CMD_FOTA_INTERVAL_REQUEST = 0xA2,
 	GF_CMD_FOTA_INTERVAL_RESPONSE = 0xA2,
+	GF_CMD_VERSION_DEV_REQUEST = 0xA3,
+	GF_CMD_VERSION_DEV_RESPONSE = 0xA3,
 }fl_wifi_cmd_e;
 
 typedef void (*RspFunc)(u8*);
@@ -129,6 +131,9 @@ void FOTA_RESPONSE(u8* _pdata);
 void FOTA_INTERVAL_REQUEST(u8* _pdata, RspFunc rspfnc){};
 void FOTA_INTERVAL_RESPONSE(u8* _pdata){};
 
+void VERSION_DEV_REQUEST(u8* _pdata, RspFunc rspfnc);
+void VERSION_DEV_RESPONSE(u8* _pdata);
+
 fl_wifiprotocol_proc_t G_WIFI_CON[] = {
 			{ { GF_CMD_PING_REQUEST, PING_REQ }, { GF_CMD_PING_RESPONSE, PING_RSP } }, //ping
 			{ { GF_CMD_REPORT_REQUEST, REPORT_REQUEST }, { GF_CMD_REPORT_RESPONSE, REPORT_RESPONSE } },
@@ -143,6 +148,8 @@ fl_wifiprotocol_proc_t G_WIFI_CON[] = {
 			//FOTA
 			{ { GF_CMD_FOTA_REQUEST, FOTA_REQUEST }, { GF_CMD_FOTA_RESPONSE, FOTA_RESPONSE } },
 //			{ { GF_CMD_FOTA_INTERVAL_REQUEST, FOTA_INTERVAL_REQUEST }, { GF_CMD_FOTA_INTERVAL_RESPONSE, FOTA_INTERVAL_RESPONSE } },
+			{ { GF_CMD_VERSION_DEV_REQUEST, VERSION_DEV_REQUEST }, { GF_CMD_VERSION_DEV_RESPONSE, VERSION_DEV_RESPONSE } },
+
 };
 
 #define GWIFI_SIZE 				(sizeof(G_WIFI_CON)/sizeof(G_WIFI_CON[0]))
@@ -592,6 +599,7 @@ void PING_REQ(u8* _pdata, RspFunc rspfnc) {
 	}
 	u8 mac[6];
 	memcpy(mac,data->data,SIZEU8(mac));
+
 	fl_api_master_req(mac,NWK_HDR_22_PING,mac,SIZEU8(mac),_PING_slave_rsp_callback,0,1);
 	if (rspfnc != 0) {
 		//don't reponse in here => wait slave rsp or timeout
@@ -601,6 +609,50 @@ void PING_RSP(u8* _pdata) {
 
 }
 
+
+void VERSION_DEV_REQUEST(u8* _pdata, RspFunc rspfnc) {
+	fl_datawifi2ble_t *data = (fl_datawifi2ble_t*) &_pdata[1];
+	LOGA(MCU,"LEN:0x%02X\r\n",data->len_data);
+	LOGA(MCU,"cmdID:0x%02X\r\n",data->cmd);
+	LOGA(MCU,"CRC8:0x%02X\r\n",data->crc8);
+	P_PRINTFHEX_A(MCU,data->data,data->len_data,"Data:");
+	u8 crc8_cal = fl_crc8(data->data,data->len_data);
+	if (crc8_cal != data->crc8) {
+		ERR(MCU,"ERR >> CRC8:0x%02X | 0x%02X\r\n",data->crc8,crc8_cal);
+		return;
+	}
+	if (rspfnc != 0) {
+		rspfnc(_pdata);
+	}
+}
+
+void VERSION_DEV_RESPONSE(u8* _pdata) {
+	extern fl_version_t _fw ;
+	extern fl_version_t _hw ;
+	extern fl_version_t _bootloader ;
+
+	fl_datawifi2ble_t wfdata;
+	wfdata.cmd = GF_CMD_VERSION_DEV_RESPONSE;
+	memset(wfdata.data,0,SIZEU8(wfdata.data));
+
+	wfdata.data[0] = _fw.major;
+	wfdata.data[1] = _fw.minor;
+	wfdata.data[2] = _fw.patch;
+
+	wfdata.data[3] = _hw.major;
+	wfdata.data[4] = _hw.minor;
+	wfdata.data[5] = _hw.patch;
+
+	wfdata.data[6] = _bootloader.major;
+	wfdata.data[7] = _bootloader.minor;
+	wfdata.data[8] = _bootloader.patch;
+
+	wfdata.len_data = 9; //DATA = 9 bytes: 0..2: FW version,3..5: HW version,6..8: Bootloader version
+
+	wfdata.crc8 = fl_crc8(wfdata.data,wfdata.len_data);
+	u8 payload_len = wfdata.len_data + SIZEU8(wfdata.cmd)+SIZEU8(wfdata.crc8)+SIZEU8(wfdata.len_data);
+	fl_ble_send_wifi((u8*)&wfdata,payload_len);
+}
 
 void _RSTPWMETER_slave_rsp_callback(void *_data, void* _data2) {
 	_slave_rsp_callbackNrspWifiMAC(G_WIFI_CON[_wf_CMD_find(GF_CMD_RSTPWMETER_REQUEST)].rsp.cmd,_data,_data2);
@@ -962,6 +1014,16 @@ void fl_ble2wifi_DEBUG2MQTT(u8* _payload,u8 _size){
 	fl_ble_send_wifi((u8*)&wfdata,wfdata.len_data+3);//len_data + id_cmd + crc
 }
 
+/**/
+
+s32 _devReboot_inform(void){
+	fl_ble2wifi_DEBUG2MQTT((u8*)"BLE Reboot.....",strlen("BLE Reboot....."));
+	return -1;
+}
+void fl_wifi2ble_Reboot_MQTTNotify(void){
+	blt_soft_timer_add(_devReboot_inform,2000*1000);
+}
+/**/
 void fl_wifi2ble_Sync_RTC(void){
 	fl_datawifi2ble_t wfdata;
 	wfdata.cmd = GF_CMD_TIMESTAMP_REQUEST;

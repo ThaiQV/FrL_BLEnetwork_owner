@@ -582,19 +582,16 @@ u8 fl_adv_sendFIFO_run(void) {
 				}
 				//Update realtime hb sending
 				u32 synch_rtc = fl_rtc_get();
-//				memcpy(&check_heartbeat.frame.payload[HB_RTC_SYNCH_INPACK],(u8*)synch_rtc,SIZEU8(u32));
+
 				check_heartbeat.frame.payload[HB_RTC_SYNCH_INPACK] = U32_BYTE0(synch_rtc);
 				check_heartbeat.frame.payload[HB_RTC_SYNCH_INPACK+1] = U32_BYTE1(synch_rtc);
 				check_heartbeat.frame.payload[HB_RTC_SYNCH_INPACK+2] = U32_BYTE2(synch_rtc);
 				check_heartbeat.frame.payload[HB_RTC_SYNCH_INPACK+3] = U32_BYTE3(synch_rtc);
-
 				check_heartbeat.frame.crc8 = fl_crc8(check_heartbeat.frame.payload,SIZEU8(check_heartbeat.frame.payload));
-//				data_in_queue.length = SIZEU8(check_heartbeat.bytes);
-//				memcpy(data_in_queue.data_arr,check_heartbeat.bytes,data_in_queue.length);
+//
 				fl_adv_send(check_heartbeat.bytes,SIZEU8(check_heartbeat.bytes),G_ADV_SETTINGS.adv_duration);
 				return inused_slot;
 			}
-
 #endif
 			/**/
 			fl_adv_send(data_in_queue.data_arr,data_in_queue.length,G_ADV_SETTINGS.adv_duration);
@@ -697,7 +694,9 @@ void fl_adv_init(void) {
 	fl_adv_scanner_init();
 	//Init protocol network layer
 	fl_nwk_protocol_InitnRun();
-
+#ifdef MASTER_CORE
+	fl_wifi2ble_Reboot_MQTTNotify();
+#endif
 }
 /***************************************************
  * @brief 		:init collection channel (0,1,2)

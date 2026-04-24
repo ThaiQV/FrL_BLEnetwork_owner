@@ -359,7 +359,7 @@ void fl_nwk_slave_init(void) {
 void _nwk_slave_syncFromPack(fl_dataframe_format_t *packet){
 //	u32 master_timetamp; //, slave_timetamp;
 	//Synchronize time master
-//	master_timetamp = MAKE_U32(packet->timetamp[3],packet->timetamp[2],packet->timetamp[1],packet->timetamp[0]);
+	u32 master_timetamp = MAKE_U32(packet->timetamp[3],packet->timetamp[2],packet->timetamp[1],packet->timetamp[0]);
 	datetime_t cur_dt;
 //	fl_rtc_timestamp_to_datetime(master_timetamp,&cur_dt);
 //	P_INFO("(%d)MASTER-TIME:%02d/%02d/%02d - %02d:%02d:%02d\r\n",packet->endpoint.dbg,cur_dt.year,cur_dt.month,cur_dt.day,cur_dt.hour,cur_dt.minute,
@@ -383,8 +383,8 @@ void _nwk_slave_syncFromPack(fl_dataframe_format_t *packet){
 	//add repeat_cnt
 	NWK_REPEAT_LEVEL = packet->endpoint.rep_settings;
 
-//	SYNC_ORIGIN_MASTER(master_timetamp,packet->milltamp);
-	SYNC_ORIGIN_MASTER(rtc_synch,packet->milltamp);
+	SYNC_ORIGIN_MASTER(master_timetamp,packet->milltamp);
+//	SYNC_ORIGIN_MASTER(rtc_synch,packet->milltamp);
 	LOGA(INF,"ORIGINAL MASTER-TIME:%d\r\n",ORIGINAL_MASTER_TIME.milstep);
 
 //	G_INFORMATION.active = true;

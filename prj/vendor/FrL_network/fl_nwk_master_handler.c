@@ -270,7 +270,13 @@ fl_pack_t fl_master_packet_heartbeat_build(void) {
 	packet.frame.payload[6] = F_EXTITFOTA_TIME;
 
 	//Synchronization RTC Master
-	memcpy(&packet.frame.payload[HB_RTC_SYNCH_INPACK],(u8*)fl_rtc_get(),SIZEU8(u32));
+//	memcpy(&packet.frame.payload[HB_RTC_SYNCH_INPACK],(u8*)fl_rtc_get(),SIZEU8(u32));
+	u32 synch_rtc = fl_rtc_get();
+
+	packet.frame.payload[HB_RTC_SYNCH_INPACK] = U32_BYTE0(synch_rtc);
+	packet.frame.payload[HB_RTC_SYNCH_INPACK + 1] = U32_BYTE1(synch_rtc);
+	packet.frame.payload[HB_RTC_SYNCH_INPACK + 2] = U32_BYTE2(synch_rtc);
+	packet.frame.payload[HB_RTC_SYNCH_INPACK + 3] = U32_BYTE3(synch_rtc);
 
 	packet.frame.payload[HB_SAMPLING_TIME_INPACK] = G_SAMPLE_TIMING;
 	//crc
@@ -979,7 +985,7 @@ int fl_master_ProccesRSP_cbk(void) {
 //						P_INFO_HEX(packet_fwcrc,SIZEU8(packet_fwcrc),"[FOTA]Ver(%d),Type(%d),Size(%d):",fw_ver,fw_type,fw_size);
 						P_INFO_HEX(packet.frame.payload+2,SIZEU8(packet_fwcrc),"[FOTA]SlaveID(%d):REC(%d)CRC128:",slave_id,slave_rec);
 						//send to debugging topic
-						u8 mqtt_payload[128];
+						u8 mqtt_payload[120];
 						memset(mqtt_payload,0,SIZEU8(mqtt_payload));
 						u8 sla_mac[6];
 						fl_master_SlaveMAC_get(slave_id,sla_mac);
