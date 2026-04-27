@@ -1,0 +1,5 @@
+file: TBS_Gateway.bin
+output: TBS_Gateway_ota.bin
+device type: 2   
+version_num: 54
+fw_version: 2.1.15

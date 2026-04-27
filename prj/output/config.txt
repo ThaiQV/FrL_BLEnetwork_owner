@@ -1,4 +1,0 @@
-file: 
-output: 
-device type: 0
-version: 108
